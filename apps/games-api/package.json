@@ -1,0 +1,22 @@
+{
+  "name": "@sigma/games-api",
+  "version": "0.0.0-internal",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "dev": "yarn build:dev && concurrently 'yarn:dev:*' -c auto -k",
+    "dev:build": "webpack --watch --mode development",
+    "dev:start": "NODE_ENV=development nodemon dist/main.js",
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "start": "NODE_ENV=production nodemon dist/main.js",
+    "start:dev": "NODE_ENV=development nodemon dist/main.js --inspect",
+    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint:fix": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\" --fix"
+  },
+  "dependencies": {
+    "@sigma/exceptions": "workspace:^",
+    "@sigma/games-db": "workspace:^",
+    "@sigma/games-model": "workspace:^"
+  }
+}

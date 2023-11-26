@@ -1,0 +1,14 @@
+{
+  "name": "@sigma/games-db",
+  "version": "0.0.0-set-automatically",
+  "license": "MIT",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "migrate:dev": "dotenv -e .env.development -- prisma migrate dev",
+    "migrate": "prisma migrate deploy",
+    "build": "prisma generate"
+  }
+}
