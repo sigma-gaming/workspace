@@ -46,7 +46,6 @@ app.register(fastifyTRPCPlugin, {
   },
 })
 
-app.listen({ port: env.port }).then((test) => {
-  console.log(test)
+app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
   console.log(`🚀 Server ready at http://localhost:${env.port}`)
 })
