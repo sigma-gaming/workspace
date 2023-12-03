@@ -17,9 +17,7 @@
       "!{projectRoot}/src/*.test.ts",
       "!{projectRoot}/src/*.test.tsx"
     ],
-    "dist": [
-      "{projectRoot}/dist/**/*"
-    ],
+    "dist": ["{projectRoot}/dist/**/*"],
     "test": [
       "{projectRoot}/**/*.test.ts",
       "{projectRoot}/**/*.test.tsx",
@@ -36,32 +34,15 @@
       "{projectRoot}/rollup.config.*",
       "{projectRoot}/webpack.config.*"
     ],
-    "scripts": [
-      "{projectRoot}/build.*",
-      "{projectRoot}/scripts/**/*"
-    ],
-    "migrations": [
-      "{projectRoot}/prisma/migrations/**/*"
-    ]
+    "scripts": ["{projectRoot}/build.*", "{projectRoot}/scripts/**/*"],
+    "migrations": ["{projectRoot}/prisma/migrations/**/*"]
   },
   "targetDefaults": {
     "build": {
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/dist",
-        "{workspaceRoot}/dist/{projectRoot}"
-      ],
-      "inputs": [
-        "shared",
-        "config",
-        "scripts",
-        "^scripts",
-        "src",
-        "^src"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist", "{workspaceRoot}/dist/{projectRoot}"],
+      "inputs": ["shared", "config", "scripts", "^scripts", "src", "^src"]
     },
     "test": {
       "cache": true,
@@ -76,41 +57,20 @@
     },
     "typecheck": {
       "cache": true,
-      "inputs": [
-        "shared",
-        "config",
-        "test",
-        "src",
-        "^src"
-      ]
+      "inputs": ["shared", "config", "test", "src", "^src"]
     },
     "lint": {
       "cache": true,
-      "inputs": [
-        "shared",
-        "config",
-        "test",
-        "src"
-      ]
+      "inputs": ["shared", "config", "test", "src"]
     },
     "dev": {
-      "dependsOn": [
-        "^build"
-      ]
+      "dependsOn": ["^build"]
     },
     "migrate": {
-      "inputs": [
-        "shared",
-        "config",
-        "migrations"
-      ]
+      "inputs": ["shared", "config", "migrations"]
     },
     "start": {
-      "dependsOn": [
-        "build",
-        "^build",
-        "^migrate"
-      ]
+      "dependsOn": ["build", "^build", "^migrate"]
     }
   },
   "affected": {

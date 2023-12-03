@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-yarn constraints --fix
+yarn constraints --fix && yarn nx format:write
