@@ -48,4 +48,5 @@ jobs:
         package: ${{ fromJson(needs.run-changesets.outputs.publishedPackages) }}
 
     steps:
-      - run: echo ${{ matrix.package }}
+      - run: echo ${{ matrix.package.name }}
+      - run: echo ${{ matrix.package.version }}
