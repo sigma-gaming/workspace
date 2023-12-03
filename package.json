@@ -20,6 +20,7 @@
     "games-api:dev": "nx run @sigma/games-api:dev",
     "games-api:build": "nx run @sigma/games-api:build",
     "games-api:start": "nx run @sigma/games-api:start",
+    "changeset:publish": "nx affected:build && changeset tag && git push --follow-tags",
     "dockerize:prepare": "mkdir -p node_modules_unlinked && cp -L -r node_modules/* node_modules_unlinked/",
     "games-api:dockerize": "yarn games-api:build && yarn dockerize:prepare && docker build -f apps/games-api/Dockerfile ."
   },
