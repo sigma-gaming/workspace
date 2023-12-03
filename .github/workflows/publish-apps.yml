@@ -67,7 +67,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: workspace-${{ github.ref }}
+          name: workspace-${{ github.sha }}
           path: workspace.tgz
           retention-days: 1
 
@@ -100,7 +100,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: workspace-${{ github.ref }}
+          name: workspace-${{ github.sha }}
 
       - name: Normalize package name for docker tag
         id: imageName
