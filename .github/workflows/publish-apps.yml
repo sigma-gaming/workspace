@@ -81,8 +81,9 @@ jobs:
         package: ${{ fromJson(needs.run-changesets.outputs.publishedPackages) }}
 
     steps:
-      - run: echo ${{ matrix.package.name }}
-      - run: echo ${{ matrix.package.version }}
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - uses: 'google-github-actions/auth@v1'
         with:
