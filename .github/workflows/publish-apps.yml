@@ -7,6 +7,9 @@ on:
 env:
   GCLOUD_TAG_BASEPATH: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
 
+concurrency:
+  group: ${{ github.workflow }}
+
 jobs:
   run-changesets:
     name: Run Changesets
