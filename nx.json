@@ -33,7 +33,8 @@
       "{projectRoot}/tsconfig.spec.json",
       "{projectRoot}/vite.config.*",
       "{projectRoot}/next.config.*",
-      "{projectRoot}/rollup.config.*"
+      "{projectRoot}/rollup.config.*",
+      "{projectRoot}/webpack.config.*"
     ],
     "scripts": [
       "{projectRoot}/build.*",

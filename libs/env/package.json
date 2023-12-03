@@ -1,0 +1,31 @@
+{
+  "name": "@tooling/env",
+  "version": "0.0.0-internal",
+  "license": "UNLICENSED",
+  "private": true,
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    },
+    "./load": {
+      "import": "./dist/load.mjs",
+      "default": "./dist/load.js"
+    },
+    "./parse": {
+      "import": "./dist/parse.mjs",
+      "default": "./dist/parse.js"
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@tooling/build": "workspace:*"
+  }
+}

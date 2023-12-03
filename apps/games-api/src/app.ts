@@ -1,9 +1,9 @@
 import ws from '@fastify/websocket'
-import { env } from '@shared/env'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import { v4 as uuid } from 'uuid'
 import { appRouter, createContext } from './routes'
+import { env } from './shared/env'
 
 const app = Fastify({
   logger: env.isProd,

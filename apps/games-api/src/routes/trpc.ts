@@ -1,4 +1,3 @@
-import { env } from '@shared/env'
 import {
   mapTrpcErrorToException,
   RouteException,
@@ -6,6 +5,7 @@ import {
 } from '@sigma/exceptions'
 import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
+import { env } from '../shared/env'
 import { Context } from './context'
 
 const t = initTRPC.context<Context>().create({

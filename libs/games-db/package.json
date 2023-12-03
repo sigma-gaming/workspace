@@ -1,6 +1,6 @@
 {
   "name": "@sigma/games-db",
-  "version": "0.0.0-set-automatically",
+  "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,
   "main": "./dist/index.js",

@@ -1,0 +1,55 @@
+name: Run changesets
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  run-changesets:
+    name: Run Changesets
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+      publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable --immutable-cache
+
+      - name: Create Release Pull Request or Tags
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: yarn nx affected:build && yarn changeset tag && git push --follow-tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish
+    needs: run-changesets
+    runs-on: ubuntu-latest
+
+    if: needs.run-changesets.outputs.published == 'true'
+
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.run-changesets.outputs.publishedPackages) }}
+
+    steps:
+      - run: echo ${{ matrix.package }}

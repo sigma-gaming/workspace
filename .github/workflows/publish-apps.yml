@@ -1,0 +1,71 @@
+name: Publish Apps
+
+on:
+  release:
+    types: [published]
+
+env:
+  GCLOUD_FULL_REPOSITORY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
+
+jobs:
+  extract-name-and-version:
+    name: Extract Name and Version
+    runs-on: ubuntu-latest
+
+    outputs:
+      name: ${{ steps.tag.outputs.name }}
+      version: ${{ steps.tag.outputs.version }}
+    steps:
+      - name: Output current branch name & date
+        uses: release-kit/regex@v1
+        id: tag
+        with:
+          string: ${{ github.event.release.tag_name }}
+          pattern: '^@?(?<name>.*)@(?<version>.*)$'
+
+  publish-apps:
+    name: Release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    env:
+      IMAGE_FULL_NAME: ${{ env.GCLOUD_FULL_REPOSITORY }}/${{ steps.tag.outputs.name }}:${{ steps.tag.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+
+      - name: 'Use gcloud CLI'
+        run: 'gcloud info'
+
+      - name: 'Setup Docker'
+        run: |-
+          gcloud auth configure-docker ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev --quiet
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: 'Install dependencies'
+        run: yarn install --immutable --immutable-cache
+
+      - name: 'Build Docker image'
+        run: |-
+          yarn nx run @${{ steps.tag.outputs.name }}:dockerize -t ${{ IMAGE_FULL_NAME }}
+
+      - name: Push image
+        run: docker push ${{ env.IMAGE_FULL_NAME }}

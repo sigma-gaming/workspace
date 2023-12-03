@@ -1,0 +1,38 @@
+name: Check
+
+on:
+  push:
+    branches: ['main']
+
+  pull_request:
+    types: [opened, synchronize]
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  nx:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable --immutable-cache
+
+      - name: Run NX checks
+        run: |
+          yarn nx format:check
+          yarn nx affected --target lint --parallel 3
+          yarn nx affected --target test --parallel 3
+          yarn nx affected --target build --parallel 3
+          yarn nx affected --target typecheck --parallel 3

@@ -3,13 +3,6 @@
   "include": ["./src/**/*", "webpack.config.ts"],
   "compilerOptions": {
     "module": "CommonJS",
-    "noEmit": false,
-    "baseUrl": "./",
-    "paths": {
-      "@entities": ["./src/entities"],
-      "@entities/*": ["./src/entities/*"],
-      "@shared": ["./src/shared"],
-      "@shared/*": ["./src/shared/*"]
-    }
+    "noEmit": false
   }
 }

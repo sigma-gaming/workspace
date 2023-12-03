@@ -3,20 +3,23 @@
   "version": "0.0.0-internal",
   "license": "UNLICENSED",
   "private": true,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "dev": "yarn build:dev && concurrently 'yarn:dev:*' -c auto -k",
-    "dev:build": "webpack --watch --mode development",
+    "dev:build": "NODE_ENV=development webpack --watch",
     "dev:start": "NODE_ENV=development nodemon dist/main.js",
-    "build": "webpack --mode production",
-    "build:dev": "webpack --mode development",
+    "build": "NODE_ENV=production webpack",
+    "build:dev": "NODE_ENV=development webpack",
     "start": "NODE_ENV=production nodemon dist/main.js",
     "start:dev": "NODE_ENV=development nodemon dist/main.js --inspect",
-    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
-    "lint:fix": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\" --fix"
+    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\""
   },
   "dependencies": {
-    "@sigma/exceptions": "workspace:^",
-    "@sigma/games-db": "workspace:^",
-    "@sigma/games-model": "workspace:^"
+    "@sigma/exceptions": "workspace:*",
+    "@sigma/games-db": "workspace:*",
+    "@sigma/games-model": "workspace:*",
+    "@tooling/env": "workspace:*"
   }
 }

@@ -1,14 +1,6 @@
-import path from 'path'
-import dotenv from 'dotenv'
-import { z, ZodError } from 'zod'
-
-if (process.env.NODE_ENV === 'development') {
-  dotenv.config({ path: path.resolve(process.cwd(), '.env.development') })
-}
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
-}
+import { loadEnv } from '@tooling/env/load'
+import { parseEnv } from '@tooling/env/parse'
+import { z } from 'zod'
 
 const EnvSchema = z
   .object({
@@ -46,14 +38,10 @@ const EnvSchema = z
     },
   }))
 
-let parsed: z.infer<typeof EnvSchema>
+loadEnv({ root: process.cwd() })
 
-try {
-  parsed = EnvSchema.parse(process.env)
-} catch (error) {
-  if (error instanceof ZodError) console.error(`Invalid env:`, error.issues)
-  else console.error(error)
-  process.exit(1)
-}
-
-export const env = parsed
+export const env = parseEnv({
+  source: process.env,
+  schema: EnvSchema,
+  exitProcessOnFail: true,
+})

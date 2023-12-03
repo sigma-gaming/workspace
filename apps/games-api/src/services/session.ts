@@ -1,4 +1,3 @@
-import { env } from '@shared/env'
 import {
   NotAuthenticatedException,
   SessionExpiredException,
@@ -8,6 +7,7 @@ import cookie, { serialize } from 'cookie'
 import { FastifyRequest } from 'fastify'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
 import { prisma } from '../shared/db'
+import { env } from '../shared/env'
 
 enum SessionState {
   Empty,

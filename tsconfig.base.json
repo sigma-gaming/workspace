@@ -4,7 +4,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "noEmit": true,
     "allowJs": true,
@@ -17,9 +17,13 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
+      "@sigma/exceptions": ["libs/exceptions/src/index.ts"],
+      "@sigma/games-api": ["apps/games-api/src/index.ts"],
       "@sigma/games-db": ["libs/games-db/generated"],
       "@sigma/games-model": ["libs/games-model/src/index.ts"],
-      "@sigma/exceptions": ["libs/exceptions/src/index.ts"]
+      "@tooling/build": ["libs/build/src/index.ts"],
+      "@tooling/env/load": ["libs/env/src/load.ts"],
+      "@tooling/env/parse": ["libs/env/src/parse.ts"]
     }
   }
 }

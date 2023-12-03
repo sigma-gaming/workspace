@@ -9,10 +9,16 @@ const config: webpack.Configuration = {
   devtool: process.env.DEBUG ? 'inline-source-map' : false,
   entry: './src/app.ts',
   target: 'node',
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-  },
+  output:
+    process.env.NODE_ENV === 'production'
+      ? {
+          path: path.resolve(__dirname, '../../dist/apps/games-api'),
+          filename: '[name].js',
+        }
+      : {
+          path: path.resolve(__dirname, 'dist'),
+          filename: '[name].js',
+        },
   plugins: [new PinoWebpackPlugin({ transports: ['pino-pretty'] })],
   externals: [nodeExternals()],
   externalsPresets: { node: true },

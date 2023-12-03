@@ -2,11 +2,13 @@
 
 # compiled output
 dist
+generated
 tmp
 /out-tsc
 
 # dependencies
 node_modules
+node_modules_unlinked
 
 # IDE
 .vscode/
@@ -36,6 +38,3 @@ Thumbs.db
 
 # Next.js
 .next
-
-# generated files
-generated
