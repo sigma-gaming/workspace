@@ -1,8 +1,8 @@
 import {
   NotAuthenticatedException,
   SessionExpiredException,
-} from '@sigma/exceptions'
-import { AccountProvider, User } from '@sigma/games-model'
+} from '@libs/exceptions'
+import { AccountProvider, User } from '@libs/games-model'
 import cookie, { serialize } from 'cookie'
 import { FastifyRequest } from 'fastify'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'

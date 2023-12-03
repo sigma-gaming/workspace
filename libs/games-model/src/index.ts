@@ -1,3 +1,3 @@
 export * from './user'
-export type { Account, Profile, Session, User } from '@sigma/games-db'
-export { AccountProvider } from '@sigma/games-db'
+export type { Account, Profile, Session, User } from '@libs/games-db'
+export { AccountProvider } from '@libs/games-db'

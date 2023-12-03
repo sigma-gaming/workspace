@@ -1,3 +1,3 @@
-import { PrismaClient } from '@sigma/games-db'
+import { PrismaClient } from '@libs/games-db'
 
 export const prisma = new PrismaClient()

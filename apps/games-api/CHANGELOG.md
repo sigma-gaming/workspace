@@ -1,4 +1,4 @@
-# @sigma/games-api
+# @apps/games-api
 
 ## 0.0.3
 

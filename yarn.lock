@@ -22,6 +22,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@apps/games-api@workspace:apps/games-api":
+  version: 0.0.0-use.local
+  resolution: "@apps/games-api@workspace:apps/games-api"
+  dependencies:
+    "@libs/exceptions": "workspace:*"
+    "@libs/games-db": "workspace:*"
+    "@libs/games-model": "workspace:*"
+    "@tooling/env": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.22.13, @babel/code-frame@npm:^7.23.4":
   version: 7.23.4
   resolution: "@babel/code-frame@npm:7.23.4"
@@ -2198,6 +2209,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@libs/exceptions@workspace:*, @libs/exceptions@workspace:libs/exceptions":
+  version: 0.0.0-use.local
+  resolution: "@libs/exceptions@workspace:libs/exceptions"
+  languageName: unknown
+  linkType: soft
+
+"@libs/games-db@workspace:*, @libs/games-db@workspace:libs/games-db":
+  version: 0.0.0-use.local
+  resolution: "@libs/games-db@workspace:libs/games-db"
+  languageName: unknown
+  linkType: soft
+
+"@libs/games-model@workspace:*, @libs/games-model@workspace:libs/games-model":
+  version: 0.0.0-use.local
+  resolution: "@libs/games-model@workspace:libs/games-model"
+  dependencies:
+    "@libs/games-db": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@lukeed/ms@npm:^2.0.1":
   version: 2.0.1
   resolution: "@lukeed/ms@npm:2.0.1"
@@ -2640,37 +2671,6 @@ __metadata:
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
-
-"@sigma/exceptions@workspace:*, @sigma/exceptions@workspace:libs/exceptions":
-  version: 0.0.0-use.local
-  resolution: "@sigma/exceptions@workspace:libs/exceptions"
-  languageName: unknown
-  linkType: soft
-
-"@sigma/games-api@workspace:apps/games-api":
-  version: 0.0.0-use.local
-  resolution: "@sigma/games-api@workspace:apps/games-api"
-  dependencies:
-    "@sigma/exceptions": "workspace:*"
-    "@sigma/games-db": "workspace:*"
-    "@sigma/games-model": "workspace:*"
-    "@tooling/env": "workspace:*"
-  languageName: unknown
-  linkType: soft
-
-"@sigma/games-db@workspace:*, @sigma/games-db@workspace:libs/games-db":
-  version: 0.0.0-use.local
-  resolution: "@sigma/games-db@workspace:libs/games-db"
-  languageName: unknown
-  linkType: soft
-
-"@sigma/games-model@workspace:*, @sigma/games-model@workspace:libs/games-model":
-  version: 0.0.0-use.local
-  resolution: "@sigma/games-model@workspace:libs/games-model"
-  dependencies:
-    "@sigma/games-db": "workspace:*"
-  languageName: unknown
-  linkType: soft
 
 "@sinclair/typebox@npm:^0.27.8":
   version: 0.27.8

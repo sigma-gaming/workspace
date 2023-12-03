@@ -1,5 +1,5 @@
 {
-  "name": "@sigma/exceptions",
+  "name": "@libs/exceptions",
   "version": "0.0.0-internal",
   "license": "UNLICENSED",
   "private": true,

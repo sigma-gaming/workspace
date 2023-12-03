@@ -2,7 +2,7 @@ import {
   mapTrpcErrorToException,
   RouteException,
   ValidationException,
-} from '@sigma/exceptions'
+} from '@libs/exceptions'
 import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
 import { env } from '../shared/env'

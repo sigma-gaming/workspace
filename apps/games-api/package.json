@@ -1,5 +1,5 @@
 {
-  "name": "@sigma/games-api",
+  "name": "@apps/games-api",
   "version": "0.0.3",
   "license": "UNLICENSED",
   "private": true,
@@ -17,9 +17,9 @@
     "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\""
   },
   "dependencies": {
-    "@sigma/exceptions": "workspace:*",
-    "@sigma/games-db": "workspace:*",
-    "@sigma/games-model": "workspace:*",
+    "@libs/exceptions": "workspace:*",
+    "@libs/games-db": "workspace:*",
+    "@libs/games-model": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

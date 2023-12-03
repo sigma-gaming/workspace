@@ -1,4 +1,4 @@
-import { Account, Profile, User } from '@sigma/games-db'
+import { Account, Profile, User } from '@libs/games-db'
 
 export type AccountPublic = Pick<
   Account,

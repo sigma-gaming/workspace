@@ -1,5 +1,5 @@
 {
-  "name": "@sigma/games-db",
+  "name": "@libs/games-db",
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,

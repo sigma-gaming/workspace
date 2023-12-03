@@ -1,43 +1,88 @@
-name: Publish Apps
+name: Publish apps
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: ['main']
 
 env:
-  GCLOUD_FULL_REPOSITORY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
+  GCLOUD_TAG_BASEPATH: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
 
 jobs:
-  extract-name-and-version:
-    name: Extract Name and Version
+  run-changesets:
+    name: Run Changesets
     runs-on: ubuntu-latest
 
     outputs:
-      name: ${{ steps.tag.outputs.name }}
-      version: ${{ steps.tag.outputs.version }}
+      published: ${{ steps.changesets.outputs.published }}
+      publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
     steps:
-      - name: Output current branch name & date
-        uses: release-kit/regex@v1
-        id: tag
+      - uses: actions/checkout@v3
         with:
-          string: ${{ github.event.release.tag_name }}
-          pattern: '^@?(?<name>.*)@(?<version>.*)$'
+          fetch-depth: 0
 
-  publish-apps:
-    name: Release
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Create Release Pull Request or Tags
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: yarn changeset:publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  prepublish:
+    name: Prepublish
+    needs: run-changesets
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
-    env:
-      IMAGE_FULL_NAME: ${{ env.GCLOUD_FULL_REPOSITORY }}/${{ steps.tag.outputs.name }}:${{ steps.tag.outputs.version }}
+    if: needs.run-changesets.outputs.published == 'true'
 
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build affected packages
+        run: yarn nx affected --target build --parallel 3
+
+      - name: Archive workspace without symlinked node_modules
+        run: tar -cf workspace.tgz --exclude=workspace.tgz .
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: workspace-${{ github.ref }}
+          path: workspace.tgz
+          retention-days: 1
+
+  publish:
+    name: Publish
+    needs: [run-changesets, prepublish]
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.run-changesets.outputs.publishedPackages) }}
+
+    steps:
+      - run: echo ${{ matrix.package.name }}
+      - run: echo ${{ matrix.package.version }}
 
       - uses: 'google-github-actions/auth@v1'
         with:
@@ -48,24 +93,24 @@ jobs:
         with:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
 
-      - name: 'Use gcloud CLI'
-        run: 'gcloud info'
-
-      - name: 'Setup Docker'
-        run: |-
-          gcloud auth configure-docker ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev --quiet
-
       - uses: actions/setup-node@v3
         with:
           node-version: 20.x
           cache: yarn
 
-      - name: 'Install dependencies'
-        run: yarn install --immutable
+      - uses: actions/download-artifact@v3
+        with:
+          name: workspace-${{ github.ref }}
 
-      - name: 'Build Docker image'
+      - name: Normalize package name for docker tag
+        id: imageName
+        uses: release-kit/regex@v1
+        with:
+          string: ${{ matrix.package.name }}
+          pattern: '^@?(?<normalized>.*)$'
+
+      - name: Build image using Google Cloud Build
         run: |-
-          yarn nx run @${{ steps.tag.outputs.name }}:dockerize -t ${{ IMAGE_FULL_NAME }}
-
-      - name: Push image
-        run: docker push ${{ env.IMAGE_FULL_NAME }}
+          gcloud builds submit "workspace.tgz" \
+            --tag ${{ env.GCLOUD_TAG_BASEPATH }}/${{ steps.imageName.outputs.normalized }}:${{ matrix.package.version }} \
+            --timeout 1h
