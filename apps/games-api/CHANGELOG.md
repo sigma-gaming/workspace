@@ -1,5 +1,11 @@
 # @sigma/games-api
 
+## 0.0.3
+
+### Patch Changes
+
+- c4005cf: Test
+
 ## 0.0.2
 
 ### Patch Changes
