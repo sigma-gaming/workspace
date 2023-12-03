@@ -19,7 +19,8 @@
     "games-web:start": "nx run @sigma/games-web:start",
     "games-api:dev": "nx run @apps/games-api:dev",
     "games-api:build": "nx run @apps/games-api:build",
-    "games-api:start": "nx run @apps/games-api:start"
+    "games-api:start": "nx run @apps/games-api:start",
+    "changeset:publish": "changeset tag && git push --follow-tags"
   },
   "dependencies": {
     "@fastify/static": "^6.12.0",
