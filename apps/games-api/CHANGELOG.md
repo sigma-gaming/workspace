@@ -1,5 +1,11 @@
 # @sigma/games-api
 
+## 0.0.2
+
+### Patch Changes
+
+- b5dc8ef: Test
+
 ## 0.0.1
 
 ### Patch Changes
