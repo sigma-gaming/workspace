@@ -15,6 +15,7 @@ jobs:
     outputs:
       published: ${{ steps.changesets.outputs.published }}
       publishedPackages: ${{ steps.changesets.outputs.publishedPackages }}
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -36,45 +37,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  prepublish:
-    name: Prepublish
-    needs: run-changesets
-    runs-on: ubuntu-latest
-
-    if: needs.run-changesets.outputs.published == 'true'
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Derive appropriate SHAs for base and head for `nx affected` commands
-        uses: nrwl/nx-set-shas@v4
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20.x
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Build affected packages
-        run: yarn nx affected --target build --parallel 3
-
-      - name: Archive workspace without symlinked node_modules
-        run: tar -cf workspace.tgz --exclude=workspace.tgz .
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: workspace-${{ github.sha }}
-          path: workspace.tgz
-          retention-days: 1
-
   publish:
     name: Publish
-    needs: [run-changesets, prepublish]
+    needs: run-changesets
     runs-on: ubuntu-latest
+    if: needs.run-changesets.outputs.published == 'true'
 
     strategy:
       matrix:
@@ -99,9 +66,14 @@ jobs:
           node-version: 20.x
           cache: yarn
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: workspace-${{ github.sha }}
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build app
+        run: yarn nx run ${{ matrix.package.name }}:build
+
+      - name: Archive workspace without symlinked node_modules
+        run: tar -cf workspace.tgz --exclude=workspace.tgz .
 
       - name: Normalize package name for docker tag
         id: imageName
