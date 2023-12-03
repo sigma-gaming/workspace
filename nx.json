@@ -51,7 +51,8 @@
         "^build"
       ],
       "outputs": [
-        "{projectRoot}/dist"
+        "{projectRoot}/dist",
+        "{workspaceRoot}/dist/{projectRoot}"
       ],
       "inputs": [
         "shared",
