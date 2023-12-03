@@ -72,8 +72,8 @@ jobs:
       - name: Build app
         run: yarn nx run ${{ matrix.package.name }}:build
 
-      - name: Archive workspace without symlinked node_modules
-        run: tar -cf workspace.tgz --exclude=workspace.tgz .
+      - name: Archive Dockerfile deps without symlinked node_modules
+        run: tar -hczf workspace.tar.gz dist node_modules
 
       - name: Normalize package name for docker tag
         id: imageName
@@ -84,6 +84,6 @@ jobs:
 
       - name: Build image using Google Cloud Build
         run: |-
-          gcloud builds submit "workspace.tgz" \
+          gcloud builds submit "workspace.tar.gz" \
             --tag ${{ env.GCLOUD_TAG_BASEPATH }}/${{ steps.imageName.outputs.normalized }}:${{ matrix.package.version }} \
             --timeout 1h
