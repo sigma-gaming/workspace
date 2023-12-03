@@ -32,7 +32,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: yarn nx affected:build && yarn changeset tag && git push --follow-tags
+          publish: yarn nx affected:build && changeset tag && git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
