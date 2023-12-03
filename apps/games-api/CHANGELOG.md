@@ -1,5 +1,11 @@
 # @apps/games-api
 
+## 0.0.5
+
+### Patch Changes
+
+- d798f2b: Test
+
 ## 0.0.4
 
 ### Patch Changes
