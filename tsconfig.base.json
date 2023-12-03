@@ -19,7 +19,7 @@
     "paths": {
       "@sigma/exceptions": ["libs/exceptions/src/index.ts"],
       "@sigma/games-api": ["apps/games-api/src/index.ts"],
-      "@sigma/games-db": ["libs/games-db/generated"],
+      "@sigma/games-db": ["libs/games-db/dist"],
       "@sigma/games-model": ["libs/games-model/src/index.ts"],
       "@tooling/build": ["libs/build/src/index.ts"],
       "@tooling/env/load": ["libs/env/src/load.ts"],
