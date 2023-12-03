@@ -1,5 +1,11 @@
 # @apps/games-api
 
+## 0.0.6
+
+### Patch Changes
+
+- ee59737: Test
+
 ## 0.0.5
 
 ### Patch Changes
