@@ -1,5 +1,11 @@
 # @apps/games-api
 
+## 0.0.12
+
+### Patch Changes
+
+- 2140823: Test
+
 ## 0.0.11
 
 ### Patch Changes
