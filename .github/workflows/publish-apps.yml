@@ -77,18 +77,22 @@ jobs:
       - name: Build app
         run: yarn nx run ${{ matrix.package.name }}:build
 
-      - name: Archive Dockerfile deps without symlinked node_modules
-        run: tar -hczf workspace.tar.gz dist node_modules
 
-      - name: Normalize package name for docker tag
-        id: imageName
+      - name: Get package path
+        id: packagePath
         uses: release-kit/regex@v1
         with:
           string: ${{ matrix.package.name }}
           pattern: '^@?(?<normalized>.*)$'
 
+      - name: Archive Dockerfile deps without symlinked node_modules
+        run: |-
+          tar -hcf workspace.tar dist node_modules
+          tar -rf workspace.tar -C ${{ steps.packagePath.outputs.normalized }} Dockerfile
+          gzip workspace.tar
+
       - name: Build image using Google Cloud Build
         run: |-
           gcloud builds submit "workspace.tar.gz" \
-            --tag ${{ env.GCLOUD_TAG_BASEPATH }}/${{ steps.imageName.outputs.normalized }}:${{ matrix.package.version }} \
+            --tag ${{ env.GCLOUD_TAG_BASEPATH }}/${{ steps.packagePath.outputs.normalized }}:${{ matrix.package.version }} \
             --timeout 1h
