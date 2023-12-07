@@ -12,7 +12,7 @@
     "dev:start": "NODE_ENV=development nodemon dist/main.js",
     "build": "NODE_ENV=production webpack",
     "build:dev": "NODE_ENV=development webpack",
-    "start": "NODE_ENV=production nodemon dist/main.js",
+    "start": "NODE_ENV=production node dist/main.js",
     "start:dev": "NODE_ENV=development nodemon dist/main.js --inspect",
     "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\""
   },

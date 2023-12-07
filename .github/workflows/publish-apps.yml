@@ -77,7 +77,6 @@ jobs:
       - name: Build app
         run: yarn nx run ${{ matrix.package.name }}:build
 
-
       - name: Get package path
         id: packagePath
         uses: release-kit/regex@v1
@@ -87,7 +86,8 @@ jobs:
 
       - name: Archive Dockerfile deps without symlinked node_modules
         run: |-
-          tar -hcf workspace.tar dist node_modules
+          tar -hcf workspace.tar node_modules
+          tar -rf workspace.tar -C ${{ steps.packagePath.outputs.normalized }} dist
           tar -rf workspace.tar -C ${{ steps.packagePath.outputs.normalized }} Dockerfile
           gzip workspace.tar
 
