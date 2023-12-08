@@ -41,6 +41,8 @@ jobs:
     needs: get-affected-apps
     runs-on: ubuntu-latest
 
+    if: needs.get-affected-apps.outputs.apps != '[]'
+
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
