@@ -34,7 +34,7 @@ jobs:
       - name: Get affected apps
         id: affected
         run: |-
-          echo "::set-output name=apps::$(yarn nx show projects --type=app --affected --json)"
+          echo "apps=$(yarn nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
 
   publish:
     name: Publish
