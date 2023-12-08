@@ -64,7 +64,7 @@ jobs:
         run: npm i -g @railway/cli@latest
 
       - name: Link railway service
-        run: railway link --environment=development ${{ secrets.RAILWAY_SERVICE_ID }} ${{ matrix.packageName }}
+        run: railway link --environment=development ${{ secrets.RAILWAY_PROJECT_ID }} ${{ matrix.packageName }}
 
       - name: Deploy railway service
         run: railway up
