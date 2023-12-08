@@ -1,0 +1,64 @@
+name: Deploy dev stands
+
+on:
+  push:
+    branches: ['main']
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  get-affected-apps:
+    name: Get affected apps
+    runs-on: ubuntu-latest
+
+    outputs:
+      apps: ${{ steps.affected.outputs.apps }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Get affected apps
+        id: affected
+        run: |-
+          echo "::set-output name=apps::$(yarn nx show projects --type=app --affected --json)"
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+    strategy:
+      matrix:
+        packageName: ${{ fromJson(needs.get-affected-apps.outputs.apps) }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Link railway service
+        run: npx railway link --enviroment=development ${{ secrets.RAILWAY_SERVICE_ID }} ${{ matrix.packageName }}
+
+      - name: Deploy railway service
+        run: npx railway up
