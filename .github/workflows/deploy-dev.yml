@@ -38,6 +38,7 @@ jobs:
 
   publish:
     name: Publish
+    needs: get-affected-apps
     runs-on: ubuntu-latest
 
     env:
