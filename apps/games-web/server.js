@@ -100,15 +100,20 @@ app.get('*', async (req, res) => {
   }
 })
 
-const serverOptions = {}
-
-if (isDevelopment) {
-  serverOptions.key = await fs.readFile(root('./ssl/local.key'))
-  serverOptions.cert = await fs.readFile(root('./ssl/local.crt'))
+const onListen = () => {
+  console.log(`Server started at ${process.env.PUBLIC_GAMES_WEB_URL}`)
 }
 
-const server = https.createServer(serverOptions, app)
+if (isDevelopment) {
+  const server = https.createServer(
+    {
+      key: await fs.readFile(root('./ssl/local.key')),
+      cert: await fs.readFile(root('./ssl/local.crt')),
+    },
+    app,
+  )
 
-server.listen(port, () => {
-  console.log(`Server started at ${process.env.PUBLIC_GAMES_WEB_URL}`)
-})
+  server.listen(port, onListen)
+} else {
+  app.listen(port, onListen)
+}
