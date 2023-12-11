@@ -16,8 +16,5 @@
     "@libs/games-model": "workspace:*",
     "@libs/ssr-bindings": "workspace:*",
     "@tooling/env": "workspace:*"
-  },
-  "devDependencies": {
-    "@apps/games-api": "workspace:*"
   }
 }

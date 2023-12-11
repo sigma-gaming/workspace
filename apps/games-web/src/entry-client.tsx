@@ -9,11 +9,12 @@ import { router } from './routing'
 const scope = fork({ values: window.INITIAL_VALUES })
 
 const history = createBrowserHistory()
-await allSettled(router.setHistory, { scope, params: history })
 
-ReactDOM.hydrateRoot(
-  document.querySelector('#root')!,
-  <Provider value={scope}>
-    <AppView />
-  </Provider>,
-)
+allSettled(router.setHistory, { scope, params: history }).then(() => {
+  ReactDOM.hydrateRoot(
+    document.querySelector('#root')!,
+    <Provider value={scope}>
+      <AppView />
+    </Provider>,
+  )
+})

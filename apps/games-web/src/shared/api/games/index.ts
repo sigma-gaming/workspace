@@ -1,6 +1,5 @@
 import {
   CreateTRPCProxyClient,
-  createTRPCProxyClient,
   createTRPCUntypedClient,
   createWSClient,
   httpBatchLink,

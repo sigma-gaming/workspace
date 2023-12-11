@@ -22,7 +22,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@apps/games-api@workspace:*, @apps/games-api@workspace:apps/games-api":
+"@apps/games-api@workspace:apps/games-api":
   version: 0.0.0-use.local
   resolution: "@apps/games-api@workspace:apps/games-api"
   dependencies:
@@ -37,7 +37,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@apps/games-web@workspace:apps/games-web"
   dependencies:
-    "@apps/games-api": "workspace:*"
     "@libs/exceptions": "workspace:*"
     "@libs/games-model": "workspace:*"
     "@libs/ssr-bindings": "workspace:*"
