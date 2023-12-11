@@ -1,0 +1,82 @@
+import { loadEnv } from '@tooling/env/load'
+import express from 'express'
+import fs from 'node:fs/promises'
+import https from 'node:https'
+import path from 'node:path'
+import url from 'node:url'
+import { createServer } from 'vite'
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+
+function root(pathEnd) {
+  return path.join(__dirname, '../..', pathEnd)
+}
+
+const paths = {
+  serverEntry: path.join(__dirname, './src/entry-server.tsx'),
+  indexHtml: path.join(__dirname, './index.html'),
+}
+
+const port = process.env.PORT || 5173
+const base = process.env.BASE || '/'
+
+loadEnv({ root: process.cwd() })
+
+const PUBLIC_ENV = JSON.stringify(
+  Object.entries(process.env).reduce((acc, [key, value]) => {
+    if (!key.startsWith('PUBLIC_')) return acc
+    acc[key] = value
+    return acc
+  }, {}),
+)
+
+const app = express()
+
+const vite = await createServer({
+  server: { middlewareMode: true },
+  appType: 'custom',
+  base,
+})
+
+app.use(vite.middlewares)
+
+app.get('/health', async (req, res) => {
+  res.json({ status: 'healthy' })
+})
+
+app.get('*', async (req, res) => {
+  try {
+    const url = req.originalUrl.replace(base, '')
+
+    let template = await fs.readFile(paths.indexHtml, 'utf-8')
+    template = await vite.transformIndexHtml(url, template)
+
+    const serverEntry = await vite.ssrLoadModule(paths.serverEntry)
+    const rendered = await serverEntry.render('/' + url, req.headers.cookie)
+
+    const html = template
+      .replace(`<!--app-head-->`, rendered.head ?? '')
+      .replace(`<!--app-html-->`, rendered.html ?? '')
+      .replace(`'<!--initial-values-->'`, rendered.initialValues ?? '')
+      .replace(`'<!--env-->'`, PUBLIC_ENV)
+
+    res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
+  } catch (error) {
+    vite?.ssrFixStacktrace(error)
+
+    console.log(error.stack)
+    res.status(500).end(error.stack)
+  }
+})
+
+const server = https.createServer(
+  {
+    key: await fs.readFile(root('./ssl/local.key')),
+    cert: await fs.readFile(root('./ssl/local.crt')),
+  },
+  app,
+)
+
+server.listen(port, () => {
+  console.log(`Server started at ${process.env.PUBLIC_GAMES_WEB_URL}`)
+})

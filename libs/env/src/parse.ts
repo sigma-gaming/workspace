@@ -4,7 +4,7 @@ class InvalidEnvError extends Error {
   issues: ZodIssue[]
 
   constructor(error: ZodError) {
-    super('Invalid env')
+    super('Invalid ENV Error')
     this.issues = error.issues
   }
 }
@@ -30,7 +30,12 @@ export function parseEnv<TOutput, TDef extends ZodTypeDef, TInput>({
       process.exit(1)
     }
 
-    if (error instanceof ZodError) throw new InvalidEnvError(error)
+    if (error instanceof ZodError) {
+      console.info('Invalid env')
+      console.error(error.issues)
+      throw new InvalidEnvError(error)
+    }
+
     throw error
   }
 }
