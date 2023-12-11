@@ -12,6 +12,9 @@
     "apps/*",
     "libs/*"
   ],
+  "engines": {
+    "node": "20"
+  },
   "scripts": {
     "postinstall": "is-ci || husky install",
     "changeset:publish": "changeset tag && git push --follow-tags",
