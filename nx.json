@@ -15,6 +15,7 @@
       "{projectRoot}/index.html",
       "{projectRoot}/server-dev.js",
       "{projectRoot}/server-prod.js",
+      "{projectRoot}/prisma/schema.prisma",
       "{projectRoot}/public/**/*",
       "{projectRoot}/src/**/*",
       "!{projectRoot}/src/*.test.ts",
