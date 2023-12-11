@@ -13,6 +13,7 @@
     "env": ["{workspaceRoot}/.env.development"],
     "src": [
       "{projectRoot}/index.html",
+      "{projectRoot}/server.js",
       "{projectRoot}/public/**/*",
       "{projectRoot}/src/**/*",
       "!{projectRoot}/src/*.test.ts",
