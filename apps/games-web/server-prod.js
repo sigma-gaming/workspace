@@ -43,8 +43,8 @@ app.get('*', async (req, res) => {
     const html = templateHtml
       .replace(`<!--app-head-->`, rendered.head ?? '')
       .replace(`<!--app-html-->`, rendered.html ?? '')
-      .replace(`'<!--initial-values-->'`, rendered.initialValues ?? '')
-      .replace(`'<!--env-->'`, PUBLIC_ENV)
+      .replace(`'<!--app-initial-values-->'`, rendered.initialValues ?? '')
+      .replace(`'<!--app-env-->'`, PUBLIC_ENV)
 
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
   } catch (error) {
