@@ -17,10 +17,11 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@apps/games-api": ["apps/games-api/src/index.ts"],
+      "@apps/games-api": ["apps/games-api/src/client.ts"],
       "@libs/exceptions": ["libs/exceptions/src/index.ts"],
       "@libs/games-db": ["libs/games-db/dist"],
       "@libs/games-model": ["libs/games-model/src/index.ts"],
+      "@libs/ssr-bindings": ["libs/ssr-bindings/src/index.ts"],
       "@tooling/build": ["libs/build/src/index.ts"],
       "@tooling/env/load": ["libs/env/src/load.ts"],
       "@tooling/env/parse": ["libs/env/src/parse.ts"]

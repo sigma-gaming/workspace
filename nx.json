@@ -10,6 +10,7 @@
       "{workspaceRoot}/package.json",
       "{workspaceRoot}/nx.json"
     ],
+    "env": ["{workspaceRoot}/.env.development"],
     "src": [
       "{projectRoot}/index.html",
       "{projectRoot}/public/**/*",
@@ -38,6 +39,16 @@
     "migrations": ["{projectRoot}/prisma/migrations/**/*"]
   },
   "targetDefaults": {
+    "copy-env": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["env"],
+      "outputs": ["{projectRoot}/.env.development"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 123"
+      }
+    },
     "build": {
       "cache": true,
       "dependsOn": ["^build"],
@@ -64,7 +75,7 @@
       "inputs": ["shared", "config", "test", "src"]
     },
     "dev": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "copy-env"]
     },
     "migrate": {
       "inputs": ["shared", "config", "migrations"]

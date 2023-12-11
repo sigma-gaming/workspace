@@ -1,0 +1,21 @@
+{
+  "name": "@libs/atomic-router",
+  "version": "0.0.0-internal",
+  "license": "MIT",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "@tooling/build": "workspace:*"
+  }
+}

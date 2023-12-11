@@ -1,9 +1,13 @@
+import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
+import fs from 'node:fs'
+import path from 'node:path'
 import { v4 as uuid } from 'uuid'
 import { appRouter, createContext } from './routes'
 import { env } from './shared/env'
+import { colors } from './shared/lib/colors'
 
 const app = Fastify({
   logger: env.isProd,
@@ -14,28 +18,40 @@ const app = Fastify({
     req.headers['x-trace-id'] = id
     return id
   },
+  https: env.isDev
+    ? {
+        key: fs.readFileSync(path.join(__dirname, '../../../ssl/local.key')),
+        cert: fs.readFileSync(path.join(__dirname, '../../../ssl/local.crt')),
+      }
+    : null,
 })
 
 if (env.isDev) {
   app.addHook('onRequest', (req, res, done) => {
-    console.log(`[Request Incoming - ${req.id}] ${req.method} ${req.url}`)
+    const prefix = colors.cyan(`[Request Incoming - ${req.id}]`)
+    console.log(`${prefix} ${req.method} ${req.url}`)
     return done()
   })
 
   app.addHook('onSend', (req, res, payload, done) => {
-    if (res.statusCode >= 400) {
-      console.log(`[Request Failed - ${req.id}] ${req.method} ${req.url}`)
-      console.log(`Status Code: ${res.statusCode}, payload: ${payload}`)
-      return done()
-    }
+    const prefix =
+      res.statusCode >= 400
+        ? colors.red(`[Request Failed - ${req.id}]`)
+        : colors.green(`[Request Completed - ${req.id}]`)
 
-    console.log(`[Request Completed - ${req.id}] ${req.method} ${req.url}`)
-    console.log(`Status Code: ${res.statusCode}, Payload: ${payload}`)
+    console.log(`${prefix} ${req.method} ${req.url}`)
+    console.log(`Status Code: ${res.statusCode}`)
+    console.log(colors.dim(`Payload: ${payload}`))
     return done()
   })
 }
 
 app.register(ws)
+
+app.register(cors, {
+  origin: [env.gamesWeb.url],
+  credentials: true,
+})
 
 app.register(fastifyTRPCPlugin, {
   prefix: '/trpc',
@@ -51,5 +67,5 @@ app.get('/health', async () => {
 })
 
 app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
-  console.log(`🚀 Server ready at http://localhost:${env.port}`)
+  console.log(`🚀 Server ready at ${env.gamesApi.url}`)
 })

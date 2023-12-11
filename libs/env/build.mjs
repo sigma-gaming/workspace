@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { buildLibrary, emptyDirectory } from '@tooling/build'
+import { buildLibrary, emptyDirectory, buildCLI } from '@tooling/build'
 
 const dirname = fileURLToPath(new URL('.', import.meta.url))
 
@@ -18,6 +18,11 @@ async function build() {
       load: src('load.ts'),
     },
     outputDir: distPath,
+  })
+
+  await buildCLI({
+    input: src('cli.ts'),
+    output: path.join(distPath, 'bin/copy-env.js'),
   })
 }
 

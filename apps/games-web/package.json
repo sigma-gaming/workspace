@@ -1,0 +1,23 @@
+{
+  "name": "@apps/games-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "copy-env": "copy-env",
+    "dev": "NODE_ENV=development node server.js",
+    "build": "yarn build:client && yarn build:server && cp server.js dist",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
+    "start": "NODE_ENV=production node server.js"
+  },
+  "dependencies": {
+    "@libs/exceptions": "workspace:*",
+    "@libs/games-model": "workspace:*",
+    "@libs/ssr-bindings": "workspace:*",
+    "@tooling/env": "workspace:*"
+  },
+  "devDependencies": {
+    "@apps/games-api": "workspace:*"
+  }
+}

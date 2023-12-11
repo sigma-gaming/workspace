@@ -4,6 +4,9 @@
   "license": "UNLICENSED",
   "private": true,
   "sideEffects": false,
+  "bin": {
+    "copy-env": "./bin/copy-env.js"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
