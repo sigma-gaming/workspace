@@ -13,13 +13,13 @@ function root(pathEnd) {
 
 const paths = {
   dev: {
-    serverEntry: './src/entry-server.tsx',
-    indexHtml: './index.html',
+    serverEntry: path.join(__dirname, './src/entry-server.tsx'),
+    indexHtml: path.join(__dirname, './index.html'),
   },
   prod: {
-    serverEntry: './server/entry-server.js',
-    indexHtml: './client/index.html',
-    static: './client',
+    serverEntry: path.join(__dirname, './server/entry-server.js'),
+    indexHtml: path.join(__dirname, './client/index.html'),
+    static: path.join(__dirname, './client'),
   },
 }
 
