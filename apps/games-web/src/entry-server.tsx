@@ -23,7 +23,8 @@ export async function render(url: string, cookies = '') {
     </Provider>,
   )
 
-  const initialValues = JSON.stringify(serialize(scope))
+  const serialized = serialize(scope, { ignore: [$$ssrContext.$cookies] })
+  const initialValues = JSON.stringify(serialized)
 
   return { html, initialValues }
 }
