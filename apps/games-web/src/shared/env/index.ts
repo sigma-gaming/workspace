@@ -7,7 +7,6 @@ const EnvSchema = z
     PUBLIC_GAMES_WEB_URL: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_GAMES_API_WS_URL: z.string(),
-    GAMES_API_URL_INTERNAL: z.string(),
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     PUBLIC_VK_APP_ID: z.string(),
   })
@@ -19,7 +18,6 @@ const EnvSchema = z
     gamesApi: {
       url: raw.PUBLIC_GAMES_API_URL,
       wsUrl: raw.PUBLIC_GAMES_API_WS_URL,
-      internalUrl: raw.GAMES_API_URL_INTERNAL,
     },
     telegram: {
       botId: raw.PUBLIC_TELEGRAM_BOT_ID,
