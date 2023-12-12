@@ -37,7 +37,7 @@ function createLinks(): TRPCLink<AppRouter>[] {
    */
   if (typeof window === 'undefined') {
     const link = httpBatchLink<AppRouter>({
-      url: internalEnv.gamesApi.internalUrl + '/trpc',
+      url: env.gamesApi.url + '/trpc',
       headers({ opList }) {
         let cookie = ''
 
