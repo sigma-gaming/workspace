@@ -49,14 +49,11 @@ function createLinks(): TRPCLink<AppRouter>[] {
           cookie = options.context.cookies
         }
 
-        const headers = {
+        return {
           cookie,
           'CF-Access-Client-Id': internalEnv.cloudflare.accessClientId,
           'CF-Access-Client-Secret': internalEnv.cloudflare.accessClientSecret,
         }
-
-        console.log(headers)
-        return headers
       },
     })
 

@@ -19,6 +19,12 @@ export const createTRPCEffect = createFactory(
 
     effect.failData.watch((error) => {
       if (error instanceof TRPCClientError) {
+        const { meta = {} } = error
+
+        if ('response' in meta) {
+          console.log(meta.response)
+        }
+
         console.error(error)
       }
     })
