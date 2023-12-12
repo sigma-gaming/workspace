@@ -15,7 +15,10 @@ function createLinks(): TRPCLink<AppRouter>[] {
   links.push(
     loggerLink({
       enabled(options) {
-        if (process.env.NODE_ENV === 'development') return true
+        if (typeof window !== 'undefined')
+          return process.env.NODE_ENV === 'development'
+
+        if (process.env.NODE_ENV === 'production') return true
         return options.direction === 'down' && options.result instanceof Error
       },
     }),
@@ -46,11 +49,14 @@ function createLinks(): TRPCLink<AppRouter>[] {
           cookie = options.context.cookies
         }
 
-        return {
+        const headers = {
           cookie,
           'CF-Access-Client-Id': internalEnv.cloudflare.accessClientId,
           'CF-Access-Client-Secret': internalEnv.cloudflare.accessClientSecret,
         }
+
+        console.log(headers)
+        return headers
       },
     })
 

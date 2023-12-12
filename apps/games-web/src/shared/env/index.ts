@@ -34,8 +34,8 @@ export const env = parseEnv({
 
 const InternalEnvSchema = z
   .object({
-    CF_ACCESS_CLIENT_ID: z.string(),
-    CF_ACCESS_CLIENT_SECRET: z.string(),
+    CF_ACCESS_CLIENT_ID: z.string().optional(),
+    CF_ACCESS_CLIENT_SECRET: z.string().optional(),
   })
   .transform((raw) => ({
     cloudflare: {
