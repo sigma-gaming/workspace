@@ -3,6 +3,7 @@ import {
   createWSClient,
   httpBatchLink,
   loggerLink,
+  splitLink,
   TRPCLink,
   wsLink,
 } from '@trpc/client'
@@ -32,7 +33,23 @@ function createLinks(): TRPCLink<AppRouter>[] {
       url: env.gamesApi.wsUrl + '/trpc',
     })
 
-    links.push(wsLink<AppRouter>({ client: wsClient }))
+    links.push(
+      splitLink({
+        condition(op) {
+          return op.type === 'subscription'
+        },
+        true: wsLink<AppRouter>({ client: wsClient }),
+        false: httpBatchLink<AppRouter>({
+          url: env.gamesApi.url + '/trpc',
+          fetch(url, options) {
+            return fetch(url, {
+              ...options,
+              credentials: 'include',
+            })
+          },
+        }),
+      }),
+    )
   }
 
   /**
