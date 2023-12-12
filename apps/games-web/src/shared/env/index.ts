@@ -34,11 +34,13 @@ export const env = parseEnv({
 
 const InternalEnvSchema = z
   .object({
-    GAMES_API_URL_INTERNAL: z.string(),
+    CF_ACCESS_CLIENT_ID: z.string(),
+    CF_ACCESS_CLIENT_SECRET: z.string(),
   })
   .transform((raw) => ({
-    gamesApi: {
-      internalUrl: raw.GAMES_API_URL_INTERNAL,
+    cloudflare: {
+      accessClientId: raw.CF_ACCESS_CLIENT_ID,
+      accessClientSecret: raw.CF_ACCESS_CLIENT_SECRET,
     },
   }))
 
