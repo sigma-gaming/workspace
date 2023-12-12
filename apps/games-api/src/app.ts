@@ -51,7 +51,7 @@ app.register(ws)
 app.register(cors, {
   origin: [env.gamesWeb.url],
   credentials: true,
-  hook: 'preHandler',
+  allowedHeaders: ['Content-Type'],
 })
 
 app.register(fastifyTRPCPlugin, {
