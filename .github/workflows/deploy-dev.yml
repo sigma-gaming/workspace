@@ -66,5 +66,10 @@ jobs:
       - name: Link railway service
         run: railway link --environment=development ${{ secrets.RAILWAY_PROJECT_ID }} ${{ matrix.packageName }}
 
+      - name: Copy Railway config and Dockerfile
+        run: |-
+          cp apps/${{ matrix.packageName }}/railway.json .
+          cp apps/${{ matrix.packageName }}/Dockerfile .
+
       - name: Deploy railway service
         run: railway up

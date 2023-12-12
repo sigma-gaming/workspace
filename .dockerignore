@@ -1,0 +1,11 @@
+# compiled output
+**/.env.development
+dist
+generated
+tmp
+/out-tsc
+
+# dependencies
+node_modules
+node_modules_unlinked
+workspace.tar*

@@ -6,7 +6,7 @@ ENV NODE_ENV production
 COPY . ./
 RUN yarn install --immutable
 COPY . ./
-RUN yarn nx run @apps/games-api:build
+RUN yarn nx run @apps/games-web:build
 COPY . ./
 
-CMD ["yarn", "nx", "run", "@apps/games-api:start"]
+CMD ["yarn", "nx", "run", "@apps/games-web:start"]
