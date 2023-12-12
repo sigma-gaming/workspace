@@ -19,7 +19,9 @@
       "{projectRoot}/public/**/*",
       "{projectRoot}/src/**/*",
       "!{projectRoot}/src/*.test.ts",
-      "!{projectRoot}/src/*.test.tsx"
+      "!{projectRoot}/src/*.test.tsx",
+      "{projectRoot}/build.*",
+      "{projectRoot}/scripts/**/*"
     ],
     "dist": ["{projectRoot}/dist/**/*"],
     "test": [
@@ -38,7 +40,6 @@
       "{projectRoot}/rollup.config.*",
       "{projectRoot}/webpack.config.*"
     ],
-    "scripts": ["{projectRoot}/build.*", "{projectRoot}/scripts/**/*"],
     "migrations": ["{projectRoot}/prisma/migrations/**/*"]
   },
   "targetDefaults": {
@@ -56,7 +57,7 @@
       "cache": true,
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/dist", "{workspaceRoot}/dist/{projectRoot}"],
-      "inputs": ["shared", "config", "scripts", "^scripts", "src", "^src"]
+      "inputs": ["shared", "config", "src", "^src"]
     },
     "test": {
       "cache": true,
