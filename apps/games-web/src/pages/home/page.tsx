@@ -1,12 +1,10 @@
 import { useClientMountedEvent } from '@libs/ssr-bindings'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
-import { useEffect } from 'react'
 import { v4 } from 'uuid'
 import { $$user } from '../../entities/user'
 import { BaseLayout } from '../../layouts/base'
 import { routes } from '../../routing'
-import { gamesApi } from '../../shared/api/games'
 import { env } from '../../shared/env'
 
 function useTelegramUrl() {

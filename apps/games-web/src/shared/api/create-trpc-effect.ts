@@ -1,4 +1,3 @@
-import { TRPCClientError } from '@trpc/client'
 import { ProcedureOptions } from '@trpc/server'
 import { createFactory } from '@withease/factories'
 import { attach, Effect } from 'effector'
@@ -8,7 +7,7 @@ type Procedure<T, O> = (input: T, options: ProcedureOptions) => O | Promise<O>
 
 export const createTRPCEffect = createFactory(
   <T, O>(procedure: Procedure<T, O>): Effect<T, O> => {
-    const effect = attach({
+    return attach({
       source: $$SSRContext.$cookies,
       async effect(cookies, input: T) {
         return procedure(input, {
@@ -16,19 +15,5 @@ export const createTRPCEffect = createFactory(
         })
       },
     })
-
-    effect.failData.watch((error) => {
-      if (error instanceof TRPCClientError) {
-        const { meta = {} } = error
-
-        if ('response' in meta) {
-          console.log(meta.response)
-        }
-
-        console.error(error)
-      }
-    })
-
-    return effect
   },
 )
