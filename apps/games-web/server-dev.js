@@ -3,6 +3,7 @@ import express from 'express'
 import fs from 'node:fs/promises'
 import https from 'node:https'
 import path from 'node:path'
+import { Writable } from 'node:stream'
 import url from 'node:url'
 import { createServer } from 'vite'
 
@@ -52,15 +53,40 @@ app.get('*', async (req, res) => {
     template = await vite.transformIndexHtml(url, template)
 
     const serverEntry = await vite.ssrLoadModule(paths.serverEntry)
-    const rendered = await serverEntry.render('/' + url, req.headers.cookie)
 
-    const html = template
-      .replace(`<!--app-head-->`, rendered.head ?? '')
-      .replace(`<!--app-html-->`, rendered.html ?? '')
-      .replace(`'<!--app-initial-values-->'`, rendered.initialValues ?? '')
-      .replace(`'<!--app-env-->'`, PUBLIC_ENV)
+    const [beforeHead, afterHead] = template.split('<!--app-head-->')
+    const [beforeApp, afterApp] = afterHead.split('<!--app-html-->')
+    const [beforeEnv, afterEnv] = afterApp.split(`'<!--app-env-->'`)
+    const [beforeInitialValues, afterInitialValues] = afterEnv.split(
+      `'<!--app-initial-values-->'`,
+    )
 
-    res.status(200).set({ 'Content-Type': 'text/html' }).end(html)
+    res.set({ 'Content-Type': 'text/html' })
+    res.write(beforeHead)
+    res.write(beforeApp)
+
+    let initialValues = ''
+
+    const stream = new Writable({
+      write(chunk, _encoding, cb) {
+        res.write(chunk, cb)
+      },
+      final() {
+        res.write(beforeEnv)
+        res.write(PUBLIC_ENV)
+        res.write(beforeInitialValues)
+        res.write(initialValues)
+        res.end(afterInitialValues)
+      },
+    })
+
+    const rendering = await serverEntry.render({
+      stream,
+      url: '/' + url,
+      cookies: req.headers.cookie,
+    })
+
+    initialValues = rendering.initialValues
   } catch (error) {
     vite?.ssrFixStacktrace(error)
 

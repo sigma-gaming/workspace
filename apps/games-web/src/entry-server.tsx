@@ -1,6 +1,7 @@
 import { allSettled, fork, serialize } from 'effector'
 import { Provider } from 'effector-react'
 import { createMemoryHistory } from 'history'
+import { Writable } from 'node:stream'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import { AppView } from './app/view'
@@ -8,7 +9,13 @@ import { $$user } from './entities/user'
 import { router } from './routing'
 import { $$SSRContext } from './shared/api'
 
-export async function render(url: string, cookies = '') {
+interface Options {
+  stream: Writable
+  url: string
+  cookies?: string
+}
+
+export async function render({ stream, url, cookies = '' }: Options) {
   const scope = fork({
     values: [[$$SSRContext.$cookies, cookies]],
   })
@@ -17,14 +24,19 @@ export async function render(url: string, cookies = '') {
   await allSettled(router.setHistory, { scope, params: history })
   await allSettled($$user.request, { scope })
 
-  const html = ReactDOMServer.renderToString(
+  const { pipe } = ReactDOMServer.renderToPipeableStream(
     <Provider value={scope}>
       <AppView />
     </Provider>,
+    {
+      onShellReady() {
+        pipe(stream)
+      },
+    },
   )
 
   const serialized = serialize(scope)
   const initialValues = JSON.stringify(serialized)
 
-  return { html, initialValues }
+  return { initialValues }
 }
