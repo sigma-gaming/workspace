@@ -6,7 +6,7 @@ import ReactDOMServer from 'react-dom/server'
 import { AppView } from './app/view'
 import { $$user } from './entities/user'
 import { router } from './routing'
-import { $$SSRContext } from './shared/api/ssr-context'
+import { $$SSRContext } from './shared/api'
 
 export async function render(url: string, cookies = '') {
   const scope = fork({

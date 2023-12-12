@@ -1,11 +1,12 @@
 import { createQuery } from '@farfetched/core'
 import { invoke } from '@withease/factories'
 import { createEvent, sample } from 'effector'
-import { gamesApi, withSSRContext } from '../../shared/api/games'
+import { createTRPCEffect } from '../../shared/api'
+import { gamesApi } from '../../shared/api/games'
 
 const userQuery = createQuery({
   name: 'user/get',
-  handler: invoke(() => withSSRContext(gamesApi.users.getMe.query)),
+  handler: invoke(() => createTRPCEffect(gamesApi.users.getMe.query)),
 })
 
 const request = createEvent()
