@@ -64,7 +64,7 @@ jobs:
         id: packagePath
         uses: release-kit/regex@v1
         with:
-          string: ${{ matrix.package.name }}
+          string: ${{ matrix.packageName }}
           pattern: '^@?(?<path>.*)$'
 
       - name: Copy Railway config and Dockerfile
