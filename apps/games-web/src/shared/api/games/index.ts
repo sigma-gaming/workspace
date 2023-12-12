@@ -1,11 +1,12 @@
 import {
   createTRPCProxyClient,
   createWSClient,
+  httpBatchLink,
   TRPCLink,
   wsLink,
 } from '@trpc/client'
 import { AppRouter } from '@apps/games-api'
-import { env } from '../../env'
+import { env, internalEnv } from '../../env'
 
 function createLinks(): TRPCLink<AppRouter>[] {
   if (typeof window !== 'undefined') {
@@ -16,9 +17,25 @@ function createLinks(): TRPCLink<AppRouter>[] {
     return [wsLink<AppRouter>({ client: wsClient })]
   }
 
-  return []
+  return [
+    httpBatchLink({
+      url: internalEnv.gamesApi.internalUrl + '/trpc',
+      headers({ opList }) {
+        let cookie = ''
+
+        for (const options of opList) {
+          if (typeof options.context.cookies !== 'string') continue
+          cookie = options.context.cookies
+        }
+
+        return { cookie }
+      },
+    }),
+  ]
 }
 
 export const gamesApi = createTRPCProxyClient<AppRouter>({
   links: createLinks(),
 })
+
+export * from './with-ssr-context.ts'

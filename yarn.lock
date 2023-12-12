@@ -2769,6 +2769,7 @@ __metadata:
     "@types/webpack": "npm:^5.28.5"
     "@types/webpack-node-externals": "npm:^3.0.4"
     "@vitejs/plugin-react": "npm:^4.2.0"
+    "@withease/factories": "npm:^1.0.3"
     "@yarnpkg/types": "npm:^4.0.0"
     atomic-router: "npm:^0.9.3"
     atomic-router-react: "npm:^0.9.1"
@@ -3544,6 +3545,13 @@ __metadata:
     webpack-dev-server:
       optional: true
   checksum: 36079d34971ff99a58b66b13f4184dcdd8617853c48cccdbc3f9ab7ea9e5d4fcf504e873c298ea7aa15e0b51ad2c4aee4d7a70bd7d9364e60f57b0eb93ca15fc
+  languageName: node
+  linkType: hard
+
+"@withease/factories@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@withease/factories@npm:1.0.3"
+  checksum: 401ddcc1cfbdc659a39088772a3c95cc419b77f9e725cb04c8e13f4ecddeb4953ecfc5ff314c681fa1e2060a225553ddd4716297fb65fe7f9b558536381b1e1e
   languageName: node
   linkType: hard
 

@@ -1,7 +1,7 @@
 import { parseEnv } from '@tooling/env/parse'
 import { z } from 'zod'
 
-const EnvSchema = z
+const PublicEnvSchema = z
   .object({
     PUBLIC_DOMAIN: z.string(),
     PUBLIC_GAMES_WEB_URL: z.string(),
@@ -29,5 +29,29 @@ const EnvSchema = z
 
 export const env = parseEnv({
   source: typeof window !== 'undefined' ? window.ENV : process.env,
-  schema: EnvSchema,
+  schema: PublicEnvSchema,
 })
+
+const InternalEnvSchema = z
+  .object({
+    GAMES_API_URL_INTERNAL: z.string(),
+  })
+  .transform((raw) => ({
+    gamesApi: {
+      internalUrl: raw.GAMES_API_URL_INTERNAL,
+    },
+  }))
+
+const InternalEnvFallback = new Proxy({} as z.infer<typeof InternalEnvSchema>, {
+  get() {
+    throw new Error(`Internal env is not available on client`)
+  },
+})
+
+export const internalEnv =
+  typeof window === 'undefined'
+    ? parseEnv({
+        source: process.env,
+        schema: InternalEnvSchema,
+      })
+    : InternalEnvFallback

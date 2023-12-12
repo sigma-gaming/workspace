@@ -1,10 +1,11 @@
 import { createQuery } from '@farfetched/core'
+import { invoke } from '@withease/factories'
 import { createEvent, sample } from 'effector'
-import { gamesApi } from '../../shared/api/games'
+import { gamesApi, withSSRContext } from '../../shared/api/games'
 
 const userQuery = createQuery({
   name: 'user/get',
-  handler: gamesApi.users.getMe.query,
+  handler: invoke(() => withSSRContext(gamesApi.users.getMe.query)),
 })
 
 const request = createEvent()
