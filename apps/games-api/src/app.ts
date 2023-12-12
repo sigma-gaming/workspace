@@ -49,9 +49,8 @@ if (env.isDev) {
 app.register(ws)
 
 app.register(cors, {
-  origin: [env.gamesWeb.url],
+  origin: env.gamesWeb.url,
   credentials: true,
-  allowedHeaders: ['Content-Type'],
 })
 
 app.register(fastifyTRPCPlugin, {

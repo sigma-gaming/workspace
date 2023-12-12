@@ -42,6 +42,8 @@ function createLinks(): TRPCLink<AppRouter>[] {
         false: httpBatchLink<AppRouter>({
           url: env.gamesApi.url + '/trpc',
           fetch(url, options) {
+            console.log(url, options)
+
             return fetch(url, {
               ...options,
               credentials: 'include',
