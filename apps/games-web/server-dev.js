@@ -5,12 +5,52 @@ import https from 'node:https'
 import path from 'node:path'
 import { Writable } from 'node:stream'
 import url from 'node:url'
+import ReactDOMServer from 'react-dom/server'
 import { createServer } from 'vite'
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 function root(pathEnd) {
   return path.join(__dirname, '../..', pathEnd)
+}
+
+function splitTemplate(template, slots, htmlSlot) {
+  const indexedSlots = []
+
+  for (const slot of slots) {
+    const index = template.indexOf(slot)
+    indexedSlots.push({ index, slot })
+  }
+
+  const sortedSlots = indexedSlots
+    .slice()
+    .sort((a, b) => a.index - b.index)
+    .map((indexed) => indexed.slot)
+
+  let current = template
+  let htmlFound = false
+  const before = []
+  const after = []
+
+  for (const slot of sortedSlots) {
+    const [left, right] = current.split(slot)
+
+    if (htmlFound) {
+      after.push(left, slot)
+    } else if (slot === htmlSlot) {
+      htmlFound = true
+      before.push(left)
+    } else {
+      before.push(left, slot)
+    }
+
+    current = right
+  }
+
+  return {
+    before: before.filter(Boolean),
+    after: after.filter(Boolean),
+  }
 }
 
 const paths = {
@@ -54,39 +94,64 @@ app.get('*', async (req, res) => {
 
     const serverEntry = await vite.ssrLoadModule(paths.serverEntry)
 
-    const [beforeHead, afterHead] = template.split('<!--app-head-->')
-    const [beforeApp, afterApp] = afterHead.split('<!--app-html-->')
-    const [beforeEnv, afterEnv] = afterApp.split(`'<!--app-env-->'`)
-    const [beforeInitialValues, afterInitialValues] = afterEnv.split(
-      `'<!--app-initial-values-->'`,
-    )
+    const htmlSlot = '<!--app-html-->'
+
+    const slots = [
+      '<!--app-head-->',
+      htmlSlot,
+      "'<!--app-env-->'",
+      "'<!--app-initial-values-->'",
+    ]
+
+    const { before, after } = splitTemplate(template, slots, htmlSlot)
+
+    const { appElement, headHtml, initialValues } = await serverEntry.render({
+      url: '/' + url,
+      cookies: req.headers.cookie,
+    })
+
+    const slotsContent = {
+      '<!--app-head-->': headHtml,
+      "'<!--app-env-->'": PUBLIC_ENV,
+      "'<!--app-initial-values-->'": initialValues,
+    }
 
     res.set({ 'Content-Type': 'text/html' })
-    res.write(beforeHead)
-    res.write(beforeApp)
 
-    let initialValues = ''
+    for (const part of before) {
+      const isSlot = slots.includes(part)
+
+      if (!isSlot) {
+        res.write(part)
+        continue
+      }
+
+      const content = await slotsContent[part]
+      res.write(content)
+    }
 
     const stream = new Writable({
       write(chunk, _encoding, cb) {
         res.write(chunk, cb)
       },
-      final() {
-        res.write(beforeEnv)
-        res.write(PUBLIC_ENV)
-        res.write(beforeInitialValues)
-        res.write(initialValues)
-        res.end(afterInitialValues)
+      final: async () => {
+        for (const part of after) {
+          const isSlot = slots.includes(part)
+
+          if (!isSlot) {
+            res.write(part)
+            continue
+          }
+
+          const content = await slotsContent[part]
+          res.write(content)
+        }
+
+        res.end()
       },
     })
 
-    const rendering = await serverEntry.render({
-      stream,
-      url: '/' + url,
-      cookies: req.headers.cookie,
-    })
-
-    initialValues = rendering.initialValues
+    ReactDOMServer.renderToPipeableStream(appElement).pipe(stream)
   } catch (error) {
     vite?.ssrFixStacktrace(error)
 
