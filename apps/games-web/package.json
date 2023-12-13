@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "copy-env": "copy-env",
-    "dev": "NODE_ENV=development node server-dev.js",
+    "dev": "NODE_ENV=development nodemon server-dev.js",
     "build": "yarn build:client && yarn build:server && cp server-prod.js dist",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",

@@ -27,6 +27,12 @@ const app = Fastify({
 })
 
 if (env.isDev) {
+  // Production origins are set in the Cloudflare dashboard
+  app.register(cors, {
+    origin: [env.gamesWeb.url],
+    credentials: true,
+  })
+
   app.addHook('onRequest', (req, res, done) => {
     const prefix = colors.cyan(`[Request Incoming - ${req.id}]`)
     console.log(`${prefix} ${req.method} ${req.url}`)
@@ -47,11 +53,6 @@ if (env.isDev) {
 }
 
 app.register(ws)
-
-app.register(cors, {
-  origin: env.gamesWeb.url,
-  credentials: true,
-})
 
 app.register(fastifyTRPCPlugin, {
   prefix: '/trpc',
