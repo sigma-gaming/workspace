@@ -1,9 +1,0 @@
-{
-  "name": "@libs/ssr-bindings",
-  "version": "0.0.0-internal",
-  "license": "MIT",
-  "private": true,
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts"
-}

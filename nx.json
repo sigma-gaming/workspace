@@ -18,6 +18,7 @@
       "{projectRoot}/prisma/schema.prisma",
       "{projectRoot}/public/**/*",
       "{projectRoot}/src/**/*",
+      "{projectRoot}/server/**/*",
       "!{projectRoot}/src/*.test.ts",
       "!{projectRoot}/src/*.test.tsx",
       "{projectRoot}/build.*",

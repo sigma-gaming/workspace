@@ -1,7 +1,12 @@
 import { createRoutesView } from 'atomic-router-react'
-import { HomeRoute } from './home'
-import { TestRoute } from './test'
+import { HomePage } from './home'
+import { TestPage } from './test'
+
+export const pages = [HomePage, TestPage]
 
 export const PageViews = createRoutesView({
-  routes: [HomeRoute, TestRoute],
+  routes: pages.map((page) => ({
+    route: page.route,
+    view: page.view,
+  })),
 })

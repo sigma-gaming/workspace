@@ -1,6 +1,6 @@
-import { useClientMountedEvent } from '@libs/ssr-bindings'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
+import { lazy, Suspense } from 'react'
 import { v4 } from 'uuid'
 import { $$user } from '../../entities/user'
 import { BaseLayout } from '../../layouts/base'
@@ -26,10 +26,14 @@ function useVkUrl() {
   return `https://id.vk.com/auth?${params.toString()}`
 }
 
-export const HomePageView = () => {
-  useClientMountedEvent($$user.request)
+const LazyComponent = lazy(async () => {
+  const module = await import('./lazy-test')
+  return { default: module.SomeLazyComponent }
+})
 
+export const HomePageView = () => {
   const user = useUnit($$user.$user)
+
   const telegramUrl = useTelegramUrl()
   const vkUrl = useVkUrl()
 
@@ -46,6 +50,9 @@ export const HomePageView = () => {
 
   return (
     <BaseLayout>
+      <Suspense fallback={<div>Loading...</div>}>
+        <LazyComponent />
+      </Suspense>
       <Link to={routes.test}>Test</Link>
       {socialButtons.map(({ label, url }) => {
         return (

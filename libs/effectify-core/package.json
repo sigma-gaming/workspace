@@ -1,0 +1,25 @@
+{
+  "name": "@effectify/core",
+  "version": "0.0.0-internal",
+  "license": "MIT",
+  "private": true,
+  "exports": {
+    "./client": {
+      "import": "./dist/client.mjs",
+      "default": "./dist/client.js"
+    },
+    "./server": {
+      "import": "./dist/server.mjs",
+      "default": "./dist/server.js"
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "nodemon -w src -e ts,tsx build.mjs",
+    "test": "vitest",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@tooling/build": "workspace:*"
+  }
+}

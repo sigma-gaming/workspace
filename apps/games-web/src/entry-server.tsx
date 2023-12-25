@@ -1,42 +1,64 @@
-import { allSettled, fork, serialize } from 'effector'
+import { $$effectify, Page } from '@effectify/core/client'
+import { initialize } from '@effectify/core/server'
+import { allSettled, fork, Scope, serialize } from 'effector'
 import { Provider } from 'effector-react'
-import { createMemoryHistory } from 'history'
-import { Writable } from 'node:stream'
+import { Request, Response } from 'express'
+import { debug } from 'patronum'
 import React from 'react'
-import ReactDOMServer from 'react-dom/server'
+import { renderToString } from 'react-dom/server'
 import { AppView } from './app/view'
-import { $$user } from './entities/user'
+import { pages } from './pages'
 import { router } from './routing'
-import { $$SSRContext } from './shared/api'
 
-interface Options {
-  stream: Writable
+interface InitializeOptions {
   url: string
-  cookies?: string
+  req: Request
+  res: Response
 }
 
-export async function render({ stream, url, cookies = '' }: Options) {
+export async function init({ url, req, res }: InitializeOptions) {
   const scope = fork({
-    values: [[$$SSRContext.$cookies, cookies]],
+    values: [[$$effectify.$context, { req, res }]],
   })
 
-  const history = createMemoryHistory({ initialEntries: [url] })
-  await allSettled(router.setHistory, { scope, params: history })
-  await allSettled($$user.request, { scope })
+  debug.registerScope(scope, { name: '/' + url })
 
-  const { pipe } = ReactDOMServer.renderToPipeableStream(
+  return initialize({
+    url,
+    scope,
+    pages,
+    router,
+  })
+}
+
+interface RenderOptions {
+  page?: Page<object>
+  scope: Scope
+}
+
+export async function render({ page, scope }: RenderOptions) {
+  await allSettled($$effectify.serverStarted, { scope })
+
+  let metaHtml = ''
+
+  if (page?.meta?.head) {
+    const HeadView = page.meta.head
+
+    metaHtml = renderToString(
+      <Provider value={scope}>
+        <HeadView />
+      </Provider>,
+    )
+  }
+
+  const appElement = (
     <Provider value={scope}>
       <AppView />
-    </Provider>,
-    {
-      onShellReady() {
-        pipe(stream)
-      },
-    },
+    </Provider>
   )
 
   const serialized = serialize(scope)
   const initialValues = JSON.stringify(serialized)
 
-  return { initialValues }
+  return { appElement, metaHtml, initialValues }
 }

@@ -1,4 +1,4 @@
-import { createHistoryRouter, createRouterControls } from 'atomic-router'
+import { createHistoryRouter } from 'atomic-router'
 import { home, test } from './routes'
 
 const routes = [
@@ -8,5 +8,4 @@ const routes = [
 
 export const router = createHistoryRouter({
   routes,
-  controls: createRouterControls(),
 })

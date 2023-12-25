@@ -1,4 +1,5 @@
 import { RouterProvider } from 'atomic-router-react'
+import React from 'react'
 import { PageViews } from '../pages'
 import { router } from '../routing'
 

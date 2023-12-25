@@ -4,12 +4,15 @@ import { createEvent, sample } from 'effector'
 import { createTRPCEffect } from '../../shared/api'
 import { gamesApi } from '../../shared/api/games'
 
+const getMeFx = invoke(() => createTRPCEffect(gamesApi.users.getMe.query))
+
 const userQuery = createQuery({
   name: 'user/get',
-  handler: invoke(() => createTRPCEffect(gamesApi.users.getMe.query)),
+  handler: getMeFx,
 })
 
 const request = createEvent()
+const refresh = createEvent()
 const loaded = userQuery.finished.success
 const settled = userQuery.finished.finally
 
@@ -19,12 +22,17 @@ const $accounts = $user.map((user) => user?.accounts ?? [])
 
 sample({
   clock: request,
-  fn: () => ({}),
   target: userQuery.start,
+})
+
+sample({
+  clock: refresh,
+  target: userQuery.refresh,
 })
 
 export const $$user = {
   request,
+  refresh,
   loaded,
   settled,
   $user,

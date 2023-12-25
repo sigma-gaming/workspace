@@ -5,16 +5,20 @@
   "type": "module",
   "scripts": {
     "copy-env": "copy-env",
-    "dev": "NODE_ENV=development nodemon server-dev.js",
-    "build": "yarn build:client && yarn build:server && cp server-prod.js dist",
-    "build:client": "vite build --outDir dist/client",
-    "build:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
-    "start": "NODE_ENV=production node dist/server-prod.js"
+    "dev": "NODE_ENV=development nodemon ./server/dev.ts",
+    "build": "yarn build:entry:client && yarn build:entry:server && yarn build:server",
+    "build:server": "node build.mjs",
+    "build:entry:client": "vite build --outDir dist/client",
+    "build:entry:server": "vite build --ssr src/entry-server.tsx --outDir dist/server",
+    "start": "NODE_ENV=production node dist/server.mjs"
   },
   "dependencies": {
+    "@effectify/core": "workspace:*",
     "@libs/exceptions": "workspace:*",
     "@libs/games-model": "workspace:*",
-    "@libs/ssr-bindings": "workspace:*",
     "@tooling/env": "workspace:*"
+  },
+  "devDependencies": {
+    "@tooling/build": "workspace:*"
   }
 }

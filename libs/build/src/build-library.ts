@@ -12,6 +12,8 @@ interface SingleOptions {
   outputBaseName?: string
   external?: ExternalOption
   extraPlugins?: InputPluginOption[]
+  formats?: Array<'es' | 'cjs'>
+  declarations?: boolean
 }
 
 interface MultiOptions {
@@ -38,6 +40,8 @@ async function buildSingle({
   outputBaseName = 'index',
   external = DEFAULT_EXTERNAL,
   extraPlugins = [],
+  formats = ['es', 'cjs'],
+  declarations = true,
 }: SingleOptions) {
   const bundle = await rollup({
     input,
@@ -45,15 +49,19 @@ async function buildSingle({
     plugins: [esbuild(), ...extraPlugins],
   })
 
-  await bundle.write({
-    file: path.join(outputDir, `${outputBaseName}.mjs`),
-    format: 'es',
-  })
+  if (formats.includes('es')) {
+    await bundle.write({
+      file: path.join(outputDir, `${outputBaseName}.mjs`),
+      format: 'es',
+    })
+  }
 
-  await bundle.write({
-    file: path.join(outputDir, `${outputBaseName}.js`),
-    format: 'cjs',
-  })
+  if (formats.includes('cjs')) {
+    await bundle.write({
+      file: path.join(outputDir, `${outputBaseName}.js`),
+      format: 'cjs',
+    })
+  }
 
   const types = await rollup({
     input,
@@ -61,15 +69,21 @@ async function buildSingle({
     plugins: [dts()],
   })
 
-  await types.write({
-    file: path.join(outputDir, `${outputBaseName}.d.ts`),
-    format: 'es',
-  })
+  if (declarations) {
+    if (formats.includes('es')) {
+      await types.write({
+        file: path.join(outputDir, `${outputBaseName}.d.ts`),
+        format: 'es',
+      })
+    }
 
-  await types.write({
-    file: path.join(outputDir, `${outputBaseName}.d.mts`),
-    format: 'es',
-  })
+    if (formats.includes('cjs')) {
+      await types.write({
+        file: path.join(outputDir, `${outputBaseName}.d.mts`),
+        format: 'es',
+      })
+    }
+  }
 }
 
 async function buildMulti({
