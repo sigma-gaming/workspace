@@ -109,6 +109,9 @@ export const telegram = procedure.query(async ({ ctx }) => {
       void TelegramBotService.messageUser(Number(tgAuthResult.id), [
         `Привет, ${tgAuthResult.first_name}!`,
         'Твой Telegram успешно привязан к аккаунту Sigma Games - наслаждайся бонусами =)',
+        'Данный бот будет присылать тебе самую важную информацию о проекте:' +
+          ' ссылки на новые зеркала сайта, новости об акциях и конкурсах, и многое другое!',
+        'Также не забудь подписаться на наш канал в Telegram: @SigmaGamesFeed',
       ])
 
       res.redirect(query.returnTo)
@@ -139,6 +142,9 @@ export const telegram = procedure.query(async ({ ctx }) => {
     void TelegramBotService.messageUser(Number(tgAuthResult.id), [
       `Добро пожаловать в Sigma Games, ${tgAuthResult.first_name}!`,
       'Мы автоматически привязали твой Telegram к аккаунту на сайте - наслаждайся бонусами =)',
+      'Данный бот будет присылать тебе самую важную информацию о проекте:' +
+        ' ссылки на новые зеркала сайта, новости об акциях и конкурсах, и многое другое!',
+      'Также не забудь подписаться на наш канал в Telegram: @SigmaGamesFeed',
     ])
 
     const { cookie } = await SessionService.createSession({
