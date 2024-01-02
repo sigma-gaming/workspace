@@ -1,17 +1,13 @@
 import { createMutation } from '@farfetched/core'
 import { AccountProvider, getFullName } from '@libs/games-model'
 import { notifications } from '@mantine/notifications'
-import { invoke } from '@withease/factories'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import { $$user } from '../../entities/user'
-import { createTRPCEffect } from '../../shared/api'
 import { gamesApi } from '../../shared/api/games'
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
-  handler: invoke(() =>
-    createTRPCEffect(gamesApi.settings.updateProfile.mutate),
-  ),
+  handler: gamesApi.settings.updateProfile.mutate,
 })
 
 const submitProfile = createEvent()

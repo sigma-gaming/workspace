@@ -7,5 +7,5 @@ export const logout = procedure.mutation(async ({ ctx }) => {
   const { cookie } = await SessionService.removeSession(session)
 
   res.header('Set-Cookie', cookie)
-  return { status: 'ok' }
+  return { status: 'success' }
 })

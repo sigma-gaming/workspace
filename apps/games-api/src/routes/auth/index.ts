@@ -1,8 +1,8 @@
 import { createRouter } from '../trpc'
-import { callbacksRouter } from './callbacks'
 import { logout } from './logout'
+import { providersRouter } from './providers'
 
 export const authRouter = createRouter({
-  callbacks: callbacksRouter,
+  providers: providersRouter,
   logout,
 })

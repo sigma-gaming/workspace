@@ -48,5 +48,5 @@ export const updateProfile = procedure
       data: { name, usedProvider: input.provider },
     })
 
-    return { status: 'ok' }
+    return { status: 'success' }
   })

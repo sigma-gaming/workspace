@@ -1,10 +1,8 @@
 import { createQuery } from '@farfetched/core'
 import { AccountProvider } from '@libs/games-model'
-import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and, not } from 'patronum'
-import { createTRPCEffect } from '../../shared/api'
 import { gamesApi } from '../../shared/api/games'
 import { appStarted } from '../../shared/events.ts'
 
@@ -14,12 +12,12 @@ const logout = createEvent()
 
 const userQuery = createQuery({
   name: 'user/get',
-  handler: invoke(() => createTRPCEffect(gamesApi.me.getDetailedUser.query)),
+  handler: gamesApi.me.getDetailedUser.query,
 })
 
 const logoutMutation = createQuery({
   name: 'user/logout',
-  handler: invoke(() => createTRPCEffect(gamesApi.auth.logout.mutate)),
+  handler: gamesApi.auth.logout.mutate,
 })
 
 const loaded = userQuery.finished.success

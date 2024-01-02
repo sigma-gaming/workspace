@@ -1,14 +1,13 @@
 import { createQuery } from '@farfetched/core'
-import { invoke } from '@withease/factories'
 import { createEvent, sample } from 'effector'
-import { and } from 'patronum'
-import { createTRPCEffect } from '../../shared/api'
+import { and, not } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { appStarted } from '../../shared/events.ts'
+import { $$user } from '../user'
 
 const balanceQuery = createQuery({
   name: 'balance/get',
-  handler: invoke(() => createTRPCEffect(gamesApi.me.getDetailedBalance.query)),
+  handler: gamesApi.me.getDetailedBalance.query,
 })
 
 const request = createEvent()
@@ -25,6 +24,7 @@ const $available = $balance.map((balance) => balance?.available ?? 0)
 
 sample({
   clock: appStarted,
+  filter: not($$user.$expired),
   target: request,
 })
 

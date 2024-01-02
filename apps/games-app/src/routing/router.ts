@@ -2,13 +2,20 @@ import { createHistoryRouter } from 'atomic-router'
 import { sample } from 'effector'
 import { createBrowserHistory } from 'history'
 import { appStarted } from '../shared/events.ts'
-import { dicesGame, home, settings, telegramRedirect } from './routes'
+import {
+  dicesGame,
+  home,
+  settings,
+  telegramCallback,
+  vkCallback,
+} from './routes'
 
 const routes = [
   { path: '/', route: home },
   { path: '/games/dices', route: dicesGame },
   { path: '/settings', route: settings },
-  { path: '/redirect/telegram', route: telegramRedirect },
+  { path: '/callbacks/vk', route: vkCallback },
+  { path: '/callbacks/telegram', route: telegramCallback },
 ]
 
 export const router = createHistoryRouter({

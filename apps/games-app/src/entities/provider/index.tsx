@@ -24,8 +24,8 @@ export const ProviderInfoMap: Record<AccountProvider, ProviderInfo> = {
 }
 
 function defaultReturnTo() {
-  if (typeof window === 'undefined') return env.gamesApp.url
-  return window.location.href
+  if (typeof window === 'undefined') return '/'
+  return window.location.pathname + window.location.search
 }
 
 export function createTelegramUrl(returnTo = defaultReturnTo()) {
@@ -36,7 +36,7 @@ export function createTelegramUrl(returnTo = defaultReturnTo()) {
   params.set('request_access', 'write')
   params.set(
     'return_to',
-    `${env.gamesApp.url}/redirect/telegram?returnTo=${returnTo}`,
+    `${env.gamesApp.url}/callbacks/telegram?path=${returnTo}`,
   )
 
   return `https://oauth.telegram.org/auth?${params.toString()}`
@@ -49,7 +49,7 @@ export function createVkUrl(returnTo = defaultReturnTo()) {
   params.set('response_type', 'silent_token')
   params.set(
     'redirect_uri',
-    `${env.gamesApi.url}/trpc/auth.callbacks.vk?returnTo=${returnTo}`,
+    `${env.gamesApp.url}/callbacks/vk/#path=${returnTo}`,
   )
 
   return `https://id.vk.com/auth?${params.toString()}`
