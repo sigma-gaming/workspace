@@ -16,12 +16,27 @@ const changeName = createEvent<string>()
 
 const $updatingProfile = updateProfileMutation.$pending
 
-const $name = createStore('').on([changeName, $$user.$name], (_, name) => name)
+const $name = createStore('').on(changeName, (_, name) => name)
 
 const $usedProvider = createStore<AccountProvider | null>(null).on(
-  [changeUsedProvider, $$user.$usedProvider],
+  changeUsedProvider,
   (_, provider) => provider,
 )
+
+sample({
+  clock: $$user.$profile,
+  fn: (profile) => {
+    if (!profile) return null
+    return profile.usedProvider as AccountProvider
+  },
+  target: $usedProvider,
+})
+
+sample({
+  clock: $$user.$profile,
+  fn: (profile) => profile?.name ?? '',
+  target: $name,
+})
 
 sample({
   clock: changeUsedProvider,

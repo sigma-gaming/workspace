@@ -1,5 +1,10 @@
+import { LoadingOverlay } from '@mantine/core'
 import { BaseLayout } from '../../../layouts/base'
 
 export const VkCallbackPageView = () => {
-  return <BaseLayout>Loading...</BaseLayout>
+  return (
+    <BaseLayout>
+      <LoadingOverlay visible={true} loaderProps={{ size: 'xl' }} />
+    </BaseLayout>
+  )
 }
