@@ -15,7 +15,6 @@ import {
   IconCategory2,
   IconCoins,
   IconCreditCard,
-  IconDeviceGamepad,
   IconLoader2,
   IconLogout,
   IconSettings,
