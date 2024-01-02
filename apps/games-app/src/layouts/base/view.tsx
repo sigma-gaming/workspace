@@ -75,10 +75,10 @@ const Left = () => {
 const Header = () => {
   return (
     <header className="flex gap-6 items-center justify-between py-6 md:py-8">
-      <div className="w-64 md:px-5 flex gap-[10px] items-center">
+      <div className="md:w-64 md:px-5 flex gap-[10px] items-center">
         <Link
           to={routes.home}
-          className="w-full md:px-4 flex items-center justify-between"
+          className="md:w-full md:px-4 flex items-center justify-between"
         >
           <Logo />
           <Title className="hidden md:block" order={1} size={40}>
