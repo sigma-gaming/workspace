@@ -24,7 +24,7 @@ const indexHtmlContent = await fs.readFile(indexHtml, 'utf-8')
 await fs.writeFile(
   indexHtml,
   indexHtmlContent.replace(
-    '<script type="module" src="/env.js"></script>',
+    '<!-- public-env -->',
     `<script>window.PUBLIC_ENV = ${PUBLIC_ENV}</script>`,
   ),
 )

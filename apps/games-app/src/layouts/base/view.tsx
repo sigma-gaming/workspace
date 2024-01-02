@@ -12,28 +12,23 @@ import {
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
-  IconBrandVk,
+  IconCategory2,
   IconCoins,
+  IconCreditCard,
+  IconDeviceGamepad,
   IconLoader2,
   IconLogout,
   IconSettings,
   IconWallet,
-  IconWalletOff,
 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
 import { PropsWithChildren } from 'react'
 import { $$balance } from '../../entities/balance'
-import {
-  createTelegramUrl,
-  createVkUrl,
-  TelegramButton,
-  VkButton,
-} from '../../entities/provider'
+import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { formatRUB } from '../../shared/lib/format/currency.ts'
-import { Icon } from '../../shared/ui/general/icon'
 import { LinkButton } from '../../shared/ui/general/link-button'
 import css from './styles.module.css'
 
@@ -55,7 +50,9 @@ const Left = () => {
         to={routes.home}
         size="lg"
         color="#4a115e"
-        leftSection={<Icon name="main-page" />}
+        leftSection={
+          <IconCategory2 style={{ width: rem(24), height: rem(24) }} />
+        }
         activeClassName={css.leftLinkActive}
       >
         Главная
@@ -64,7 +61,9 @@ const Left = () => {
         to={routes.dicesGame}
         size="lg"
         color="#4a115e"
-        leftSection={<Icon name="pin-code" />}
+        leftSection={
+          <IconCreditCard style={{ width: rem(24), height: rem(24) }} />
+        }
         activeClassName={css.leftLinkActive}
       >
         PIN Code

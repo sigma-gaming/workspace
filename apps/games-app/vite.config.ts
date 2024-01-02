@@ -1,4 +1,3 @@
-import svg from '@neodx/svg/vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -22,19 +21,10 @@ export default defineConfig({
       babel: { babelrc: true },
     }),
     tsconfigPaths(),
-    svg({
-      root: './src/shared/ui/assets/icons',
-      output: './public',
-      fileName: '{name}.{hash:8}.svg',
-      metadata: {
-        path: './src/shared/ui/general/icon/sprites.generated.ts',
-        runtime: {
-          size: true,
-          viewBox: true,
-        },
-      },
-      group: false,
-      resetColors: false,
-    }),
   ],
+  build: {
+    rollupOptions: {
+      external: ['/env.js'],
+    },
+  },
 })

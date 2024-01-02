@@ -1,7 +1,7 @@
 import { AccountProvider } from '@libs/games-model'
 import { v4 } from 'uuid'
 import { env } from '../../shared/env'
-import { Icon } from '../../shared/ui/general/icon'
+import { Icons } from '../../shared/ui/general/icons'
 import {
   LinkButton,
   LinkButtonProps,
@@ -63,7 +63,7 @@ export const VkButton = ({
     <LinkButton
       to={createVkUrl()}
       color="#3375F6"
-      leftSection={<Icon name="logo-vk" />}
+      leftSection={<Icons.Vk />}
       rightSection={<span />}
       justify="space-between"
       {...rest}
@@ -81,7 +81,7 @@ export const TelegramButton = ({
     <LinkButton
       to={createTelegramUrl()}
       color="#51A2DD"
-      leftSection={<Icon name="logo-telegram" />}
+      leftSection={<Icons.Telegram />}
       rightSection={<span />}
       justify="space-between"
       {...rest}
