@@ -48,9 +48,13 @@ app.setNotFoundHandler((request, reply) => {
   reply.sendFile('index.html')
 })
 
+app.get('/health', async () => {
+  return { status: 'healthy' }
+})
+
 const port = process.env.PORT || 5173
 
-await app.listen({ port }, (err) => {
+await app.listen({ host: '0.0.0.0', port }, (err) => {
   if (err) {
     console.error(err)
     process.exit(1)
