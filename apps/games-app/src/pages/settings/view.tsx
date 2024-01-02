@@ -64,7 +64,7 @@ const Profile = () => {
 
       <Title order={3}>Профиль</Title>
 
-      <Skeleton visible={!loaded} width="fit-content">
+      <Skeleton className="sm:w-fit" visible={!loaded}>
         <Select
           label="Источник данных"
           description="Из какой социальной сети брать информацию для профиля"
@@ -78,7 +78,7 @@ const Profile = () => {
         />
       </Skeleton>
 
-      <Skeleton visible={!loaded} width="fit-content">
+      <Skeleton className="sm:w-fit" visible={!loaded}>
         <TextInput
           label="Имя в профиле"
           description="Переопределить имя из социальной сети"
@@ -87,8 +87,12 @@ const Profile = () => {
         />
       </Skeleton>
 
-      <Skeleton visible={!loaded} width="fit-content">
-        <Button type="submit" disabled={updatingProfile || !loaded}>
+      <Skeleton className="sm:w-fit" visible={!loaded}>
+        <Button
+          type="submit"
+          disabled={updatingProfile || !loaded}
+          fullWidth={true}
+        >
           Сохранить изменения
         </Button>
       </Skeleton>
@@ -115,94 +119,92 @@ const SocialNetworks = () => {
       <Title order={3}>Социальные сети</Title>
 
       {!hasAllAccounts && (
-        <Group>
+        <div className="flex flex-col sm:flex-row gap-4">
           {!vkAccount && (
-            <Skeleton visible={!loaded} width="fit-content">
-              <VkButton size="sm">Привязать VK ID</VkButton>
+            <Skeleton className="sm:w-fit" visible={!loaded}>
+              <VkButton size="sm" fullWidth={true}>
+                Привязать VK ID
+              </VkButton>
             </Skeleton>
           )}
           {!telegramAccount && (
-            <Skeleton visible={!loaded} width="fit-content">
-              <TelegramButton size="sm">Привязать Telegram</TelegramButton>
+            <Skeleton className="sm:w-fit" visible={!loaded}>
+              <TelegramButton size="sm" fullWidth={true}>
+                Привязать Telegram
+              </TelegramButton>
             </Skeleton>
           )}
-        </Group>
+        </div>
       )}
 
-      {!loaded && (
-        <SimpleGrid className="h-24" cols={2}>
-          {Array.from({ length: 2 }).map((_, index) => {
-            return (
-              // eslint-disable-next-line react/no-array-index-key
-              <Card key={index} className="justify-center">
-                <Group>
-                  <Skeleton circle height={56} width={56} />
-                  <Stack gap={12}>
-                    <Skeleton width={100} height={20} />
-                    <Skeleton width={200} height={16} />
-                  </Stack>
-                </Group>
-              </Card>
-            )
-          })}
-        </SimpleGrid>
-      )}
-
-      {loaded && (
-        <SimpleGrid className="h-24" cols={accounts.length}>
-          {accounts.map(
-            ({
-              provider,
-              providerUsername,
-              providerUserFirstName,
-              providerUserLastName,
-              providerUserImage,
-            }) => {
-              const fullName = getFullName(
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        {loaded
+          ? accounts.map(
+              ({
+                provider,
+                providerUsername,
                 providerUserFirstName,
                 providerUserLastName,
-              )
+                providerUserImage,
+              }) => {
+                const fullName = getFullName(
+                  providerUserFirstName,
+                  providerUserLastName,
+                )
 
-              const { label, profileUrl } = ProviderInfoMap[provider]
+                const { label, profileUrl } = ProviderInfoMap[provider]
 
-              const profileLink = providerUsername && (
-                <Anchor
-                  component={Link}
-                  to={profileUrl.replace('{{id}}', providerUsername)}
-                  target="_blank"
-                  underline="never"
-                >
-                  @{providerUsername}
-                </Anchor>
-              )
+                const profileLink = providerUsername && (
+                  <Anchor
+                    component={Link}
+                    to={profileUrl.replace('{{id}}', providerUsername)}
+                    target="_blank"
+                    underline="never"
+                  >
+                    @{providerUsername}
+                  </Anchor>
+                )
 
+                return (
+                  <Card key={provider}>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      {providerUserImage && (
+                        <Avatar
+                          src={providerUserImage}
+                          size={48}
+                          classNames={{
+                            root: 'overflow-visible m-1',
+                            image:
+                              'rounded-full outline outline-2 outline-offset-2 outline-sigma-600',
+                          }}
+                        />
+                      )}
+                      <Stack gap={4}>
+                        <Title order={4}>{label}</Title>
+                        <Text ff="Rubik, sans-serif">
+                          {fullName} {profileLink && <>({profileLink})</>}
+                        </Text>
+                      </Stack>
+                    </div>
+                  </Card>
+                )
+              },
+            )
+          : Array.from({ length: 2 }).map((_, index) => {
               return (
-                <Card key={provider} className="justify-center">
+                // eslint-disable-next-line react/no-array-index-key
+                <Card key={index} className="justify-center">
                   <Group>
-                    {providerUserImage && (
-                      <Avatar
-                        src={providerUserImage}
-                        size={48}
-                        classNames={{
-                          root: 'overflow-visible m-1',
-                          image:
-                            'rounded-full outline outline-2 outline-offset-2 outline-sigma-600',
-                        }}
-                      />
-                    )}
-                    <Stack gap={4}>
-                      <Title order={4}>{label}</Title>
-                      <Text ff="Rubik, sans-serif">
-                        {fullName} {profileLink && <>({profileLink})</>}
-                      </Text>
+                    <Skeleton circle height={56} width={56} />
+                    <Stack gap={12}>
+                      <Skeleton width={100} height={20} />
+                      <Skeleton width={200} height={16} />
                     </Stack>
                   </Group>
                 </Card>
               )
-            },
-          )}
-        </SimpleGrid>
-      )}
+            })}
+      </div>
     </Card>
   )
 }

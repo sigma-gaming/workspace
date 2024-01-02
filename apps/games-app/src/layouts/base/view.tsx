@@ -22,7 +22,7 @@ import {
 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, SVGProps } from 'react'
 import { $$balance } from '../../entities/balance'
 import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
@@ -33,18 +33,19 @@ import css from './styles.module.css'
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
   return (
-    <div className={css.template}>
+    <div className="flex flex-col px-4 pb-8">
       <Header />
-      <Left />
-      <main className={css.content}>{children}</main>
-      {/*<aside className={css.right}>Right</aside>*/}
+      <div className="flex flex-col md:flex-row gap-8">
+        <Left />
+        <main className="grow">{children}</main>
+      </div>
     </div>
   )
 }
 
 const Left = () => {
   return (
-    <aside className={css.left}>
+    <aside className="hidden md:flex w-64 flex-col gap-4">
       <LinkButton
         to={routes.home}
         size="lg"
@@ -73,14 +74,14 @@ const Left = () => {
 
 const Header = () => {
   return (
-    <header className={css.header}>
-      <div className="w-64 px-5 flex gap-[10px] items-center">
+    <header className="flex gap-6 items-center justify-between py-6 md:py-8">
+      <div className="w-64 md:px-5 flex gap-[10px] items-center">
         <Link
           to={routes.home}
-          className="w-full px-4 flex items-center justify-between"
+          className="w-full md:px-4 flex items-center justify-between"
         >
           <Logo />
-          <Title order={1} size={40}>
+          <Title className="hidden md:block" order={1} size={40}>
             Sigma
           </Title>
         </Link>
@@ -129,7 +130,7 @@ const Profile = () => {
   return (
     <Menu width={240} position="bottom-end" offset={16} disabled={userLoading}>
       <Menu.Target>
-        <Group className="pl-4 cursor-pointer">
+        <div className="flex gap-4 items-center pl-4 cursor-pointer">
           <Stack gap={6} align="end">
             <Skeleton visible={balanceLoading} width="fit-content" radius="sm">
               <Text className="leading-none" size="sm" c="dimmed">
@@ -158,7 +159,7 @@ const Profile = () => {
               }}
             />
           </Skeleton>
-        </Group>
+        </div>
       </Menu.Target>
 
       <Menu.Dropdown p="xs">
@@ -212,7 +213,7 @@ const Profile = () => {
   )
 }
 
-const Logo = () => {
+const Logo = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width="64"
@@ -220,6 +221,7 @@ const Logo = () => {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <circle cx="7" cy="8" r="4.5" stroke="#FA00FF" strokeWidth="3" />
       <path
