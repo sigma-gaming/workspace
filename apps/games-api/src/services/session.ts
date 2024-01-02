@@ -16,9 +16,9 @@ enum SessionState {
 }
 
 export type Session =
-  | { state: SessionState.Authenticated; user: User }
+  | { state: SessionState.Authenticated; user: User; token: string }
+  | { state: SessionState.Expired; user: null; token: string }
   | { state: SessionState.Empty; user: null }
-  | { state: SessionState.Expired; user: null }
 
 export const getSession = async (req: FastifyRequest): Promise<Session> => {
   if (!req.headers.cookie) {
@@ -26,6 +26,10 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
   }
 
   const { session } = cookie.parse(req.headers.cookie)
+
+  if (!session) {
+    return { state: SessionState.Empty, user: null }
+  }
 
   try {
     verify(session, env.jwt.secret)
@@ -35,7 +39,7 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
         ? SessionState.Expired
         : SessionState.Empty
 
-    return { state, user: null }
+    return { state, user: null, token: session }
   }
 
   const user = await prisma.user.findFirst({
@@ -50,7 +54,7 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
     return { state: SessionState.Empty, user: null }
   }
 
-  return { state: SessionState.Authenticated, user }
+  return { state: SessionState.Authenticated, user, token: session }
 }
 
 export const getUser = (session: Session): User => {
@@ -100,6 +104,13 @@ async function createSession(options: AddSessionOptions) {
       sameSite: 'lax',
       secure: true,
     }),
+    serialize('sessionExpiresAt', session.expiresAt.toISOString(), {
+      domain: env.domain,
+      path: '/',
+      expires: session.expiresAt,
+      sameSite: 'lax',
+      secure: true,
+    }),
     serialize('lastSocialProviderUsed', provider, {
       domain: env.domain,
       path: '/',
@@ -112,8 +123,39 @@ async function createSession(options: AddSessionOptions) {
   return { cookie }
 }
 
+async function removeSession(session: Session) {
+  if (session.state === SessionState.Empty) {
+    throw new NotAuthenticatedException()
+  }
+
+  await prisma.session.delete({
+    where: { token: session.token },
+  })
+
+  const cookie = [
+    serialize('session', '', {
+      domain: env.domain,
+      path: '/',
+      expires: new Date(0),
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: true,
+    }),
+    serialize('sessionExpiresAt', '', {
+      domain: env.domain,
+      path: '/',
+      expires: new Date(0),
+      sameSite: 'lax',
+      secure: true,
+    }),
+  ]
+
+  return { cookie }
+}
+
 export const SessionService = {
   createSession,
   getSession,
   getUser,
+  removeSession,
 }

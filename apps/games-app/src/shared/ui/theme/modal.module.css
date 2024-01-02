@@ -1,0 +1,23 @@
+.content {
+  background-color: #330e4d;
+}
+
+.header {
+  background-color: transparent;
+}
+
+.title {
+  @apply text-lg font-semibold;
+}
+
+.body {
+  background-color: transparent;
+}
+
+.close {
+  color: white;
+
+  &:hover {
+    background-color: #471769;
+  }
+}

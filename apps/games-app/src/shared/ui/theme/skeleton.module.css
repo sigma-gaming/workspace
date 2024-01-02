@@ -1,0 +1,7 @@
+.root[data-visible]:before {
+  background-color: #4e2568;
+}
+
+.root[data-visible]:after {
+  background-color: #624774 !important;
+}

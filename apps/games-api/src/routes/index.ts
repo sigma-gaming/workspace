@@ -1,22 +1,12 @@
-import { observable } from '@trpc/server/observable'
 import { authRouter } from './auth'
-import { createRouter, procedure } from './trpc'
-import { usersRouter } from './users'
+import { meRouter } from './me'
+import { settingsRouter } from './settings'
+import { createRouter } from './trpc'
 
 export const appRouter = createRouter({
-  users: usersRouter,
+  me: meRouter,
   auth: authRouter,
-  sub: procedure.subscription(() => {
-    return observable<number>((emit) => {
-      const timer = setInterval(() => {
-        emit.next(Math.random())
-      }, 1000)
-
-      return () => {
-        clearInterval(timer)
-      }
-    })
-  }),
+  settings: settingsRouter,
 })
 
 export type AppRouter = typeof appRouter

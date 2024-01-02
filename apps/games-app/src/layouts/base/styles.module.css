@@ -1,0 +1,41 @@
+/*
+ * Template
+ */
+
+.template {
+  @apply grid gap-8;
+  @apply px-4 pb-8;
+
+  grid-template-areas:
+    'header header header'
+    'left content right';
+
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto;
+}
+
+.header {
+  @apply mt-8;
+  @apply flex gap-6 items-center justify-between;
+  grid-area: header;
+}
+
+.left {
+  @apply w-64 flex flex-col gap-4;
+  grid-area: left;
+}
+
+.content {
+  grid-area: content;
+}
+
+.right {
+  grid-area: right;
+}
+
+/*
+ * Specific
+ */
+
+.leftLinkActive {
+}

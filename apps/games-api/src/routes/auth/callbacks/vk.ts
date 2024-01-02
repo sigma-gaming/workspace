@@ -1,4 +1,5 @@
-import { AccountProvider, Prisma } from '@libs/games-db'
+import { Prisma } from '@libs/games-db'
+import { AccountProvider } from '@libs/games-model'
 import axios from 'axios'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
@@ -7,6 +8,7 @@ import { env } from '../../../shared/env'
 import { procedure } from '../../trpc'
 
 const QuerySchema = z.object({
+  returnTo: z.string().default(env.gamesApp.url),
   payload: z.string(),
 })
 
@@ -21,7 +23,7 @@ const PayloadSchema = z.object({
     id: z.number(),
     first_name: z.string(),
     last_name: z.string(),
-    avatar: z.string(),
+    avatar: z.string().optional(),
   }),
 })
 
@@ -42,6 +44,7 @@ const GetProfileSchema = z
       photo_200: z.string().optional(),
       first_name: z.string(),
       last_name: z.string(),
+      screen_name: z.string().optional(),
     }),
   })
   .transform((result) => result.response)
@@ -81,7 +84,7 @@ export const vk = procedure.query(async ({ ctx }) => {
           .send('Аккаунт VK уже привязан к другому пользователю')
       }
 
-      res.redirect(env.gamesWeb.url)
+      res.redirect(query.returnTo)
       return
     }
 
@@ -96,14 +99,12 @@ export const vk = procedure.query(async ({ ctx }) => {
       return GetProfileSchema.parse(response.data)
     })
 
-    const fullName = [vkProfile.first_name, vkProfile.last_name]
-      .filter(Boolean)
-      .join(' ')
-
     const accountSharedInput: Omit<Prisma.AccountCreateInput, 'user'> = {
       provider: AccountProvider.VK,
       providerUserId: vkProfile.id.toString(),
-      providerUserName: fullName,
+      providerUsername: vkProfile.screen_name,
+      providerUserFirstName: vkProfile.first_name,
+      providerUserLastName: vkProfile.last_name,
       providerUserImage: vkProfile.photo_200,
     }
 
@@ -121,7 +122,7 @@ export const vk = procedure.query(async ({ ctx }) => {
         include: { user: true },
       })
 
-      res.redirect(env.gamesWeb.url)
+      res.redirect(query.returnTo)
       return
     }
 
@@ -136,8 +137,7 @@ export const vk = procedure.query(async ({ ctx }) => {
             create: {
               profile: {
                 create: {
-                  name: fullName,
-                  image: vkProfile.photo_200,
+                  usedProvider: AccountProvider.VK,
                 },
               },
             },
@@ -153,7 +153,7 @@ export const vk = procedure.query(async ({ ctx }) => {
     })
 
     res.header('Set-Cookie', cookie)
-    res.redirect(env.gamesWeb.url)
+    res.redirect(query.returnTo)
   } catch (error) {
     req.log.error(error)
 

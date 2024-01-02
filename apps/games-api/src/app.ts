@@ -49,7 +49,7 @@ if (env.isDev) {
 app.register(ws)
 
 app.register(cors, {
-  origin: env.gamesWeb.url,
+  origin: env.gamesApp.url,
   credentials: true,
 })
 

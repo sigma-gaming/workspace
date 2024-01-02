@@ -26,7 +26,9 @@
   },
   "scripts": {
     "build": "node build.mjs",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint:fix": "yarn lint --fix"
   },
   "devDependencies": {
     "@tooling/build": "workspace:*"

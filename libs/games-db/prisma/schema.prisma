@@ -5,40 +5,61 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountProvider {
+  VK
+  Telegram
+}
+
+enum TransactionType {
+  Deposit
+  Withdrawal
+  Bet
+  Win
+  Loss
+}
+
+enum Game {
+  Dice
 }
 
 model User {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
-  username  String?  @unique
 
-  profile  Profile?
-  accounts Account[]
-  sessions Session[]
+  profile      Profile?
+  accounts     Account[]
+  sessions     Session[]
+  transactions Transaction[]
 }
 
 model Profile {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
-  name      String?  @db.Text
-  image     String?  @db.Text
+
+  name         String?         @db.Text
+  username     String?         @unique @db.Text
+  usedProvider AccountProvider
 
   userId String @unique @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
-  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt         DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt         DateTime        @updatedAt @db.Timestamp(6)
-  provider          AccountProvider
-  providerUserId    String          @db.Text
-  providerUserName  String?         @db.Text
-  providerUserImage String?         @db.Text
+  id                    String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt             DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime        @updatedAt @db.Timestamp(6)
+  provider              AccountProvider
+  providerUserId        String          @db.Text
+  providerUsername      String?         @db.Text
+  providerUserFirstName String?         @db.Text
+  providerUserLastName  String?         @db.Text
+  providerUserImage     String?         @db.Text
 
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -53,7 +74,17 @@ model Session {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-enum AccountProvider {
-  VK
-  Telegram
+model Transaction {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+
+  type TransactionType
+  game Game?
+
+  openingBalance Int @default(0) @db.Integer
+  closingBalance Int @db.Integer
+  amount         Int @db.Integer
+
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: NoAction)
 }

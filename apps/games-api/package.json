@@ -15,7 +15,8 @@
     "build:dev": "NODE_ENV=development webpack",
     "start": "NODE_ENV=production node dist/main.js",
     "start:dev": "NODE_ENV=development nodemon dist/main.js --inspect",
-    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\""
+    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
     "@libs/exceptions": "workspace:*",

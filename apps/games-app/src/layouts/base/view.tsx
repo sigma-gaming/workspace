@@ -1,0 +1,248 @@
+import {
+  Avatar,
+  Button,
+  Group,
+  Menu,
+  Modal,
+  rem,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
+import {
+  IconBrandVk,
+  IconCoins,
+  IconLoader2,
+  IconLogout,
+  IconSettings,
+  IconWallet,
+  IconWalletOff,
+} from '@tabler/icons-react'
+import { Link } from 'atomic-router-react'
+import { useUnit } from 'effector-react'
+import { PropsWithChildren } from 'react'
+import { $$balance } from '../../entities/balance'
+import {
+  createTelegramUrl,
+  createVkUrl,
+  TelegramButton,
+  VkButton,
+} from '../../entities/provider'
+import { $$user } from '../../entities/user'
+import { routes } from '../../routing'
+import { formatRUB } from '../../shared/lib/format/currency.ts'
+import { Icon } from '../../shared/ui/general/icon'
+import { LinkButton } from '../../shared/ui/general/link-button'
+import css from './styles.module.css'
+
+export const BaseLayout = ({ children }: PropsWithChildren) => {
+  return (
+    <div className={css.template}>
+      <Header />
+      <Left />
+      <main className={css.content}>{children}</main>
+      {/*<aside className={css.right}>Right</aside>*/}
+    </div>
+  )
+}
+
+const Left = () => {
+  return (
+    <aside className={css.left}>
+      <LinkButton
+        to={routes.home}
+        size="lg"
+        color="#4a115e"
+        leftSection={<Icon name="main-page" />}
+        activeClassName={css.leftLinkActive}
+      >
+        Главная
+      </LinkButton>
+      <LinkButton
+        to={routes.dicesGame}
+        size="lg"
+        color="#4a115e"
+        leftSection={<Icon name="pin-code" />}
+        activeClassName={css.leftLinkActive}
+      >
+        PIN Code
+      </LinkButton>
+    </aside>
+  )
+}
+
+const Header = () => {
+  return (
+    <header className={css.header}>
+      <div className="w-64 px-5 flex gap-[10px] items-center">
+        <Link
+          to={routes.home}
+          className="w-full px-4 flex items-center justify-between"
+        >
+          <Logo />
+          <Title order={1} size={40}>
+            Sigma
+          </Title>
+        </Link>
+      </div>
+      <Profile />
+    </header>
+  )
+}
+
+const Profile = () => {
+  const [opened, { open, close }] = useDisclosure(false)
+  const userLoading = useUnit($$user.$loading)
+  const userExpired = useUnit($$user.$expired)
+  const profile = useUnit($$user.$profile)
+  const loggingOut = useUnit($$user.$loggingOut)
+  const balance = useUnit($$balance.$available)
+  const balanceLoading = useUnit($$balance.$loading)
+
+  if (userExpired) {
+    return (
+      <>
+        <Button size="md" onClick={open}>
+          Войти в аккаунт
+        </Button>
+
+        <Modal
+          title="Авторизация"
+          opened={opened}
+          onClose={close}
+          size="xs"
+          centered
+        >
+          <div className="flex flex-col gap-2">
+            <VkButton size="md" fullWidth>
+              Войти через VK ID
+            </VkButton>
+            <TelegramButton size="md" fullWidth>
+              Войти через Telegram
+            </TelegramButton>
+          </div>
+        </Modal>
+      </>
+    )
+  }
+
+  return (
+    <Menu width={240} position="bottom-end" offset={16} disabled={userLoading}>
+      <Menu.Target>
+        <Group className="pl-4 cursor-pointer">
+          <Stack gap={6} align="end">
+            <Skeleton visible={balanceLoading} width="fit-content" radius="sm">
+              <Text className="leading-none" size="sm" c="dimmed">
+                Баланс
+              </Text>
+            </Skeleton>
+            <Skeleton visible={balanceLoading} width="fit-content">
+              <Text
+                className="font-interface leading-none"
+                size="xl"
+                fw={500}
+                c="green.6"
+              >
+                {formatRUB(balance / 100)}
+              </Text>
+            </Skeleton>
+          </Stack>
+
+          <Skeleton visible={userLoading} height={56} circle>
+            <Avatar
+              src={profile?.image}
+              component="button"
+              size={48}
+              classNames={{
+                root: 'm-1 outline outline-2 outline-offset-2 outline-sigma-600',
+              }}
+            />
+          </Skeleton>
+        </Group>
+      </Menu.Target>
+
+      <Menu.Dropdown p="xs">
+        <Menu.Label>Баланс</Menu.Label>
+        <Menu.Item
+          color="green"
+          leftSection={
+            <IconWallet style={{ width: rem(16), height: rem(16) }} />
+          }
+        >
+          Пополнить баланс
+        </Menu.Item>
+        <Menu.Item
+          leftSection={
+            <IconCoins style={{ width: rem(16), height: rem(16) }} />
+          }
+        >
+          Вывести деньги
+        </Menu.Item>
+
+        <Menu.Label>Аккаунт</Menu.Label>
+        <Menu.Item
+          component={Link}
+          to={routes.settings}
+          leftSection={
+            <IconSettings style={{ width: rem(16), height: rem(16) }} />
+          }
+        >
+          Настройки
+        </Menu.Item>
+        <Menu.Item
+          color="red"
+          onClick={() => $$user.logout()}
+          closeMenuOnClick={false}
+          disabled={loggingOut}
+          leftSection={
+            loggingOut ? (
+              <IconLoader2
+                className="animate-spin"
+                style={{ width: rem(16), height: rem(16) }}
+              />
+            ) : (
+              <IconLogout style={{ width: rem(16), height: rem(16) }} />
+            )
+          }
+        >
+          {loggingOut ? 'Выходим из аккаунта...' : 'Выйти из аккаунта'}
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  )
+}
+
+const Logo = () => {
+  return (
+    <svg
+      width="64"
+      height="64"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="7" cy="8" r="4.5" stroke="#FA00FF" strokeWidth="3" />
+      <path
+        d="M13.5 3.5L7.5 3.5H7.02494C4.33453 3.5 2.23229 5.82295 2.5 8.5V8.5"
+        stroke="url(#paint0_linear_4_4)"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_4_4"
+          x1="7"
+          y1="3.5"
+          x2="2.5"
+          y2="8.5"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#9B00E4" />
+          <stop offset="1" stopColor="#9B00E4" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+    </svg>
+  )
+}

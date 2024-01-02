@@ -81,6 +81,9 @@
     "dev": {
       "dependsOn": ["^build", "copy-env"]
     },
+    "preview": {
+      "dependsOn": ["copy-env", "build"]
+    },
     "migrate": {
       "inputs": ["shared", "config", "migrations"]
     },

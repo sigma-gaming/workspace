@@ -8,7 +8,7 @@ const EnvSchema = z
     PORT: z.string().transform(Number).default('5050'),
 
     PUBLIC_DOMAIN: z.string(),
-    PUBLIC_GAMES_WEB_URL: z.string(),
+    PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_GAMES_API_WS_URL: z.string(),
     JWT_SECRET: z.string(),
@@ -25,8 +25,8 @@ const EnvSchema = z
     isProd: raw.NODE_ENV === 'production',
     port: raw.PORT,
     domain: raw.PUBLIC_DOMAIN,
-    gamesWeb: {
-      url: raw.PUBLIC_GAMES_WEB_URL,
+    gamesApp: {
+      url: raw.PUBLIC_GAMES_APP_URL,
       wsUrl: raw.PUBLIC_GAMES_API_WS_URL,
     },
     gamesApi: {
@@ -38,6 +38,7 @@ const EnvSchema = z
     telegram: {
       botId: raw.PUBLIC_TELEGRAM_BOT_ID,
       botToken: raw.TELEGRAM_BOT_TOKEN,
+      butFullToken: `${raw.PUBLIC_TELEGRAM_BOT_ID}:${raw.TELEGRAM_BOT_TOKEN}`,
     },
     vk: {
       appId: raw.PUBLIC_VK_APP_ID,

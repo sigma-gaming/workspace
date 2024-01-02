@@ -9,6 +9,8 @@
   "scripts": {
     "migrate:dev": "dotenv -e .env.development -- prisma migrate dev",
     "migrate": "prisma migrate deploy",
-    "build": "prisma generate"
+    "migrate:reset": "dotenv -e .env.development -- prisma migrate reset",
+    "build": "prisma generate",
+    "lint:fix": "prisma format"
   }
 }
