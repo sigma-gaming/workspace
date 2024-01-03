@@ -13,9 +13,11 @@ const updateProfileMutation = createMutation({
 const submitProfile = createEvent()
 const changeUsedProvider = createEvent<AccountProvider>()
 const changeName = createEvent<string>()
+const changeUsername = createEvent<string>()
 
 const $updatingProfile = updateProfileMutation.$pending
 
+const $username = createStore('').on(changeUsername, (_, username) => username)
 const $name = createStore('').on(changeName, (_, name) => name)
 
 const $usedProvider = createStore<AccountProvider | null>(null).on(
@@ -39,6 +41,12 @@ sample({
 })
 
 sample({
+  clock: $$user.$profile,
+  fn: (profile) => profile?.username ?? '',
+  target: $username,
+})
+
+sample({
   clock: changeUsedProvider,
   source: $$user.$accounts,
   fn: (accounts, provider) => {
@@ -56,10 +64,15 @@ sample({
   clock: submitProfile,
   source: {
     name: $name,
+    username: $username,
     provider: $usedProvider,
   },
   filter: ({ provider }) => Boolean(provider),
-  fn: ({ name, provider }) => ({ name, provider: provider! }),
+  fn: ({ name, username, provider }) => ({
+    name,
+    username,
+    provider: provider!,
+  }),
   target: updateProfileMutation.start,
 })
 
@@ -80,9 +93,11 @@ sample({
 
 export const $$settingsPage = {
   changeName,
+  changeUsername,
   changeUsedProvider,
   submitProfile,
   $name,
+  $username,
   $usedProvider,
   $updatingProfile,
 }

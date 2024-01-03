@@ -45,6 +45,9 @@ const Profile = () => {
   const usedProvider = useUnit($$settingsPage.$usedProvider)
   const changeUsedProvider = useUnit($$settingsPage.changeUsedProvider)
 
+  const username = useUnit($$settingsPage.$username)
+  const changeUsername = useUnit($$settingsPage.changeUsername)
+
   const name = useUnit($$settingsPage.$name)
   const changeName = useUnit($$settingsPage.changeName)
 
@@ -63,6 +66,15 @@ const Profile = () => {
       <LoadingOverlay visible={updatingProfile} />
 
       <Title order={3}>Профиль</Title>
+
+      <Skeleton className="sm:w-fit" visible={!loaded}>
+        <TextInput
+          label="Никнейм"
+          description="Используется для ссылки на профиль"
+          value={username}
+          onChange={(event) => changeUsername(event.target.value)}
+        />
+      </Skeleton>
 
       <Skeleton className="sm:w-fit" visible={!loaded}>
         <Select

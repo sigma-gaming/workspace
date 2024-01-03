@@ -163,7 +163,17 @@ const Profile = () => {
       </Menu.Target>
 
       <Menu.Dropdown p="xs">
-        <Menu.Label>Баланс</Menu.Label>
+        {profile && (
+          <div className="px-3 py-2 font-interface">
+            <Text fw={500}>{profile.name}</Text>
+            {profile.username && (
+              <Text size="sm" c="dark.2">
+                @{profile.username}
+              </Text>
+            )}
+          </div>
+        )}
+
         <Menu.Item
           color="green"
           leftSection={
@@ -180,7 +190,8 @@ const Profile = () => {
           Вывести деньги
         </Menu.Item>
 
-        <Menu.Label>Аккаунт</Menu.Label>
+        <Menu.Divider />
+
         <Menu.Item
           component={Link}
           to={routes.settings}

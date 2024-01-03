@@ -8,6 +8,7 @@ import { procedure } from '../trpc'
 export const updateProfile = procedure
   .input(
     z.object({
+      username: z.string(),
       name: z.string(),
       provider: z.nativeEnum(AccountProvider),
     }),
@@ -30,7 +31,8 @@ export const updateProfile = procedure
       })
     }
 
-    let name = null
+    let username: string | null = null
+    let name: string | null = null
 
     if (
       input.name &&
@@ -43,9 +45,24 @@ export const updateProfile = procedure
       name = input.name
     }
 
+    if (input.username) {
+      const existingUser = await prisma.profile.findFirst({
+        where: { username: input.username },
+      })
+
+      if (existingUser && existingUser.userId !== user.id) {
+        throw new BadRequestException({
+          path: ['username'],
+          message: 'Пользователь с таким никнеймом уже существует',
+        })
+      }
+
+      username = input.username
+    }
+
     await prisma.profile.update({
       where: { userId: user.id },
-      data: { name, usedProvider: input.provider },
+      data: { name, username, usedProvider: input.provider },
     })
 
     return { status: 'success' }
