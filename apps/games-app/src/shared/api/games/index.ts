@@ -6,14 +6,14 @@ import {
   splitLink,
   wsLink,
 } from '@trpc/client'
-import { AppRouter } from '@apps/games-api'
+import { GamesAPIRouter } from '@apps/games-api'
 import { env } from '../../env'
 
 const wsClient = createWSClient({
   url: env.gamesApi.wsUrl + '/trpc',
 })
 
-export const gamesApi = createTRPCProxyClient<AppRouter>({
+export const gamesApi = createTRPCProxyClient<GamesAPIRouter>({
   links: [
     loggerLink({
       enabled() {
@@ -24,12 +24,12 @@ export const gamesApi = createTRPCProxyClient<AppRouter>({
       condition(op) {
         return op.type === 'subscription'
       },
-      true: wsLink<AppRouter>({ client: wsClient }),
-      false: httpBatchLink<AppRouter>({
+      true: wsLink<GamesAPIRouter>({
+        client: wsClient,
+      }),
+      false: httpBatchLink<GamesAPIRouter>({
         url: env.gamesApi.url + '/trpc',
         fetch(url, options) {
-          console.log(url, options)
-
           return fetch(url, {
             ...options,
             credentials: 'include',

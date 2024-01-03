@@ -1,5 +1,10 @@
 import { BadRequestException } from '@libs/exceptions'
-import { AccountProvider, getFullName } from '@libs/games-model'
+import { Prisma } from '@libs/games-db'
+import {
+  AccountProvider,
+  getFullName,
+  ProfileValidation,
+} from '@libs/games-model'
 import { z } from 'zod'
 import { SessionService } from '../../services/session'
 import { prisma } from '../../shared/db'
@@ -8,13 +13,26 @@ import { procedure } from '../trpc'
 export const updateProfile = procedure
   .input(
     z.object({
-      username: z.string(),
-      name: z.string(),
+      username: ProfileValidation.UsernameSchema.nullable(),
+      name: ProfileValidation.NameSchema.optional(),
       provider: z.nativeEnum(AccountProvider),
     }),
   )
   .mutation(async ({ ctx, input }) => {
     const user = SessionService.getUser(ctx.session)
+
+    if (input.username) {
+      const existingUser = await prisma.profile.findFirst({
+        where: { username: input.username },
+      })
+
+      if (existingUser && existingUser.userId !== user.id) {
+        throw new BadRequestException({
+          path: ['username'],
+          message: 'Пользователь с таким никнеймом уже существует',
+        })
+      }
+    }
 
     const accounts = await prisma.account.findMany({
       where: { userId: user.id },
@@ -31,38 +49,23 @@ export const updateProfile = procedure
       })
     }
 
-    let username: string | null = null
-    let name: string | null = null
-
-    if (
-      input.name &&
-      input.name !==
-        getFullName(
-          selectedProvider.providerUserFirstName,
-          selectedProvider.providerUserLastName,
-        )
-    ) {
-      name = input.name
+    const data: Prisma.ProfileUpdateInput = {
+      username: input.username,
+      usedProvider: input.provider,
     }
 
-    if (input.username) {
-      const existingUser = await prisma.profile.findFirst({
-        where: { username: input.username },
-      })
+    const nameFromProvider = getFullName(
+      selectedProvider.providerUserFirstName,
+      selectedProvider.providerUserLastName,
+    )
 
-      if (existingUser && existingUser.userId !== user.id) {
-        throw new BadRequestException({
-          path: ['username'],
-          message: 'Пользователь с таким никнеймом уже существует',
-        })
-      }
-
-      username = input.username
+    if (input.name && input.name !== nameFromProvider) {
+      data.name = input.name
     }
 
     await prisma.profile.update({
       where: { userId: user.id },
-      data: { name, username, usedProvider: input.provider },
+      data,
     })
 
     return { status: 'success' }

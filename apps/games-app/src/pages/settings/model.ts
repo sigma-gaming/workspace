@@ -1,4 +1,4 @@
-import { createMutation } from '@farfetched/core'
+import { createMutation, RemoteOperationParams } from '@farfetched/core'
 import { AccountProvider, getFullName } from '@libs/games-model'
 import { notifications } from '@mantine/notifications'
 import { createEffect, createEvent, createStore, sample } from 'effector'
@@ -9,6 +9,8 @@ const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
   handler: gamesApi.settings.updateProfile.mutate,
 })
+
+type UpdateProfilePayload = RemoteOperationParams<typeof updateProfileMutation>
 
 const submitProfile = createEvent()
 const changeUsedProvider = createEvent<AccountProvider>()
@@ -68,11 +70,18 @@ sample({
     provider: $usedProvider,
   },
   filter: ({ provider }) => Boolean(provider),
-  fn: ({ name, username, provider }) => ({
-    name,
-    username,
-    provider: provider!,
-  }),
+  fn: ({ name, username, provider }) => {
+    const payload: UpdateProfilePayload = {
+      username: username ? username : null,
+      provider: provider!,
+    }
+
+    if (name) {
+      payload.name = name
+    }
+
+    return payload
+  },
   target: updateProfileMutation.start,
 })
 
@@ -89,6 +98,14 @@ sample({
       message: `Ты великолепен!`,
     })
   }),
+})
+
+sample({
+  clock: updateProfileMutation.finished.failure,
+  fn: ({ error }) => {
+    console.log(Object.assign({}, error))
+    return null
+  },
 })
 
 export const $$settingsPage = {
