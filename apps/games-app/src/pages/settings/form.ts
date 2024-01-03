@@ -1,3 +1,6 @@
+import { Mutation } from '@farfetched/core'
+import { TRPCClientError } from '@trpc/client'
+import { TRPCError } from '@trpc/server'
 import {
   combine,
   createEffect,
@@ -28,7 +31,7 @@ export function createForm<
 >(options: {
   values: { [K in keyof TValues]: Store<TValues[K]> }
   schema: ZodSchema<TValidated, ZodObjectDef, TDirty>
-  target: UnitTargetable<TValidated>
+  mutation: Mutation<TValidated, any, unknown>
 }) {
   interface ValidResult {
     valid: true
@@ -73,16 +76,34 @@ export function createForm<
 
   sample({
     source: validateFx.doneData,
-    filter: (result: ValidationResult): result is ValidResult => result.valid,
-    fn: (result) => result.values,
-    target: options.target,
+    filter: (result: ValidationResult): result is InvalidResult =>
+      !result.valid,
+    fn: (result) => result.errors,
+    target: $errors,
   })
 
   sample({
     source: validateFx.doneData,
-    filter: (result: ValidationResult): result is InvalidResult =>
-      !result.valid,
-    fn: (result) => result.errors,
+    filter: (result: ValidationResult): result is ValidResult => result.valid,
+    fn: (result) => result.values,
+    target: options.mutation.start,
+  })
+
+  sample({
+    source: options.mutation.finished.failure,
+    fn: ({ error }) => {
+      if (
+        error instanceof TRPCClientError &&
+        error.data.error === 'BadRequestException'
+      ) {
+        const errors: Record<string, string> = {}
+        const { path, message } = error.data.payload
+        errors[path.join('.')] = message
+        return errors
+      }
+
+      return {}
+    },
     target: $errors,
   })
 

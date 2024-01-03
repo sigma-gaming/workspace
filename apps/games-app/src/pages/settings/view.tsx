@@ -77,6 +77,7 @@ const Profile = () => {
           value={username}
           onChange={(event) => changeUsername(event.target.value)}
           error={errors.username}
+          spellCheck={false}
         />
       </Skeleton>
 
@@ -103,6 +104,7 @@ const Profile = () => {
           value={name}
           onChange={(event) => changeName(event.target.value)}
           error={errors.name}
+          spellCheck={false}
         />
       </Skeleton>
 

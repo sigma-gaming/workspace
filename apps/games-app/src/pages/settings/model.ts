@@ -51,7 +51,7 @@ const $$profileForm = createForm({
     username: ProfileValidation.UsernameSchema,
     provider: z.nativeEnum(AccountProvider),
   }),
-  target: updateProfileMutation.start,
+  mutation: updateProfileMutation,
 })
 
 sample({
@@ -104,14 +104,6 @@ sample({
       message: `Ты великолепен!`,
     })
   }),
-})
-
-sample({
-  clock: updateProfileMutation.finished.failure,
-  fn: ({ error }) => {
-    console.log(Object.assign({}, error))
-    return null
-  },
 })
 
 export const $$settingsPage = {
