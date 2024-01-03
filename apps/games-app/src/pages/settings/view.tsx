@@ -41,25 +41,28 @@ const Profile = () => {
   const loaded = useUnit($$user.$loaded)
   const accounts = useUnit($$user.$accounts)
 
-  const usedProvider = useUnit($$settingsPage.$usedProvider)
+  const { name, username, provider } = useUnit(
+    $$settingsPage.$$profileForm.$values,
+  )
+
+  const errors = useUnit($$settingsPage.$$profileForm.$errors)
+
+  const submit = useUnit($$settingsPage.$$profileForm.submit)
+
   const changeUsedProvider = useUnit($$settingsPage.changeUsedProvider)
-
-  const username = useUnit($$settingsPage.$username)
   const changeUsername = useUnit($$settingsPage.changeUsername)
-
-  const name = useUnit($$settingsPage.$name)
   const changeName = useUnit($$settingsPage.changeName)
 
   const updatingProfile = useUnit($$settingsPage.$updatingProfile)
-  const submitProfile = useUnit($$settingsPage.submitProfile)
 
   return (
     <Card
       component="form"
+      className="p-4 rounded-xl md:p-6 md:rounded-2xl"
       style={{ gap: 'var(--mantine-spacing-md)' }}
       onSubmit={(event) => {
         event.preventDefault()
-        submitProfile()
+        submit()
       }}
     >
       <LoadingOverlay visible={updatingProfile} />
@@ -70,8 +73,10 @@ const Profile = () => {
         <TextInput
           label="Никнейм"
           description="Используется для ссылки на профиль"
+          placeholder="Введите никнейм"
           value={username}
           onChange={(event) => changeUsername(event.target.value)}
+          error={errors.username}
         />
       </Skeleton>
 
@@ -83,9 +88,10 @@ const Profile = () => {
             label: ProviderInfoMap[account.provider].label,
             value: account.provider,
           }))}
-          value={usedProvider}
+          value={provider}
           onChange={(value) => changeUsedProvider(value as AccountProvider)}
           allowDeselect={false}
+          error={errors.provider}
         />
       </Skeleton>
 
@@ -93,8 +99,10 @@ const Profile = () => {
         <TextInput
           label="Имя в профиле"
           description="Переопределить имя из социальной сети"
+          placeholder="Введите имя"
           value={name}
           onChange={(event) => changeName(event.target.value)}
+          error={errors.name}
         />
       </Skeleton>
 
@@ -126,7 +134,10 @@ const SocialNetworks = () => {
   const hasAllAccounts = Boolean(vkAccount && telegramAccount)
 
   return (
-    <Card style={{ gap: 'var(--mantine-spacing-md)' }}>
+    <Card
+      className="p-4 rounded-xl md:p-6 md:rounded-2xl"
+      style={{ gap: 'var(--mantine-spacing-md)' }}
+    >
       <Title order={3}>Социальные сети</Title>
 
       {!hasAllAccounts && (

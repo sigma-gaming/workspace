@@ -4,6 +4,7 @@ import {
   createTheme,
   CSSVariablesResolver,
   Input,
+  InputWrapper,
   LoadingOverlay,
   MantineProvider,
   Menu,
@@ -16,6 +17,7 @@ import { PropsWithChildren } from 'react'
 import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
 import inputClassNames from './input.module.css'
+import inputWrapperClassNames from './input-wrapper.module.css'
 import loadingOverlayClassNames from './loading-overlay.module.css'
 import menuClassNames from './menu.module.css'
 import modalClassNames from './modal.module.css'
@@ -52,6 +54,9 @@ export const theme = createTheme({
     Input: Input.extend({
       classNames: inputClassNames,
     }),
+    InputWrapper: InputWrapper.extend({
+      classNames: inputWrapperClassNames,
+    }),
     Card: Card.extend({
       classNames: cardClassNames,
     }),
@@ -84,8 +89,9 @@ const resolver: CSSVariablesResolver = () => ({
   dark: {
     '--mantine-color-borders': '#4e2567',
     '--mantine-color-text': '#ededed',
-    '--mantine-color-bg': '#220032',
+    '--mantine-color-bg': '#2a003d',
     '--mantine-overlay-bg': 'rgb(78 37 104 / 80%)',
+    '--mantine-color-error': '#fd473a',
   },
 })
 

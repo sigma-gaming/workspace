@@ -164,7 +164,7 @@ const Profile = () => {
 
       <Menu.Dropdown p="xs">
         {profile && (
-          <div className="px-3 py-2 font-interface">
+          <div className="px-3 py-2">
             <Text fw={500}>{profile.name}</Text>
             {profile.username && (
               <Text size="sm" c="dark.2">

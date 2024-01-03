@@ -1,9 +1,15 @@
 import { createMutation, RemoteOperationParams } from '@farfetched/core'
-import { AccountProvider, getFullName } from '@libs/games-model'
+import {
+  AccountProvider,
+  getFullName,
+  ProfileValidation,
+} from '@libs/games-model'
 import { notifications } from '@mantine/notifications'
 import { createEffect, createEvent, createStore, sample } from 'effector'
+import { z } from 'zod'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
+import { createForm } from './form.ts'
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
@@ -19,33 +25,33 @@ const changeUsername = createEvent<string>()
 
 const $updatingProfile = updateProfileMutation.$pending
 
-const $username = createStore('').on(changeUsername, (_, username) => username)
-const $name = createStore('').on(changeName, (_, name) => name)
+const $username = createStore('')
+  .on(changeUsername, (_, username) => username)
+  .on($$user.$profile, (_, profile) => profile?.username ?? '')
 
-const $usedProvider = createStore<AccountProvider | null>(null).on(
-  changeUsedProvider,
-  (_, provider) => provider,
-)
+const $name = createStore('')
+  .on(changeName, (_, name) => name)
+  .on($$user.$profile, (_, profile) => profile?.name ?? '')
 
-sample({
-  clock: $$user.$profile,
-  fn: (profile) => {
+const $usedProvider = createStore<AccountProvider | null>(null)
+  .on(changeUsedProvider, (_, provider) => provider)
+  .on($$user.$profile, (_, profile) => {
     if (!profile) return null
     return profile.usedProvider as AccountProvider
+  })
+
+const $$profileForm = createForm({
+  values: {
+    name: $name,
+    username: $username,
+    provider: $usedProvider,
   },
-  target: $usedProvider,
-})
-
-sample({
-  clock: $$user.$profile,
-  fn: (profile) => profile?.name ?? '',
-  target: $name,
-})
-
-sample({
-  clock: $$user.$profile,
-  fn: (profile) => profile?.username ?? '',
-  target: $username,
+  schema: z.object({
+    name: ProfileValidation.NameSchema,
+    username: ProfileValidation.UsernameSchema,
+    provider: z.nativeEnum(AccountProvider),
+  }),
+  target: updateProfileMutation.start,
 })
 
 sample({
@@ -109,6 +115,7 @@ sample({
 })
 
 export const $$settingsPage = {
+  $$profileForm,
   changeName,
   changeUsername,
   changeUsedProvider,
