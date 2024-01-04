@@ -1,51 +1,35 @@
-import { createMutation, RemoteOperationParams } from '@farfetched/core'
+import { createMutation } from '@farfetched/core'
 import {
   AccountProvider,
   getFullName,
   ProfileValidation,
 } from '@libs/games-model'
 import { notifications } from '@mantine/notifications'
-import { createEffect, createEvent, createStore, sample } from 'effector'
+import { createEffect, createEvent, sample } from 'effector'
 import { z } from 'zod'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
-import { createForm } from './form.ts'
+import { createForm, defineInitialValues } from './form.ts'
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
   handler: gamesApi.settings.updateProfile.mutate,
 })
 
-type UpdateProfilePayload = RemoteOperationParams<typeof updateProfileMutation>
-
-const submitProfile = createEvent()
-const changeUsedProvider = createEvent<AccountProvider>()
-const changeName = createEvent<string>()
-const changeUsername = createEvent<string>()
-
 const $updatingProfile = updateProfileMutation.$pending
 
-const $username = createStore('')
-  .on(changeUsername, (_, username) => username)
-  .on($$user.$profile, (_, profile) => profile?.username ?? '')
-
-const $name = createStore('')
-  .on(changeName, (_, name) => name)
-  .on($$user.$profile, (_, profile) => profile?.name ?? '')
-
-const $usedProvider = createStore<AccountProvider | null>(null)
-  .on(changeUsedProvider, (_, provider) => provider)
-  .on($$user.$profile, (_, profile) => {
-    if (!profile) return null
-    return profile.usedProvider as AccountProvider
-  })
+const initialValues = defineInitialValues<{
+  name: string
+  username: string
+  provider: AccountProvider | null
+}>({
+  name: '',
+  username: '',
+  provider: null,
+})
 
 const $$profileForm = createForm({
-  values: {
-    name: $name,
-    username: $username,
-    provider: $usedProvider,
-  },
+  initialValues,
   schema: z.object({
     name: ProfileValidation.NameSchema,
     username: ProfileValidation.UsernameSchema,
@@ -55,40 +39,49 @@ const $$profileForm = createForm({
 })
 
 sample({
-  clock: changeUsedProvider,
-  source: $$user.$accounts,
-  fn: (accounts, provider) => {
-    const account = accounts.find((account) => account.provider === provider)
-
-    return getFullName(
-      account?.providerUserFirstName,
-      account?.providerUserLastName,
-    )
+  source: $$user.$profile,
+  fn: (profile) => {
+    if (!profile) return {}
+    return { username: profile.username ?? '' }
   },
-  target: $name,
+  target: $$profileForm.updateValues,
 })
 
 sample({
-  clock: submitProfile,
-  source: {
-    name: $name,
-    username: $username,
-    provider: $usedProvider,
+  source: $$user.$profile,
+  fn: (profile) => {
+    if (!profile) return {}
+    return { provider: profile.usedProvider as AccountProvider }
   },
-  filter: ({ provider }) => Boolean(provider),
-  fn: ({ name, username, provider }) => {
-    const payload: UpdateProfilePayload = {
-      username: username ? username : null,
-      provider: provider!,
-    }
+  target: $$profileForm.updateValues,
+})
 
-    if (name) {
-      payload.name = name
-    }
-
-    return payload
+sample({
+  source: $$user.$profile,
+  fn: (profile) => {
+    if (!profile) return {}
+    return { name: profile.name ?? '' }
   },
-  target: updateProfileMutation.start,
+  target: $$profileForm.updateValues,
+})
+
+sample({
+  clock: $$profileForm.updateValues,
+  source: $$user.$accounts,
+  filter: (_, updates) => 'provider' in updates,
+  fn: (accounts, updates) => {
+    const account = accounts.find(
+      (account) => account.provider === updates.provider,
+    )
+
+    return {
+      name: getFullName(
+        account?.providerUserFirstName,
+        account?.providerUserLastName,
+      ),
+    }
+  },
+  target: $$profileForm.updateValues,
 })
 
 sample({
@@ -108,12 +101,5 @@ sample({
 
 export const $$settingsPage = {
   $$profileForm,
-  changeName,
-  changeUsername,
-  changeUsedProvider,
-  submitProfile,
-  $name,
-  $username,
-  $usedProvider,
   $updatingProfile,
 }

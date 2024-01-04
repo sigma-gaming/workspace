@@ -1,6 +1,5 @@
 import { Mutation } from '@farfetched/core'
 import { TRPCClientError } from '@trpc/client'
-import { TRPCError } from '@trpc/server'
 import {
   combine,
   createEffect,
@@ -8,7 +7,6 @@ import {
   createStore,
   sample,
   Store,
-  UnitTargetable,
 } from 'effector'
 import { reset } from 'patronum'
 import { ZodError, ZodObjectDef, ZodSchema } from 'zod'
@@ -24,15 +22,47 @@ function normalizeFieldErrors(errors: Record<string, string[] | undefined>) {
   return normalized
 }
 
+interface FailureParams<TValidated> {
+  params: TValidated
+  error: unknown
+}
+
+type MapFailure = <TValidated>(
+  params: FailureParams<TValidated>,
+) => Record<string, string>
+
+const defaultMapFailure: MapFailure = ({ error }) => {
+  if (
+    error instanceof TRPCClientError &&
+    error.data.error === 'BadRequestException'
+  ) {
+    const errors: Record<string, string> = {}
+    const { path, message } = error.data.payload
+    errors[path.join('.')] = message
+    return errors
+  }
+
+  return {}
+}
+
+export function defineInitialValues<TValues extends FormValues>(
+  initialValues: TValues,
+) {
+  return initialValues
+}
+
 export function createForm<
   TValues extends FormValues,
   TDirty,
   TValidated,
 >(options: {
-  values: { [K in keyof TValues]: Store<TValues[K]> }
+  initialValues: TValues
   schema: ZodSchema<TValidated, ZodObjectDef, TDirty>
   mutation: Mutation<TValidated, any, unknown>
+  mapFailure?: MapFailure
 }) {
+  const { mapFailure = defaultMapFailure } = options
+
   interface ValidResult {
     valid: true
     values: TValidated
@@ -45,7 +75,7 @@ export function createForm<
 
   type ValidationResult = ValidResult | InvalidResult
 
-  const validateFx = createEffect((values: FormValues): ValidationResult => {
+  const validateFx = createEffect((values: TValues): ValidationResult => {
     try {
       const validated = options.schema.parse(values)
       return { valid: true, values: validated }
@@ -58,9 +88,18 @@ export function createForm<
     }
   })
 
+  const updateValues = createEvent<Partial<TValues>>()
+
   const submit = createEvent()
 
-  const $values = combine(options.values, (values) => values)
+  const $values = createStore<TValues>(options.initialValues).on(
+    updateValues,
+    (values, updates) => ({
+      ...values,
+      ...updates,
+    }),
+  )
+
   const $errors = createStore<Record<string, string>>({})
 
   sample({
@@ -91,25 +130,14 @@ export function createForm<
 
   sample({
     source: options.mutation.finished.failure,
-    fn: ({ error }) => {
-      if (
-        error instanceof TRPCClientError &&
-        error.data.error === 'BadRequestException'
-      ) {
-        const errors: Record<string, string> = {}
-        const { path, message } = error.data.payload
-        errors[path.join('.')] = message
-        return errors
-      }
-
-      return {}
-    },
+    fn: mapFailure,
     target: $errors,
   })
 
   return {
     $values,
     $errors,
+    updateValues,
     submit,
   }
 }

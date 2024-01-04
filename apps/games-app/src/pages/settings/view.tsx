@@ -47,11 +47,8 @@ const Profile = () => {
 
   const errors = useUnit($$settingsPage.$$profileForm.$errors)
 
+  const updateValues = useUnit($$settingsPage.$$profileForm.updateValues)
   const submit = useUnit($$settingsPage.$$profileForm.submit)
-
-  const changeUsedProvider = useUnit($$settingsPage.changeUsedProvider)
-  const changeUsername = useUnit($$settingsPage.changeUsername)
-  const changeName = useUnit($$settingsPage.changeName)
 
   const updatingProfile = useUnit($$settingsPage.$updatingProfile)
 
@@ -75,7 +72,7 @@ const Profile = () => {
           description="Используется для ссылки на профиль"
           placeholder="Введите никнейм"
           value={username}
-          onChange={(event) => changeUsername(event.target.value)}
+          onChange={(event) => updateValues({ username: event.target.value })}
           error={errors.username}
           spellCheck={false}
         />
@@ -90,7 +87,9 @@ const Profile = () => {
             value: account.provider,
           }))}
           value={provider}
-          onChange={(value) => changeUsedProvider(value as AccountProvider)}
+          onChange={(value) =>
+            updateValues({ provider: value as AccountProvider })
+          }
           allowDeselect={false}
           error={errors.provider}
         />
@@ -102,7 +101,7 @@ const Profile = () => {
           description="Переопределить имя из социальной сети"
           placeholder="Введите имя"
           value={name}
-          onChange={(event) => changeName(event.target.value)}
+          onChange={(event) => updateValues({ name: event.target.value })}
           error={errors.name}
           spellCheck={false}
         />

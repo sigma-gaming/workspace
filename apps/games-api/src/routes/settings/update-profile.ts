@@ -63,6 +63,10 @@ export const updateProfile = procedure
       data.name = input.name
     }
 
+    if (input.name === nameFromProvider) {
+      data.name = null
+    }
+
     await prisma.profile.update({
       where: { userId: user.id },
       data,
