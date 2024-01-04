@@ -13,7 +13,7 @@ import { procedure } from '../trpc'
 export const updateProfile = procedure
   .input(
     z.object({
-      username: ProfileValidation.UsernameSchema.nullable(),
+      username: ProfileValidation.UsernameSchema.optional(),
       name: ProfileValidation.NameSchema.optional(),
       provider: z.nativeEnum(AccountProvider),
     }),
@@ -50,7 +50,7 @@ export const updateProfile = procedure
     }
 
     const data: Prisma.ProfileUpdateInput = {
-      username: input.username,
+      username: input.username ?? null,
       usedProvider: input.provider,
     }
 

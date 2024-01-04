@@ -1,15 +1,17 @@
 import { createMutation } from '@farfetched/core'
+import { BadRequestException, ValidationException } from '@libs/exceptions'
 import {
   AccountProvider,
   getFullName,
   ProfileValidation,
 } from '@libs/games-model'
 import { notifications } from '@mantine/notifications'
-import { createEffect, createEvent, sample } from 'effector'
+import { TRPCClientError } from '@trpc/client'
+import { createEffect, sample } from 'effector'
 import { z } from 'zod'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
-import { createForm, defineInitialValues } from './form.ts'
+import { createField, createForm, normalizeFieldErrors } from './form.ts'
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
@@ -18,70 +20,84 @@ const updateProfileMutation = createMutation({
 
 const $updatingProfile = updateProfileMutation.$pending
 
-const initialValues = defineInitialValues<{
-  name: string
-  username: string
-  provider: AccountProvider | null
-}>({
-  name: '',
-  username: '',
-  provider: null,
-})
+const profileFields = {
+  name: createField({
+    emptyValue: '',
+  }),
+  username: createField({
+    emptyValue: '',
+  }),
+  provider: createField<AccountProvider | null>({
+    emptyValue: null,
+  }),
+}
 
-const $$profileForm = createForm({
-  initialValues,
+const profileForm = createForm({
+  fields: profileFields,
   schema: z.object({
-    name: ProfileValidation.NameSchema,
-    username: ProfileValidation.UsernameSchema,
+    name: ProfileValidation.NameSchema.optional(),
+    username: ProfileValidation.UsernameSchema.optional(),
     provider: z.nativeEnum(AccountProvider),
   }),
-  mutation: updateProfileMutation,
-})
-
-sample({
-  source: $$user.$profile,
-  fn: (profile) => {
-    if (!profile) return {}
-    return { username: profile.username ?? '' }
+  cleanEmpty: {
+    name: true,
+    username: true,
   },
-  target: $$profileForm.updateValues,
 })
 
 sample({
-  source: $$user.$profile,
-  fn: (profile) => {
-    if (!profile) return {}
-    return { provider: profile.usedProvider as AccountProvider }
-  },
-  target: $$profileForm.updateValues,
+  source: profileForm.submitted,
+  target: updateProfileMutation.start,
 })
 
 sample({
-  source: $$user.$profile,
-  fn: (profile) => {
-    if (!profile) return {}
-    return { name: profile.name ?? '' }
-  },
-  target: $$profileForm.updateValues,
-})
+  source: updateProfileMutation.finished.failure,
+  fn: ({ error }) => {
+    const isTRPCClientError = error instanceof TRPCClientError
+    if (!isTRPCClientError) return {}
 
-sample({
-  clock: $$profileForm.updateValues,
-  source: $$user.$accounts,
-  filter: (_, updates) => 'provider' in updates,
-  fn: (accounts, updates) => {
-    const account = accounts.find(
-      (account) => account.provider === updates.provider,
-    )
-
-    return {
-      name: getFullName(
-        account?.providerUserFirstName,
-        account?.providerUserLastName,
-      ),
+    if (error.data.error === BadRequestException.name) {
+      const exception = new BadRequestException(error.data.payload)
+      const errors: Record<string, string[]> = {}
+      const { path = ['root'], message } = exception.payload
+      errors[path.join('.')] = [message]
+      return errors
     }
+
+    if (error.data.error === ValidationException.name) {
+      const exception = new ValidationException(error.data.payload)
+      const { fieldErrors } = exception.payload
+      return normalizeFieldErrors(fieldErrors)
+    }
+
+    return {}
   },
-  target: $$profileForm.updateValues,
+  target: profileForm.setErrors,
+})
+
+sample({
+  source: $$user.$profile,
+  filter: Boolean,
+  fn: (profile) => ({
+    name: profile.name ?? '',
+    username: profile.username ?? '',
+    provider: profile.usedProvider as AccountProvider,
+  }),
+  target: profileForm.initialize,
+})
+
+sample({
+  clock: profileFields.provider.update,
+  source: $$user.$accounts,
+  fn: (accounts, provider) => {
+    const account = accounts.find((account) => account.provider === provider)
+
+    return getFullName(
+      account?.providerUserFirstName,
+      account?.providerUserLastName,
+    )
+  },
+  target: profileFields.name.update,
 })
 
 sample({
@@ -100,6 +116,7 @@ sample({
 })
 
 export const $$settingsPage = {
-  $$profileForm,
+  profileFields,
+  profileForm,
   $updatingProfile,
 }

@@ -41,14 +41,15 @@ const Profile = () => {
   const loaded = useUnit($$user.$loaded)
   const accounts = useUnit($$user.$accounts)
 
-  const { name, username, provider } = useUnit(
-    $$settingsPage.$$profileForm.$values,
-  )
+  const name = useUnit($$settingsPage.profileFields.name.$value)
+  const username = useUnit($$settingsPage.profileFields.username.$value)
+  const provider = useUnit($$settingsPage.profileFields.provider.$value)
+  const errors = useUnit($$settingsPage.profileForm.$errors)
 
-  const errors = useUnit($$settingsPage.$$profileForm.$errors)
-
-  const updateValues = useUnit($$settingsPage.$$profileForm.updateValues)
-  const submit = useUnit($$settingsPage.$$profileForm.submit)
+  const updateUsername = useUnit($$settingsPage.profileFields.username.update)
+  const updateProvider = useUnit($$settingsPage.profileFields.provider.update)
+  const updateName = useUnit($$settingsPage.profileFields.name.update)
+  const submit = useUnit($$settingsPage.profileForm.submit)
 
   const updatingProfile = useUnit($$settingsPage.$updatingProfile)
 
@@ -72,8 +73,8 @@ const Profile = () => {
           description="Используется для ссылки на профиль"
           placeholder="Введите никнейм"
           value={username}
-          onChange={(event) => updateValues({ username: event.target.value })}
-          error={errors.username}
+          onChange={(event) => updateUsername(event.target.value)}
+          error={errors.username[0]}
           spellCheck={false}
         />
       </Skeleton>
@@ -87,11 +88,9 @@ const Profile = () => {
             value: account.provider,
           }))}
           value={provider}
-          onChange={(value) =>
-            updateValues({ provider: value as AccountProvider })
-          }
+          onChange={(value) => updateProvider(value as AccountProvider)}
           allowDeselect={false}
-          error={errors.provider}
+          error={errors.provider[0]}
         />
       </Skeleton>
 
@@ -101,8 +100,8 @@ const Profile = () => {
           description="Переопределить имя из социальной сети"
           placeholder="Введите имя"
           value={name}
-          onChange={(event) => updateValues({ name: event.target.value })}
-          error={errors.name}
+          onChange={(event) => updateName(event.target.value)}
+          error={errors.name[0]}
           spellCheck={false}
         />
       </Skeleton>
