@@ -24,7 +24,12 @@ const t = initTRPC.context<Context>().create({
     }
 
     if (error.cause instanceof ZodError) {
-      return finish(new ValidationException(error.cause))
+      return finish(
+        new ValidationException({
+          issues: error.cause.issues,
+          fieldErrors: error.cause.formErrors.fieldErrors,
+        }),
+      )
     }
 
     if (error.cause instanceof RouteException) {

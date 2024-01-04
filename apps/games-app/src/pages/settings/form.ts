@@ -1,4 +1,5 @@
 import { Mutation } from '@farfetched/core'
+import { BadRequestException, ValidationException } from '@libs/exceptions'
 import { TRPCClientError } from '@trpc/client'
 import {
   combine,
@@ -32,14 +33,21 @@ type MapFailure = <TValidated>(
 ) => Record<string, string>
 
 const defaultMapFailure: MapFailure = ({ error }) => {
-  if (
-    error instanceof TRPCClientError &&
-    error.data.error === 'BadRequestException'
-  ) {
+  const isTRPCClientError = error instanceof TRPCClientError
+  if (!isTRPCClientError) return {}
+
+  if (error.data.error === BadRequestException.name) {
+    const exception = new BadRequestException(error.data.payload)
     const errors: Record<string, string> = {}
-    const { path, message } = error.data.payload
+    const { path = ['root'], message } = exception.payload
     errors[path.join('.')] = message
     return errors
+  }
+
+  if (error.data.error === ValidationException.name) {
+    const exception = new ValidationException(error.data.payload)
+    const { fieldErrors } = exception.payload
+    return normalizeFieldErrors(fieldErrors)
   }
 
   return {}

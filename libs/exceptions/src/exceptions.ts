@@ -76,12 +76,13 @@ export class BadRequestException extends RouteException<BadRequestExceptionPaylo
   message = 'Bad request'
 }
 
-export class ValidationException extends RouteException<ZodIssue[]> {
+interface ValidationExceptionPayload {
+  issues: ZodIssue[]
+  fieldErrors: Record<string, string[] | undefined>
+}
+
+export class ValidationException extends RouteException<ValidationExceptionPayload> {
   name = 'ValidationException'
   statusCode = 400
   message = 'Validation error'
-
-  constructor(zodError: ZodError) {
-    super(zodError.issues)
-  }
 }
