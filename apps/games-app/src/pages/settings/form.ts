@@ -8,6 +8,7 @@ import {
   sample,
   Store,
 } from 'effector'
+import { debug } from 'patronum'
 import { ZodError, ZodObjectDef, ZodSchema } from 'zod'
 
 // interface FailureParams<TValidated> {
@@ -187,9 +188,11 @@ export function createForm<
   type ValidationResult = ValidResult | InvalidResult
 
   const validateFx = createEffect(
-    (values: CleanValues<TValues, TCleanEmpty>): ValidationResult => {
+    async (
+      values: CleanValues<TValues, TCleanEmpty>,
+    ): Promise<ValidationResult> => {
       try {
-        const validated = schema.parse(values)
+        const validated = await schema.parseAsync(values)
         return { valid: true, values: validated }
       } catch (error) {
         const isZodError = error instanceof ZodError
@@ -314,8 +317,7 @@ export function createForm<
 
   sample({
     clock: resetErrors,
-    fn: () => ({}),
-    target: setErrors,
+    target: Object.values(fields).map((field) => field.resetErrors),
   })
 
   sample({
