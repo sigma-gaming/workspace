@@ -56,7 +56,7 @@ sample({
     const isTRPCClientError = error instanceof TRPCClientError
     if (!isTRPCClientError) return {}
 
-    if (error.data.error === BadRequestException.name) {
+    if (error.data.error === 'BadRequestException') {
       const exception = new BadRequestException(error.data.payload)
       const errors: Record<string, string[]> = {}
       const { path = ['root'], message } = exception.payload
@@ -64,7 +64,7 @@ sample({
       return errors
     }
 
-    if (error.data.error === ValidationException.name) {
+    if (error.data.error === 'ValidationException') {
       const exception = new ValidationException(error.data.payload)
       const { fieldErrors } = exception.payload
       return normalizeFieldErrors(fieldErrors)
