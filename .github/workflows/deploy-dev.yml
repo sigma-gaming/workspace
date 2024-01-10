@@ -67,11 +67,6 @@ jobs:
           string: ${{ matrix.packageName }}
           pattern: '^@?(?<path>.*)$'
 
-      - name: Copy Railway config and Dockerfile
-        run: |-
-          cp ${{ steps.packagePath.outputs.path }}/railway.json .
-          cp ${{ steps.packagePath.outputs.path }}/Dockerfile .
-
       - name: Install railway cli
         run: npm i -g @railway/cli@latest
 
