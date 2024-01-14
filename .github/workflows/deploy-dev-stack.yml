@@ -71,6 +71,10 @@ jobs:
         with:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
 
+      - name: Authenticate Docker registry
+        run: |-
+          gcloud auth configure-docker ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev --quiet
+
       - name: Get package path
         id: packagePath
         uses: release-kit/regex@v1
@@ -78,20 +82,15 @@ jobs:
           string: ${{ matrix.packageName }}
           pattern: '^@?(?<path>.*)$'
 
-      - name: Copy Dockerfile to root
-        run: cp ${{ steps.packagePath.outputs.path }}/Dockerfile Dockerfile
-
-      - name: Build image using Google Cloud Build
+      - name: Build image
         run: |-
-          gcloud builds submit . \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }} \
-            --timeout 1h
+          docker build . -f ${{ steps.packagePath.outputs.path }}/Dockerfile \
+            -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }}
+            -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest
 
-      - name: Add latest tag
+      - name: Push image
         run: |-
-          gcloud artifacts docker tags add \
-            ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }} \
-            ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }} --all-tags
 
   deploy-dev-stack:
     name: Deploy dev stack
