@@ -90,7 +90,7 @@ jobs:
 
       - name: Push image
         run: |-
-          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }} --all-tags
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest --all-tags
 
   deploy-dev-stack:
     name: Deploy dev stack

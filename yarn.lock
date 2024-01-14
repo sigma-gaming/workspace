@@ -33,6 +33,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@apps/games-api@workspace:apps/games-api"
   dependencies:
+    "@infra/config": "workspace:*"
     "@libs/exceptions": "workspace:*"
     "@libs/games-db": "workspace:*"
     "@libs/games-model": "workspace:*"
@@ -44,6 +45,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@apps/games-app@workspace:apps/games-app"
   dependencies:
+    "@infra/config": "workspace:*"
     "@libs/exceptions": "workspace:*"
     "@libs/games-model": "workspace:*"
     "@libs/ssr-bindings": "workspace:*"
@@ -2237,6 +2239,12 @@ __metadata:
   checksum: 9dba24e59fdb4041829d92b693aacb778add3b6f612aaa9c0774f3b650c11a378cc64f042a59da85c11dae33df456580a3c36837b953541aed6ff94294f97fac
   languageName: node
   linkType: hard
+
+"@infra/config@workspace:*, @infra/config@workspace:infra":
+  version: 0.0.0-use.local
+  resolution: "@infra/config@workspace:infra"
+  languageName: unknown
+  linkType: soft
 
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2

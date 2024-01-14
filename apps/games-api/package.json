@@ -23,5 +23,8 @@
     "@libs/games-db": "workspace:*",
     "@libs/games-model": "workspace:*",
     "@tooling/env": "workspace:*"
+  },
+  "devDependencies": {
+    "@infra/config": "workspace:*"
   }
 }
