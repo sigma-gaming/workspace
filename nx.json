@@ -8,7 +8,9 @@
     "shared": [
       "{workspaceRoot}/tsconfig.base.json",
       "{workspaceRoot}/package.json",
-      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/nx.json"
+    ],
+    "infra": [
       "{workspaceRoot}/infra/dev.docker-compose.yml"
     ],
     "env": ["{workspaceRoot}/.env.development"],
@@ -89,7 +91,7 @@
       "inputs": ["shared", "config", "migrations"]
     },
     "start": {
-      "dependsOn": ["build", "^build", "^migrate"]
+      "dependsOn": ["infra", "build", "^build", "^migrate"]
     }
   },
   "affected": {
