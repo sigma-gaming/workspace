@@ -37,7 +37,7 @@ services:
       replicas: 1
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.games-api.rule=Host(`api-dev.${DOMAIN}`)'
+        - 'traefik.http.routers.games-api.rule=Host(`api-dev.${PUBLIC_DOMAIN}`)'
         - 'traefik.http.routers.games-api.entrypoints=https'
         - 'traefik.http.routers.games-api.tls.certresolver=cloudflare'
         - 'traefik.http.routers.games-api.service=games-api'
@@ -54,7 +54,7 @@ services:
       replicas: 1
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.games-app.rule=Host(`dev.${DOMAIN}`)'
+        - 'traefik.http.routers.games-app.rule=Host(`dev.${PUBLIC_DOMAIN}`)'
         - 'traefik.http.routers.games-app.entrypoints=https'
         - 'traefik.http.routers.games-app.tls.certresolver=cloudflare'
         - 'traefik.http.routers.games-app.service=games-app'
