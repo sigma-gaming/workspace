@@ -61,14 +61,23 @@ interface Form<
   update: EventCallable<Partial<TValues>>
   submit: EventCallable<void>
   submitted: Event<TValidated>
-  updateErrors: EventCallable<Partial<Record<keyof TValues, string[]>>>
-  setErrors: EventCallable<Partial<Record<keyof TValues, string[]>>>
+  updateErrors: EventCallable<Partial<FormErrors<TValues>>>
+  setErrors: EventCallable<Partial<FormErrors<TValues>>>
   $values: Store<TValues>
   $cleanValues: Store<CleanValues<TValues, TCleanEmpty>>
   $dirty: Store<Record<keyof TValues, boolean>>
   $empty: Store<Record<keyof TValues, boolean>>
-  $errors: Store<Record<keyof TValues, string[]>>
+  $errors: Store<FormErrors<TValues>>
 }
+
+export type InferFormValues<TForm> = TForm extends Form<infer TValues, any, any>
+  ? TValues
+  : never
+
+export type FormErrors<TValues extends FormValues> = Record<
+  keyof TValues,
+  string[]
+>
 
 export function createField<TValue>(
   options: FieldOptions<TValue>,
@@ -180,10 +189,10 @@ export function createForm<
   type UpdatePayload = Partial<TValues>
   const update = createEvent<UpdatePayload>()
 
-  type SetErrorsPayload = Partial<Record<keyof TValues, string[]>>
+  type SetErrorsPayload = Partial<FormErrors<TValues>>
   const setErrors = createEvent<SetErrorsPayload>()
 
-  type UpdateErrorsPayload = Partial<Record<keyof TValues, string[]>>
+  type UpdateErrorsPayload = Partial<FormErrors<TValues>>
   const updateErrors = createEvent<UpdateErrorsPayload>()
 
   const resetErrors = createEvent()
@@ -214,7 +223,7 @@ export function createForm<
   const $values = combine(reshapeFields('$value')) as Store<TValues>
 
   const $errors = combine(reshapeFields('$errors')) as Store<
-    Record<keyof TValues, string[]>
+    FormErrors<TValues>
   >
 
   const $cleanValues = combine($values, (values) => {

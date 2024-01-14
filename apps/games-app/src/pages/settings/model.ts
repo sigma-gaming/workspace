@@ -11,7 +11,13 @@ import { createEffect, sample } from 'effector'
 import { z } from 'zod'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
-import { createField, createForm, normalizeFieldErrors } from './form.ts'
+import {
+  createField,
+  createForm,
+  FormErrors,
+  InferFormValues,
+  normalizeFieldErrors,
+} from './form.ts'
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
@@ -45,6 +51,9 @@ const profileForm = createForm({
   },
 })
 
+type ProfileFormValues = InferFormValues<typeof profileForm>
+type ProfileFormErrors = FormErrors<ProfileFormValues>
+
 sample({
   source: profileForm.submitted,
   target: updateProfileMutation.start,
@@ -52,7 +61,7 @@ sample({
 
 sample({
   source: updateProfileMutation.finished.failure,
-  fn: ({ error }) => {
+  fn: ({ error }): Partial<ProfileFormErrors> => {
     const isTRPCClientError = error instanceof TRPCClientError
     if (!isTRPCClientError) return {}
 

@@ -1,0 +1,57 @@
+version: "3.8"
+
+x-common: &common
+  networks:
+    - public
+  environment:
+    DATABASE_URL: ${DATABASE_URL}
+    DATABASE_DIRECT_URL: ${DATABASE_DIRECT_URL}
+    PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
+    PUBLIC_GAMES_APP_URL: ${PUBLIC_GAMES_APP_URL}
+    PUBLIC_GAMES_API_URL: ${PUBLIC_GAMES_API_URL}
+    PUBLIC_GAMES_API_WS_URL: ${PUBLIC_GAMES_API_WS_URL}
+    JWT_SECRET: ${JWT_SECRET}
+    PUBLIC_TELEGRAM_BOT_ID: ${PUBLIC_TELEGRAM_BOT_ID}
+    TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    PUBLIC_VK_APP_ID: ${PUBLIC_VK_APP_ID}
+    VK_APP_SECRET: ${VK_APP_SECRET}
+    VK_SERVICE_TOKEN: ${VK_SERVICE_TOKEN}
+
+x-deploy-common: &deploy-common
+  update_config:
+    order: start-first
+  placement:
+    constraints: [ node.role == worker ]
+
+services:
+  games-api:
+    <<: *common
+    image: ${DOCKER_REGISTRY}/apps/games-api:latest
+    deploy:
+      <<: *deploy-common
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.games-api.rule=Host(`api-dev.${DOMAIN}`)"
+        - "traefik.http.routers.games-api.entrypoints=https"
+        - "traefik.http.routers.games-api.tls.certresolver=cloudflare"
+        - "traefik.http.routers.games-api.service=games-api"
+        - "traefik.http.services.games-api.loadbalancer.server.port=5050"
+
+  games-app:
+    <<: *common
+    image: ${DOCKER_REGISTRY}/apps/games-app:latest
+    depends_on:
+      - games-api
+    deploy:
+      <<: *deploy-common
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.games-app.rule=Host(`dev.${DOMAIN}`)"
+        - "traefik.http.routers.games-app.entrypoints=https"
+        - "traefik.http.routers.games-app.tls.certresolver=cloudflare"
+        - "traefik.http.routers.games-app.service=games-app"
+        - "traefik.http.services.games-app.loadbalancer.server.port=5173"
