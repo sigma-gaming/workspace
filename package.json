@@ -10,8 +10,7 @@
   },
   "workspaces": [
     "apps/*",
-    "libs/*",
-    "infra"
+    "libs/*"
   ],
   "engines": {
     "node": "20"
