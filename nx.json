@@ -8,7 +8,8 @@
     "shared": [
       "{workspaceRoot}/tsconfig.base.json",
       "{workspaceRoot}/package.json",
-      "{workspaceRoot}/nx.json"
+      "{workspaceRoot}/nx.json",
+      "{workspaceRoot}/infra/dev.docker-compose.yml"
     ],
     "env": ["{workspaceRoot}/.env.development"],
     "src": [
