@@ -10,8 +10,9 @@
       "{workspaceRoot}/package.json",
       "{workspaceRoot}/nx.json"
     ],
-    "infra": [
-      "{workspaceRoot}/infra/dev.docker-compose.yml"
+    "ci": [
+      "{workspaceRoot}/infra/dev.docker-compose.yml",
+      "{workspaceRoot}/.github/workflows/deploy-dev-stack.yml"
     ],
     "env": ["{workspaceRoot}/.env.development"],
     "src": [
@@ -91,7 +92,7 @@
       "inputs": ["shared", "config", "migrations"]
     },
     "start": {
-      "dependsOn": ["infra", "build", "^build", "^migrate"]
+      "dependsOn": ["ci", "build", "^build", "^migrate"]
     }
   },
   "affected": {
