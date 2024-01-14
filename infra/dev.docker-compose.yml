@@ -23,6 +23,10 @@ x-deploy-common: &deploy-common
   placement:
     constraints: [node.role == worker]
 
+networks:
+  public:
+    external: true
+
 services:
   games-api:
     <<: *common
