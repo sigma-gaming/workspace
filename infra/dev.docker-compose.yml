@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 x-common: &common
   networks:
@@ -21,7 +21,7 @@ x-deploy-common: &deploy-common
   update_config:
     order: start-first
   placement:
-    constraints: [ node.role == worker ]
+    constraints: [node.role == worker]
 
 services:
   games-api:
@@ -32,12 +32,12 @@ services:
       mode: replicated
       replicas: 1
       labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.games-api.rule=Host(`api-dev.${DOMAIN}`)"
-        - "traefik.http.routers.games-api.entrypoints=https"
-        - "traefik.http.routers.games-api.tls.certresolver=cloudflare"
-        - "traefik.http.routers.games-api.service=games-api"
-        - "traefik.http.services.games-api.loadbalancer.server.port=5050"
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.games-api.rule=Host(`api-dev.${DOMAIN}`)'
+        - 'traefik.http.routers.games-api.entrypoints=https'
+        - 'traefik.http.routers.games-api.tls.certresolver=cloudflare'
+        - 'traefik.http.routers.games-api.service=games-api'
+        - 'traefik.http.services.games-api.loadbalancer.server.port=5050'
 
   games-app:
     <<: *common
@@ -49,9 +49,9 @@ services:
       mode: replicated
       replicas: 1
       labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.games-app.rule=Host(`dev.${DOMAIN}`)"
-        - "traefik.http.routers.games-app.entrypoints=https"
-        - "traefik.http.routers.games-app.tls.certresolver=cloudflare"
-        - "traefik.http.routers.games-app.service=games-app"
-        - "traefik.http.services.games-app.loadbalancer.server.port=5173"
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.games-app.rule=Host(`dev.${DOMAIN}`)'
+        - 'traefik.http.routers.games-app.entrypoints=https'
+        - 'traefik.http.routers.games-app.tls.certresolver=cloudflare'
+        - 'traefik.http.routers.games-app.service=games-app'
+        - 'traefik.http.services.games-app.loadbalancer.server.port=5173'

@@ -16,7 +16,6 @@
     "node": "20"
   },
   "scripts": {
-    "postinstall": "is-ci || husky install",
     "changeset:publish": "changeset tag && git push --follow-tags",
     "cert:generate": "mkcert -key-file ssl/local.key -cert-file ssl/local.crt localhost sigma.local '*.sigma.local'"
   },
@@ -78,7 +77,6 @@
     "esbuild": "^0.19.6",
     "eslint": "^8.53.0",
     "eslint-kit": "^10.0.0",
-    "husky": "^8.0.3",
     "is-ci": "^3.0.1",
     "nodemon": "^3.0.1",
     "nx": "17.0.2",
@@ -92,7 +90,7 @@
     "ts-loader": "^9.5.1",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript": "^5.1.3",
-    "vite": "^5.0.2",
+    "vite": "^5.0.5",
     "vite-tsconfig-paths": "^4.2.2",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",

@@ -71,17 +71,6 @@ jobs:
         with:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Build app
-        run: yarn nx run ${{ matrix.package.name }}:build
-
       - name: Get package path
         id: packagePath
         uses: release-kit/regex@v1
