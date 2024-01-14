@@ -85,7 +85,7 @@ jobs:
       - name: Build image
         run: |-
           docker build . -f ${{ steps.packagePath.outputs.path }}/Dockerfile \
-            -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }}
+            -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }} \
             -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest
 
       - name: Push image
