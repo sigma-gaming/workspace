@@ -85,12 +85,13 @@ jobs:
       - name: Build image
         run: |-
           docker build . -f ${{ steps.packagePath.outputs.path }}/Dockerfile \
-            -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }} \
-            -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest
+            -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest \
+            -t ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }}
 
       - name: Push image
         run: |-
-          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest --all-tags
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }}
 
   deploy-dev-stack:
     name: Deploy dev stack
