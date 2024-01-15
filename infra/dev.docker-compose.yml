@@ -42,6 +42,9 @@ services:
         - 'traefik.http.routers.games-api.tls.certresolver=cloudflare'
         - 'traefik.http.routers.games-api.service=games-api'
         - 'traefik.http.services.games-api.loadbalancer.server.port=5050'
+        - 'traefik.http.services.games-api.loadbalancer.healthcheck.path=/health'
+        - 'traefik.http.services.games-api.loadbalancer.healthcheck.interval=10s'
+        - 'traefik.http.services.games-api.loadbalancer.healthcheck.timeout=5s'
 
   games-app:
     <<: *common
@@ -59,3 +62,6 @@ services:
         - 'traefik.http.routers.games-app.tls.certresolver=cloudflare'
         - 'traefik.http.routers.games-app.service=games-app'
         - 'traefik.http.services.games-app.loadbalancer.server.port=5173'
+        - 'traefik.http.services.games-api.loadbalancer.healthcheck.path=/health'
+        - 'traefik.http.services.games-api.loadbalancer.healthcheck.interval=10s'
+        - 'traefik.http.services.games-api.loadbalancer.healthcheck.timeout=5s'

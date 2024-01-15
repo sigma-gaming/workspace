@@ -48,14 +48,9 @@
   },
   "targetDefaults": {
     "copy-env": {
-      "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["env"],
-      "outputs": ["{projectRoot}/.env.development"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "echo 123"
-      }
+      "outputs": ["{projectRoot}/.env.development"]
     },
     "build": {
       "cache": true,
