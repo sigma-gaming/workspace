@@ -1,0 +1,23 @@
+name: Deploy portainer stack
+
+on:
+  push:
+    paths:
+      - "infra/portainer.docker-compose.yml"
+
+jobs:
+  deploy-portainer-stack:
+    name: Deploy portainer stack
+    runs-on: [ self-hosted, swarm ]
+
+    env:
+      PUBLIC_DOMAIN: ${{ vars.PUBLIC_DOMAIN_DEV }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Deploy portainer stack
+        run: |-
+          docker stack deploy -c infra/portainer.docker-compose.yml portainer --prune

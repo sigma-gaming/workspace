@@ -1,0 +1,11 @@
+managers:
+  hosts:
+    manager1:
+      ansible_user: root
+      ansible_host: 188.119.112.142
+
+workers:
+  hosts:
+    worker1:
+      ansible_user: root
+      ansible_host: 188.119.112.223
