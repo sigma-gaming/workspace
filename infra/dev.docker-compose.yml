@@ -31,6 +31,12 @@ services:
   games-api:
     <<: *common
     image: ${DOCKER_REGISTRY}/apps/games-api:latest
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:5050/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     deploy:
       <<: *deploy-common
       mode: replicated
@@ -51,6 +57,12 @@ services:
     image: ${DOCKER_REGISTRY}/apps/games-app:latest
     depends_on:
       - games-api
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:5173/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     deploy:
       <<: *deploy-common
       mode: replicated
