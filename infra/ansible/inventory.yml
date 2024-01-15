@@ -1,8 +1,11 @@
 managers:
   hosts:
-    manager1:
+    control:
       ansible_user: root
       ansible_host: 188.119.112.142
+    monitoring:
+      ansible_user: root
+      ansible_host: 188.119.113.85
 
 workers:
   hosts:

@@ -100,18 +100,18 @@ jobs:
 
     env:
       NODE_ENV: production
-      DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
-      DATABASE_DIRECT_URL: ${{ secrets.DATABASE_DIRECT_URL_DEV }}
+      DATABASE_URL: ${{ vars.DATABASE_URL_DEV }}
+      DATABASE_DIRECT_URL: ${{ vars.DATABASE_DIRECT_URL_DEV }}
       PUBLIC_DOMAIN: ${{ vars.PUBLIC_DOMAIN_DEV }}
       PUBLIC_GAMES_APP_URL: ${{ vars.PUBLIC_GAMES_APP_URL_DEV }}
       PUBLIC_GAMES_API_URL: ${{ vars.PUBLIC_GAMES_API_URL_DEV }}
       PUBLIC_GAMES_API_WS_URL: ${{ vars.PUBLIC_GAMES_API_WS_URL_DEV }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET_DEV }}
+      JWT_SECRET: ${{ vars.JWT_SECRET_DEV }}
       PUBLIC_TELEGRAM_BOT_ID: ${{ vars.PUBLIC_TELEGRAM_BOT_ID_DEV }}
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}
+      TELEGRAM_BOT_TOKEN: ${{ vars.TELEGRAM_BOT_TOKEN_DEV }}
       PUBLIC_VK_APP_ID: ${{ vars.PUBLIC_VK_APP_ID_DEV }}
-      VK_APP_SECRET: ${{ secrets.VK_APP_SECRET_DEV }}
-      VK_SERVICE_TOKEN: ${{ secrets.VK_SERVICE_TOKEN_DEV }}
+      VK_APP_SECRET: ${{ vars.VK_APP_SECRET_DEV }}
+      VK_SERVICE_TOKEN: ${{ vars.VK_SERVICE_TOKEN_DEV }}
 
     steps:
       - uses: actions/checkout@v4

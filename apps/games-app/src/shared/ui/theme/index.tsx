@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Button,
   Card,
   createTheme,
@@ -45,6 +46,11 @@ export const theme = createTheme({
     ],
   },
   components: {
+    Anchor: Anchor.extend({
+      defaultProps: {
+        c: 'sigma.3',
+      },
+    }),
     Title: Title.extend({
       classNames: titleClassNames,
     }),

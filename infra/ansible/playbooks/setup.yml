@@ -1,14 +1,6 @@
 ---
-- name: Setup python3
-  hosts: managers,workers
-  become: true
-  gather_facts: no
-  pre_tasks:
-    - name: install python
-      raw: 'sudo apt-get install python3'
-
 - name: Setup SSH
-  hosts: managers,workers
+  hosts: all
   become: true
   gather_facts: no
 
@@ -38,7 +30,7 @@
         state: restarted
 
 - name: Setup dependencies
-  hosts: managers,workers
+  hosts: all
   become: true
   vars:
     arch_mapping:
@@ -117,3 +109,38 @@
       loop:
         - docker.service
         - containerd.service
+
+- name: Setup Docker swarm
+  hosts: control
+  become: true
+
+  tasks:
+    - name: Initialize swarm
+      shell: docker swarm init --advertise-addr {{ hostvars.control.ansible_default_ipv4.address }}
+      ignore_errors: true
+
+    - name: Get swarm manager join token
+      shell: docker swarm join-token -q manager
+      register: manager_token
+
+    - name: Get swarm worker join token
+      shell: docker swarm join-token -q worker
+      register: worker_token
+
+- name: Join managers to swarm
+  hosts: managers:!control
+  become: true
+
+  tasks:
+    - name: Join swarm
+      shell: docker swarm join --token {{ hostvars.control.manager_token.stdout }} {{ hostvars.control.ansible_default_ipv4.address }}:2377
+      ignore_errors: true
+
+- name: Join workers to swarm
+  hosts: workers
+  become: true
+
+  tasks:
+    - name: Join swarm
+      shell: docker swarm join --token {{ hostvars.control.worker_token.stdout }} {{ hostvars.control.ansible_default_ipv4.address }}:2377
+      ignore_errors: true

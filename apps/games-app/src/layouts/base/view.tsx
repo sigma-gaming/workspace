@@ -153,6 +153,7 @@ const Profile = () => {
             <Avatar
               src={profile?.image}
               component="button"
+              name="Меню пользователя"
               size={48}
               classNames={{
                 root: 'm-1 outline outline-2 outline-offset-2 outline-sigma-600',
