@@ -11,7 +11,7 @@
       "{workspaceRoot}/nx.json"
     ],
     "ci": [
-      "{workspaceRoot}/infra/dev.docker-compose.yml",
+      "{workspaceRoot}/stacks/dev.docker-compose.yml",
       "{workspaceRoot}/.github/workflows/deploy-dev-stack.yml"
     ],
     "env": ["{workspaceRoot}/.env.development"],

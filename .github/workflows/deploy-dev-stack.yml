@@ -133,4 +133,4 @@ jobs:
 
       - name: Deploy dev stack
         run: |-
-          docker stack deploy -c infra/dev.docker-compose.yml dev --with-registry-auth --prune
+          docker stack deploy -c stacks/dev.docker-compose.yml dev --with-registry-auth --prune
