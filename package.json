@@ -17,6 +17,7 @@
   },
   "scripts": {
     "dev:services": "docker compose -f local.docker-compose.yml  up -d",
+    "check": "yarn nx affected --target build test lint typecheck --parallel 3",
     "changeset:publish": "changeset tag && git push --follow-tags",
     "cert:generate": "mkcert -key-file ssl/local.key -cert-file ssl/local.crt localhost sigma.local '*.sigma.local'"
   },
@@ -29,6 +30,7 @@
     "@mantine/hooks": "^7.3.2",
     "@mantine/notifications": "^7.3.2",
     "@prisma/client": "^5.6.0",
+    "@sesamecare-oss/redlock": "^1.2.0",
     "@tabler/icons-react": "^2.44.0",
     "@trpc/client": "^10.44.1",
     "@trpc/server": "^10.44.1",
@@ -42,6 +44,7 @@
     "fastify": "^4.24.3",
     "grammy": "^1.20.1",
     "history": "^5.3.0",
+    "ioredis": "^5.3.2",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "patronum": "^2.0.0",

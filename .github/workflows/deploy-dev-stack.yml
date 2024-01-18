@@ -35,11 +35,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Run NX checks
-        run: |
-          yarn nx affected --target build --parallel 3
-          yarn nx affected --target lint --parallel 3
-          yarn nx affected --target test --parallel 3
-          yarn nx affected --target typecheck --parallel 3
+        run: yarn nx affected --target build test lint typecheck --parallel 3
 
       - name: Output affected apps
         id: affected
@@ -101,12 +97,11 @@ jobs:
     env:
       NODE_ENV: production
       DATABASE_URL: ${{ vars.DATABASE_URL_DEV }}
-      DATABASE_DIRECT_URL: ${{ vars.DATABASE_DIRECT_URL_DEV }}
+      REDIS_URL: ${{ vars.REDIS_URL_DEV }}
       PUBLIC_DOMAIN: ${{ vars.PUBLIC_DOMAIN_DEV }}
       PUBLIC_GAMES_APP_URL: ${{ vars.PUBLIC_GAMES_APP_URL_DEV }}
       PUBLIC_GAMES_API_URL: ${{ vars.PUBLIC_GAMES_API_URL_DEV }}
       PUBLIC_GAMES_API_WS_URL: ${{ vars.PUBLIC_GAMES_API_WS_URL_DEV }}
-      RABBITMQ_URL: ${{ vars.RABBITMQ_URL_DEV }}
       JWT_SECRET: ${{ vars.JWT_SECRET_DEV }}
       PUBLIC_TELEGRAM_BOT_ID: ${{ vars.PUBLIC_TELEGRAM_BOT_ID_DEV }}
       TELEGRAM_BOT_TOKEN: ${{ vars.TELEGRAM_BOT_TOKEN_DEV }}

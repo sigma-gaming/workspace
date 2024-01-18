@@ -5,12 +5,11 @@ x-common: &common
     - public
   environment:
     DATABASE_URL: ${DATABASE_URL}
-    DATABASE_DIRECT_URL: ${DATABASE_DIRECT_URL}
+    REDIS_URL: ${REDIS_URL}
     PUBLIC_DOMAIN: ${PUBLIC_DOMAIN}
     PUBLIC_GAMES_APP_URL: ${PUBLIC_GAMES_APP_URL}
     PUBLIC_GAMES_API_URL: ${PUBLIC_GAMES_API_URL}
     PUBLIC_GAMES_API_WS_URL: ${PUBLIC_GAMES_API_WS_URL}
-    RABBITMQ_URL: ${RABBITMQ_URL}
     JWT_SECRET: ${JWT_SECRET}
     PUBLIC_TELEGRAM_BOT_ID: ${PUBLIC_TELEGRAM_BOT_ID}
     TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
@@ -18,50 +17,80 @@ x-common: &common
     VK_APP_SECRET: ${VK_APP_SECRET}
     VK_SERVICE_TOKEN: ${VK_SERVICE_TOKEN}
 
-x-deploy-common: &deploy-common
-  update_config:
-    order: start-first
-  placement:
-    constraints: [node.role == worker]
-
 networks:
   public:
     external: true
 
 volumes:
-  rabbitmq-data:
+  pgdata:
+  redis:
 
 services:
-  rabbitmq:
-    image: rabbitmq:3.8.9-management-alpine
-    hostname: dev_rabbitmq
+  postgres:
+    image: postgres:16.1-alpine
     volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
+      - pgdata:/var/lib/postgresql/data
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: 12345
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 5s
-      timeout: 15s
-      retries: 5
-      start_period: 10s
+      POSTGRES_PASSWORD: SECRET_REMOVED
     networks:
       - public
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
     deploy:
       mode: replicated
       replicas: 1
       restart_policy:
         condition: on-failure
       placement:
+        constraints: [ node.role == worker, node.postgres == true ]
+
+  redis:
+    image: redis:7.2.4-alpine
+    command: redis-server
+    volumes:
+      - redis:/var/lib/redis
+    networks:
+      - public
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [ node.role == worker, node.redis == true ]
+
+  redis-commander:
+    image: ghcr.io/joeferner/redis-commander:latest
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    networks:
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        order: start-first
+      placement:
         constraints: [ node.role == worker ]
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.rabbitmq.rule=Host(`rabbitmq-dev.${PUBLIC_DOMAIN}`)'
-        - 'traefik.http.routers.rabbitmq.entrypoints=https'
-        - 'traefik.http.routers.rabbitmq.tls.certresolver=cloudflare'
-        - 'traefik.http.routers.rabbitmq.service=rabbitmq'
-        - 'traefik.http.services.rabbitmq.loadbalancer.server.port=15672'
+        - 'traefik.http.routers.redis-dev.rule=Host(`redis-dev.${PUBLIC_DOMAIN}`)'
+        - 'traefik.http.routers.redis-dev.entrypoints=https'
+        - 'traefik.http.routers.redis-dev.tls.certresolver=cloudflare'
+        - 'traefik.http.routers.redis-dev.service=redis-dev'
+        - 'traefik.http.services.redis-dev.loadbalancer.server.port=8081'
 
   games-api:
     <<: *common
@@ -73,9 +102,12 @@ services:
       retries: 5
       start_period: 15s
     deploy:
-      <<: *deploy-common
       mode: replicated
       replicas: 1
+      update_config:
+        order: start-first
+      placement:
+        constraints: [ node.role == worker ]
       labels:
         - 'traefik.enable=true'
         - 'traefik.http.routers.games-api.rule=Host(`api-dev.${PUBLIC_DOMAIN}`)'
@@ -99,9 +131,12 @@ services:
       retries: 5
       start_period: 10s
     deploy:
-      <<: *deploy-common
       mode: replicated
       replicas: 1
+      update_config:
+        order: start-first
+      placement:
+        constraints: [ node.role == worker ]
       labels:
         - 'traefik.enable=true'
         - 'traefik.http.routers.games-app.rule=Host(`dev.${PUBLIC_DOMAIN}`)'
@@ -112,17 +147,3 @@ services:
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.path=/health'
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.interval=10s'
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.timeout=5s'
-
-  games-worker:
-    <<: *common
-    image: ${DOCKER_REGISTRY}/apps/games-worker:latest
-    healthcheck:
-      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:5051/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    deploy:
-      <<: *deploy-common
-      mode: replicated
-      replicas: 1
