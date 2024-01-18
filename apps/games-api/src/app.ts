@@ -63,9 +63,9 @@ app.register(fastifyTRPCPlugin, {
 })
 
 app.get('/health', async () => {
-  return { status: 'healthy' }
+  return 'Healthy'
 })
 
-app.listen({ port: env.port }).then(() => {
+app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
   console.log(`🚀 Server ready at ${env.gamesApi.url}`)
 })

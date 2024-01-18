@@ -78,10 +78,10 @@ server.get('/health', async (_, reply) => {
     return
   }
 
-  return { status: 'healthy' }
+  return 'Healthy'
 })
 
-server.listen({ port: env.port }).then(() => {
+server.listen({ host: '0.0.0.0', port: env.port }).then(() => {
   console.log(`🚀 Server ready`)
 })
 
