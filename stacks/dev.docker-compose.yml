@@ -46,7 +46,7 @@ services:
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [ node.role == worker, node.postgres == true ]
+        constraints: [ node.labels.postgres == true ]
 
   redis:
     image: redis:7.2.4-alpine
@@ -67,7 +67,7 @@ services:
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [ node.role == worker, node.redis == true ]
+        constraints: [ node.labels.redis == true ]
 
   redis-commander:
     image: ghcr.io/joeferner/redis-commander:latest
