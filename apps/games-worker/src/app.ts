@@ -6,10 +6,7 @@ import {
   Queue,
 } from '@libs/games-queue-model'
 import Fastify from 'fastify'
-import fs from 'node:fs'
-import path from 'node:path'
 import { Connection } from 'rabbitmq-client'
-import { v4 as uuid } from 'uuid'
 import { prisma } from './shared/db'
 import { env } from './shared/env'
 
