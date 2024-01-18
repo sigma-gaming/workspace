@@ -18,6 +18,8 @@ x-common: &common
     VK_SERVICE_TOKEN: ${VK_SERVICE_TOKEN}
 
 x-deploy-common: &deploy-common
+  restart_policy:
+    condition: on-failure
   update_config:
     order: start-first
   placement:
@@ -33,6 +35,7 @@ volumes:
 services:
   rabbitmq:
     image: rabbitmq:3.8.9-management-alpine
+    hostname: dev_rabbitmq
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     environment:
@@ -49,11 +52,13 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
       placement:
         constraints: [ node.role == worker ]
       labels:
         - 'traefik.enable=true'
-        - 'traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.${PUBLIC_DOMAIN}`)'
+        - 'traefik.http.routers.rabbitmq.rule=Host(`rabbitmq-dev.${PUBLIC_DOMAIN}`)'
         - 'traefik.http.routers.rabbitmq.entrypoints=https'
         - 'traefik.http.routers.rabbitmq.tls.certresolver=cloudflare'
         - 'traefik.http.routers.rabbitmq.service=rabbitmq'
