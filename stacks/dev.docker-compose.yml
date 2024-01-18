@@ -19,8 +19,6 @@ x-common: &common
     VK_SERVICE_TOKEN: ${VK_SERVICE_TOKEN}
 
 x-deploy-common: &deploy-common
-  restart_policy:
-    condition: on-failure
   update_config:
     order: start-first
   placement:
@@ -89,7 +87,7 @@ services:
         - 'traefik.http.services.games-api.loadbalancer.healthcheck.path=/health'
         - 'traefik.http.services.games-api.loadbalancer.healthcheck.interval=10s'
         - 'traefik.http.services.games-api.loadbalancer.healthcheck.timeout=5s'
-        - 'io.cadvisor.metric.prometheus=/var/cadvisor/metrics-endpoint.json'
+#        - 'io.cadvisor.metric.prometheus=/var/cadvisor/metrics-endpoint.json'
 
   games-app:
     <<: *common
@@ -116,7 +114,7 @@ services:
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.path=/health'
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.interval=10s'
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.timeout=5s'
-        - 'io.cadvisor.metric.prometheus=/var/cadvisor/metrics-endpoint.json'
+#        - 'io.cadvisor.metric.prometheus=/var/cadvisor/metrics-endpoint.json'
 
   games-worker:
     <<: *common
