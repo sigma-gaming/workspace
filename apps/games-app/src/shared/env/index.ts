@@ -1,4 +1,4 @@
-import { parseEnv } from '@tooling/env/parse'
+import { parseEnv } from '@tooling/env'
 import { z } from 'zod'
 
 const PublicEnvSchema = z

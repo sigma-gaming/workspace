@@ -1,14 +1,23 @@
 import { createQuery } from '@farfetched/core'
+import { fromTrpc, NotAuthenticatedException } from '@libs/exceptions'
 import { AccountProvider } from '@libs/games-model'
-import { createEvent, createStore, sample } from 'effector'
+import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and, not } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
+import { env } from '../../shared/env'
 import { appStarted } from '../../shared/events.ts'
 
 const request = createEvent()
 const refresh = createEvent()
 const logout = createEvent()
+
+const getExpiresAt = () =>
+  new Date(Cookies.get('sessionExpiresAt') ?? Date.now())
+const resetExpiresAt = () =>
+  Cookies.remove('sessionExpiresAt', { domain: env.domain })
+
+const clientLogoutFx = createEffect(resetExpiresAt)
 
 const userQuery = createQuery({
   name: 'user/get',
@@ -28,8 +37,7 @@ const $loading = userQuery.$pending
 const $loaded = and($user)
 const $loggingOut = logoutMutation.$pending
 
-const expiresAt = new Date(Cookies.get('sessionExpiresAt') ?? Date.now())
-const $expired = createStore(new Date() >= expiresAt)
+const $expired = createStore(new Date() >= getExpiresAt())
 
 const $accounts = $user.map((user) => user?.accounts ?? [])
 
@@ -61,11 +69,17 @@ sample({
 
 sample({
   clock: logout,
-  target: logoutMutation.start,
+  target: [clientLogoutFx, logoutMutation.start],
 })
 
 sample({
-  clock: logoutMutation.finished.success,
+  source: userQuery.finished.failure,
+  filter: ({ error }) => fromTrpc(error) instanceof NotAuthenticatedException,
+  target: clientLogoutFx,
+})
+
+sample({
+  clock: clientLogoutFx.done,
   fn: () => true,
   target: [userQuery.reset, $expired],
 })

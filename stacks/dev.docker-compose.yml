@@ -28,6 +28,34 @@ networks:
     external: true
 
 services:
+  rabbitmq:
+    image: rabbitmq:3.8.9-management-alpine
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: 12345
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 5
+      start_period: 10s
+    networks:
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [ node.role == worker ]
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.${PUBLIC_DOMAIN}`)'
+        - 'traefik.http.routers.rabbitmq.entrypoints=https'
+        - 'traefik.http.routers.rabbitmq.tls.certresolver=cloudflare'
+        - 'traefik.http.routers.rabbitmq.service=rabbitmq'
+        - 'traefik.http.services.rabbitmq.loadbalancer.server.port=15672'
+
   games-api:
     <<: *common
     image: ${DOCKER_REGISTRY}/apps/games-api:latest
@@ -48,9 +76,11 @@ services:
         - 'traefik.http.routers.games-api.tls.certresolver=cloudflare'
         - 'traefik.http.routers.games-api.service=games-api'
         - 'traefik.http.services.games-api.loadbalancer.server.port=5050'
+        - 'traefik.http.services.games-api.loadbalancer.sticky.cookie=true'
         - 'traefik.http.services.games-api.loadbalancer.healthcheck.path=/health'
         - 'traefik.http.services.games-api.loadbalancer.healthcheck.interval=10s'
         - 'traefik.http.services.games-api.loadbalancer.healthcheck.timeout=5s'
+        - 'io.cadvisor.metric.prometheus=/var/cadvisor/metrics-endpoint.json'
 
   games-app:
     <<: *common
@@ -77,3 +107,18 @@ services:
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.path=/health'
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.interval=10s'
         - 'traefik.http.services.games-app.loadbalancer.healthcheck.timeout=5s'
+        - 'io.cadvisor.metric.prometheus=/var/cadvisor/metrics-endpoint.json'
+
+  games-worker:
+    <<: *common
+    image: ${DOCKER_REGISTRY}/apps/games-worker:latest
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:5051/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      <<: *deploy-common
+      mode: replicated
+      replicas: 1

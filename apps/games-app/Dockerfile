@@ -9,4 +9,6 @@ COPY . ./
 RUN yarn nx run @apps/games-app:build
 COPY . ./
 
+COPY ./apps/games-app/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
+
 CMD ["yarn", "nx", "run", "@apps/games-app:start"]

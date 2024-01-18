@@ -51,6 +51,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@apps/games-worker@workspace:apps/games-worker":
+  version: 0.0.0-use.local
+  resolution: "@apps/games-worker@workspace:apps/games-worker"
+  dependencies:
+    "@libs/games-db": "workspace:*"
+    "@libs/games-model": "workspace:*"
+    "@libs/games-queue-model": "workspace:*"
+    "@tooling/env": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.22.13, @babel/code-frame@npm:^7.23.4":
   version: 7.23.4
   resolution: "@babel/code-frame@npm:7.23.4"
@@ -2343,6 +2354,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@libs/games-queue-model@workspace:*, @libs/games-queue-model@workspace:libs/games-queue-model":
+  version: 0.0.0-use.local
+  resolution: "@libs/games-queue-model@workspace:libs/games-queue-model"
+  dependencies:
+    "@libs/games-db": "workspace:*"
+    "@libs/games-model": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@libs/ssr-bindings@workspace:*, @libs/ssr-bindings@workspace:libs/ssr-bindings":
   version: 0.0.0-use.local
   resolution: "@libs/ssr-bindings@workspace:libs/ssr-bindings"
@@ -2904,6 +2924,7 @@ __metadata:
     postcss-simple-vars: "npm:^7.0.1"
     prettier: "npm:^3.1.0"
     prisma: "npm:^5.6.0"
+    rabbitmq-client: "npm:^4.5.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     tailwindcss: "npm:^3.4.0"
@@ -9717,6 +9738,13 @@ __metadata:
   version: 4.0.1
   resolution: "quick-lru@npm:4.0.1"
   checksum: f9b1596fa7595a35c2f9d913ac312fede13d37dc8a747a51557ab36e11ce113bbe88ef4c0154968845559a7709cb6a7e7cbe75f7972182451cd45e7f057a334d
+  languageName: node
+  linkType: hard
+
+"rabbitmq-client@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "rabbitmq-client@npm:4.5.0"
+  checksum: 098b7ae018028fe41f469bc4aa9d75903cc92fb9cf490828dcb7c84e177a7fc753d2e17b80e0fe27f63dab0fce30361f717b324c27c5238c763a1c8b1cd4f3f9
   languageName: node
   linkType: hard
 

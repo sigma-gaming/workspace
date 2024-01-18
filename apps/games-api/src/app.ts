@@ -66,6 +66,6 @@ app.get('/health', async () => {
   return { status: 'healthy' }
 })
 
-app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
+app.listen({ port: env.port }).then(() => {
   console.log(`🚀 Server ready at ${env.gamesApi.url}`)
 })

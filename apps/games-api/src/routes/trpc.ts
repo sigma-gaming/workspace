@@ -1,4 +1,5 @@
 import {
+  InternalServerException,
   mapTrpcErrorToException,
   RouteException,
   ValidationException,
@@ -36,7 +37,16 @@ const t = initTRPC.context<Context>().create({
       return finish(error.cause)
     }
 
-    return finish(mapTrpcErrorToException(error))
+    const exception = mapTrpcErrorToException(error)
+
+    if (
+      exception instanceof InternalServerException &&
+      process.env.NODE_ENV === 'development'
+    ) {
+      console.error(error)
+    }
+
+    return finish(exception)
   },
 })
 

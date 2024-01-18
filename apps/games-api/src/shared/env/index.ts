@@ -1,5 +1,4 @@
-import { loadEnv } from '@tooling/env/load'
-import { parseEnv } from '@tooling/env/parse'
+import { loadEnv, parseEnv } from '@tooling/env'
 import { z } from 'zod'
 
 const EnvSchema = z
@@ -13,6 +12,8 @@ const EnvSchema = z
     PUBLIC_GAMES_API_WS_URL: z.string(),
     JWT_SECRET: z.string(),
 
+    RABBITMQ_URL: z.string(),
+
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
 
@@ -25,6 +26,9 @@ const EnvSchema = z
     isProd: raw.NODE_ENV === 'production',
     port: raw.PORT,
     domain: raw.PUBLIC_DOMAIN,
+    rabbitmq: {
+      url: raw.RABBITMQ_URL,
+    },
     gamesApp: {
       url: raw.PUBLIC_GAMES_APP_URL,
       wsUrl: raw.PUBLIC_GAMES_API_WS_URL,

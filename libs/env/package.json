@@ -14,14 +14,6 @@
     ".": {
       "import": "./dist/index.mjs",
       "default": "./dist/index.js"
-    },
-    "./load": {
-      "import": "./dist/load.mjs",
-      "default": "./dist/load.js"
-    },
-    "./parse": {
-      "import": "./dist/parse.mjs",
-      "default": "./dist/parse.js"
     }
   },
   "scripts": {

@@ -1,4 +1,4 @@
-import { ZodError, ZodIssue } from 'zod'
+import { ZodIssue } from 'zod'
 
 export class RouteException<TPayload = void> extends Error {
   name = 'RouteException'

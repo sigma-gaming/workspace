@@ -99,6 +99,7 @@ const Profile = () => {
   const loggingOut = useUnit($$user.$loggingOut)
   const balance = useUnit($$balance.$available)
   const balanceLoading = useUnit($$balance.$loading)
+  const balanceDepositing = useUnit($$balance.$depositing)
 
   if (userExpired) {
     return (
@@ -176,13 +177,24 @@ const Profile = () => {
         )}
 
         <Menu.Item
-          color="green"
+          c="green.6"
+          onClick={() => $$balance.deposit()}
+          closeMenuOnClick={false}
+          disabled={balanceDepositing}
           leftSection={
-            <IconWallet style={{ width: rem(16), height: rem(16) }} />
+            balanceDepositing ? (
+              <IconLoader2
+                className="animate-spin"
+                style={{ width: rem(16), height: rem(16) }}
+              />
+            ) : (
+              <IconWallet style={{ width: rem(16), height: rem(16) }} />
+            )
           }
         >
-          Пополнить баланс
+          {balanceDepositing ? 'Пополняем баланс...' : 'Пополнить баланс'}
         </Menu.Item>
+
         <Menu.Item
           leftSection={
             <IconCoins style={{ width: rem(16), height: rem(16) }} />
@@ -203,7 +215,7 @@ const Profile = () => {
           Настройки
         </Menu.Item>
         <Menu.Item
-          color="red"
+          c="red.6"
           onClick={() => $$user.logout()}
           closeMenuOnClick={false}
           disabled={loggingOut}
