@@ -27,6 +27,9 @@ networks:
   public:
     external: true
 
+volumes:
+  rabbitmq-data:
+
 services:
   rabbitmq:
     image: rabbitmq:3.8.9-management-alpine
