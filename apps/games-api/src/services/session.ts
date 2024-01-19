@@ -18,7 +18,7 @@ enum SessionState {
 export type Session =
   | { state: SessionState.Authenticated; user: User; token: string }
   | { state: SessionState.Expired; user: null; token: string }
-  | { state: SessionState.Empty; user: null }
+  | { state: SessionState.Empty; user: null; token?: string }
 
 export const getSession = async (req: FastifyRequest): Promise<Session> => {
   if (!req.headers.cookie) {
@@ -124,13 +124,13 @@ async function createSession(options: AddSessionOptions) {
 }
 
 async function removeSession(session: Session) {
-  if (session.state === SessionState.Empty) {
-    throw new NotAuthenticatedException()
+  try {
+    await prisma.session.delete({
+      where: { token: session.token },
+    })
+  } catch {
+    // Session doesn't exist
   }
-
-  await prisma.session.delete({
-    where: { token: session.token },
-  })
 
   const cookie = [
     serialize('session', '', {

@@ -12,12 +12,9 @@ const request = createEvent()
 const refresh = createEvent()
 const logout = createEvent()
 
-const getExpiresAt = () =>
-  new Date(Cookies.get('sessionExpiresAt') ?? Date.now())
-const resetExpiresAt = () =>
+const clientLogoutFx = createEffect(() => {
   Cookies.remove('sessionExpiresAt', { domain: env.domain })
-
-const clientLogoutFx = createEffect(resetExpiresAt)
+})
 
 const userQuery = createQuery({
   name: 'user/get',
@@ -37,7 +34,9 @@ const $loading = userQuery.$pending
 const $loaded = and($user)
 const $loggingOut = logoutMutation.$pending
 
-const $expired = createStore(new Date() >= getExpiresAt())
+const expiresAt = Cookies.get('sessionExpiresAt') ?? null
+const initialExpired = expiresAt === null || new Date() >= new Date(expiresAt)
+const $expired = createStore(initialExpired)
 
 const $accounts = $user.map((user) => user?.accounts ?? [])
 
@@ -68,20 +67,15 @@ sample({
 })
 
 sample({
-  clock: logout,
-  target: [clientLogoutFx, logoutMutation.start],
-})
-
-sample({
   source: userQuery.finished.failure,
   filter: ({ error }) => fromTrpc(error) instanceof NotAuthenticatedException,
-  target: clientLogoutFx,
+  target: logout,
 })
 
 sample({
-  clock: clientLogoutFx.done,
+  clock: logout,
   fn: () => true,
-  target: [userQuery.reset, $expired],
+  target: [clientLogoutFx, userQuery.reset, $expired, logoutMutation.start],
 })
 
 export const $$user = {

@@ -1,7 +1,6 @@
 import {
   Avatar,
   Button,
-  Group,
   Menu,
   Modal,
   rem,
@@ -217,20 +216,12 @@ const Profile = () => {
         <Menu.Item
           c="red.6"
           onClick={() => $$user.logout()}
-          closeMenuOnClick={false}
           disabled={loggingOut}
           leftSection={
-            loggingOut ? (
-              <IconLoader2
-                className="animate-spin"
-                style={{ width: rem(16), height: rem(16) }}
-              />
-            ) : (
-              <IconLogout style={{ width: rem(16), height: rem(16) }} />
-            )
+            <IconLogout style={{ width: rem(16), height: rem(16) }} />
           }
         >
-          {loggingOut ? 'Выходим из аккаунта...' : 'Выйти из аккаунта'}
+          Выйти из аккаунта
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
