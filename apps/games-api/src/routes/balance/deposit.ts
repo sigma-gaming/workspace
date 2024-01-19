@@ -1,6 +1,7 @@
 import { BadRequestException } from '@libs/exceptions'
 import { TransactionType } from '@libs/games-model'
 import { SessionService } from '../../services/session'
+import { TransactionService } from '../../services/transaction'
 import { prisma } from '../../shared/db'
 import { redlock } from '../../shared/redis'
 import { procedure } from '../trpc'
@@ -12,21 +13,15 @@ export const deposit = procedure.mutation(async ({ ctx }) => {
   const lock = await redlock.acquire([`balance-${user.id}`], 2500)
 
   try {
-    const lastTransaction = await prisma.transaction.findFirst({
-      where: { userId: user.id },
-      orderBy: { createdAt: 'desc' },
-    })
+    const lastTransaction = await TransactionService.getLastTransaction(user.id)
 
     const lastBalance = lastTransaction?.closingBalance ?? 0
 
-    const newTransaction = await prisma.transaction.create({
-      data: {
-        userId: user.id,
-        type: TransactionType.Deposit,
-        amount,
-        openingBalance: lastBalance,
-        closingBalance: lastBalance + amount,
-      },
+    const newTransaction = await TransactionService.createTransaction(user.id, {
+      type: TransactionType.Deposit,
+      amount,
+      openingBalance: lastBalance,
+      closingBalance: lastBalance + amount,
     })
 
     return {
