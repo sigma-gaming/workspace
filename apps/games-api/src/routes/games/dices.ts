@@ -50,7 +50,7 @@ export const dices = procedure
       if (lastBalance < input.bet) {
         throw new BadRequestException({
           path: ['bet'],
-          message: 'Недостаточно средств на балансе',
+          message: 'Голда не на балике',
         })
       }
 
