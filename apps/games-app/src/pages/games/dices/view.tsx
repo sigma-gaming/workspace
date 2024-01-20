@@ -29,7 +29,7 @@ export const DicesGamePageView = () => {
           onChange={(value) => $$dicesPage.fields.bet.update(Number(value))}
           error={errors.bet[0]}
           min={1}
-          step={0.01}
+          decimalScale={2}
         />
 
         <MultiSelect
