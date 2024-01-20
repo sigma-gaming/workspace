@@ -28,6 +28,7 @@ export const DicesGamePageView = () => {
           value={bet}
           onChange={(value) => $$dicesPage.fields.bet.update(Number(value))}
           error={errors.bet[0]}
+          disabled={autoplaying}
           min={1}
           decimalScale={2}
         />
@@ -45,9 +46,10 @@ export const DicesGamePageView = () => {
           value={sides}
           onChange={(sides) => $$dicesPage.fields.sides.update(sides)}
           error={errors.sides[0]}
+          disabled={autoplaying}
         />
 
-        <Button type="submit" disabled={playing} fullWidth={true}>
+        <Button type="submit" disabled={playing || autoplaying} fullWidth={true}>
           Играть
         </Button>
         <Button onClick={() => $$dicesPage.autoplayToggled()} fullWidth={true}>
