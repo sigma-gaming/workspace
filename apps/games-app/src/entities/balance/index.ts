@@ -1,4 +1,4 @@
-import { createMutation, createQuery, update } from '@farfetched/core'
+import { createMutation, createQuery, Mutation, update } from '@farfetched/core'
 import { createEvent, sample } from 'effector'
 import { and, not } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
@@ -15,17 +15,24 @@ const depositMutation = createMutation({
   handler: gamesApi.balance.deposit.mutate,
 })
 
-update(balanceQuery, {
-  on: depositMutation,
-  by: {
-    success: ({ query, mutation }) => {
-      if (query && 'error' in query) return { error: query.error }
+function receiveUpdates<T>(
+  mutation: Mutation<any, T, unknown>,
+  selector: (data: T) => number,
+) {
+  update(balanceQuery, {
+    on: mutation,
+    by: {
+      success: ({ query, mutation }) => {
+        if (query && 'error' in query) return { error: query.error }
 
-      const available = mutation.result.updatedBalance
-      return { result: { ...query?.result, available } }
+        const available = selector(mutation.result)
+        return { result: { ...query?.result, available } }
+      },
     },
-  },
-})
+  })
+}
+
+receiveUpdates(depositMutation, (data) => data.updatedBalance)
 
 const request = createEvent()
 const refresh = createEvent()
@@ -63,6 +70,7 @@ sample({
 })
 
 export const $$balance = {
+  receiveUpdates,
   request,
   refresh,
   deposit,

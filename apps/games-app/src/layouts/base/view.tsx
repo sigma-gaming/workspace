@@ -13,11 +13,11 @@ import { useDisclosure } from '@mantine/hooks'
 import {
   IconCategory2,
   IconCoins,
-  IconCreditCard,
+  IconDice3,
   IconLoader2,
   IconLogout,
   IconSettings,
-  IconWallet,
+  IconWallet
 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
@@ -61,11 +61,11 @@ const Left = () => {
         size="lg"
         color="#4a115e"
         leftSection={
-          <IconCreditCard style={{ width: rem(24), height: rem(24) }} />
+          <IconDice3 style={{ width: rem(24), height: rem(24) }} />
         }
         activeClassName={css.leftLinkActive}
       >
-        PIN Code
+        Dices
       </LinkButton>
     </aside>
   )

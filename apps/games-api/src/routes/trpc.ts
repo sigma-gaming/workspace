@@ -1,9 +1,11 @@
 import {
   InternalServerException,
   mapTrpcErrorToException,
+  ResourceLockedException,
   RouteException,
   ValidationException,
 } from '@libs/exceptions'
+import { ResourceLockedError } from '@sesamecare-oss/redlock'
 import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
 import { env } from '../shared/env'
@@ -31,6 +33,10 @@ const t = initTRPC.context<Context>().create({
           fieldErrors: error.cause.formErrors.fieldErrors,
         }),
       )
+    }
+
+    if (error.cause instanceof ResourceLockedError) {
+      return finish(new ResourceLockedException())
     }
 
     if (error.cause instanceof RouteException) {

@@ -17,6 +17,12 @@ export class InternalServerException extends RouteException {
   message = 'Internal server error'
 }
 
+export class ResourceLockedException extends RouteException {
+  name = 'ResourceLockedException'
+  statusCode = 423
+  message = 'Resource is locked'
+}
+
 export class NotFoundException extends RouteException {
   name = 'NotFoundException'
   statusCode = 404
