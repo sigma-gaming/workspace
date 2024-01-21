@@ -49,7 +49,7 @@ services:
         constraints: [ node.labels.postgres == true ]
       labels:
         - 'traefik.enable=true'
-        - 'traefik.tcp.routers.postgres-dev.rule=Host(`postgres-dev.${PUBLIC_DOMAIN}`)'
+        - 'traefik.tcp.routers.postgres-dev.rule=HostSNI(`*`)'
         - 'traefik.tcp.routers.postgres-dev.entrypoints=postgres'
         - 'traefik.tcp.routers.postgres-dev.service=postgres-dev'
         - 'traefik.tcp.services.postgres-dev.loadbalancer.server.port=5432'
