@@ -1,4 +1,5 @@
 import { attach, createEffect, sample } from 'effector'
+import { delay } from 'patronum'
 import { $$balance } from '../../../entities/balance'
 import { $$user } from '../../../entities/user'
 import { router, routes } from '../../../routing'
@@ -33,6 +34,11 @@ sample({
 
 sample({
   clock: authenticateFx.doneData,
+  target: [$$user.request, $$balance.request],
+})
+
+sample({
+  clock: delay(authenticateFx.doneData, 1000),
   fn: ({ returnPath }) => returnPath,
-  target: [redirectFx, $$user.request, $$balance.request],
+  target: redirectFx,
 })
