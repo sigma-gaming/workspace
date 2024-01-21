@@ -33,7 +33,7 @@ export const httpLogger = createHttpLogger<
   RawRequestDefaultExpression,
   RawReplyDefaultExpression
 >({
-  simple: false,
+  simple: !env.isProd,
   shouldLogRequest: true,
   getRequestId: (req) => {
     const existingID = req.headers['x-trace-id']
