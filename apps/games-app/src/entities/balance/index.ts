@@ -93,6 +93,17 @@ sample({
 })
 
 sample({
+  clock: depositMutation.finished.success,
+  target: createEffect(() => {
+    notifications.show({
+      color: 'green',
+      title: 'Баланс обновлен',
+      message: `Деньги зачислены на ваш счёт`,
+    })
+  }),
+})
+
+sample({
   clock: withdrawMutation.finished.success,
   target: createEffect(() => {
     notifications.show({
