@@ -26,12 +26,11 @@ services:
       start_period: 10s
 
   redis:
-    image: redis:7.2.4-alpine
-    command: redis-server
+    image: redis/redis-stack:7.2.0-v6-arm64
     ports:
       - 6379:6379
     volumes:
-      - redis:/var/lib/redis
+      - redis:/data
     networks:
       - redis
 

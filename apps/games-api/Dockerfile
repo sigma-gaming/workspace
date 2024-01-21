@@ -2,6 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 ENV NODE_ENV production
+STOPSIGNAL SIGTERM
 
 COPY . ./
 RUN yarn install --immutable

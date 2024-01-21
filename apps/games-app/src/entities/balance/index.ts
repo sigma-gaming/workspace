@@ -1,8 +1,18 @@
 import { createMutation, createQuery, Mutation, update } from '@farfetched/core'
-import { createEvent, sample } from 'effector'
+import {
+  BadRequestException,
+  exceptionFilter,
+  fromTrpc,
+  InternalServerException,
+  notExceptionFilter,
+  RouteException,
+} from '@libs/exceptions'
+import { notifications } from '@mantine/notifications'
+import { createEffect, createEvent, sample } from 'effector'
 import { and, not } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { appStarted } from '../../shared/events.ts'
+import { $$notifications } from '../notifications'
 import { $$user } from '../user'
 
 const balanceQuery = createQuery({
@@ -13,6 +23,11 @@ const balanceQuery = createQuery({
 const depositMutation = createMutation({
   name: 'balance/deposit',
   handler: gamesApi.balance.deposit.mutate,
+})
+
+const withdrawMutation = createMutation({
+  name: 'balance/withdraw',
+  handler: gamesApi.balance.withdraw.mutate,
 })
 
 function receiveUpdates<T>(
@@ -33,10 +48,12 @@ function receiveUpdates<T>(
 }
 
 receiveUpdates(depositMutation, (data) => data.updatedBalance)
+receiveUpdates(withdrawMutation, (data) => data.updatedBalance)
 
 const request = createEvent()
 const refresh = createEvent()
 const deposit = createEvent()
+const withdraw = createEvent()
 const loaded = balanceQuery.finished.success
 const settled = balanceQuery.finished.finally
 
@@ -44,6 +61,7 @@ const $balance = balanceQuery.$data
 const $loading = balanceQuery.$pending
 const $loaded = and($balance)
 const $depositing = depositMutation.$pending
+const $withdrawing = withdrawMutation.$pending
 
 const $available = $balance.map((balance) => balance?.available ?? 0)
 
@@ -69,11 +87,57 @@ sample({
   target: depositMutation.start,
 })
 
+sample({
+  clock: withdraw,
+  target: withdrawMutation.start,
+})
+
+sample({
+  clock: withdrawMutation.finished.success,
+  target: createEffect(() => {
+    notifications.show({
+      color: 'green',
+      title: 'Баланс обновлен',
+      message: `Деньги успешно выведены`,
+    })
+  }),
+})
+
+const receivedException = sample({
+  source: withdrawMutation.finished.failure,
+  fn: ({ error }) => fromTrpc(error),
+})
+
+sample({
+  source: receivedException,
+  filter: exceptionFilter<BadRequestException>(BadRequestException),
+  fn: (exception) =>
+    $$notifications.options({
+      color: 'red',
+      title: 'Произошла ошибка',
+      message: exception.payload.message,
+    }),
+  target: $$notifications.show,
+})
+
+sample({
+  source: receivedException,
+  filter: notExceptionFilter(BadRequestException),
+  fn: () =>
+    $$notifications.options({
+      color: 'red',
+      title: 'Что-то пошло не так',
+      message: 'Попробуйте снова через пару минут',
+    }),
+  target: $$notifications.show,
+})
+
 export const $$balance = {
   receiveUpdates,
   request,
   refresh,
   deposit,
+  withdraw,
   loaded,
   settled,
   $balance,
@@ -81,4 +145,5 @@ export const $$balance = {
   $loaded,
   $available,
   $depositing,
+  $withdrawing,
 }

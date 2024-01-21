@@ -9,3 +9,7 @@ export enum TransactionType {
   Win = 'Win',
   Loss = 'Loss',
 }
+
+export function rub(amount: number) {
+  return amount * 100
+}

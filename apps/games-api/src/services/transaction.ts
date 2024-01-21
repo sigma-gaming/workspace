@@ -1,10 +1,6 @@
 import { Prisma, Transaction } from '@libs/games-db'
+import { lastTransactionCache } from '../caches/transaction'
 import { prisma } from '../shared/db'
-import { cache } from '../shared/redis'
-
-const lastTransactionCache = cache.entity<string, Transaction>({
-  keygen: (userId: string) => `last-transaction:${userId}`,
-})
 
 export const getLastTransaction = async (
   userId: string,

@@ -6,9 +6,9 @@ import { AccountProvider, User } from '@libs/games-model'
 import cookie, { serialize } from 'cookie'
 import { FastifyRequest } from 'fastify'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
+import { sessionCache } from '../caches/session'
 import { prisma } from '../shared/db'
 import { env } from '../shared/env'
-import { cache } from '../shared/redis'
 
 enum SessionState {
   Empty,
@@ -20,10 +20,6 @@ export type Session =
   | { state: SessionState.Authenticated; user: User; token: string }
   | { state: SessionState.Expired; user: null; token: string }
   | { state: SessionState.Empty; user: null; token?: string }
-
-const sessionCache = cache.entity<string, Session>({
-  keygen: (token: string) => `session:${token}`,
-})
 
 export const getSession = async (req: FastifyRequest): Promise<Session> => {
   if (!req.headers.cookie) {

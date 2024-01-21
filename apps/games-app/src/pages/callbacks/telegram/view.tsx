@@ -1,10 +1,15 @@
-import { LoadingOverlay } from '@mantine/core'
-import { BaseLayout } from '../../../layouts/base'
+import { Loader, Text } from '@mantine/core'
+import { CenteredLayout } from '../../../layouts/centered'
 
 export const TelegramCallbackPageView = () => {
   return (
-    <BaseLayout>
-      <LoadingOverlay visible={true} loaderProps={{ size: 'xl' }} />
-    </BaseLayout>
+    <CenteredLayout>
+      <div className="flex flex-col items-center gap-8">
+        <Loader size="xl" />
+        <Text className="text-center" size="lg" lh="xs">
+          Выполняется вход через&nbsp;Telegram
+        </Text>
+      </div>
+    </CenteredLayout>
   )
 }

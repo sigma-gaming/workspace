@@ -6,7 +6,7 @@ import nodeExternals from 'webpack-node-externals'
 
 const config: webpack.Configuration = {
   mode: 'none',
-  devtool: process.env.DEBUG ? 'inline-source-map' : false,
+  devtool: process.env.NODE_ENV === 'development' ? 'eval' : false,
   entry: './src/app.ts',
   target: 'node',
   output: {

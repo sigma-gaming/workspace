@@ -17,7 +17,7 @@ import {
   IconLoader2,
   IconLogout,
   IconSettings,
-  IconWallet
+  IconWallet,
 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
@@ -60,9 +60,7 @@ const Left = () => {
         to={routes.dicesGame}
         size="lg"
         color="#4a115e"
-        leftSection={
-          <IconDice3 style={{ width: rem(24), height: rem(24) }} />
-        }
+        leftSection={<IconDice3 style={{ width: rem(24), height: rem(24) }} />}
         activeClassName={css.leftLinkActive}
       >
         Dices
@@ -99,6 +97,7 @@ const Profile = () => {
   const balance = useUnit($$balance.$available)
   const balanceLoading = useUnit($$balance.$loading)
   const balanceDepositing = useUnit($$balance.$depositing)
+  const balanceWithdrawing = useUnit($$balance.$withdrawing)
 
   if (userExpired) {
     return (
@@ -195,11 +194,21 @@ const Profile = () => {
         </Menu.Item>
 
         <Menu.Item
+          onClick={() => $$balance.withdraw()}
+          closeMenuOnClick={false}
+          disabled={balanceWithdrawing}
           leftSection={
-            <IconCoins style={{ width: rem(16), height: rem(16) }} />
+            balanceWithdrawing ? (
+              <IconLoader2
+                className="animate-spin"
+                style={{ width: rem(16), height: rem(16) }}
+              />
+            ) : (
+              <IconCoins style={{ width: rem(16), height: rem(16) }} />
+            )
           }
         >
-          Вывести деньги
+          {balanceWithdrawing ? 'Выводим деньги...' : 'Вывести деньги'}
         </Menu.Item>
 
         <Menu.Divider />

@@ -1,4 +1,4 @@
-import { createMutation, update } from '@farfetched/core'
+import { createMutation } from '@farfetched/core'
 import { BadRequestException, fromTrpc } from '@libs/exceptions'
 import { createEvent, createStore, sample } from 'effector'
 import { z } from 'zod'
@@ -21,10 +21,10 @@ const $autoplaying = createStore(false).on(autoplayToggled, (state) => !state)
 
 const fields = {
   bet: createField({
-    emptyValue: 0,
+    emptyValue: 1,
   }),
   sides: createField<string[]>({
-    emptyValue: [],
+    emptyValue: ['1'],
   }),
 }
 
@@ -35,7 +35,7 @@ export const form = createForm({
       .number()
       .min(1, 'Минимальная ставка - 1 рубль')
       .step(0.01, 'Ставка должна быть кратна 0.01')
-      .transform((rubles) => rubles * 100),
+      .transform((rubles) => Math.floor(rubles * 100)),
     sides: z
       .array(z.string().transform(Number))
       .min(1, 'Выберите как минимум одну грань')

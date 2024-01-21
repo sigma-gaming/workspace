@@ -10,6 +10,7 @@ import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
 import { env } from '../shared/env'
 import { Context } from './context'
+import { logger } from '../shared/logger'
 
 const t = initTRPC.context<Context>().create({
   isDev: env.isDev,
@@ -49,7 +50,7 @@ const t = initTRPC.context<Context>().create({
       exception instanceof InternalServerException &&
       process.env.NODE_ENV === 'development'
     ) {
-      console.error(error)
+      logger.error(error)
     }
 
     return finish(exception)

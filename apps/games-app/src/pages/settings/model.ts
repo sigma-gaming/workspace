@@ -9,6 +9,7 @@ import { notifications } from '@mantine/notifications'
 import { TRPCClientError } from '@trpc/client'
 import { createEffect, sample } from 'effector'
 import { z } from 'zod'
+import { $$notifications } from '../../entities/notifications'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import {
@@ -116,12 +117,13 @@ sample({
 
 sample({
   clock: updateProfileMutation.finished.success,
-  target: createEffect(() => {
-    notifications.show({
+  fn: () =>
+    $$notifications.options({
+      color: 'green',
       title: 'Профиль обновлен',
       message: `Ты великолепен!`,
-    })
-  }),
+    }),
+  target: $$notifications.show,
 })
 
 export const $$settingsPage = {

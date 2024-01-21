@@ -4,6 +4,6 @@ const formatter = new Intl.NumberFormat('ru-RU', {
   maximumFractionDigits: 2,
 })
 
-export function formatRUB(number: number) {
+export function formatRUB(number: number | bigint) {
   return formatter.format(number)
 }

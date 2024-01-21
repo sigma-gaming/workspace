@@ -10,7 +10,7 @@ import { SessionService } from '../../services/session'
 import { TransactionService } from '../../services/transaction'
 import { procedure } from '../trpc'
 
-export const deposit = procedure.mutation(async ({ ctx }) => {
+export const withdraw = procedure.mutation(async ({ ctx }) => {
   const user = SessionService.getUser(ctx.session)
   const amount = 1000000
 
@@ -21,14 +21,18 @@ export const deposit = procedure.mutation(async ({ ctx }) => {
 
     const lastBalance = lastTransaction?.closingBalance ?? 0
 
+    if (lastBalance < amount) {
+      throw new BadRequestException({ message: 'Недостаточно голды на балике' })
+    }
+
     const newTransaction = await TransactionService.createTransaction(user.id, {
-      type: TransactionType.Deposit,
-      amount,
+      type: TransactionType.Withdrawal,
+      amount: -amount,
       openingBalance: lastBalance,
-      closingBalance: lastBalance + amount,
+      closingBalance: lastBalance - amount,
     })
 
-    await BudgetService.increaseBudget(amount)
+    await BudgetService.increaseBudget(-amount)
 
     return {
       status: 'success',

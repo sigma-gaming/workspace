@@ -86,6 +86,10 @@
     "migrate": {
       "inputs": ["shared", "config", "migrations"]
     },
+    "migrate:dev": {
+      "cache": false,
+      "dependsOn": ["copy-env"]
+    },
     "start": {
       "dependsOn": ["ci", "build", "^build", "^migrate"]
     }
