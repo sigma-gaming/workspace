@@ -1,5 +1,6 @@
 import { createLogger } from '@neodx/log'
 import { createHttpLogger } from '@neodx/log/http'
+import { json, pretty } from '@neodx/log/node'
 import { v4 as uuid } from 'uuid'
 import { env } from '../env'
 
@@ -15,4 +16,6 @@ export const httpLogger = createHttpLogger({
   },
 })
 
-export const logger = createLogger()
+export const logger = createLogger({
+  target: env.isProd ? json() : pretty(),
+})
