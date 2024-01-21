@@ -89,44 +89,21 @@ jobs:
           docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:latest
           docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.packagePath.outputs.path }}:${{ github.sha }}
 
-  deploy-dev-stack:
-    name: Deploy dev stack
-    needs: publish
-    runs-on: [self-hosted, swarm]
+  trigger-dev-deploy:
+    name: Trigger dev deploy
+    needs: [affected, publish]
+    runs-on: ubuntu-latest
 
-    env:
-      NODE_ENV: production
-      DATABASE_URL: ${{ vars.DATABASE_URL_DEV }}
-      REDIS_URL: ${{ vars.REDIS_URL_DEV }}
-      PUBLIC_DOMAIN: ${{ vars.PUBLIC_DOMAIN_DEV }}
-      PUBLIC_GAMES_APP_URL: ${{ vars.PUBLIC_GAMES_APP_URL_DEV }}
-      PUBLIC_GAMES_API_URL: ${{ vars.PUBLIC_GAMES_API_URL_DEV }}
-      PUBLIC_GAMES_API_WS_URL: ${{ vars.PUBLIC_GAMES_API_WS_URL_DEV }}
-      JWT_SECRET: ${{ vars.JWT_SECRET_DEV }}
-      PUBLIC_TELEGRAM_BOT_ID: ${{ vars.PUBLIC_TELEGRAM_BOT_ID_DEV }}
-      TELEGRAM_BOT_TOKEN: ${{ vars.TELEGRAM_BOT_TOKEN_DEV }}
-      PUBLIC_VK_APP_ID: ${{ vars.PUBLIC_VK_APP_ID_DEV }}
-      VK_APP_SECRET: ${{ vars.VK_APP_SECRET_DEV }}
-      VK_SERVICE_TOKEN: ${{ vars.VK_SERVICE_TOKEN_DEV }}
+    if: needs.affected.outputs.apps != '[]'
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: 'google-github-actions/auth@v2'
+      - uses: convictional/trigger-workflow-and-wait@v1.6.1
         with:
-          credentials_json: '${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}'
-
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-        with:
-          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-
-      - name: Authenticate Docker registry
-        run: |-
-          gcloud auth configure-docker ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev --quiet
-
-      - name: Deploy dev stack
-        run: |-
-          docker stack deploy -c stacks/dev.docker-compose.yml dev --with-registry-auth --prune
+          owner: sigma-gaming
+          repo: infra
+          github_token: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
+          workflow_file_name: deploy-stacks.yml
