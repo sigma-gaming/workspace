@@ -48,6 +48,10 @@ app.setNotFoundHandler((request, reply) => {
   reply.sendFile('index.html')
 })
 
+app.get('/container', async () => {
+  return 'Healthy'
+})
+
 app.get('/health', async (_, reply) => {
   return reply.code(503).send()
 })
