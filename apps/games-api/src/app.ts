@@ -61,7 +61,14 @@ app.register(fastifyTRPCPlugin, {
   },
 })
 
-app.get('/health', async () => {
+app.get('/container', async () => {
+  return 'Healthy'
+})
+
+app.get('/health', async (_, reply) => {
+  const response = await fetch(`${process.env.INTERNAL_MAINTENANCE_URL}/get`)
+  const { value } = await response.json()
+  if (!value) return reply.status(503).send()
   return 'Healthy'
 })
 

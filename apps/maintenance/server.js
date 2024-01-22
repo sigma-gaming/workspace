@@ -1,5 +1,6 @@
 import fastifyStatic from '@fastify/static'
 import Fastify from 'fastify'
+import Client from 'ioredis'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import url from 'node:url'
@@ -50,6 +51,33 @@ app.setNotFoundHandler((request, reply) => {
 
 app.get('/health', async () => {
   return { status: 'healthy' }
+})
+
+const redis = new Client(process.env.REDIS_URL)
+
+app.get('/get', async () => {
+  // Redis is required
+  if (redis.status !== 'ready') {
+    return { value: true }
+  }
+
+  const cached = await redis.get('global:maintenance')
+
+  if (cached === null) {
+    await redis.set('global:maintenance', 'false')
+    return { value: false }
+  }
+
+  return { value: JSON.parse(cached) }
+})
+
+app.post('/set', async (request, reply) => {
+  if (!request.body) return reply.code(400).send()
+  if (typeof request.body !== 'object') return reply.code(400).send()
+  const { value } = request.body
+  if (typeof value !== 'boolean') return reply.code(400).send()
+  await redis.set('global:maintenance', JSON.stringify(value))
+  return { value }
 })
 
 const port = process.env.PORT || 5173
