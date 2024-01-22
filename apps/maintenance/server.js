@@ -1,6 +1,5 @@
 import fastifyStatic from '@fastify/static'
 import Fastify from 'fastify'
-import Client from 'ioredis'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import url from 'node:url'
@@ -49,62 +48,8 @@ app.setNotFoundHandler((request, reply) => {
   reply.sendFile('index.html')
 })
 
-app.get('/health', async () => {
+app.get('/container', async () => {
   return { status: 'healthy' }
-})
-
-const [correctUsername, correctPassword] = Buffer.from(
-  process.env.MAINTENANCE_BASIC_AUTH,
-  'base64',
-)
-  .toString('utf8')
-  .split(':')
-
-function validate(username, password, req, reply, done) {
-  if (username === correctUsername && password === correctPassword) {
-    done()
-  } else {
-    done(new Error('Not authorized'))
-  }
-}
-
-app.register(require('@fastify/basic-auth'), { validate })
-
-const redis = new Client(process.env.REDIS_URL)
-
-app.route({
-  method: 'GET',
-  url: '/get',
-  onRequest: app.basicAuth,
-  handler: async () => {
-    // Redis is required
-    if (redis.status !== 'ready') {
-      return { value: true }
-    }
-
-    const cached = await redis.get('global:maintenance')
-
-    if (cached === null) {
-      await redis.set('global:maintenance', 'false')
-      return { value: false }
-    }
-
-    return { value: JSON.parse(cached) }
-  },
-})
-
-app.route({
-  method: 'POST',
-  url: '/set',
-  onRequest: app.basicAuth,
-  handler: async (request, reply) => {
-    if (!request.body) return reply.code(400).send()
-    if (typeof request.body !== 'object') return reply.code(400).send()
-    const { value } = request.body
-    if (typeof value !== 'boolean') return reply.code(400).send()
-    await redis.set('global:maintenance', JSON.stringify(value))
-    return { value }
-  },
 })
 
 const port = process.env.PORT || 5173

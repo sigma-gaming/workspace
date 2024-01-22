@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { buildLibrary, emptyDirectory, buildCLI } from '@tooling/build'
+import { buildLibrary, emptyDirectory } from '@tooling/build'
 
 const dirname = fileURLToPath(new URL('.', import.meta.url))
 
@@ -14,11 +14,7 @@ async function build() {
     type: 'single',
     input: src('index.ts'),
     outputDir: distPath,
-  })
-
-  await buildCLI({
-    input: src('cli.ts'),
-    output: path.join(distPath, 'bin/copy-env.js'),
+    external: ['ioredis']
   })
 }
 

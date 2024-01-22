@@ -2382,6 +2382,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@libs/maintenance-storage@workspace:libs/maintenance-storage":
+  version: 0.0.0-use.local
+  resolution: "@libs/maintenance-storage@workspace:libs/maintenance-storage"
+  dependencies:
+    "@tooling/build": "workspace:*"
+  bin:
+    copy-env: ./bin/copy-env.js
+  languageName: unknown
+  linkType: soft
+
 "@lukeed/ms@npm:^2.0.1":
   version: 2.0.1
   resolution: "@lukeed/ms@npm:2.0.1"

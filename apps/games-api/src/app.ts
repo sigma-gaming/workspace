@@ -1,5 +1,6 @@
 import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
+import { isMaintenanceMode } from '@libs/maintenance-storage'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import fs from 'node:fs'
@@ -66,15 +67,7 @@ app.get('/container', async () => {
 })
 
 app.get('/health', async (_, reply) => {
-  const headers = new Headers()
-  headers.set('Authorization', `Basic ${env.maintenance.basicAuth}`)
-
-  const response = await fetch(`${env.maintenance.internalUrl}/get`, {
-    headers,
-  })
-
-  const { value } = await response.json()
-  if (value) return reply.status(503).send()
+  if (await isMaintenanceMode()) return reply.status(503).send()
   return 'Healthy'
 })
 

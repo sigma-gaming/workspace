@@ -33,10 +33,6 @@ const EnvSchema = z
     redis: {
       url: raw.REDIS_URL,
     },
-    maintenance: {
-      internalUrl: raw.INTERNAL_MAINTENANCE_URL,
-      basicAuth: raw.MAINTENANCE_BASIC_AUTH,
-    },
 
     // rabbitmq: {
     //   url: raw.RABBITMQ_URL,

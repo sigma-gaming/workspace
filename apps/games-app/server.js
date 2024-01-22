@@ -1,4 +1,5 @@
 import fastifyStatic from '@fastify/static'
+import { isMaintenanceMode } from '@libs/maintenance-storage'
 import Fastify from 'fastify'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -53,16 +54,7 @@ app.get('/container', async () => {
 })
 
 app.get('/health', async (_, reply) => {
-  const headers = new Headers()
-  headers.set('Authorization', `Basic ${process.env.MAINTENANCE_BASIC_AUTH}`)
-
-  const response = await fetch(`${process.env.INTERNAL_MAINTENANCE_URL}/get`, {
-    headers,
-  })
-
-  const { value } = await response.json()
-  console.log({ healthcheck: value })
-  if (value) return reply.status(503).send()
+  if (await isMaintenanceMode()) return reply.status(503).send()
   return 'Healthy'
 })
 
