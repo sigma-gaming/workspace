@@ -53,8 +53,15 @@ app.get('/health', async () => {
   return { status: 'healthy' }
 })
 
+const [correctUsername, correctPassword] = Buffer.from(
+  process.env.MAINTENANCE_BASIC_AUTH,
+  'base64',
+)
+  .toString('utf8')
+  .split(':')
+
 function validate(username, password, req, reply, done) {
-  if (username === 'maintenance' && password === 'aoh79a4t38fgs8gf87g28g3f') {
+  if (username === correctUsername && password === correctPassword) {
     done()
   } else {
     done(new Error('Not authorized'))
