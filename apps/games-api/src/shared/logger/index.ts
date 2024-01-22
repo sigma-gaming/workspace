@@ -7,6 +7,10 @@ import { Connect } from 'vite'
 import { env } from '../env'
 import IncomingMessage = Connect.IncomingMessage
 
+export const logger = createLogger({
+  target: env.isProd ? json() : pretty(),
+})
+
 function serializeReq(req: IncomingMessage) {
   const sessionCookieIndex = req.headers.cookie?.indexOf('session') ?? -1
 
@@ -34,6 +38,7 @@ export const httpLogger = createHttpLogger<
   RawReplyDefaultExpression
 >({
   simple: !env.isProd,
+  logger,
   shouldLogRequest: true,
   getRequestId: (req) => {
     const existingID = req.headers['x-trace-id']
@@ -50,8 +55,4 @@ export const httpLogger = createHttpLogger<
     responseTime: ctx.responseTime,
     req: serializeReq(ctx.req),
   }),
-})
-
-export const logger = createLogger({
-  target: env.isProd ? json() : pretty(),
 })

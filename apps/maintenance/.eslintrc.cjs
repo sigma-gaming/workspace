@@ -9,9 +9,13 @@ module.exports = configure({
     presets.node(),
     presets.prettier(),
     presets.typescript(),
+    presets.react(),
   ],
 
   extend: {
     ignorePatterns: ['!**/*', 'node_modules', 'dist'],
+    rules: {
+      'import/extensions': 'off',
+    },
   },
 })

@@ -46,7 +46,16 @@ __metadata:
   dependencies:
     "@libs/exceptions": "workspace:*"
     "@libs/games-model": "workspace:*"
-    "@libs/ssr-bindings": "workspace:*"
+    "@tooling/env": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"@apps/maintenance@workspace:apps/maintenance":
+  version: 0.0.0-use.local
+  resolution: "@apps/maintenance@workspace:apps/maintenance"
+  dependencies:
+    "@libs/exceptions": "workspace:*"
+    "@libs/games-model": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -2349,12 +2358,6 @@ __metadata:
   resolution: "@libs/games-model@workspace:libs/games-model"
   dependencies:
     "@libs/games-db": "workspace:*"
-  languageName: unknown
-  linkType: soft
-
-"@libs/ssr-bindings@workspace:*, @libs/ssr-bindings@workspace:libs/ssr-bindings":
-  version: 0.0.0-use.local
-  resolution: "@libs/ssr-bindings@workspace:libs/ssr-bindings"
   languageName: unknown
   linkType: soft
 
