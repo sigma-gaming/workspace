@@ -1,6 +1,5 @@
 import fastifyStatic from '@fastify/static'
-import { isMaintenanceMode } from '@libs/maintenance-storage'
-import { createMaintenanceStorage } from '@libs/maintenance-storage/src'
+import { createMaintenanceStorage } from '@libs/maintenance-storage'
 import Fastify from 'fastify'
 import fs from 'node:fs/promises'
 import path from 'node:path'
