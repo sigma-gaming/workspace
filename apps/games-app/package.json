@@ -16,6 +16,7 @@
   "dependencies": {
     "@libs/exceptions": "workspace:*",
     "@libs/games-model": "workspace:*",
+    "@libs/maintenance-storage": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }
