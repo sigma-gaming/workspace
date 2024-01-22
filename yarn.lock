@@ -47,6 +47,7 @@ __metadata:
     "@libs/exceptions": "workspace:*"
     "@libs/games-db": "workspace:*"
     "@libs/games-model": "workspace:*"
+    "@libs/maintenance-storage": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -57,6 +58,7 @@ __metadata:
   dependencies:
     "@libs/exceptions": "workspace:*"
     "@libs/games-model": "workspace:*"
+    "@libs/maintenance-storage": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -2382,7 +2384,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@libs/maintenance-storage@workspace:libs/maintenance-storage":
+"@libs/maintenance-storage@workspace:*, @libs/maintenance-storage@workspace:libs/maintenance-storage":
   version: 0.0.0-use.local
   resolution: "@libs/maintenance-storage@workspace:libs/maintenance-storage"
   dependencies:
