@@ -12,9 +12,6 @@ const EnvSchema = z
     PUBLIC_GAMES_API_WS_URL: z.string(),
     JWT_SECRET: z.string(),
 
-    INTERNAL_MAINTENANCE_URL: z.string(),
-    MAINTENANCE_BASIC_AUTH: z.string(),
-
     // RABBITMQ_URL: z.string(),
     REDIS_URL: z.string(),
 
