@@ -2387,8 +2387,6 @@ __metadata:
   resolution: "@libs/maintenance-storage@workspace:libs/maintenance-storage"
   dependencies:
     "@tooling/build": "workspace:*"
-  bin:
-    copy-env: ./bin/copy-env.js
   languageName: unknown
   linkType: soft
 
