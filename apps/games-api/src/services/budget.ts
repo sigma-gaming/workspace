@@ -18,6 +18,7 @@ export const getBudget = async (): Promise<Budget> => {
 
     budget = await prisma.budget.create({
       data: {
+        id: 1,
         available: rub(10000),
         unwantedLoss: rub(10000),
         maxLoss: rub(10000),
@@ -76,7 +77,7 @@ export async function syncBudget(force = false): Promise<void> {
     }, 0)
 
     const updatedBudget = await prisma.budget.update({
-      where: { id: budget.id },
+      where: { id: 1 },
       data: {
         available: { increment: diff },
         lastSyncAt: currentSyncAt,
