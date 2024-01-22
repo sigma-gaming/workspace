@@ -47,7 +47,7 @@ app.addHook('onSend', (request, reply, payloadUnknown, done) => {
 app.register(ws)
 
 app.register(cors, {
-  origin: env.controlApp.url,
+  origin: [env.controlApp.url, env.gamesApp.url],
   credentials: true,
 })
 

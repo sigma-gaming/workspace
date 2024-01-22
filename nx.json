@@ -90,6 +90,9 @@
       "dependsOn": ["copy-env"]
     },
     "start": {
+      "dependsOn": ["ci", "build", "^build"]
+    },
+    "start:migrate": {
       "dependsOn": ["ci", "build", "^build", "^migrate"]
     }
   },

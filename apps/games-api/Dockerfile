@@ -18,4 +18,4 @@ COPY . ./
 
 COPY ./apps/games-api/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
 
-CMD ["yarn", "nx", "run", "@apps/games-api:start"]
+CMD ["yarn", "nx", "run", "@apps/games-api:start:migrate"]
