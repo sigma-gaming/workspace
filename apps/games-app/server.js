@@ -52,6 +52,10 @@ app.get('/health', async () => {
   return { status: 'healthy' }
 })
 
+app.get('/maintenance', async (_, reply) => {
+  reply.status(503).send()
+})
+
 const port = process.env.PORT || 5173
 
 await app.listen({ host: '0.0.0.0', port }, (err) => {
