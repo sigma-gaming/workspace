@@ -4,8 +4,7 @@ dist
 generated
 tmp
 /out-tsc
+.nx
 
 # dependencies
 node_modules
-node_modules_unlinked
-workspace.tar*

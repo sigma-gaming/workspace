@@ -29,6 +29,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@apps/control-api@workspace:apps/control-api":
+  version: 0.0.0-use.local
+  resolution: "@apps/control-api@workspace:apps/control-api"
+  dependencies:
+    "@libs/exceptions": "workspace:*"
+    "@libs/games-db": "workspace:*"
+    "@libs/games-model": "workspace:*"
+    "@tooling/env": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@apps/games-api@workspace:apps/games-api":
   version: 0.0.0-use.local
   resolution: "@apps/games-api@workspace:apps/games-api"
