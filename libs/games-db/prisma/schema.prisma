@@ -38,7 +38,6 @@ model User {
   updatedAt DateTime @updatedAt @default(now()) @db.Timestamp(6)
 
   roles UserRole[] @default([User])
-  test Boolean   @default(false)
 
   profile      Profile?
   accounts     Account[]
