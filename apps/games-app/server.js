@@ -55,8 +55,7 @@ app.get('/container', async () => {
 app.get('/health', async (_, reply) => {
   const response = await fetch(`${process.env.INTERNAL_MAINTENANCE_URL}/get`)
   const { value } = await response.json()
-  console.log({ value })
-  if (!value) return reply.status(503).send()
+  if (value) return reply.status(503).send()
   return 'Healthy'
 })
 
