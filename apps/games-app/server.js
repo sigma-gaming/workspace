@@ -1,5 +1,6 @@
 import fastifyStatic from '@fastify/static'
 import Fastify from 'fastify'
+import Client from 'ioredis'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import url from 'node:url'
@@ -52,7 +53,12 @@ app.get('/container', async () => {
   return 'Healthy'
 })
 
-app.get('/health', async () => {
+const redis = new Client(process.env.REDIS_URL)
+
+app.get('/health', async (_, reply) => {
+  const maintenanceMode = await redis.call('JSON.GET', 'global:maintenance')
+  if (JSON.parse(maintenanceMode)) return reply.code(503).send()
+
   return 'Healthy'
 })
 
