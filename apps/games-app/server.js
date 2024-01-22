@@ -52,8 +52,8 @@ app.get('/container', async () => {
   return 'Healthy'
 })
 
-app.get('/health', async (_, reply) => {
-  return reply.code(503).send()
+app.get('/health', async () => {
+  return 'Healthy'
 })
 
 const port = process.env.PORT || 5173
