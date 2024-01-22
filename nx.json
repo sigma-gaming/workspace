@@ -17,8 +17,7 @@
     "env": ["{workspaceRoot}/.env.development"],
     "src": [
       "{projectRoot}/index.html",
-      "{projectRoot}/server-dev.js",
-      "{projectRoot}/server-prod.js",
+      "{projectRoot}/server.js",
       "{projectRoot}/prisma/schema.prisma",
       "{projectRoot}/public/**/*",
       "{projectRoot}/src/**/*",
