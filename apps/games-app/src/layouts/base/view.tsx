@@ -21,7 +21,14 @@ import {
 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
-import { PropsWithChildren, SVGProps } from 'react'
+import { animate } from 'framer-motion/dom'
+import {
+  PropsWithChildren,
+  SVGProps,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react'
 import { $$balance } from '../../entities/balance'
 import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
@@ -88,13 +95,42 @@ const Header = () => {
   )
 }
 
+const AnimatedBalance = () => {
+  const previous = useUnit($$balance.$previousAvailable)
+  const current = useUnit($$balance.$available)
+
+  console.log(previous, current)
+
+  const nodeRef = useRef<HTMLSpanElement>(null)
+
+  useLayoutEffect(() => {
+    const node = nodeRef.current
+    if (!node) return
+
+    if (previous === 0 || previous == null) {
+      node.textContent = formatRUB(current / 100)
+      return
+    }
+
+    const controls = animate(previous, current, {
+      duration: 0.25,
+      onUpdate(value) {
+        node.textContent = formatRUB(value / 100)
+      },
+    })
+
+    return () => controls.stop()
+  }, [previous, current])
+
+  return <span ref={nodeRef} />
+}
+
 const Profile = () => {
   const [opened, { open, close }] = useDisclosure(false)
   const userLoading = useUnit($$user.$loading)
   const userExpired = useUnit($$user.$expired)
   const profile = useUnit($$user.$profile)
   const loggingOut = useUnit($$user.$loggingOut)
-  const balance = useUnit($$balance.$available)
   const balanceLoading = useUnit($$balance.$loading)
   const balanceDepositing = useUnit($$balance.$depositing)
   const balanceWithdrawing = useUnit($$balance.$withdrawing)
@@ -143,7 +179,7 @@ const Profile = () => {
                 fw={500}
                 c="green.6"
               >
-                {formatRUB(balance / 100)}
+                <AnimatedBalance />
               </Text>
             </Skeleton>
           </Stack>

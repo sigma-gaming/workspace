@@ -9,7 +9,7 @@ import {
 } from '@libs/exceptions'
 import { notifications } from '@mantine/notifications'
 import { createEffect, createEvent, sample } from 'effector'
-import { and, not } from 'patronum'
+import { and, not, previous } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { appStarted } from '../../shared/events.ts'
 import { $$notifications } from '../notifications'
@@ -64,6 +64,7 @@ const $depositing = depositMutation.$pending
 const $withdrawing = withdrawMutation.$pending
 
 const $available = $balance.map((balance) => balance?.available ?? 0)
+const $previousAvailable = previous($available)
 
 sample({
   clock: appStarted,
@@ -155,6 +156,7 @@ export const $$balance = {
   $loading,
   $loaded,
   $available,
+  $previousAvailable,
   $depositing,
   $withdrawing,
 }

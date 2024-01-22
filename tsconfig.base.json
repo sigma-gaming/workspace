@@ -21,6 +21,7 @@
       "@libs/exceptions": ["libs/exceptions/src/index.ts"],
       "@libs/games-db": ["libs/games-db/dist"],
       "@libs/games-model": ["libs/games-model/src/index.ts"],
+      "@libs/maintenance-storage": ["libs/maintenance-storage/src/index.ts"],
       "@tooling/build": ["libs/build/src/index.ts"],
       "@tooling/env": ["libs/env/src/index.ts"]
     }

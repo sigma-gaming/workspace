@@ -1,6 +1,6 @@
 import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
-import { isMaintenanceMode } from '@libs/maintenance-storage'
+import { createMaintenanceStorage } from '@libs/maintenance-storage'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import fs from 'node:fs'
@@ -66,8 +66,11 @@ app.get('/container', async () => {
   return 'Healthy'
 })
 
+const maintenanceStorage = createMaintenanceStorage(env.redis.url)
+
 app.get('/health', async (_, reply) => {
-  if (await isMaintenanceMode()) return reply.status(503).send()
+  if (await maintenanceStorage.isMaintenanceMode())
+    return reply.status(503).send()
   return 'Healthy'
 })
 

@@ -1,5 +1,6 @@
 import fastifyStatic from '@fastify/static'
 import { isMaintenanceMode } from '@libs/maintenance-storage'
+import { createMaintenanceStorage } from '@libs/maintenance-storage/src'
 import Fastify from 'fastify'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -53,8 +54,11 @@ app.get('/container', async () => {
   return 'Healthy'
 })
 
+const maintenanceStorage = createMaintenanceStorage()
+
 app.get('/health', async (_, reply) => {
-  if (await isMaintenanceMode()) return reply.status(503).send()
+  if (await maintenanceStorage.isMaintenanceMode())
+    return reply.status(503).send()
   return 'Healthy'
 })
 
