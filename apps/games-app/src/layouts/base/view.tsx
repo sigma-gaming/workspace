@@ -23,6 +23,7 @@ import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
 import { animate } from 'framer-motion/dom'
 import {
+  memo,
   PropsWithChildren,
   SVGProps,
   useEffect,
@@ -95,12 +96,9 @@ const Header = () => {
   )
 }
 
-const AnimatedBalance = () => {
+const AnimatedBalance = memo(() => {
   const previous = useUnit($$balance.$previousAvailable)
   const current = useUnit($$balance.$available)
-
-  console.log(previous, current)
-
   const nodeRef = useRef<HTMLSpanElement>(null)
 
   useLayoutEffect(() => {
@@ -123,7 +121,7 @@ const AnimatedBalance = () => {
   }, [previous, current])
 
   return <span ref={nodeRef} />
-}
+})
 
 const Profile = () => {
   const [opened, { open, close }] = useDisclosure(false)
