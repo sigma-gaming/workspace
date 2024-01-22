@@ -61,6 +61,7 @@ app.get('/health', async (_, reply) => {
   })
 
   const { value } = await response.json()
+  console.log({ healthcheck: value })
   if (value) return reply.status(503).send()
   return 'Healthy'
 })
