@@ -2079,6 +2079,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/basic-auth@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@fastify/basic-auth@npm:5.1.1"
+  dependencies:
+    "@fastify/error": "npm:^3.0.0"
+    fastify-plugin: "npm:^4.0.0"
+  checksum: 6085e0867d98ba061d06fbcdd8fb1726f2d4637a1139e760b9ff3954f252d89616afab48148129302c20705103f7bc77f2506a0c93b0362872dde524092ab935
+  languageName: node
+  linkType: hard
+
 "@fastify/cors@npm:^8.4.2":
   version: 8.4.2
   resolution: "@fastify/cors@npm:8.4.2"
@@ -2096,7 +2106,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/error@npm:^3.2.0, @fastify/error@npm:^3.4.0":
+"@fastify/error@npm:^3.0.0, @fastify/error@npm:^3.2.0, @fastify/error@npm:^3.4.0":
   version: 3.4.1
   resolution: "@fastify/error@npm:3.4.1"
   checksum: 1f1a0faa8c86639afb6f4bd47a9cdc1f0f20ce0d6944340fbdec8218aaba91dc9cae9ed78e24e61bceb782a867efda2b9a6320091f00dcbb896d9c8a9bdf5f96
@@ -2951,6 +2961,7 @@ __metadata:
   dependencies:
     "@changesets/cli": "npm:^2.27.1"
     "@farfetched/core": "npm:^0.11.2"
+    "@fastify/basic-auth": "npm:^5.1.1"
     "@fastify/cors": "npm:^8.4.2"
     "@fastify/static": "npm:^6.12.0"
     "@fastify/vite": "npm:^5.0.4"
