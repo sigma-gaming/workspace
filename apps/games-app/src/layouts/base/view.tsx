@@ -26,7 +26,6 @@ import {
   memo,
   PropsWithChildren,
   SVGProps,
-  useEffect,
   useLayoutEffect,
   useRef,
 } from 'react'
@@ -97,28 +96,36 @@ const Header = () => {
 }
 
 const AnimatedBalance = memo(() => {
-  const previous = useUnit($$balance.$previousAvailable)
   const current = useUnit($$balance.$available)
+  const loaded = useUnit($$balance.$loaded)
+  const previousLoadedRef = useRef(loaded)
+  const previousRef = useRef(current)
   const nodeRef = useRef<HTMLSpanElement>(null)
 
   useLayoutEffect(() => {
     const node = nodeRef.current
     if (!node) return
 
-    if (previous === 0 || previous == null) {
+    if (!previousLoadedRef.current && loaded) {
+      previousLoadedRef.current = loaded
+      previousRef.current = current
+    }
+
+    if (previousRef.current === current) {
       node.textContent = formatRUB(current / 100)
       return
     }
 
-    const controls = animate(previous, current, {
+    const controls = animate(previousRef.current, current, {
       duration: 0.25,
       onUpdate(value) {
         node.textContent = formatRUB(value / 100)
       },
     })
 
+    previousRef.current = current
     return () => controls.stop()
-  }, [previous, current])
+  }, [loaded, current])
 
   return <span ref={nodeRef} />
 })
