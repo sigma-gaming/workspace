@@ -2,9 +2,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 ENV NODE_ENV production
+ENV NX_DAEMON false
 
-COPY . ./
+COPY package.json yarn.lock .yarnrc.yml yarn.config.cjs ./
+COPY .yarn/releases ./.yarn/releases
+COPY apps ./apps
+COPY libs ./libs
+COPY tooling ./tooling
 RUN yarn install --immutable
+
 COPY . ./
 RUN yarn nx run @apps/maintenance:build
 COPY . ./

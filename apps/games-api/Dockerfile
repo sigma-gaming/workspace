@@ -10,6 +10,7 @@ COPY package.json yarn.lock .yarnrc.yml yarn.config.cjs ./
 COPY .yarn/releases ./.yarn/releases
 COPY apps ./apps
 COPY libs ./libs
+COPY tooling ./tooling
 RUN yarn install --immutable
 
 COPY . ./
