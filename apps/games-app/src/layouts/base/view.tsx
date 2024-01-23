@@ -1,40 +1,10 @@
-import {
-  Avatar,
-  Button,
-  Menu,
-  Modal,
-  rem,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
-import {
-  IconCategory2,
-  IconCoins,
-  IconDice3,
-  IconLoader2,
-  IconLogout,
-  IconSettings,
-  IconWallet,
-} from '@tabler/icons-react'
+import { rem, Title } from '@mantine/core'
+import { IconCategory2, IconDice3 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
-import { useUnit } from 'effector-react'
-import { animate } from 'framer-motion/dom'
-import {
-  memo,
-  PropsWithChildren,
-  SVGProps,
-  useLayoutEffect,
-  useRef,
-} from 'react'
-import { $$balance } from '../../entities/balance'
-import { TelegramButton, VkButton } from '../../entities/provider'
-import { $$user } from '../../entities/user'
+import { memo, PropsWithChildren, SVGProps } from 'react'
 import { routes } from '../../routing'
-import { formatRUB } from '../../shared/lib/format/currency.ts'
 import { LinkButton } from '../../shared/ui/general/link-button'
+import { MiniProfile } from './mini-profile.tsx'
 import css from './styles.module.css'
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
@@ -49,7 +19,7 @@ export const BaseLayout = ({ children }: PropsWithChildren) => {
   )
 }
 
-const Left = () => {
+const Left = memo(() => {
   return (
     <aside className="hidden md:flex w-64 flex-col gap-4">
       <LinkButton
@@ -74,9 +44,11 @@ const Left = () => {
       </LinkButton>
     </aside>
   )
-}
+})
 
-const Header = () => {
+const Header = memo(() => {
+  console.log('render header')
+
   return (
     <header className="flex gap-6 items-center justify-between py-6 md:py-8">
       <div className="md:w-64 md:px-5 flex gap-[10px] items-center">
@@ -90,193 +62,10 @@ const Header = () => {
           </Title>
         </Link>
       </div>
-      <Profile />
+      <MiniProfile />
     </header>
   )
-}
-
-const AnimatedBalance = memo(() => {
-  const current = useUnit($$balance.$available)
-  const loaded = useUnit($$balance.$loaded)
-  const previousLoadedRef = useRef(loaded)
-  const previousRef = useRef(current)
-  const nodeRef = useRef<HTMLSpanElement>(null)
-
-  useLayoutEffect(() => {
-    const node = nodeRef.current
-    if (!node) return
-
-    if (!previousLoadedRef.current && loaded) {
-      previousLoadedRef.current = loaded
-      previousRef.current = current
-    }
-
-    if (previousRef.current === current) {
-      node.textContent = formatRUB(current / 100)
-      return
-    }
-
-    const controls = animate(previousRef.current, current, {
-      duration: 0.25,
-      onUpdate(value) {
-        node.textContent = formatRUB(value / 100)
-      },
-    })
-
-    previousRef.current = current
-    return () => controls.stop()
-  }, [loaded, current])
-
-  return <span ref={nodeRef} />
 })
-
-const Profile = () => {
-  const [opened, { open, close }] = useDisclosure(false)
-  const userLoading = useUnit($$user.$loading)
-  const userExpired = useUnit($$user.$expired)
-  const profile = useUnit($$user.$profile)
-  const loggingOut = useUnit($$user.$loggingOut)
-  const balanceLoading = useUnit($$balance.$loading)
-  const balanceDepositing = useUnit($$balance.$depositing)
-  const balanceWithdrawing = useUnit($$balance.$withdrawing)
-
-  if (userExpired) {
-    return (
-      <>
-        <Button size="md" onClick={open}>
-          Войти в аккаунт
-        </Button>
-
-        <Modal
-          title="Авторизация"
-          opened={opened}
-          onClose={close}
-          size="xs"
-          centered
-        >
-          <div className="flex flex-col gap-2">
-            <VkButton size="md" fullWidth>
-              Войти через VK ID
-            </VkButton>
-            <TelegramButton size="md" fullWidth>
-              Войти через Telegram
-            </TelegramButton>
-          </div>
-        </Modal>
-      </>
-    )
-  }
-
-  return (
-    <Menu width={240} position="bottom-end" offset={16} disabled={userLoading}>
-      <Menu.Target>
-        <div className="flex gap-4 items-center pl-4 cursor-pointer">
-          <Stack gap={6} align="end">
-            <Skeleton visible={balanceLoading} width="fit-content" radius="sm">
-              <Text className="leading-none" size="sm" c="dimmed">
-                Баланс
-              </Text>
-            </Skeleton>
-            <Skeleton visible={balanceLoading} width="fit-content">
-              <Text
-                className="font-interface leading-none"
-                size="xl"
-                fw={500}
-                c="green.6"
-              >
-                <AnimatedBalance />
-              </Text>
-            </Skeleton>
-          </Stack>
-
-          <Skeleton visible={userLoading} height={56} circle>
-            <Avatar
-              src={profile?.image}
-              component="button"
-              name="Меню пользователя"
-              size={48}
-              classNames={{
-                root: 'm-1 outline outline-2 outline-offset-2 outline-sigma-600',
-              }}
-            />
-          </Skeleton>
-        </div>
-      </Menu.Target>
-
-      <Menu.Dropdown p="xs">
-        {profile && (
-          <div className="px-3 py-2">
-            <Text fw={500}>{profile.name}</Text>
-            {profile.username && (
-              <Text size="sm" c="dark.2">
-                @{profile.username}
-              </Text>
-            )}
-          </div>
-        )}
-
-        <Menu.Item
-          c="green.6"
-          onClick={() => $$balance.deposit()}
-          closeMenuOnClick={false}
-          disabled={balanceDepositing}
-          leftSection={
-            balanceDepositing ? (
-              <IconLoader2
-                className="animate-spin"
-                style={{ width: rem(16), height: rem(16) }}
-              />
-            ) : (
-              <IconWallet style={{ width: rem(16), height: rem(16) }} />
-            )
-          }
-        >
-          {balanceDepositing ? 'Пополняем баланс...' : 'Пополнить баланс'}
-        </Menu.Item>
-
-        <Menu.Item
-          onClick={() => $$balance.withdraw()}
-          closeMenuOnClick={false}
-          disabled={balanceWithdrawing}
-          leftSection={
-            balanceWithdrawing ? (
-              <IconLoader2
-                className="animate-spin"
-                style={{ width: rem(16), height: rem(16) }}
-              />
-            ) : (
-              <IconCoins style={{ width: rem(16), height: rem(16) }} />
-            )
-          }
-        >
-          {balanceWithdrawing ? 'Выводим деньги...' : 'Вывести деньги'}
-        </Menu.Item>
-
-        <Menu.Divider />
-
-        <Menu.Item
-          component={Link}
-          to={routes.settings}
-          leftSection={
-            <IconSettings style={{ width: rem(16), height: rem(16) }} />
-          }
-        >
-          Настройки
-        </Menu.Item>
-        <Menu.Item
-          c="red.6"
-          onClick={() => $$user.logout()}
-          disabled={loggingOut}
-          leftSection={
-            <IconLogout style={{ width: rem(16), height: rem(16) }} />
-          }
-        >
-          Выйти из аккаунта
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
-  )
-}
 
 const Logo = (props: SVGProps<SVGSVGElement>) => {
   return (

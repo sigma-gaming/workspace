@@ -1,16 +1,13 @@
-import { createRoutesView } from 'atomic-router-react'
-import { TelegramCallbackRoute } from './callbacks/telegram'
-import { VkCallbackRoute } from './callbacks/vk'
-import { DicesGameRoute } from './games/dices'
-import { HomeRoute } from './home'
-import { SettingsRoute } from './settings'
+import { TelegramCallbackPage } from './callbacks/telegram'
+import { VkCallbackPage } from './callbacks/vk'
+import { DicesGamePage } from './games/dices'
+import { HomePage } from './home'
+import { SettingsPage } from './settings'
 
-export const PageViews = createRoutesView({
-  routes: [
-    HomeRoute,
-    DicesGameRoute,
-    SettingsRoute,
-    VkCallbackRoute,
-    TelegramCallbackRoute,
-  ],
-})
+export const PAGES = [
+  HomePage,
+  DicesGamePage,
+  SettingsPage,
+  VkCallbackPage,
+  TelegramCallbackPage,
+]

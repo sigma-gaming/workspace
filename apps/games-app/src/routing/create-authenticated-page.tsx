@@ -4,7 +4,7 @@ import { $$user } from '../entities/user'
 import { home } from './routes.ts'
 import { RouteRecord } from './types.ts'
 
-export function createAuthenticatedRoute({
+export function createAuthenticatedPage({
   view: View,
   ...rest
 }: RouteRecord): RouteRecord {

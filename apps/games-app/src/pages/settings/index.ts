@@ -1,9 +1,9 @@
-import { routes } from '../../routing'
-import { createAuthenticatedRoute } from '../../routing/authenticated-route.tsx'
-import { RouteRecord } from '../../routing/types.ts'
+import { BaseLayout } from '../../layouts/base'
+import { createAuthenticatedPage, routes } from '../../routing'
 import { SettingsPageView } from './view.tsx'
 
-export const SettingsRoute: RouteRecord = createAuthenticatedRoute({
+export const SettingsPage = createAuthenticatedPage({
   route: routes.settings,
   view: SettingsPageView,
+  layout: BaseLayout,
 })

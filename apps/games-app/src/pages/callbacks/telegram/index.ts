@@ -1,9 +1,10 @@
 import './model.ts'
-import { routes } from '../../../routing'
-import { RouteRecord } from '../../../routing/types.ts'
+import { CenteredLayout } from '../../../layouts/centered'
+import { createPage, routes } from '../../../routing'
 import { TelegramCallbackPageView } from './view.tsx'
 
-export const TelegramCallbackRoute: RouteRecord = {
+export const TelegramCallbackPage = createPage({
   route: routes.telegramCallback,
   view: TelegramCallbackPageView,
-}
+  layout: CenteredLayout,
+})

@@ -17,6 +17,7 @@
     "node": "20"
   },
   "scripts": {
+    "dev": "nx run-many -t dev -p @apps/games-app @apps/games-api --parallel",
     "dev:services": "docker compose -f local.docker-compose.yml  up -d",
     "check": "yarn constraints && yarn nx affected --target build test lint typecheck --parallel 3",
     "changeset:publish": "changeset tag && git push --follow-tags",

@@ -1,8 +1,9 @@
-import { routes } from '../../routing'
-import { RouteRecord } from '../../routing/types.ts'
+import { BaseLayout } from '../../layouts/base'
+import { createPage, routes } from '../../routing'
 import { HomePageView } from './view.tsx'
 
-export const HomeRoute: RouteRecord = {
+export const HomePage = createPage({
   route: routes.home,
   view: HomePageView,
-}
+  layout: BaseLayout,
+})

@@ -22,18 +22,17 @@ import {
   VkButton,
 } from '../../entities/provider'
 import { $$user } from '../../entities/user'
-import { BaseLayout } from '../../layouts/base'
 import { $$settingsPage } from './model.ts'
 
 export const SettingsPageView = () => {
   return (
-    <BaseLayout>
+    <>
       <Title>Настройки</Title>
       <Space h="xl" />
       <Profile />
       <Space h="xl" />
       <SocialNetworks />
-    </BaseLayout>
+    </>
   )
 }
 

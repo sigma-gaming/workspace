@@ -1,9 +1,9 @@
-import { routes } from '../../../routing'
-import { RouteRecord } from '../../../routing/types.ts'
+import { BaseLayout } from '../../../layouts/base'
+import { createAuthenticatedPage, routes } from '../../../routing'
 import { DicesGamePageView } from './view.tsx'
-import { createAuthenticatedRoute } from '../../../routing/authenticated-route.tsx'
 
-export const DicesGameRoute = createAuthenticatedRoute({
+export const DicesGamePage = createAuthenticatedPage({
   route: routes.dicesGame,
   view: DicesGamePageView,
+  layout: BaseLayout,
 })

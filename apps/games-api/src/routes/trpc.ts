@@ -9,8 +9,8 @@ import { ResourceLockedError } from '@sesamecare-oss/redlock'
 import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
 import { env } from '../shared/env'
-import { Context } from './context'
 import { logger } from '../shared/logger'
+import { Context } from './context'
 
 const t = initTRPC.context<Context>().create({
   isDev: env.isDev,
