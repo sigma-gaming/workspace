@@ -3093,9 +3093,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tooling/build@workspace:*, @tooling/build@workspace:libs/build":
+"@tooling/build@workspace:*, @tooling/build@workspace:tooling/build":
   version: 0.0.0-use.local
-  resolution: "@tooling/build@workspace:libs/build"
+  resolution: "@tooling/build@workspace:tooling/build"
   dependencies:
     "@types/fs-extra": "npm:^11.0.4"
     common-path-prefix: "npm:^3.0.0"
@@ -3107,9 +3107,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tooling/env@workspace:*, @tooling/env@workspace:libs/env":
+"@tooling/env@workspace:*, @tooling/env@workspace:tooling/env":
   version: 0.0.0-use.local
-  resolution: "@tooling/env@workspace:libs/env"
+  resolution: "@tooling/env@workspace:tooling/env"
   dependencies:
     "@tooling/build": "workspace:*"
   bin:

@@ -10,14 +10,15 @@
   },
   "workspaces": [
     "apps/*",
-    "libs/*"
+    "libs/*",
+    "tooling/*"
   ],
   "engines": {
     "node": "20"
   },
   "scripts": {
     "dev:services": "docker compose -f local.docker-compose.yml  up -d",
-    "check": "yarn nx affected --target build test lint typecheck --parallel 3",
+    "check": "yarn constraints && yarn nx affected --target build test lint typecheck --parallel 3",
     "changeset:publish": "changeset tag && git push --follow-tags",
     "cert:generate": "mkcert -key-file ssl/local.key -cert-file ssl/local.crt localhost sigma.local '*.sigma.local'",
     "cert:install": "mkcert -install"
