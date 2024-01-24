@@ -44,6 +44,7 @@ app.register(fastifyStatic, {
   root: distDir,
   wildcard: false,
   cacheControl: false,
+  lastModified: false,
 })
 
 app.setNotFoundHandler((request, reply) => {
