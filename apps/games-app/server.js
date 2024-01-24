@@ -46,7 +46,7 @@ app.register(fastifyStatic, {
 })
 
 app.setNotFoundHandler((request, reply) => {
-  reply.sendFile('index.html', { lastModified: false })
+  reply.sendFile('index.html', { cacheControl: false, lastModified: false })
 })
 
 app.get('/container', async () => {
