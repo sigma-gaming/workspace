@@ -7,6 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { v4 as uuid } from 'uuid'
 import { CronJobs } from './cronjobs'
+import { maintenanceEvents } from './events/maintenance'
 import { appRouter, createContext } from './routes'
 import { BudgetService } from './services/budget'
 import { env } from './shared/env'
@@ -69,8 +70,11 @@ app.get('/container', async () => {
 const maintenanceStorage = createMaintenanceStorage(env.redis.url)
 
 app.get('/health', async (_, reply) => {
-  if (await maintenanceStorage.isMaintenanceMode())
+  if (await maintenanceStorage.isMaintenanceMode()) {
+    maintenanceEvents.emit('started')
     return reply.status(503).send()
+  }
+
   return 'Healthy'
 })
 

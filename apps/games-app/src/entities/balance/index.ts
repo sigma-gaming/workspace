@@ -3,17 +3,13 @@ import {
   BadRequestException,
   exceptionFilter,
   fromTrpc,
-  InternalServerException,
   notExceptionFilter,
-  RouteException,
 } from '@libs/exceptions'
 import { notifications } from '@mantine/notifications'
 import { createEffect, createEvent, sample } from 'effector'
-import { and, not, previous } from 'patronum'
+import { and, previous } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
-import { appStarted } from '../../shared/events.ts'
 import { $$notifications } from '../notifications'
-import { $$user } from '../user'
 
 const balanceQuery = createQuery({
   name: 'balance/get',
@@ -31,6 +27,7 @@ const withdrawMutation = createMutation({
 })
 
 function receiveUpdates<T>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mutation: Mutation<any, T, unknown>,
   selector: (data: T) => number,
 ) {
@@ -65,12 +62,6 @@ const $withdrawing = withdrawMutation.$pending
 
 const $available = $balance.map((balance) => balance?.available ?? 0)
 const $previousAvailable = previous($available)
-
-sample({
-  clock: appStarted,
-  filter: not($$user.$expired),
-  target: request,
-})
 
 sample({
   clock: request,

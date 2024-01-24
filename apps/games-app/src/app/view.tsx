@@ -4,6 +4,7 @@ import './global.css'
 import { Notifications } from '@mantine/notifications'
 import { createRoutesView, RouterProvider } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
+import { MaintenanceOverlay } from '../features/maintenance/overlay.tsx'
 import { PAGES } from '../pages'
 import { router } from '../routing'
 import { RouteLayout } from '../routing/types.ts'
@@ -43,6 +44,7 @@ export const AppView = () => {
       <ThemeProvider>
         <Notifications limit={3} />
         <OptimizedPages />
+        <MaintenanceOverlay />
       </ThemeProvider>
     </RouterProvider>
   )

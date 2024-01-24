@@ -1,7 +1,4 @@
 import { createHistoryRouter } from 'atomic-router'
-import { sample } from 'effector'
-import { createBrowserHistory } from 'history'
-import { appStarted } from '../shared/events.ts'
 import {
   dicesGame,
   home,
@@ -20,10 +17,4 @@ const routes = [
 
 export const router = createHistoryRouter({
   routes,
-})
-
-sample({
-  clock: appStarted,
-  fn: () => createBrowserHistory(),
-  target: router.setHistory,
 })

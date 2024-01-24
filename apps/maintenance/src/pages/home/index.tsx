@@ -1,10 +1,5 @@
 import { Anchor, rem, Text, Title } from '@mantine/core'
-import {
-  IconAlertCircle,
-  IconAlertOctagon,
-  IconAlertTriangle, IconBarrierBlock, IconTrafficCone
-} from '@tabler/icons-react'
-import { Link } from 'atomic-router-react'
+import { IconBarrierBlock } from '@tabler/icons-react'
 import { CenteredLayout } from '../../layouts/centered'
 
 export const HomePageView = () => {
@@ -21,7 +16,7 @@ export const HomePageView = () => {
           </Title>
         </div>
         <Text className="text-center" size="lg" lh="md">
-          Подробную информацию вы&nbsp;можете получить в&nbsp;нашем{' '}
+          Следите за&nbsp;обновлениями в&nbsp;нашем{' '}
           <Anchor href="https://t.me/SigmaGamesFeed">
             Telegram&nbsp;канале
           </Anchor>

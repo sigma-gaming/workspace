@@ -16,6 +16,7 @@ module.exports = configure({
     ignorePatterns: ['!**/*', 'node_modules', 'dist'],
     rules: {
       'import/extensions': 'off',
+      '@typescript-eslint/no-unnecessary-condition': 'off',
     },
   },
 })

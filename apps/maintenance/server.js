@@ -56,6 +56,10 @@ app.get('/container', async () => {
   return { status: 'healthy' }
 })
 
+app.get('/is-maintenance', async () => {
+  return { maintenance: true }
+})
+
 const port = process.env.PORT || 5173
 
 await app.listen({ host: '0.0.0.0', port }, (err) => {

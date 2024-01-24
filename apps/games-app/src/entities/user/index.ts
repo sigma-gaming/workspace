@@ -3,10 +3,9 @@ import { fromTrpc, NotAuthenticatedException } from '@libs/exceptions'
 import { AccountProvider } from '@libs/games-model'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
-import { and, not } from 'patronum'
+import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { env } from '../../shared/env'
-import { appStarted } from '../../shared/events.ts'
 
 const request = createEvent()
 const refresh = createEvent()
@@ -47,12 +46,6 @@ const $name = $profile.map((profile) => profile?.name ?? '')
 const $usedProvider = $profile.map((profile) => {
   if (!profile) return null
   return profile.usedProvider as AccountProvider
-})
-
-sample({
-  clock: appStarted,
-  filter: not($expired),
-  target: request,
 })
 
 sample({

@@ -11,6 +11,12 @@ export class RouteException<TPayload = void> extends Error {
   }
 }
 
+export class MaintenanceException extends RouteException {
+  name = 'MaintenanceException'
+  statusCode = 503
+  message = 'Maintenance mode enabled'
+}
+
 export class InternalServerException extends RouteException {
   name = 'InternalServerException'
   statusCode = 500

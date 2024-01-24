@@ -1,7 +1,22 @@
+import clsx from 'clsx'
 import { PropsWithChildren } from 'react'
 
-export const CenteredLayout = ({ children }: PropsWithChildren) => {
+interface Props {
+  className?: string
+}
+
+export const CenteredLayout = ({
+  className,
+  children,
+}: PropsWithChildren<Props>) => {
   return (
-    <div className="flex items-center justify-center fixed inset-0 p-6">{children}</div>
+    <div
+      className={clsx(
+        className,
+        'flex items-center justify-center fixed inset-0 p-6',
+      )}
+    >
+      {children}
+    </div>
   )
 }
