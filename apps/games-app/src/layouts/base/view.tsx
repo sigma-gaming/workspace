@@ -2,7 +2,7 @@ import { rem, Title } from '@mantine/core'
 import { IconCategory2, IconDice3 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import { memo, PropsWithChildren, SVGProps } from 'react'
-import { routes } from '../../routing'
+import { routes } from '../../routing/index.ts'
 import { LinkButton } from '../../shared/ui/general/link-button'
 import { MiniProfile } from './mini-profile.tsx'
 import css from './styles.module.css'
@@ -47,8 +47,6 @@ const Left = memo(() => {
 })
 
 const Header = memo(() => {
-  console.log('render header')
-
   return (
     <header className="flex gap-6 items-center justify-between py-6 md:py-8">
       <div className="md:w-64 md:px-5 flex gap-[10px] items-center">

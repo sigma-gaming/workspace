@@ -39,6 +39,8 @@ export async function runGame(bet: number, sides: number[]) {
   throw new Error('Unreachable')
 }
 
+let replicaCount = 0
+
 export const dices = procedure
   .input(
     z.object({
@@ -57,6 +59,8 @@ export const dices = procedure
     }
 
     const lock = await lastTransactionCache.lock(user.id, 10000)
+
+    replicaCount += 1
 
     try {
       const lastTransaction = await TransactionService.getLastTransaction(
@@ -91,6 +95,7 @@ export const dices = procedure
         side,
         amount,
         updatedBalance: newTransaction.closingBalance,
+        replicaCount,
       }
     } catch (error) {
       if (error instanceof RouteException) {
