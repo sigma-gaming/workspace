@@ -42,14 +42,10 @@ const app = Fastify({
 app.register(fastifyStatic, {
   root: distDir,
   wildcard: false,
-  cacheControl: false,
 })
 
 app.setNotFoundHandler((request, reply) => {
-  reply.sendFile('index.html', {
-    cacheControl: false,
-    lastModified: false,
-  })
+  reply.header('Cache-Control', 'no-cache, no-store').sendFile('index.html')
 })
 
 app.get('/container', async () => {
