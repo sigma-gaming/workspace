@@ -43,7 +43,7 @@ const app = Fastify({
 app.register(fastifyStatic, {
   root: distDir,
   wildcard: false,
-  allowedPath: (path) => !path.endsWith('.html'),
+  allowedPath: (path) => path !== '/',
 })
 
 app.setNotFoundHandler((request, reply) => {

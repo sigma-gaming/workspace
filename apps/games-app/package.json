@@ -9,7 +9,7 @@
     "dev": "dotenv -e .env.development yarn create-env && vite",
     "build": "vite build",
     "start": "NODE_ENV=production node server.js",
-    "preview": "NODE_ENV=development dotenv -e .env.development node ./server.js",
+    "preview": "NODE_ENV=development dotenv -e .env.development nodemon ./server.js",
     "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "yarn lint --fix"
   },
