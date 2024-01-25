@@ -50,8 +50,8 @@ app.setNotFoundHandler((request, reply) => {
   reply.header('Cache-Control', 'no-cache, no-store').sendFile('index.html')
 })
 
-app.get('/container', async (_, reply) => {
-  return reply.status(503).send()
+app.get('/container', async () => {
+  return 'Healthy'
 })
 
 const maintenanceStorage = createMaintenanceStorage()

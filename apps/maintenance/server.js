@@ -50,7 +50,7 @@ app.setNotFoundHandler((request, reply) => {
 })
 
 app.get('/container', async () => {
-  return { status: 'healthy' }
+  return 'Healthy'
 })
 
 app.get('/is-maintenance', async () => {
