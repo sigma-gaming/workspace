@@ -60,7 +60,7 @@ app.register(fastifyTRPCPlugin, {
   },
 })
 
-app.get('/health', async () => {
+app.get('/container', async () => {
   return 'Healthy'
 })
 
