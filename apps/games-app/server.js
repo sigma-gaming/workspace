@@ -46,12 +46,14 @@ app.register(fastifyStatic, {
   allowedPath: (path) => path !== '/',
 })
 
-app.setNotFoundHandler((request, reply) => {
+app.setNotFoundHandler((_, reply) => {
   reply.header('Cache-Control', 'no-cache, no-store').sendFile('index.html')
 })
 
-app.get('/container', async () => {
-  return 'Healthy'
+app.get('/container', async (_, reply) => {
+  const response = await fetch('http://games-api:5050/container')
+  if (response.ok) return 'Healthy'
+  return reply.status(response.status).send()
 })
 
 const maintenanceStorage = createMaintenanceStorage()
