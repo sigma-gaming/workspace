@@ -49,7 +49,7 @@ app.setNotFoundHandler((request, reply) => {
   reply.header('Cache-Control', 'no-cache, no-store').sendFile('index.html')
 })
 
-app.get('/container', async () => {
+app.get('/health', async () => {
   return 'Healthy'
 })
 

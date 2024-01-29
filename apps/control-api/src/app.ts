@@ -60,8 +60,12 @@ app.register(fastifyTRPCPlugin, {
   },
 })
 
-app.get('/container', async () => {
+app.get('/health', async () => {
   return 'Healthy'
+})
+
+app.get('/ready', async () => {
+  return 'Ready'
 })
 
 app.listen({ host: '0.0.0.0', port: env.port }).then(() => {

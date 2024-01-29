@@ -1,5 +1,4 @@
 import fastifyStatic from '@fastify/static'
-import { createMaintenanceStorage } from '@libs/maintenance-storage'
 import Fastify from 'fastify'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -50,18 +49,16 @@ app.setNotFoundHandler((_, reply) => {
   reply.header('Cache-Control', 'no-cache, no-store').sendFile('index.html')
 })
 
-app.get('/container', async (_, reply) => {
-  const response = await fetch('http://games-api:5050/container')
+app.get('/health', async (_, reply) => {
+  const response = await fetch('http://games-api:5050/health')
   if (response.ok) return 'Healthy'
   return reply.status(response.status).send()
 })
 
-const maintenanceStorage = createMaintenanceStorage()
-
-app.get('/health', async (_, reply) => {
-  if (await maintenanceStorage.isMaintenanceMode())
-    return reply.status(503).send()
-  return 'Healthy'
+app.get('/ready', async (_, reply) => {
+  const response = await fetch('http://games-api:5050/ready')
+  if (response.ok) return 'Ready'
+  return reply.status(response.status).send()
 })
 
 const port = process.env.PORT || 5173

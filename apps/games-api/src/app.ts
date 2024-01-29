@@ -63,19 +63,19 @@ app.register(fastifyTRPCPlugin, {
   },
 })
 
-app.get('/container', async () => {
+app.get('/health', async () => {
   return 'Healthy'
 })
 
 const maintenanceStorage = createMaintenanceStorage(env.redis.url)
 
-app.get('/health', async (_, reply) => {
+app.get('/ready', async (_, reply) => {
   if (await maintenanceStorage.isMaintenanceMode()) {
     maintenanceEvents.emit('started')
     return reply.status(503).send()
   }
 
-  return 'Healthy'
+  return 'Ready'
 })
 
 app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
