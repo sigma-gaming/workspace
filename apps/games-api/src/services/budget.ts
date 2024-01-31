@@ -66,11 +66,11 @@ export async function syncBudget(force = false): Promise<void> {
 
     const diff = transactions.reduce((acc, transaction) => {
       if (transaction.type === TransactionType.Deposit) {
-        acc += transaction.amount
+        return acc + transaction.amount
       }
 
       if (transaction.type === TransactionType.Withdrawal) {
-        acc -= transaction.amount
+        return acc - transaction.amount
       }
 
       return acc

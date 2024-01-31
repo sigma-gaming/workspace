@@ -1,6 +1,7 @@
 import { InternalServerException } from '@libs/exceptions'
 import { Prisma } from '@libs/games-db'
 import { AccountProvider } from '@libs/games-model'
+import { detailedProfileCache } from 'apps/games-api/src/caches/profile'
 import axios from 'axios'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
@@ -121,6 +122,8 @@ export const vk = procedure
           },
           include: { user: true },
         })
+
+        await detailedProfileCache.del(session.user.id)
 
         return { status: 'success' }
       }

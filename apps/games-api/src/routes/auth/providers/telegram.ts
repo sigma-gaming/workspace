@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { Prisma } from '@libs/games-db'
 import { AccountProvider } from '@libs/games-model'
+import { detailedProfileCache } from 'apps/games-api/src/caches/profile'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
 import { TelegramBotService } from '../../../services/telegram-bot'
@@ -112,6 +113,8 @@ export const telegram = procedure
             ' ссылки на новые зеркала сайта, новости об акциях и конкурсах, и многое другое!',
           'Также не забудь подписаться на наш канал в Telegram: @SigmaGamesFeed',
         ])
+
+        await detailedProfileCache.del(session.user.id)
 
         return { status: 'success' }
       }

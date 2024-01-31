@@ -2,7 +2,7 @@ import {
   NotAuthenticatedException,
   SessionExpiredException,
 } from '@libs/exceptions'
-import { AccountProvider, User } from '@libs/games-model'
+import { AccountProvider, normalizeUser, User } from '@libs/games-model'
 import cookie, { serialize } from 'cookie'
 import { FastifyRequest } from 'fastify'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
@@ -70,7 +70,7 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
 
   return await sessionCache.set(session, {
     state: SessionState.Authenticated,
-    user,
+    user: normalizeUser(user),
     token: session,
   })
 }
@@ -109,7 +109,7 @@ async function createSession(options: AddSessionOptions) {
 
   const session: Session = {
     state: SessionState.Authenticated,
-    user,
+    user: normalizeUser(user),
     token,
   }
 

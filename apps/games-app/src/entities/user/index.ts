@@ -1,6 +1,5 @@
 import { createQuery } from '@farfetched/core'
 import { fromTrpc, NotAuthenticatedException } from '@libs/exceptions'
-import { AccountProvider } from '@libs/games-model'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and } from 'patronum'
@@ -17,7 +16,7 @@ const clientLogoutFx = createEffect(() => {
 
 const userQuery = createQuery({
   name: 'user/get',
-  handler: gamesApi.me.getDetailedUser.query,
+  handler: gamesApi.me.getUser.query,
 })
 
 const logoutMutation = createQuery({
@@ -36,17 +35,6 @@ const $loggingOut = logoutMutation.$pending
 const expiresAt = Cookies.get('sessionExpiresAt') ?? null
 const initialExpired = expiresAt === null || new Date() >= new Date(expiresAt)
 const $expired = createStore(initialExpired)
-
-const $accounts = $user.map((user) => user?.accounts ?? [])
-
-const $profile = $user.map((user) => user?.profile ?? null)
-
-const $name = $profile.map((profile) => profile?.name ?? '')
-
-const $usedProvider = $profile.map((profile) => {
-  if (!profile) return null
-  return profile.usedProvider as AccountProvider
-})
 
 sample({
   clock: request,
@@ -80,10 +68,6 @@ export const $$user = {
   $user,
   $loading,
   $loaded,
-  $accounts,
   $expired,
   $loggingOut,
-  $profile,
-  $name,
-  $usedProvider,
 }

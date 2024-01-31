@@ -3,6 +3,7 @@ import { createBrowserHistory } from 'history'
 import { not } from 'patronum'
 import { $$balance } from '../entities/balance'
 import { $$commonEvents } from '../entities/common-events'
+import { $$profile } from '../entities/profile'
 import { $$user } from '../entities/user'
 import { router } from '../routing'
 
@@ -17,7 +18,7 @@ sample({
 sample({
   clock: started,
   filter: not($$user.$expired),
-  target: [$$user.request, $$balance.request],
+  target: [$$user.request, $$profile.request, $$balance.request],
 })
 
 sample({

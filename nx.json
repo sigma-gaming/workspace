@@ -12,7 +12,7 @@
     ],
     "ci": [
       "{workspaceRoot}/stacks/dev.docker-compose.yml",
-      "{workspaceRoot}/.github/workflows/deploy-dev-stack.yml"
+      "{workspaceRoot}/.github/workflows/deploy-dev-stacks.yml"
     ],
     "env": ["{workspaceRoot}/.env.development"],
     "src": [

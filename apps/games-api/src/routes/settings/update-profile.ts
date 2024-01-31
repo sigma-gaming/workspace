@@ -3,12 +3,20 @@ import { Prisma } from '@libs/games-db'
 import {
   AccountProvider,
   getFullName,
+  ProfileDetailed,
   ProfileValidation,
 } from '@libs/games-model'
 import { z } from 'zod'
+import { detailedProfileCache } from '../../caches/profile'
+import { ProfileService } from '../../services/profile'
 import { SessionService } from '../../services/session'
 import { prisma } from '../../shared/db'
 import { procedure } from '../trpc'
+
+interface UpdateProfileOutput {
+  status: 'success'
+  detailedProfile: ProfileDetailed
+}
 
 export const updateProfile = procedure
   .input(
@@ -18,7 +26,7 @@ export const updateProfile = procedure
       provider: z.nativeEnum(AccountProvider),
     }),
   )
-  .mutation(async ({ ctx, input }) => {
+  .mutation(async ({ ctx, input }): Promise<UpdateProfileOutput> => {
     const user = SessionService.getUser(ctx.session)
 
     if (input.username) {
@@ -67,10 +75,17 @@ export const updateProfile = procedure
       data.name = null
     }
 
-    await prisma.profile.update({
+    const profile = await prisma.profile.update({
       where: { userId: user.id },
       data,
     })
 
-    return { status: 'success' }
+    await detailedProfileCache.del(user.id)
+
+    return {
+      status: 'success',
+      detailedProfile: await ProfileService.getDetailedProfile(user, {
+        profile,
+      }),
+    }
   })

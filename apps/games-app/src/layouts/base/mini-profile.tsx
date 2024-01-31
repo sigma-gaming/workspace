@@ -21,6 +21,7 @@ import { useUnit } from 'effector-react'
 import { animate } from 'framer-motion/dom'
 import { useLayoutEffect, useRef } from 'react'
 import { $$balance } from '../../entities/balance'
+import { $$profile } from '../../entities/profile/index.ts'
 import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
@@ -32,7 +33,7 @@ export const MiniProfile = () => {
   const balanceDepositing = useUnit($$balance.$depositing)
   const balanceWithdrawing = useUnit($$balance.$withdrawing)
   const userLoading = useUnit($$user.$loading)
-  const profile = useUnit($$user.$profile)
+  const profile = useUnit($$profile.$profile)
   const balanceLoading = useUnit($$balance.$loading)
 
   if (userExpired) {

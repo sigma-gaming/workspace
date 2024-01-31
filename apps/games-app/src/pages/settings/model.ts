@@ -5,11 +5,11 @@ import {
   getFullName,
   ProfileValidation,
 } from '@libs/games-model'
-import { notifications } from '@mantine/notifications'
 import { TRPCClientError } from '@trpc/client'
-import { createEffect, sample } from 'effector'
+import { sample } from 'effector'
 import { z } from 'zod'
 import { $$notifications } from '../../entities/notifications'
+import { $$profile } from '../../entities/profile/index.ts'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import {
@@ -86,7 +86,7 @@ sample({
 })
 
 sample({
-  source: $$user.$profile,
+  source: $$profile.$profile,
   filter: Boolean,
   fn: (profile) => ({
     name: profile.name ?? '',
@@ -98,7 +98,7 @@ sample({
 
 sample({
   clock: profileFields.provider.update,
-  source: $$user.$accounts,
+  source: $$profile.$accounts,
   fn: (accounts, provider) => {
     const account = accounts.find((account) => account.provider === provider)
 
@@ -110,10 +110,10 @@ sample({
   target: profileFields.name.update,
 })
 
-sample({
-  clock: updateProfileMutation.finished.success,
-  target: $$user.request,
-})
+$$profile.receiveUpdates(
+  updateProfileMutation,
+  (output) => output.detailedProfile,
+)
 
 sample({
   clock: updateProfileMutation.finished.success,

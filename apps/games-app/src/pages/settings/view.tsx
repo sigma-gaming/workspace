@@ -16,6 +16,7 @@ import {
 } from '@mantine/core'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
+import { $$profile } from '../../entities/profile/index.ts'
 import {
   ProviderInfoMap,
   TelegramButton,
@@ -38,7 +39,7 @@ export const SettingsPageView = () => {
 
 const Profile = () => {
   const loaded = useUnit($$user.$loaded)
-  const accounts = useUnit($$user.$accounts)
+  const accounts = useUnit($$profile.$accounts)
 
   const name = useUnit($$settingsPage.profileFields.name.$value)
   const username = useUnit($$settingsPage.profileFields.username.$value)
@@ -120,7 +121,7 @@ const Profile = () => {
 
 const SocialNetworks = () => {
   const loaded = useUnit($$user.$loaded)
-  const accounts = useUnit($$user.$accounts)
+  const accounts = useUnit($$profile.$accounts)
 
   const vkAccount = accounts.find(
     (account) => account.provider === AccountProvider.VK,
@@ -138,25 +139,6 @@ const SocialNetworks = () => {
       style={{ gap: 'var(--mantine-spacing-md)' }}
     >
       <Title order={3}>Социальные сети</Title>
-
-      {!hasAllAccounts && (
-        <div className="flex flex-col sm:flex-row gap-4">
-          {!vkAccount && (
-            <Skeleton className="sm:w-fit" visible={!loaded}>
-              <VkButton size="sm" fullWidth={true}>
-                Привязать VK ID
-              </VkButton>
-            </Skeleton>
-          )}
-          {!telegramAccount && (
-            <Skeleton className="sm:w-fit" visible={!loaded}>
-              <TelegramButton size="sm" fullWidth={true}>
-                Привязать Telegram
-              </TelegramButton>
-            </Skeleton>
-          )}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {loaded
@@ -226,6 +208,25 @@ const SocialNetworks = () => {
               )
             })}
       </div>
+
+      {!hasAllAccounts && (
+        <div className="flex flex-col sm:flex-row gap-4">
+          {!vkAccount && (
+            <Skeleton className="sm:w-fit" visible={!loaded}>
+              <VkButton size="sm" fullWidth={true}>
+                Привязать VK ID
+              </VkButton>
+            </Skeleton>
+          )}
+          {!telegramAccount && (
+            <Skeleton className="sm:w-fit" visible={!loaded}>
+              <TelegramButton size="sm" fullWidth={true}>
+                Привязать Telegram
+              </TelegramButton>
+            </Skeleton>
+          )}
+        </div>
+      )}
     </Card>
   )
 }

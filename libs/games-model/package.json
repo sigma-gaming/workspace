@@ -6,9 +6,6 @@
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
-  "dependencies": {
-    "@libs/games-db": "workspace:*"
-  },
   "scripts": {
     "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "yarn lint --fix"

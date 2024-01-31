@@ -1,4 +1,5 @@
 import fastifyStatic from '@fastify/static'
+import { getPublicEnv } from '@tooling/env'
 import Fastify from 'fastify'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -12,11 +13,7 @@ const distDir = path.join(__dirname, 'dist')
 const indexHtml = path.join(distDir, 'index.html')
 
 const PUBLIC_ENV = JSON.stringify(
-  Object.entries(process.env).reduce((acc, [key, value]) => {
-    if (!key.startsWith('PUBLIC_')) return acc
-    acc[key] = value
-    return acc
-  }, {}),
+  getPublicEnv({ source: process.env, exitProcessOnFail: true }),
 )
 
 const indexHtmlContent = await fs.readFile(indexHtml, 'utf-8')
