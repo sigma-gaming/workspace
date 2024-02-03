@@ -3,24 +3,14 @@ import {
   SessionExpiredException,
 } from '@libs/exceptions'
 import { AccountProvider, Sessions, User, Users } from '@libs/games-db-schema'
+import { Session, SessionState } from '@libs/games-model'
 import cookie, { serialize } from 'cookie'
 import { desc, eq, inArray } from 'drizzle-orm'
 import { FastifyRequest } from 'fastify'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
-import { sessionCache } from '../caches/session'
+import { caches } from '../shared/cache'
 import { db } from '../shared/db'
 import { env } from '../shared/env'
-
-enum SessionState {
-  Empty,
-  Expired,
-  Authenticated,
-}
-
-export type Session =
-  | { state: SessionState.Authenticated; user: User; token: string }
-  | { state: SessionState.Expired; user: null; token: string }
-  | { state: SessionState.Empty; user: null; token?: string }
 
 export const getSession = async (req: FastifyRequest): Promise<Session> => {
   if (!req.headers.cookie) {
@@ -33,7 +23,7 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
     return { state: SessionState.Empty, user: null }
   }
 
-  const cached = await sessionCache.get(token)
+  const cached = await caches.session.get(token)
 
   if (cached) {
     return cached
@@ -47,7 +37,7 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
         ? SessionState.Expired
         : SessionState.Empty
 
-    return await sessionCache.set(token, {
+    return await caches.session.set(token, {
       state,
       user: null,
       token,
@@ -63,13 +53,13 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
   })
 
   if (!user) {
-    return await sessionCache.set(token, {
+    return await caches.session.set(token, {
       state: SessionState.Empty,
       user: null,
     })
   }
 
-  return await sessionCache.set(token, {
+  return await caches.session.set(token, {
     state: SessionState.Authenticated,
     user,
     token,
@@ -119,7 +109,7 @@ async function createSession(options: AddSessionOptions) {
     token,
   }
 
-  await sessionCache.set(token, session)
+  await caches.session.set(token, session)
 
   const extraSessions = await db.query.Sessions.findMany({
     where: eq(Sessions.userId, userId),
@@ -172,7 +162,7 @@ async function removeSession(session: Session) {
       // Session doesn't exist
     }
 
-    await sessionCache.del(session.token)
+    await caches.session.del(session.token)
   }
 
   const cookie = [

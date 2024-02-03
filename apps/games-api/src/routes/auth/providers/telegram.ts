@@ -6,11 +6,11 @@ import {
   Profiles,
   Users,
 } from '@libs/games-db-schema'
-import { detailedProfileCache } from 'apps/games-api/src/caches/profile'
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
 import { TelegramBotService } from '../../../services/telegram-bot'
+import { caches } from '../../../shared/cache'
 import { db } from '../../../shared/db'
 import { env } from '../../../shared/env'
 import { procedure } from '../../trpc'
@@ -114,7 +114,7 @@ export const telegram = procedure
           'Также не забудь подписаться на наш канал: @SigmaGamesFeed',
         ])
 
-        await detailedProfileCache.del(session.user.id)
+        await caches.detailedProfile.del(session.user.id)
 
         return { status: 'success' }
       }

@@ -21,10 +21,10 @@
   },
   "dependencies": {
     "@libs/exceptions": "workspace:*",
+    "@libs/games-cache": "workspace:*",
     "@libs/games-db": "workspace:*",
     "@libs/games-db-schema": "workspace:*",
     "@libs/games-model": "workspace:*",
-    "@libs/maintenance-storage": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

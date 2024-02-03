@@ -1,11 +1,11 @@
 import { Budget, Transactions, TransactionType } from '@libs/games-db-schema'
 import { and, eq, gt, lte, sql } from 'drizzle-orm'
-import { budgetCache } from '../caches/budget'
+import { caches } from '../shared/cache'
 import { db } from '../shared/db'
 import { logger } from '../shared/logger'
 
 export const getBudget = async (): Promise<Budget> => {
-  const cached = await budgetCache.get()
+  const cached = await caches.budget.get()
 
   if (cached) {
     return cached
@@ -20,21 +20,21 @@ export const getBudget = async (): Promise<Budget> => {
     budget = created[0]
   }
 
-  await budgetCache.set(budget)
+  await caches.budget.set(budget)
 
   return budget
 }
 
 export async function increaseBudget(amount: number): Promise<void> {
   try {
-    await budgetCache.incField('available', amount)
+    await caches.budget.incField('available', amount)
   } catch (error) {
     logger.error('Failed to increase budget')
   }
 }
 
 export async function syncBudget(force = false): Promise<void> {
-  const lock = await budgetCache.lock(10000)
+  const lock = await caches.budget.lock(10000)
 
   try {
     const budget = await getBudget()
@@ -77,7 +77,7 @@ export async function syncBudget(force = false): Promise<void> {
       .where(eq(Budget.id, 1))
       .returning()
 
-    await budgetCache.set(updatedBudget)
+    await caches.budget.set(updatedBudget)
     logger.info('Budget synced successfully')
   } catch (error) {
     logger.error('Failed to sync budget')

@@ -22,7 +22,7 @@
       "@libs/games-db": ["libs/games-db/src/index.ts"],
       "@libs/games-db-schema": ["libs/games-db-schema/src/index.ts"],
       "@libs/games-model": ["libs/games-model/src/index.ts"],
-      "@libs/maintenance-storage": ["libs/maintenance-storage/src/index.ts"],
+      "@libs/games-cache": ["libs/games-cache/src/index.ts"],
       "@tooling/build": ["tooling/build/src/index.ts"],
       "@tooling/env": ["tooling/env/src/index.ts"]
     }

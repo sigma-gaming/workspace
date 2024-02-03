@@ -29,6 +29,10 @@ const EnvSchema = z
     port: raw.PORT,
     domain: raw.PUBLIC_DOMAIN,
 
+    versions: {
+      gamesApi: 'dev',
+    },
+
     database: {
       url: raw.DATABASE_URL,
     },

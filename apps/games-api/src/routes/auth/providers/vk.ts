@@ -6,12 +6,12 @@ import {
   Profiles,
   Users,
 } from '@libs/games-db-schema'
-import { detailedProfileCache } from 'apps/games-api/src/caches/profile'
 import axios from 'axios'
 import { and, eq } from 'drizzle-orm'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
+import { caches } from '../../../shared/cache'
 import { db } from '../../../shared/db'
 import { env } from '../../../shared/env'
 import { procedure } from '../../trpc'
@@ -124,7 +124,7 @@ export const vk = procedure
           ...accountSharedInput,
         })
 
-        await detailedProfileCache.del(session.user.id)
+        await caches.detailedProfile.del(session.user.id)
 
         return { status: 'success' }
       }

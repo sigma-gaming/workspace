@@ -12,9 +12,9 @@ import {
 } from '@libs/games-model'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { detailedProfileCache } from '../../caches/profile'
 import { ProfileService } from '../../services/profile'
 import { SessionService } from '../../services/session'
+import { caches } from '../../shared/cache'
 import { db } from '../../shared/db'
 import { procedure } from '../trpc'
 
@@ -87,7 +87,7 @@ export const updateProfile = procedure
       .where(eq(Profiles.userId, user.id))
       .returning()
 
-    await detailedProfileCache.del(user.id)
+    await caches.detailedProfile.del(user.id)
 
     return {
       status: 'success',

@@ -7,10 +7,10 @@ import { Game, TransactionType } from '@libs/games-db-schema'
 import { rub } from '@libs/games-model'
 import crypto from 'node:crypto'
 import { z } from 'zod'
-import { lastTransactionCache } from '../../caches/transaction'
 import { BudgetService } from '../../services/budget'
 import { SessionService } from '../../services/session'
 import { TransactionService } from '../../services/transaction'
+import { caches } from '../../shared/cache'
 import { logger } from '../../shared/logger'
 import { procedure } from '../trpc'
 
@@ -57,7 +57,7 @@ export const dices = procedure
       })
     }
 
-    const lock = await lastTransactionCache.lock(user.id, 10000)
+    const lock = await caches.lastTransaction.lock(user.id, 10000)
 
     try {
       const lastTransaction = await TransactionService.getLastTransaction(

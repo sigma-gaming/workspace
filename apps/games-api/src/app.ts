@@ -1,6 +1,5 @@
 import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
-import { createMaintenanceStorage } from '@libs/maintenance-storage'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import fs from 'node:fs'
@@ -10,6 +9,7 @@ import { CronJobs } from './cronjobs'
 import { maintenanceEvents } from './events/maintenance'
 import { appRouter, createContext } from './routes'
 import { BudgetService } from './services/budget'
+import { maintenanceCache } from './shared/cache'
 import { env } from './shared/env'
 import { httpLogger, logger } from './shared/logger'
 
@@ -67,10 +67,8 @@ app.get('/health', async () => {
   return 'Healthy'
 })
 
-const maintenanceStorage = createMaintenanceStorage(env.redis.url)
-
 app.get('/ready', async (_, reply) => {
-  if (await maintenanceStorage.isMaintenanceMode()) {
+  if (await maintenanceCache.isMaintenanceMode()) {
     maintenanceEvents.emit('started')
     return reply.status(503).send()
   }

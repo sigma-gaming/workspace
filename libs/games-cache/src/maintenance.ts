@@ -1,19 +1,27 @@
 import { Redis } from 'ioredis'
+import { Cache } from './cache'
 
-export function createMaintenanceStorage(redisUrl = process.env.REDIS_URL) {
-  if (!redisUrl) throw new Error('No redisUrl was provided')
-  const client = new Redis(redisUrl)
+export function createMaintenanceCache(options: {
+  cache: Cache
+  redis: Redis
+}) {
+  const { cache, redis } = options
+
+  const entity = cache.entity<void, boolean>({
+    keygen: () => `global:maintenance`,
+    options: { ttl: Infinity },
+  })
 
   return {
     async isMaintenanceMode() {
-      if (client.status !== 'ready') {
+      if (redis.status !== 'ready') {
         return true
       }
 
       for (let i = 0; i < 3; i++) {
         try {
-          const value = await client.get('global:maintenance')
-          return value === 'true'
+          const value = await entity.get()
+          return Boolean(value)
         } catch (error) {
           console.log('[Maintenance Storage] Failed to get maintenance mode:')
           console.error(error)
@@ -25,8 +33,8 @@ export function createMaintenanceStorage(redisUrl = process.env.REDIS_URL) {
       return true
     },
     async setMaintenanceMode(value: boolean) {
-      if (client.status !== 'ready') return null
-      await client.set('global:maintenance', String(value))
+      if (redis.status !== 'ready') return null
+      await entity.set(value)
       return value
     },
   }

@@ -4,17 +4,17 @@ import {
   RouteException,
 } from '@libs/exceptions'
 import { TransactionType } from '@libs/games-db-schema'
-import { lastTransactionCache } from '../../caches/transaction'
 import { BudgetService } from '../../services/budget'
 import { SessionService } from '../../services/session'
 import { TransactionService } from '../../services/transaction'
+import { caches } from '../../shared/cache'
 import { procedure } from '../trpc'
 
 export const withdraw = procedure.mutation(async ({ ctx }) => {
   const user = SessionService.getUser(ctx.session)
   const amount = 1000000
 
-  const lock = await lastTransactionCache.lock(user.id, 10000)
+  const lock = await caches.lastTransaction.lock(user.id, 10000)
 
   try {
     const lastTransaction = await TransactionService.getLastTransaction(user.id)

@@ -45,10 +45,10 @@ __metadata:
   resolution: "@apps/games-api@workspace:apps/games-api"
   dependencies:
     "@libs/exceptions": "workspace:*"
+    "@libs/games-cache": "workspace:*"
     "@libs/games-db": "workspace:*"
     "@libs/games-db-schema": "workspace:*"
     "@libs/games-model": "workspace:*"
-    "@libs/maintenance-storage": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -59,7 +59,6 @@ __metadata:
   dependencies:
     "@libs/exceptions": "workspace:*"
     "@libs/games-model": "workspace:*"
-    "@libs/maintenance-storage": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -2755,6 +2754,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@libs/games-cache@workspace:*, @libs/games-cache@workspace:libs/games-cache":
+  version: 0.0.0-use.local
+  resolution: "@libs/games-cache@workspace:libs/games-cache"
+  dependencies:
+    "@libs/games-db-schema": "workspace:*"
+    "@libs/games-model": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@libs/games-db-schema@workspace:*, @libs/games-db-schema@workspace:libs/games-db-schema":
   version: 0.0.0-use.local
   resolution: "@libs/games-db-schema@workspace:libs/games-db-schema"
@@ -2773,14 +2781,6 @@ __metadata:
 "@libs/games-model@workspace:*, @libs/games-model@workspace:libs/games-model":
   version: 0.0.0-use.local
   resolution: "@libs/games-model@workspace:libs/games-model"
-  languageName: unknown
-  linkType: soft
-
-"@libs/maintenance-storage@workspace:*, @libs/maintenance-storage@workspace:libs/maintenance-storage":
-  version: 0.0.0-use.local
-  resolution: "@libs/maintenance-storage@workspace:libs/maintenance-storage"
-  dependencies:
-    "@tooling/build": "workspace:*"
   languageName: unknown
   linkType: soft
 

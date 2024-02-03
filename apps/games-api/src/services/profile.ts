@@ -8,7 +8,7 @@ import {
 } from '@libs/games-db-schema'
 import { getFullName, ProfileDetailed } from '@libs/games-model'
 import { eq } from 'drizzle-orm'
-import { detailedProfileCache } from '../caches/profile'
+import { caches } from '../shared/cache'
 import { db } from '../shared/db'
 
 interface Reused {
@@ -20,7 +20,7 @@ async function getDetailedProfile(
   user: User,
   reused?: Reused,
 ): Promise<ProfileDetailed> {
-  const cached = await detailedProfileCache.get(user.id)
+  const cached = await caches.detailedProfile.get(user.id)
 
   if (cached) {
     return cached
@@ -63,7 +63,7 @@ async function getDetailedProfile(
     accounts,
   }
 
-  await detailedProfileCache.set(user.id, detailedProfile)
+  await caches.detailedProfile.set(user.id, detailedProfile)
 
   return detailedProfile
 }
