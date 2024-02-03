@@ -1,61 +1,10 @@
-import {
-  Account as PrismaAccount,
-  Profile as PrismaProfile,
-} from '@libs/games-db'
+import { Profile } from '@libs/games-db-schema'
 import { z } from 'zod'
-
-export enum AccountProvider {
-  VK = 'VK',
-  Telegram = 'Telegram',
-}
-
-export interface AccountPublic {
-  provider: AccountProvider
-  providerUsername: string | null
-  providerUserFirstName: string | null
-  providerUserLastName: string | null
-  providerUserImage: string | null
-}
-
-export interface Account extends AccountPublic {
-  id: string
-  createdAt: string
-  updatedAt: string
-  providerUserId: string
-  userId: string
-}
-
-export interface Profile {
-  id: string
-  createdAt: string
-  updatedAt: string
-  name: string | null
-  username: string | null
-  usedProvider: AccountProvider
-  userId: string
-}
+import { AccountPublic } from './account'
 
 export interface ProfileDetailed extends Profile {
   image: string | null
   accounts: AccountPublic[]
-}
-
-export function normalizeAccount(account: PrismaAccount): Account {
-  return {
-    ...account,
-    createdAt: account.createdAt.toISOString(),
-    updatedAt: account.updatedAt.toISOString(),
-    provider: account.provider as AccountProvider,
-  }
-}
-
-export function normalizeProfile(profile: PrismaProfile): Profile {
-  return {
-    ...profile,
-    createdAt: profile.createdAt.toISOString(),
-    updatedAt: profile.updatedAt.toISOString(),
-    usedProvider: profile.usedProvider as AccountProvider,
-  }
 }
 
 export function getFullName(

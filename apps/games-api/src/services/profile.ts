@@ -1,14 +1,15 @@
 import { NotFoundException } from '@libs/exceptions'
-import { Account, Profile } from '@libs/games-db'
 import {
-  getFullName,
-  normalizeAccount,
-  normalizeProfile,
-  ProfileDetailed,
+  Account,
+  Accounts,
+  Profile,
+  Profiles,
   User,
-} from '@libs/games-model'
+} from '@libs/games-db-schema'
+import { getFullName, ProfileDetailed } from '@libs/games-model'
+import { eq } from 'drizzle-orm'
 import { detailedProfileCache } from '../caches/profile'
-import { prisma } from '../shared/db'
+import { db } from '../shared/db'
 
 interface Reused {
   profile?: Profile
@@ -27,14 +28,14 @@ async function getDetailedProfile(
 
   const profile =
     reused?.profile ??
-    (await prisma.profile.findUnique({
-      where: { userId: user.id },
+    (await db.query.Profiles.findFirst({
+      where: eq(Profiles.userId, user.id),
     }))
 
   const accounts =
     reused?.accounts ??
-    (await prisma.account.findMany({
-      where: { userId: user.id },
+    (await db.query.Accounts.findMany({
+      where: eq(Accounts.userId, user.id),
     }))
 
   if (!profile) {
@@ -56,10 +57,10 @@ async function getDetailedProfile(
   }
 
   const detailedProfile: ProfileDetailed = {
-    ...normalizeProfile(profile),
+    ...profile,
     name: calculateName(),
     image: profileAccount?.providerUserImage ?? null,
-    accounts: accounts.map(normalizeAccount),
+    accounts,
   }
 
   await detailedProfileCache.set(user.id, detailedProfile)

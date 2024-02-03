@@ -2,12 +2,13 @@ import {
   NotAuthenticatedException,
   SessionExpiredException,
 } from '@libs/exceptions'
-import { User } from '@libs/games-model'
+import { Sessions, User } from '@libs/games-db-schema'
 import cookie from 'cookie'
+import { eq } from 'drizzle-orm'
 import { FastifyRequest } from 'fastify'
 import { TokenExpiredError, verify } from 'jsonwebtoken'
 import { sessionCache } from '../caches/session'
-import { prisma } from '../shared/db'
+import { db } from '../shared/db'
 import { env } from '../shared/env'
 
 enum SessionState {
@@ -26,52 +27,52 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
     return { state: SessionState.Empty, user: null }
   }
 
-  const { session } = cookie.parse(req.headers.cookie)
+  const { session: token } = cookie.parse(req.headers.cookie)
 
-  if (!session) {
+  if (!token) {
     return { state: SessionState.Empty, user: null }
   }
 
-  const cached = await sessionCache.get(session)
+  const cached = await sessionCache.get(token)
 
   if (cached) {
     return cached
   }
 
   try {
-    verify(session, env.jwt.secret)
+    verify(token, env.jwt.secret)
   } catch (error) {
     const state =
       error instanceof TokenExpiredError
         ? SessionState.Expired
         : SessionState.Empty
 
-    return await sessionCache.set(session, {
+    return await sessionCache.set(token, {
       state,
       user: null,
-      token: session,
+      token,
     })
   }
 
-  const user = await prisma.user.findFirst({
-    where: {
+  const user = await db.query.Users.findFirst({
+    with: {
       sessions: {
-        some: { token: session },
+        where: eq(Sessions.token, token),
       },
     },
   })
 
   if (!user) {
-    return await sessionCache.set(session, {
+    return await sessionCache.set(token, {
       state: SessionState.Empty,
       user: null,
     })
   }
 
-  return await sessionCache.set(session, {
+  return await sessionCache.set(token, {
     state: SessionState.Authenticated,
     user,
-    token: session,
+    token,
   })
 }
 

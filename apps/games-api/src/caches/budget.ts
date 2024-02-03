@@ -1,4 +1,4 @@
-import { Budget } from '@libs/games-db'
+import { Budget } from '@libs/games-db-schema'
 import { cache } from '../shared/redis'
 
 export const budgetCache = cache.entity<void, Budget>({

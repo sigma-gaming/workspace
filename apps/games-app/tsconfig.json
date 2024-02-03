@@ -4,6 +4,6 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true
   },
-  "include": ["src", "server.js", ".eslintrc.cjs"],
+  "include": ["src", "scripts", "**.ts", "**.js", "**.mjs", "**.cjs"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

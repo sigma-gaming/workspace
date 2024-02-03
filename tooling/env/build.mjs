@@ -1,6 +1,6 @@
-import { fileURLToPath } from 'node:url'
+import { buildCLI, buildLibrary, emptyDirectory } from '@tooling/build'
 import path from 'node:path'
-import { buildLibrary, emptyDirectory, buildCLI } from '@tooling/build'
+import { fileURLToPath } from 'node:url'
 
 const dirname = fileURLToPath(new URL('.', import.meta.url))
 

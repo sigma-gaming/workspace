@@ -1,16 +1,21 @@
 import { BadRequestException } from '@libs/exceptions'
-import { Prisma } from '@libs/games-db'
 import {
   AccountProvider,
+  Accounts,
+  Profiles,
+  ProfileUpdate,
+} from '@libs/games-db-schema'
+import {
   getFullName,
   ProfileDetailed,
   ProfileValidation,
 } from '@libs/games-model'
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { detailedProfileCache } from '../../caches/profile'
 import { ProfileService } from '../../services/profile'
 import { SessionService } from '../../services/session'
-import { prisma } from '../../shared/db'
+import { db } from '../../shared/db'
 import { procedure } from '../trpc'
 
 interface UpdateProfileOutput {
@@ -28,13 +33,14 @@ export const updateProfile = procedure
   )
   .mutation(async ({ ctx, input }): Promise<UpdateProfileOutput> => {
     const user = SessionService.getUser(ctx.session)
+    const { username } = input
 
-    if (input.username) {
-      const existingUser = await prisma.profile.findFirst({
-        where: { username: input.username },
+    if (username) {
+      const currentProfile = await db.query.Profiles.findFirst({
+        where: eq(Profiles.username, username),
       })
 
-      if (existingUser && existingUser.userId !== user.id) {
+      if (currentProfile && currentProfile.userId !== user.id) {
         throw new BadRequestException({
           path: ['username'],
           message: 'Пользователь с таким никнеймом уже существует',
@@ -42,8 +48,8 @@ export const updateProfile = procedure
       }
     }
 
-    const accounts = await prisma.account.findMany({
-      where: { userId: user.id },
+    const accounts = await db.query.Accounts.findMany({
+      where: eq(Accounts.userId, user.id),
     })
 
     const selectedProvider = accounts.find(
@@ -57,7 +63,7 @@ export const updateProfile = procedure
       })
     }
 
-    const data: Prisma.ProfileUpdateInput = {
+    const updates: ProfileUpdate = {
       username: input.username ?? null,
       usedProvider: input.provider,
     }
@@ -68,17 +74,18 @@ export const updateProfile = procedure
     )
 
     if (input.name && input.name !== nameFromProvider) {
-      data.name = input.name
+      updates.name = input.name
     }
 
     if (input.name === nameFromProvider) {
-      data.name = null
+      updates.name = null
     }
 
-    const profile = await prisma.profile.update({
-      where: { userId: user.id },
-      data,
-    })
+    const [profile] = await db
+      .update(Profiles)
+      .set(updates)
+      .where(eq(Profiles.userId, user.id))
+      .returning()
 
     await detailedProfileCache.del(user.id)
 

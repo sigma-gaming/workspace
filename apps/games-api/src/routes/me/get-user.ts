@@ -1,4 +1,4 @@
-import { User } from '@libs/games-model'
+import { User } from '@libs/games-db-schema'
 import { SessionService } from '../../services/session'
 import { procedure } from '../trpc'
 

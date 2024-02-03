@@ -70,6 +70,7 @@ interface Form<
   $errors: Store<FormErrors<TValues>>
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type InferFormValues<TForm> = TForm extends Form<infer TValues, any, any>
   ? TValues
   : never

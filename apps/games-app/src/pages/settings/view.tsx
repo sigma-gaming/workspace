@@ -1,4 +1,5 @@
-import { AccountProvider, getFullName } from '@libs/games-model'
+import { AccountProvider } from '@libs/games-db-schema'
+import { getFullName } from '@libs/games-model'
 import {
   Anchor,
   Avatar,
@@ -88,7 +89,7 @@ const Profile = () => {
             value: account.provider,
           }))}
           value={provider}
-          onChange={(value) => updateProvider(value as AccountProvider)}
+          onChange={(value) => updateProvider(value as AccountProvider | null)}
           allowDeselect={false}
           error={errors.provider[0]}
         />

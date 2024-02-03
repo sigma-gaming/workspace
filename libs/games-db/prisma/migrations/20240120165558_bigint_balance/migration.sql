@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE "Transaction" ALTER COLUMN "openingBalance" SET DATA TYPE BIGINT,
-ALTER COLUMN "closingBalance" SET DATA TYPE BIGINT,
-ALTER COLUMN "amount" SET DATA TYPE BIGINT;

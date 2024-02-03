@@ -42,9 +42,10 @@
       "{projectRoot}/vite.config.*",
       "{projectRoot}/next.config.*",
       "{projectRoot}/rollup.config.*",
-      "{projectRoot}/webpack.config.*"
+      "{projectRoot}/webpack.config.*",
+      "{projectRoot}/drizzle.config.*"
     ],
-    "migrations": ["{projectRoot}/prisma/migrations/**/*"]
+    "migrations": ["{projectRoot}/migrate.*", "{projectRoot}/drizzle/**/*"]
   },
   "targetDefaults": {
     "copy-env": {
@@ -77,24 +78,20 @@
       "cache": true,
       "inputs": ["shared", "config", "test", "src"]
     },
-    "dev": {
-      "dependsOn": ["^build", "copy-env"]
-    },
     "preview": {
       "dependsOn": ["copy-env", "build"]
     },
-    "migrate": {
+    "migration:apply": {
       "inputs": ["shared", "config", "migrations"]
     },
-    "migrate:dev": {
-      "cache": false,
+    "migration:dev": {
       "dependsOn": ["copy-env"]
     },
-    "start": {
-      "dependsOn": ["ci", "build", "^build"]
+    "dev": {
+      "dependsOn": ["copy-env", "^build", "^migration:dev"]
     },
-    "start:migrate": {
-      "dependsOn": ["ci", "build", "^build", "^migrate"]
+    "start": {
+      "dependsOn": ["ci", "build", "^build", "^migration:apply"]
     }
   },
   "affected": {

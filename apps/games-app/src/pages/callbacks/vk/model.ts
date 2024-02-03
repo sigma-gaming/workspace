@@ -1,44 +1,16 @@
-import { attach, createEffect, sample } from 'effector'
-import { delay } from 'patronum'
-import { $$balance } from '../../../entities/balance'
-import { $$user } from '../../../entities/user'
-import { router, routes } from '../../../routing'
+import { invoke } from '@withease/factories'
+import { $$socialAuthentication } from '../../../features/social-authentication'
+import { routes } from '../../../routing'
 import { gamesApi } from '../../../shared/api/games'
 
-const authenticateFx = createEffect(async () => {
-  const [hash, payloadEncoded] = window.location.hash.split('&payload=')
-  const returnPath = decodeURIComponent(hash.replace('#path=', ''))
-  const payload = decodeURIComponent(payloadEncoded)
-  const { status } = await gamesApi.auth.providers.vk.mutate({ payload })
-  if (status !== 'success') throw new Error('Authentication failed')
-  return { returnPath }
-})
-
-const redirectFx = attach({
-  source: router.$history,
-  effect(history, returnPath: string) {
-    history.replace(returnPath)
-  },
-})
-
-sample({
+invoke($$socialAuthentication.factory, {
   clock: routes.vkCallback.opened,
-  target: authenticateFx,
-})
-
-sample({
-  clock: authenticateFx.doneData,
-  fn: () => false,
-  target: $$user.$expired,
-})
-
-sample({
-  clock: authenticateFx.doneData,
-  target: [$$user.request, $$balance.request],
-})
-
-sample({
-  clock: delay(authenticateFx.doneData, 1000),
-  fn: ({ returnPath }) => returnPath,
-  target: redirectFx,
+  authenticate: async () => {
+    const [hash, payloadEncoded] = window.location.hash.split('&payload=')
+    const returnPath = decodeURIComponent(hash.replace('#path=', ''))
+    const payload = decodeURIComponent(payloadEncoded)
+    const { status } = await gamesApi.auth.providers.vk.mutate({ payload })
+    if (status !== 'success') throw new Error('Authentication failed')
+    return { returnPath }
+  },
 })

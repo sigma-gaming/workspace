@@ -3,7 +3,7 @@ import {
   InternalServerException,
   RouteException,
 } from '@libs/exceptions'
-import { TransactionType } from '@libs/games-model'
+import { TransactionType } from '@libs/games-db-schema'
 import { lastTransactionCache } from '../../caches/transaction'
 import { BudgetService } from '../../services/budget'
 import { SessionService } from '../../services/session'
@@ -27,6 +27,7 @@ export const withdraw = procedure.mutation(async ({ ctx }) => {
 
     const newTransaction = await TransactionService.createTransaction(user.id, {
       type: TransactionType.Withdrawal,
+      game: null,
       amount: -amount,
       openingBalance: lastBalance,
       closingBalance: lastBalance - amount,

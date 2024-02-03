@@ -1,7 +1,7 @@
-import { Budget } from '@libs/games-db'
-import { rub, TransactionType } from '@libs/games-model'
+import { Budget, Transactions, TransactionType } from '@libs/games-db-schema'
+import { and, eq, gt, lte, sql } from 'drizzle-orm'
 import { budgetCache } from '../caches/budget'
-import { prisma } from '../shared/db'
+import { db } from '../shared/db'
 import { logger } from '../shared/logger'
 
 export const getBudget = async (): Promise<Budget> => {
@@ -11,19 +11,13 @@ export const getBudget = async (): Promise<Budget> => {
     return cached
   }
 
-  let budget = await prisma.budget.findFirst()
+  let budget = await db.query.Budget.findFirst()
 
   if (!budget) {
     logger.info('Budget not found in db, creating a new one')
 
-    budget = await prisma.budget.create({
-      data: {
-        id: 1,
-        available: rub(10000),
-        unwantedLoss: rub(10000),
-        maxLoss: rub(10000),
-      },
-    })
+    const created = await db.insert(Budget).values({}).returning()
+    budget = created[0]
   }
 
   await budgetCache.set(budget)
@@ -55,13 +49,11 @@ export async function syncBudget(force = false): Promise<void> {
       return
     }
 
-    const transactions = await prisma.transaction.findMany({
-      where: {
-        createdAt: {
-          gt: lastSyncAt,
-          lte: currentSyncAt,
-        },
-      },
+    const transactions = await db.query.Transactions.findMany({
+      where: and(
+        gt(Transactions.createdAt, lastSyncAt.toISOString()),
+        lte(Transactions.createdAt, currentSyncAt.toISOString()),
+      ),
     })
 
     const diff = transactions.reduce((acc, transaction) => {
@@ -76,13 +68,14 @@ export async function syncBudget(force = false): Promise<void> {
       return acc
     }, 0)
 
-    const updatedBudget = await prisma.budget.update({
-      where: { id: 1 },
-      data: {
-        available: { increment: diff },
-        lastSyncAt: currentSyncAt,
-      },
-    })
+    const [updatedBudget] = await db
+      .update(Budget)
+      .set({
+        available: sql`${Budget.available} + ${diff}`,
+        lastSyncAt: currentSyncAt.toISOString(),
+      })
+      .where(eq(Budget.id, 1))
+      .returning()
 
     await budgetCache.set(updatedBudget)
     logger.info('Budget synced successfully')

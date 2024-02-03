@@ -4,6 +4,7 @@ import { z } from 'zod'
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
+    DATABASE_URL: z.string(),
     PORT: z.string().transform(Number).default('5050'),
 
     PUBLIC_DOMAIN: z.string(),
@@ -27,6 +28,11 @@ const EnvSchema = z
     isProd: raw.NODE_ENV === 'production',
     port: raw.PORT,
     domain: raw.PUBLIC_DOMAIN,
+
+    database: {
+      url: raw.DATABASE_URL,
+    },
+
     redis: {
       url: raw.REDIS_URL,
     },

@@ -19,4 +19,4 @@ COPY . ./
 
 COPY ./apps/control-api/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
 
-CMD ["yarn", "nx", "run", "@apps/control-api:start:migrate"]
+CMD ["yarn", "nx", "run", "@apps/control-api:start"]

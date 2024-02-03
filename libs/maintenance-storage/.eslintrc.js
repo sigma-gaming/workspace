@@ -12,6 +12,6 @@ module.exports = configure({
   ],
 
   extend: {
-    ignorePatterns: ['!**/*', 'node_modules', 'dist'],
+    ignorePatterns: ['!**/*', 'node_modules', 'dist', 'public'],
   },
 })

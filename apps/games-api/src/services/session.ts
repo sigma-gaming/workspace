@@ -2,12 +2,13 @@ import {
   NotAuthenticatedException,
   SessionExpiredException,
 } from '@libs/exceptions'
-import { AccountProvider, normalizeUser, User } from '@libs/games-model'
+import { AccountProvider, Sessions, User, Users } from '@libs/games-db-schema'
 import cookie, { serialize } from 'cookie'
+import { desc, eq, inArray } from 'drizzle-orm'
 import { FastifyRequest } from 'fastify'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
 import { sessionCache } from '../caches/session'
-import { prisma } from '../shared/db'
+import { db } from '../shared/db'
 import { env } from '../shared/env'
 
 enum SessionState {
@@ -26,52 +27,52 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
     return { state: SessionState.Empty, user: null }
   }
 
-  const { session } = cookie.parse(req.headers.cookie)
+  const { session: token } = cookie.parse(req.headers.cookie)
 
-  if (!session) {
+  if (!token) {
     return { state: SessionState.Empty, user: null }
   }
 
-  const cached = await sessionCache.get(session)
+  const cached = await sessionCache.get(token)
 
   if (cached) {
     return cached
   }
 
   try {
-    verify(session, env.jwt.secret)
+    verify(token, env.jwt.secret)
   } catch (error) {
     const state =
       error instanceof TokenExpiredError
         ? SessionState.Expired
         : SessionState.Empty
 
-    return await sessionCache.set(session, {
+    return await sessionCache.set(token, {
       state,
       user: null,
-      token: session,
+      token,
     })
   }
 
-  const user = await prisma.user.findFirst({
-    where: {
+  const user = await db.query.Users.findFirst({
+    with: {
       sessions: {
-        some: { token: session },
+        where: eq(Sessions.token, token),
       },
     },
   })
 
   if (!user) {
-    return await sessionCache.set(session, {
+    return await sessionCache.set(token, {
       state: SessionState.Empty,
       user: null,
     })
   }
 
-  return await sessionCache.set(session, {
+  return await sessionCache.set(token, {
     state: SessionState.Authenticated,
-    user: normalizeUser(user),
-    token: session,
+    user,
+    token,
   })
 }
 
@@ -95,53 +96,59 @@ async function createSession(options: AddSessionOptions) {
   const expiresAt = new Date(Date.now() + 1000 * expiresIn)
   const token = jwt.sign({ userId }, env.jwt.secret, { expiresIn })
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
+  const user = await db.query.Users.findFirst({
+    where: eq(Users.id, userId),
   })
 
   if (!user) {
     throw new NotAuthenticatedException()
   }
 
-  const sessionEntity = await prisma.session.create({
-    data: { userId, token, expiresAt },
-  })
+  await db
+    .insert(Sessions)
+    .values({
+      userId,
+      token,
+      expiresAt: expiresAt.toISOString(),
+    })
+    .returning()
 
   const session: Session = {
     state: SessionState.Authenticated,
-    user: normalizeUser(user),
+    user,
     token,
   }
 
   await sessionCache.set(token, session)
 
-  const extraSessions = await prisma.session.findMany({
-    where: { userId },
-    orderBy: { expiresAt: 'desc' },
-    skip: 5, // Max 5 sessions per user
+  const extraSessions = await db.query.Sessions.findMany({
+    where: eq(Sessions.userId, userId),
+    orderBy: desc(Sessions.expiresAt),
+    offset: 5, // Max 5 sessions per user
   })
 
   if (extraSessions.length > 0) {
-    await prisma.session.deleteMany({
-      where: {
-        id: { in: extraSessions.map((s) => s.id) },
-      },
-    })
+    await db.delete(Sessions).where(
+      inArray(
+        Sessions.id,
+        extraSessions.map((s) => s.id),
+      ),
+    )
   }
 
   const cookie = [
     serialize('session', token, {
       domain: env.domain,
       path: '/',
-      expires: sessionEntity.expiresAt,
+      expires: expiresAt,
       httpOnly: true,
       sameSite: 'lax',
       secure: true,
     }),
-    serialize('sessionExpiresAt', sessionEntity.expiresAt.toISOString(), {
+    serialize('sessionExpiresAt', expiresAt.toISOString(), {
       domain: env.domain,
       path: '/',
-      expires: sessionEntity.expiresAt,
+      expires: expiresAt,
       sameSite: 'lax',
       secure: true,
     }),
@@ -160,9 +167,7 @@ async function createSession(options: AddSessionOptions) {
 async function removeSession(session: Session) {
   if (session.token) {
     try {
-      await prisma.session.delete({
-        where: { token: session.token },
-      })
+      await db.delete(Sessions).where(eq(Sessions.token, session.token))
     } catch {
       // Session doesn't exist
     }

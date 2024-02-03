@@ -1,8 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": ["src", "webpack.config.ts"],
+  "include": ["src", "scripts", "**.ts", "**.js", "**.mjs", "**.cjs"],
   "compilerOptions": {
     "module": "CommonJS",
-    "noEmit": false
+    "noEmit": false,
+    "outDir": "dist"
   }
 }

@@ -1,9 +1,9 @@
+import fsExtra from 'fs-extra'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { rollup } from 'rollup'
 import dts from 'rollup-plugin-dts'
 import esbuild from 'rollup-plugin-esbuild'
-import { fileURLToPath } from 'node:url'
-import path from 'node:path'
-import fsExtra from 'fs-extra'
-import { rollup } from 'rollup'
 
 const dirname = fileURLToPath(new URL('.', import.meta.url))
 

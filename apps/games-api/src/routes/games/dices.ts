@@ -3,7 +3,8 @@ import {
   InternalServerException,
   RouteException,
 } from '@libs/exceptions'
-import { Game, rub, TransactionType } from '@libs/games-model'
+import { Game, TransactionType } from '@libs/games-db-schema'
+import { rub } from '@libs/games-model'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 import { lastTransactionCache } from '../../caches/transaction'

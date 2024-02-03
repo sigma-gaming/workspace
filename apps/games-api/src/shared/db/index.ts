@@ -1,3 +1,6 @@
-import { PrismaClient } from '@libs/games-db'
+import { createDb } from '@libs/games-db'
+import { env } from '../env'
 
-export const prisma = new PrismaClient()
+export const db = createDb(env.database.url, {
+  logger: env.isDev,
+})

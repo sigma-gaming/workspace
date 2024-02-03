@@ -1,16 +1,12 @@
 import { createMutation } from '@farfetched/core'
 import { BadRequestException, ValidationException } from '@libs/exceptions'
-import {
-  AccountProvider,
-  getFullName,
-  ProfileValidation,
-} from '@libs/games-model'
+import { AccountProvider } from '@libs/games-db-schema'
+import { getFullName, ProfileValidation } from '@libs/games-model'
 import { TRPCClientError } from '@trpc/client'
 import { sample } from 'effector'
 import { z } from 'zod'
 import { $$notifications } from '../../entities/notifications'
 import { $$profile } from '../../entities/profile/index.ts'
-import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import {
   createField,

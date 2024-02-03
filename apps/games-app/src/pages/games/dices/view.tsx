@@ -1,6 +1,5 @@
 import { Button, Card, MultiSelect, NumberInput, Title } from '@mantine/core'
 import { useUnit } from 'effector-react'
-import { BaseLayout } from '../../../layouts/base'
 import { $$dicesPage } from './model.ts'
 
 export const DicesGamePageView = () => {

@@ -15,8 +15,8 @@
   },
   "scripts": {
     "build": "node build.mjs",
-    "typecheck": "tsc",
-    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "yarn lint --fix"
   },
   "devDependencies": {

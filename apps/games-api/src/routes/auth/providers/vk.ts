@@ -1,11 +1,18 @@
 import { InternalServerException } from '@libs/exceptions'
-import { Prisma } from '@libs/games-db'
-import { AccountProvider } from '@libs/games-model'
+import {
+  AccountInsert,
+  AccountProvider,
+  Accounts,
+  Profiles,
+  Users,
+} from '@libs/games-db-schema'
 import { detailedProfileCache } from 'apps/games-api/src/caches/profile'
 import axios from 'axios'
+import { and, eq } from 'drizzle-orm'
+import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
-import { prisma } from '../../../shared/db'
+import { db } from '../../../shared/db'
 import { env } from '../../../shared/env'
 import { procedure } from '../../trpc'
 
@@ -71,12 +78,11 @@ export const vk = procedure
         return ExchangeSilentAuthTokenSchema.parse(response.data)
       })
 
-      let account = await prisma.account.findFirst({
-        where: {
-          provider: AccountProvider.VK,
-          providerUserId: user_id.toString(),
-        },
-        include: { user: true },
+      let account = await db.query.Accounts.findFirst({
+        where: and(
+          eq(Accounts.provider, AccountProvider.VK),
+          eq(Accounts.providerUserId, user_id.toString()),
+        ),
       })
 
       if (session.user && account) {
@@ -100,7 +106,7 @@ export const vk = procedure
         return GetProfileSchema.parse(response.data)
       })
 
-      const accountSharedInput: Omit<Prisma.AccountCreateInput, 'user'> = {
+      const accountSharedInput: Omit<AccountInsert, 'userId'> = {
         provider: AccountProvider.VK,
         providerUserId: vkProfile.id.toString(),
         providerUsername: vkProfile.screen_name,
@@ -113,14 +119,9 @@ export const vk = procedure
        * If user is logged in and account is not found, create account and connect it to user
        */
       if (session.user && !account) {
-        await prisma.account.create({
-          data: {
-            ...accountSharedInput,
-            user: {
-              connect: { id: session.user.id },
-            },
-          },
-          include: { user: true },
+        await db.insert(Accounts).values({
+          userId: session.user.id,
+          ...accountSharedInput,
         })
 
         await detailedProfileCache.del(session.user.id)
@@ -132,20 +133,24 @@ export const vk = procedure
        * If user is not logged in and account is not found, perform registration
        */
       if (!account) {
-        account = await prisma.account.create({
-          data: {
-            ...accountSharedInput,
-            user: {
-              create: {
-                profile: {
-                  create: {
-                    usedProvider: AccountProvider.VK,
-                  },
-                },
-              },
-            },
-          },
-          include: { user: true },
+        account = await db.transaction(async (tx) => {
+          const userId = randomUUID()
+          const profileId = randomUUID()
+
+          await tx.insert(Users).values({ id: userId, profileId })
+
+          await tx.insert(Profiles).values({
+            id: profileId,
+            userId,
+            usedProvider: AccountProvider.VK,
+          })
+
+          const [account] = await tx
+            .insert(Accounts)
+            .values({ userId, ...accountSharedInput })
+            .returning()
+
+          return account
         })
       }
 

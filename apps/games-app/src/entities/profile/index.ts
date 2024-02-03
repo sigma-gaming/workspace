@@ -1,5 +1,5 @@
 import { createQuery, Mutation, update } from '@farfetched/core'
-import { AccountProvider, ProfileDetailed } from '@libs/games-model'
+import { ProfileDetailed } from '@libs/games-model'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
@@ -43,7 +43,7 @@ const $name = $profile.map((profile) => profile?.name ?? '')
 
 const $usedProvider = $profile.map((profile) => {
   if (!profile) return null
-  return profile.usedProvider as AccountProvider
+  return profile.usedProvider
 })
 
 sample({

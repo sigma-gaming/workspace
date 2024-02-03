@@ -6,5 +6,5 @@ export const syncBudgetJob = CronJob.from({
   runOnInit: true,
   onTick: async () => {
     await BudgetService.syncBudget()
-  }
+  },
 })

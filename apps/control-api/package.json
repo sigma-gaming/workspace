@@ -13,9 +13,10 @@
     "dev:start": "NODE_ENV=development nodemon dist/main.js",
     "build": "NODE_ENV=production webpack",
     "build:dev": "NODE_ENV=development webpack",
-    "start:migrate": "NODE_ENV=production node dist/main.js",
+    "start": "NODE_ENV=production node dist/main.js",
     "preview": "NODE_ENV=development nodemon dist/main.js --inspect",
-    "lint": "eslint \"src/**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "yarn lint --fix"
   },
   "dependencies": {

@@ -1,6 +1,11 @@
-import { Prisma, Transaction } from '@libs/games-db'
+import {
+  Transaction,
+  TransactionInsert,
+  Transactions,
+} from '@libs/games-db-schema'
+import { desc, eq } from 'drizzle-orm'
 import { lastTransactionCache } from '../caches/transaction'
-import { prisma } from '../shared/db'
+import { db } from '../shared/db'
 
 export const getLastTransaction = async (
   userId: string,
@@ -11,25 +16,26 @@ export const getLastTransaction = async (
     return cached
   }
 
-  const transaction = await prisma.transaction.findFirst({
-    where: { userId },
-    orderBy: { createdAt: 'desc' },
+  const transaction = await db.query.Transactions.findFirst({
+    where: eq(Transactions.userId, userId),
+    orderBy: desc(Transactions.createdAt),
   })
 
   if (transaction) {
     await lastTransactionCache.set(userId, transaction)
   }
 
-  return transaction
+  return transaction ?? null
 }
 
 export const createTransaction = async (
   userId: string,
-  payload: Omit<Prisma.TransactionUncheckedCreateInput, 'userId'>,
+  payload: Omit<TransactionInsert, 'userId'>,
 ): Promise<Transaction> => {
-  const newTransaction = await prisma.transaction.create({
-    data: { userId, ...payload },
-  })
+  const [newTransaction] = await db
+    .insert(Transactions)
+    .values({ userId, ...payload })
+    .returning()
 
   await lastTransactionCache.set(userId, newTransaction)
 

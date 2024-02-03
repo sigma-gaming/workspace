@@ -1,4 +1,4 @@
-import { AccountProvider } from '@libs/games-model'
+import { AccountProvider } from '@libs/games-db-schema'
 import { v4 } from 'uuid'
 import { env } from '../../shared/env'
 import { Icons } from '../../shared/ui/general/icons'

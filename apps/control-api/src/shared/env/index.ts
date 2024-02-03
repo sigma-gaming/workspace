@@ -7,6 +7,7 @@ const EnvSchema = z
     PORT: z.string().transform(Number).default('5050'),
 
     PUBLIC_DOMAIN: z.string(),
+    DATABASE_URL: z.string(),
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_GAMES_API_WS_URL: z.string(),
@@ -30,6 +31,9 @@ const EnvSchema = z
     isProd: raw.NODE_ENV === 'production',
     port: raw.PORT,
     domain: raw.PUBLIC_DOMAIN,
+    database: {
+      url: raw.DATABASE_URL,
+    },
     redis: {
       url: raw.REDIS_URL,
     },

@@ -1,11 +1,17 @@
-import crypto from 'crypto'
-import { Prisma } from '@libs/games-db'
-import { AccountProvider } from '@libs/games-model'
+import crypto, { randomUUID } from 'crypto'
+import {
+  AccountInsert,
+  AccountProvider,
+  Accounts,
+  Profiles,
+  Users,
+} from '@libs/games-db-schema'
 import { detailedProfileCache } from 'apps/games-api/src/caches/profile'
+import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
 import { TelegramBotService } from '../../../services/telegram-bot'
-import { prisma } from '../../../shared/db'
+import { db } from '../../../shared/db'
 import { env } from '../../../shared/env'
 import { procedure } from '../../trpc'
 
@@ -65,12 +71,11 @@ export const telegram = procedure
         throw new Error('tgAuthResult is already expired')
       }
 
-      let account = await prisma.account.findFirst({
-        where: {
-          provider: AccountProvider.Telegram,
-          providerUserId: tgAuthResult.id,
-        },
-        include: { user: true },
+      let account = await db.query.Accounts.findFirst({
+        where: and(
+          eq(Accounts.provider, AccountProvider.Telegram),
+          eq(Accounts.providerUserId, tgAuthResult.id),
+        ),
       })
 
       if (session.user && account) {
@@ -83,7 +88,7 @@ export const telegram = procedure
         return { status: 'success' }
       }
 
-      const accountSharedInput: Omit<Prisma.AccountCreateInput, 'user'> = {
+      const accountSharedInput: Omit<AccountInsert, 'userId'> = {
         provider: AccountProvider.Telegram,
         providerUserId: tgAuthResult.id,
         providerUsername: tgAuthResult.username,
@@ -96,14 +101,9 @@ export const telegram = procedure
        * If user is logged in and account is not found, create account and connect it to user
        */
       if (session.user && !account) {
-        await prisma.account.create({
-          data: {
-            ...accountSharedInput,
-            user: {
-              connect: { id: session.user.id },
-            },
-          },
-          include: { user: true },
+        await db.insert(Accounts).values({
+          userId: session.user.id,
+          ...accountSharedInput,
         })
 
         void TelegramBotService.messageUser(Number(tgAuthResult.id), [
@@ -111,7 +111,7 @@ export const telegram = procedure
           'Твой Telegram успешно привязан к аккаунту Sigma Games - наслаждайся бонусами =)',
           'Данный бот будет присылать тебе самую важную информацию о проекте:' +
             ' ссылки на новые зеркала сайта, новости об акциях и конкурсах, и многое другое!',
-          'Также не забудь подписаться на наш канал в Telegram: @SigmaGamesFeed',
+          'Также не забудь подписаться на наш канал: @SigmaGamesFeed',
         ])
 
         await detailedProfileCache.del(session.user.id)
@@ -123,20 +123,24 @@ export const telegram = procedure
        * If user is not logged in and account is not found, perform registration
        */
       if (!account) {
-        account = await prisma.account.create({
-          data: {
-            ...accountSharedInput,
-            user: {
-              create: {
-                profile: {
-                  create: {
-                    usedProvider: AccountProvider.Telegram,
-                  },
-                },
-              },
-            },
-          },
-          include: { user: true },
+        account = account = await db.transaction(async (tx) => {
+          const userId = randomUUID()
+          const profileId = randomUUID()
+
+          await tx.insert(Users).values({ id: userId, profileId })
+
+          await tx.insert(Profiles).values({
+            id: profileId,
+            userId,
+            usedProvider: AccountProvider.Telegram,
+          })
+
+          const [account] = await tx
+            .insert(Accounts)
+            .values({ userId, ...accountSharedInput })
+            .returning()
+
+          return account
         })
 
         void TelegramBotService.messageUser(Number(tgAuthResult.id), [
@@ -144,7 +148,7 @@ export const telegram = procedure
           'Мы автоматически привязали твой Telegram к аккаунту на сайте - наслаждайся бонусами =)',
           'Данный бот будет присылать тебе самую важную информацию о проекте:' +
             ' ссылки на новые зеркала сайта, новости об акциях и конкурсах, и многое другое!',
-          'Также не забудь подписаться на наш канал в Telegram: @SigmaGamesFeed',
+          'Также не забудь подписаться на наш канал: @SigmaGamesFeed',
         ])
       }
 
