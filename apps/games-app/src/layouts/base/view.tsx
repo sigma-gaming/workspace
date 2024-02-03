@@ -1,4 +1,4 @@
-import { rem, Title } from '@mantine/core'
+import { Card, rem, Text, Title } from '@mantine/core'
 import { IconCategory2, IconDice3 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import { memo, PropsWithChildren, SVGProps } from 'react'
@@ -9,11 +9,11 @@ import css from './styles.module.css'
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
   return (
-    <div className="flex flex-col px-4 pb-8">
+    <div className="flex flex-col pb-8">
       <Header />
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col md:flex-row gap-4">
         <Left />
-        <main className="grow">{children}</main>
+        <main className="grow px-4">{children}</main>
       </div>
     </div>
   )
@@ -21,34 +21,34 @@ export const BaseLayout = ({ children }: PropsWithChildren) => {
 
 const Left = memo(() => {
   return (
-    <aside className="hidden md:flex w-64 flex-col gap-4">
-      <LinkButton
+    <Card className="w-64 px-0 py-4 h-fit rounded-l-none">
+      <Link
         to={routes.home}
-        size="lg"
-        color="#4a115e"
-        leftSection={
-          <IconCategory2 style={{ width: rem(24), height: rem(24) }} />
-        }
-        activeClassName={css.leftLinkActive}
+        className="px-10 py-3 inline-flex gap-4 text-center items-center"
+        activeClassName="bg-sigma-100"
       >
-        Главная
-      </LinkButton>
-      <LinkButton
+        <IconCategory2 style={{ width: rem(24), height: rem(24) }} />
+        <Text size="lg" fw={600}>
+          Главная
+        </Text>
+      </Link>
+      <Link
         to={routes.dicesGame}
-        size="lg"
-        color="#4a115e"
-        leftSection={<IconDice3 style={{ width: rem(24), height: rem(24) }} />}
-        activeClassName={css.leftLinkActive}
+        className="px-10 py-3 inline-flex gap-4 text-center items-center"
+        activeClassName="bg-sigma-100"
       >
-        Dices
-      </LinkButton>
-    </aside>
+        <IconDice3 style={{ width: rem(24), height: rem(24) }} />
+        <Text size="lg" fw={600}>
+          Dices
+        </Text>
+      </Link>
+    </Card>
   )
 })
 
 const Header = memo(() => {
   return (
-    <header className="flex gap-6 items-center justify-between py-6 md:py-8">
+    <header className="flex gap-6 items-center justify-between px-4 py-6 md:py-8">
       <div className="md:w-64 md:px-5 flex gap-[10px] items-center">
         <Link
           to={routes.home}

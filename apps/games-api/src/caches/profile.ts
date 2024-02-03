@@ -1,5 +1,5 @@
 import { ProfileDetailed } from '@libs/games-model'
-import { cache } from '../shared/redis'
+import { cache } from '../shared/cache'
 
 export const detailedProfileCache = cache.entity<string, ProfileDetailed>({
   keygen: (token: string) => `detailed-profile:${token}`,

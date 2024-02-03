@@ -1,6 +1,7 @@
 import { Lock } from '@sesamecare-oss/redlock'
 import { logger } from '../logger'
-import { redis, redlock } from './redis'
+import { redis } from './redis'
+import { redlock } from './redlock'
 
 interface Options {
   /**

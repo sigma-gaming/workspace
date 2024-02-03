@@ -78,13 +78,13 @@ app.get('/ready', async (_, reply) => {
   return 'Ready'
 })
 
-app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
-  logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
-})
-
 CronJobs.forEach((job) => {
   job.instance.start()
   logger.info(`🚀 Cron job ${job.name} started`)
+})
+
+app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
+  logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
 })
 
 process.on('SIGTERM', async () => {

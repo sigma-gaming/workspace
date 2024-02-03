@@ -1,8 +1,5 @@
 import { Redlock } from '@sesamecare-oss/redlock'
-import Client from 'ioredis'
-import { env } from '../env'
-
-export const redis = new Client(env.redis.url)
+import { redis } from './redis'
 
 export const redlock = new Redlock([redis], {
   // http://redis.io/topics/distlock
