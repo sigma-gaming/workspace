@@ -25,12 +25,20 @@ export const withdraw = procedure.mutation(async ({ ctx }) => {
       throw new BadRequestException({ message: 'Недостаточно голды на балике' })
     }
 
+    if (!lastTransaction) {
+      throw new InternalServerException()
+    }
+
     const newTransaction = await TransactionService.createTransaction(user.id, {
       type: TransactionType.Withdrawal,
       game: null,
       amount: -amount,
       openingBalance: lastBalance,
       closingBalance: lastBalance - amount,
+      totalBet: lastTransaction.totalBet,
+      totalWon: lastTransaction.totalWon,
+      totalLost: lastTransaction.totalLost,
+      totalRTP: lastTransaction.totalRTP,
     })
 
     await BudgetService.increaseBudget(-amount)

@@ -1,11 +1,10 @@
 import { Card, rem, Text, Title } from '@mantine/core'
 import { IconCategory2, IconDice3 } from '@tabler/icons-react'
+import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
-import { memo, PropsWithChildren, SVGProps } from 'react'
+import { memo, PropsWithChildren, ReactNode, SVGProps } from 'react'
 import { routes } from '../../routing/index.ts'
-import { LinkButton } from '../../shared/ui/general/link-button'
 import { MiniProfile } from './mini-profile.tsx'
-import css from './styles.module.css'
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
   return (
@@ -19,29 +18,43 @@ export const BaseLayout = ({ children }: PropsWithChildren) => {
   )
 }
 
+const MenuLink = ({
+  to,
+  icon,
+  children,
+}: PropsWithChildren<{
+  to: RouteInstance<RouteParams>
+  icon: ReactNode
+}>) => {
+  return (
+    <Link
+      to={to}
+      className="px-4 md:px-10 py-2 md:py-3 inline-flex gap-4 text-center items-center"
+      activeClassName="bg-sigma-100"
+    >
+      {icon}
+      <Text className="text-md md:text-lg" fw={600}>
+        {children}
+      </Text>
+    </Link>
+  )
+}
+
 const Left = memo(() => {
   return (
-    <Card className="w-64 px-0 py-4 h-fit rounded-l-none">
-      <Link
+    <Card className="md:w-64 mx-4 md:mx-0 px-0 py-2 md:py-4 h-fit md:rounded-l-none">
+      <MenuLink
         to={routes.home}
-        className="px-10 py-3 inline-flex gap-4 text-center items-center"
-        activeClassName="bg-sigma-100"
+        icon={<IconCategory2 style={{ width: rem(24), height: rem(24) }} />}
       >
-        <IconCategory2 style={{ width: rem(24), height: rem(24) }} />
-        <Text size="lg" fw={600}>
-          Главная
-        </Text>
-      </Link>
-      <Link
+        Главная
+      </MenuLink>
+      <MenuLink
         to={routes.dicesGame}
-        className="px-10 py-3 inline-flex gap-4 text-center items-center"
-        activeClassName="bg-sigma-100"
+        icon={<IconDice3 style={{ width: rem(24), height: rem(24) }} />}
       >
-        <IconDice3 style={{ width: rem(24), height: rem(24) }} />
-        <Text size="lg" fw={600}>
-          Dices
-        </Text>
-      </Link>
+        Dices
+      </MenuLink>
     </Card>
   )
 })

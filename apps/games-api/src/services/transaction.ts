@@ -21,6 +21,10 @@ const createTransactionQuery = db
     amount: sql.placeholder('amount'),
     openingBalance: sql.placeholder('openingBalance'),
     closingBalance: sql.placeholder('closingBalance'),
+    totalBet: sql.placeholder('totalBet'),
+    totalWon: sql.placeholder('totalWon'),
+    totalLost: sql.placeholder('totalLost'),
+    totalRTP: sql.placeholder('totalRTP'),
   })
   .returning()
   .prepare('createTransactionQuery')

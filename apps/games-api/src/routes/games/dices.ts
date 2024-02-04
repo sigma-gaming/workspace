@@ -14,12 +14,12 @@ import { caches } from '../../shared/cache'
 import { logger } from '../../shared/logger'
 import { procedure } from '../trpc'
 
-const rtp = 0.96
+const rtpMultiplier = 0.96
 
 export async function runGame(bet: number, sides: number[]) {
   const { unwantedLoss, maxLoss } = await BudgetService.getBudget()
   const uniqueSides = new Set(sides)
-  const multiplier = (6 / uniqueSides.size) * rtp
+  const multiplier = (6 / uniqueSides.size) * rtpMultiplier
   const winAmount = Math.ceil(bet * multiplier - bet)
 
   let tries = 1
@@ -64,7 +64,13 @@ export const dices = procedure
         user.id,
       )
 
-      const lastBalance = lastTransaction?.closingBalance ?? 0
+      const {
+        closingBalance: lastBalance = 0,
+        totalBet = 0,
+        totalWon = 0,
+        totalLost = 0,
+        totalRTP = 0,
+      } = lastTransaction ?? {}
 
       if (lastBalance < input.bet) {
         throw new BadRequestException({
@@ -75,6 +81,9 @@ export const dices = procedure
 
       const { hasWon, winAmount, side } = await runGame(input.bet, input.sides)
       const amount = hasWon ? winAmount : -input.bet
+      const rtp = amount + input.bet
+      const won = hasWon ? winAmount : 0
+      const lost = hasWon ? 0 : input.bet
 
       const newTransaction = await TransactionService.createTransaction(
         user.id,
@@ -84,6 +93,10 @@ export const dices = procedure
           amount,
           openingBalance: lastBalance,
           closingBalance: lastBalance + amount,
+          totalBet: totalBet + input.bet,
+          totalWon: totalWon + won,
+          totalLost: totalLost + lost,
+          totalRTP: totalRTP + rtp,
         },
       )
 

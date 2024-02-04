@@ -23,6 +23,10 @@ export const deposit = procedure.mutation(async ({ ctx }) => {
       amount,
       openingBalance: lastBalance,
       closingBalance: lastBalance + amount,
+      totalBet: lastTransaction?.totalBet ?? 0,
+      totalWon: lastTransaction?.totalWon ?? 0,
+      totalLost: lastTransaction?.totalLost ?? 0,
+      totalRTP: lastTransaction?.totalRTP ?? 0,
     })
 
     await BudgetService.increaseBudget(amount)

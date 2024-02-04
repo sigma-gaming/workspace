@@ -17,6 +17,11 @@ export const Transactions = pgTable('Transactions', {
   closingBalance: bigint('closingBalance', { mode: 'number' }).notNull(),
   amount: bigint('amount', { mode: 'number' }).notNull(),
 
+  totalBet: bigint('totalBet', { mode: 'number' }).notNull().default(0),
+  totalWon: bigint('totalWin', { mode: 'number' }).notNull().default(0),
+  totalLost: bigint('totalLost', { mode: 'number' }).notNull().default(0),
+  totalRTP: bigint('totalRTP', { mode: 'number' }).notNull().default(0),
+
   userId: uuid('userId')
     .references(() => Users.id)
     .notNull(),
