@@ -42,7 +42,7 @@ const MenuLink = ({
 
 const Left = memo(() => {
   return (
-    <Card className="md:w-64 mx-4 md:mx-0 px-0 py-2 md:py-4 h-fit md:rounded-l-none">
+    <Card className="md:w-72 mx-4 md:mx-0 px-0 py-2 md:py-4 h-fit md:rounded-l-none">
       <MenuLink
         to={routes.home}
         icon={<IconCategory2 style={{ width: rem(24), height: rem(24) }} />}
