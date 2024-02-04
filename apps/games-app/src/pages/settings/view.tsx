@@ -29,8 +29,6 @@ import { $$settingsPage } from './model.ts'
 export const SettingsPageView = () => {
   return (
     <>
-      <Title>Настройки</Title>
-      <Space h="xl" />
       <Profile />
       <Space h="xl" />
       <SocialNetworks />

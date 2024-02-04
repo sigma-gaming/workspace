@@ -29,10 +29,6 @@ const EnvSchema = z
     port: raw.PORT,
     domain: raw.PUBLIC_DOMAIN,
 
-    versions: {
-      gamesApi: 'dev',
-    },
-
     database: {
       url: raw.DATABASE_URL,
     },
@@ -49,6 +45,7 @@ const EnvSchema = z
       wsUrl: raw.PUBLIC_GAMES_API_WS_URL,
     },
     gamesApi: {
+      version: 'dev',
       url: raw.PUBLIC_GAMES_API_URL,
     },
     jwt: {

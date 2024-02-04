@@ -13,4 +13,4 @@ const redlock = createRedlock(redis)
 const cache = createCache({ redis, redlock })
 
 export const maintenanceCache = createMaintenanceCache({ cache, redis })
-export const caches = createCaches(cache, { version: env.versions.gamesApi })
+export const caches = createCaches(cache, { version: env.gamesApi.version })
