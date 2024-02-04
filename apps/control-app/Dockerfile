@@ -12,9 +12,9 @@ COPY tooling ./tooling
 RUN yarn install --immutable
 
 COPY . ./
-RUN yarn nx run @apps/games-app:build
+RUN yarn nx run @apps/control-app:build
 COPY . ./
 
-COPY ./apps/games-app/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
+COPY ./apps/control-app/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
 
-CMD ["yarn", "nx", "run", "@apps/games-app:start"]
+CMD ["yarn", "nx", "run", "@apps/control-app:start"]
