@@ -27,4 +27,4 @@ jobs:
         run: yarn install --immutable
 
       - name: Run checks
-        run: yarn check
+        run: yarn check:affected

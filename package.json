@@ -25,7 +25,8 @@
     "dev:games:migrate": "nx run @libs/games-db:migration:dev",
     "dev:control-app": "nx run @apps/control-app:dev",
     "dev:control-api": "nx run @apps/control-api:dev",
-    "check": "yarn constraints && yarn nx affected --target build test lint typecheck --parallel 3",
+    "check": "yarn constraints && yarn nx run-many -t build test lint typecheck --parallel 3",
+    "check:affected": "yarn constraints && yarn nx affected -t build test lint typecheck --parallel 3",
     "changeset:publish": "changeset tag && git push --follow-tags",
     "cert:generate": "mkcert -key-file ssl/local.key -cert-file ssl/local.crt localhost sigma.local '*.sigma.local'",
     "cert:install": "mkcert -install"
