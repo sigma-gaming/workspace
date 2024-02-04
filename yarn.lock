@@ -40,6 +40,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@apps/control-app@workspace:apps/control-app":
+  version: 0.0.0-use.local
+  resolution: "@apps/control-app@workspace:apps/control-app"
+  dependencies:
+    "@libs/exceptions": "workspace:*"
+    "@libs/games-model": "workspace:*"
+    "@tooling/env": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@apps/games-api@workspace:apps/games-api":
   version: 0.0.0-use.local
   resolution: "@apps/games-api@workspace:apps/games-api"

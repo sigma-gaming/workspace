@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src", "scripts", "**.ts", "**.js", "**.mjs", "**.cjs"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

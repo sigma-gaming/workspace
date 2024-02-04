@@ -1,0 +1,11 @@
+.header {
+  @apply mt-8;
+  @apply flex gap-6 items-center justify-between;
+}
+
+/*
+ * Specific
+ */
+
+.leftLinkActive {
+}

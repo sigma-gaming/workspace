@@ -4,7 +4,7 @@ import { z } from 'zod'
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
-    PORT: z.string().transform(Number).default('5050'),
+    PORT: z.string().transform(Number).default('5051'),
 
     PUBLIC_DOMAIN: z.string(),
     DATABASE_URL: z.string(),
@@ -42,6 +42,7 @@ const EnvSchema = z
       wsUrl: raw.PUBLIC_GAMES_API_WS_URL,
     },
     gamesApi: {
+      version: 'dev',
       url: raw.PUBLIC_GAMES_API_URL,
     },
     controlApp: {

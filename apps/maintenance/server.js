@@ -57,7 +57,7 @@ app.get('/is-maintenance', async () => {
   return { maintenance: true }
 })
 
-const port = process.env.PORT || 5173
+const port = process.env.PORT || 5175
 
 await app.listen({ host: '0.0.0.0', port }, (err) => {
   if (err) {

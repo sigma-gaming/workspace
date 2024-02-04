@@ -1,0 +1,17 @@
+@layer tailwind {
+  @tailwind base;
+}
+
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  @apply bg-[#220032] text-[#ededed];
+}
+
+html,
+body,
+#root {
+  @apply m-0 min-h-full;
+}

@@ -1,0 +1,12 @@
+.wrapper {
+  margin-top: var(--mantine-spacing-xs);
+}
+
+.input {
+  background-color: var(--mantine-color-bg);
+}
+
+html body .input[data-disabled] {
+  background-color: var(--mantine-color-bg);
+  opacity: 0.6;
+}

@@ -11,6 +11,7 @@ const monorepo = (end: string) => path.resolve(__dirname, '../..', end)
 export default defineConfig({
   server: {
     host: 'app.sigma.local',
+    port: 5173,
     https: {
       cert: fs.readFileSync(monorepo('ssl/local.crt')),
       key: fs.readFileSync(monorepo('ssl/local.key')),

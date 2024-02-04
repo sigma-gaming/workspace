@@ -18,6 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@apps/games-api": ["apps/games-api/src/client.ts"],
+      "@apps/control-api": ["apps/control-api/src/client.ts"],
       "@libs/exceptions": ["libs/exceptions/src/index.ts"],
       "@libs/games-db": ["libs/games-db/src/index.ts"],
       "@libs/games-db-schema": ["libs/games-db-schema/src/index.ts"],

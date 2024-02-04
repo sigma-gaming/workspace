@@ -4,13 +4,13 @@ import {
   Transactions,
 } from '@libs/games-db-schema'
 import { desc, eq } from 'drizzle-orm'
-import { lastTransactionCache } from '../caches/transaction'
+import { caches } from '../shared/cache'
 import { db } from '../shared/db'
 
 export const getLastTransaction = async (
   userId: string,
 ): Promise<Transaction | null> => {
-  const cached = await lastTransactionCache.get(userId)
+  const cached = await caches.lastTransaction.get(userId)
 
   if (cached) {
     return cached
@@ -22,7 +22,7 @@ export const getLastTransaction = async (
   })
 
   if (transaction) {
-    await lastTransactionCache.set(userId, transaction)
+    await caches.lastTransaction.set(userId, transaction)
   }
 
   return transaction ?? null
@@ -37,7 +37,7 @@ export const createTransaction = async (
     .values({ userId, ...payload })
     .returning()
 
-  await lastTransactionCache.set(userId, newTransaction)
+  await caches.lastTransaction.set(userId, newTransaction)
 
   return newTransaction
 }
