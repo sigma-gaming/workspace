@@ -14,7 +14,9 @@
       "{workspaceRoot}/stacks/dev.docker-compose.yml",
       "{workspaceRoot}/.github/workflows/deploy-dev-stacks.yml"
     ],
-    "env": ["{workspaceRoot}/.env.development"],
+    "env": [
+      "{workspaceRoot}/.env.development"
+    ],
     "src": [
       "{projectRoot}/index.html",
       "{projectRoot}/**.js",
@@ -27,7 +29,9 @@
       "{projectRoot}/build.*",
       "{projectRoot}/scripts/**/*"
     ],
-    "dist": ["{projectRoot}/dist/**/*"],
+    "dist": [
+      "{projectRoot}/dist/**/*"
+    ],
     "test": [
       "{projectRoot}/**/*.test.ts",
       "{projectRoot}/**/*.test.tsx",
@@ -45,19 +49,38 @@
       "{projectRoot}/webpack.config.*",
       "{projectRoot}/drizzle.config.*"
     ],
-    "migrations": ["{projectRoot}/migrate.*", "{projectRoot}/drizzle/**/*"]
+    "migrations": [
+      "{projectRoot}/migrate.*",
+      "{projectRoot}/drizzle/**/*"
+    ]
   },
   "targetDefaults": {
     "copy-env": {
-      "dependsOn": ["^build"],
-      "inputs": ["env"],
-      "outputs": ["{projectRoot}/.env.development"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "env"
+      ],
+      "outputs": [
+        "{projectRoot}/.env.development"
+      ]
     },
     "build": {
       "cache": true,
-      "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/dist", "{workspaceRoot}/dist/{projectRoot}"],
-      "inputs": ["shared", "config", "src", "^src"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "{projectRoot}/dist",
+        "{workspaceRoot}/dist/{projectRoot}"
+      ],
+      "inputs": [
+        "shared",
+        "config",
+        "src",
+        "^src"
+      ]
     },
     "test": {
       "cache": true,
@@ -72,26 +95,55 @@
     },
     "typecheck": {
       "cache": true,
-      "inputs": ["shared", "config", "test", "src", "^src"]
+      "inputs": [
+        "shared",
+        "config",
+        "test",
+        "src",
+        "^src"
+      ]
     },
     "lint": {
       "cache": true,
-      "inputs": ["shared", "config", "test", "src"]
+      "inputs": [
+        "shared",
+        "config",
+        "test",
+        "src"
+      ]
     },
     "preview": {
-      "dependsOn": ["copy-env", "build"]
+      "dependsOn": [
+        "copy-env",
+        "build"
+      ]
     },
     "migration:apply": {
-      "inputs": ["shared", "config", "migrations"]
+      "inputs": [
+        "shared",
+        "config",
+        "migrations"
+      ]
     },
     "migration:dev": {
-      "dependsOn": ["copy-env"]
+      "dependsOn": [
+        "copy-env"
+      ]
     },
     "dev": {
-      "dependsOn": ["copy-env", "^build", "^migration:dev"]
+      "dependsOn": [
+        "copy-env",
+        "^build",
+        "^migration:dev"
+      ]
     },
     "start": {
-      "dependsOn": ["ci", "build", "^build", "^migration:apply"]
+      "dependsOn": [
+        "ci",
+        "build",
+        "^build",
+        "^migration:apply"
+      ]
     }
   },
   "affected": {

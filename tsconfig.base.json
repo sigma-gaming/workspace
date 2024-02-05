@@ -1,10 +1,17 @@
 {
-  "exclude": ["**/node_modules", "**/dist"],
+  "exclude": [
+    "**/node_modules",
+    "**/dist"
+  ],
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "node",
     "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "jsx": "react-jsx",
     "noEmit": true,
     "allowJs": true,
@@ -17,15 +24,33 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@apps/games-api": ["apps/games-api/src/client.ts"],
-      "@apps/control-api": ["apps/control-api/src/client.ts"],
-      "@libs/exceptions": ["libs/exceptions/src/index.ts"],
-      "@libs/games-db": ["libs/games-db/src/index.ts"],
-      "@libs/games-db-schema": ["libs/games-db-schema/src/index.ts"],
-      "@libs/games-model": ["libs/games-model/src/index.ts"],
-      "@libs/games-cache": ["libs/games-cache/src/index.ts"],
-      "@tooling/build": ["tooling/build/src/index.ts"],
-      "@tooling/env": ["tooling/env/src/index.ts"]
+      "@apps/games-api": [
+        "apps/games-api/src/client.ts"
+      ],
+      "@apps/control-api": [
+        "apps/control-api/src/client.ts"
+      ],
+      "@libs/exceptions": [
+        "libs/exceptions/src/index.ts"
+      ],
+      "@libs/games-db": [
+        "libs/games-db/src/index.ts"
+      ],
+      "@libs/games-db-schema": [
+        "libs/games-db-schema/src/index.ts"
+      ],
+      "@libs/games-model": [
+        "libs/games-model/src/index.ts"
+      ],
+      "@libs/games-cache": [
+        "libs/games-cache/src/index.ts"
+      ],
+      "@tooling/build": [
+        "tooling/build/src/index.ts"
+      ],
+      "@tooling/env": [
+        "tooling/env/src/index.ts"
+      ]
     }
   }
 }

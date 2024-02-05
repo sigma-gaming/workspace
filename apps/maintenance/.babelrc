@@ -2,7 +2,11 @@
   "plugins": [
     [
       "effector/babel-plugin",
-      { "factories": ["@farfetched/core"] }
+      {
+        "factories": [
+          "@farfetched/core"
+        ]
+      }
     ]
   ]
 }

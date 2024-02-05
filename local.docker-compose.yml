@@ -45,10 +45,12 @@ services:
     networks:
       redis:
 
+
 volumes:
   pgdata:
   redis:
   rabbitmq-data:
+
 
 networks:
   redis:
