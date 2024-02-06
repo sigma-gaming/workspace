@@ -44,15 +44,12 @@ const getSession = async (req: FastifyRequest): Promise<Session> => {
     })
   }
 
-  const user = await db.query.Users.findFirst({
-    with: {
-      sessions: {
-        where: eq(Sessions.token, token),
-      },
-    },
+  const session = await db.query.Sessions.findFirst({
+    where: eq(Sessions.token, token),
+    with: { user: true },
   })
 
-  if (!user) {
+  if (!session) {
     return await caches.session.set(token, {
       state: SessionState.Empty,
       user: null,
@@ -61,7 +58,7 @@ const getSession = async (req: FastifyRequest): Promise<Session> => {
 
   return await caches.session.set(token, {
     state: SessionState.Authenticated,
-    user,
+    user: session.user,
     token,
   })
 }
@@ -100,14 +97,11 @@ async function createSession(options: AddSessionOptions) {
     throw new NotAuthenticatedException()
   }
 
-  await db
-    .insert(Sessions)
-    .values({
-      userId,
-      token,
-      expiresAt: expiresAt.toISOString(),
-    })
-    .returning()
+  await db.insert(Sessions).values({
+    userId,
+    token,
+    expiresAt: expiresAt.toISOString(),
+  })
 
   const session: Session = {
     state: SessionState.Authenticated,
