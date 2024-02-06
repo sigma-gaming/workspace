@@ -12,6 +12,7 @@ import { BudgetService } from './services/budget'
 import { maintenanceCache } from './shared/cache'
 import { env } from './shared/env'
 import { httpLogger, logger } from './shared/logger'
+import { rmq } from './shared/queue'
 
 const app = Fastify({
   logger: false,
@@ -85,8 +86,13 @@ app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
   logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
 })
 
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM signal received')
+async function handleExit() {
+  logger.info('Exit signal received')
+
+  logger.info('Closing RMQ connection..')
+  await rmq.rpc.close()
+  await rmq.connection.close()
+  logger.info('RMQ connection closed')
 
   logger.info('Closing HTTP server..')
   await app.close()
@@ -104,4 +110,7 @@ process.on('SIGTERM', async () => {
 
   logger.info('Exiting..')
   process.exit(0)
-})
+}
+
+process.on('SIGTERM', handleExit)
+process.on('SIGINT', handleExit)

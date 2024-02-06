@@ -9,6 +9,7 @@ import { CronJobs } from './cronjobs'
 import { appRouter, createContext } from './routes'
 import { env } from './shared/env'
 import { httpLogger, logger } from './shared/logger'
+import { rmq } from './shared/queue'
 
 const app = Fastify({
   logger: false,
@@ -77,8 +78,13 @@ CronJobs.forEach((job) => {
   logger.info(`🚀 Cron job ${job.name} started`)
 })
 
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM signal received')
+async function handleExit() {
+  logger.info('Exit signal received')
+
+  logger.info('Closing RMQ connection..')
+  await rmq.rpc.close()
+  await rmq.connection.close()
+  logger.info('RMQ connection closed')
 
   logger.info('Closing HTTP server..')
   await app.close()
@@ -93,4 +99,7 @@ process.on('SIGTERM', async () => {
 
   logger.info('Exiting..')
   process.exit(0)
-})
+}
+
+process.on('SIGTERM', handleExit)
+process.on('SIGINT', handleExit)

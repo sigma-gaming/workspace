@@ -13,7 +13,7 @@ const EnvSchema = z
     PUBLIC_GAMES_API_WS_URL: z.string(),
     JWT_SECRET: z.string(),
 
-    // RABBITMQ_URL: z.string(),
+    RABBITMQ_URL: z.string(),
     REDIS_URL: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
@@ -37,9 +37,10 @@ const EnvSchema = z
       url: raw.REDIS_URL,
     },
 
-    // rabbitmq: {
-    //   url: raw.RABBITMQ_URL,
-    // },
+    rabbitmq: {
+      url: raw.RABBITMQ_URL,
+    },
+
     gamesApp: {
       url: raw.PUBLIC_GAMES_APP_URL,
       wsUrl: raw.PUBLIC_GAMES_API_WS_URL,

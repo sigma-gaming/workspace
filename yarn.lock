@@ -2794,6 +2794,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@libs/games-queue@workspace:libs/games-queue":
+  version: 0.0.0-use.local
+  resolution: "@libs/games-queue@workspace:libs/games-queue"
+  dependencies:
+    "@libs/games-db-schema": "workspace:*"
+    "@libs/games-model": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@lukeed/ms@npm:^2.0.1":
   version: 2.0.1
   resolution: "@lukeed/ms@npm:2.0.1"
