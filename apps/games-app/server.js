@@ -58,7 +58,7 @@ app.get('/ready', async (_, reply) => {
   return reply.status(response.status).send()
 })
 
-const port = 5173
+const port = Number(process.env.PORT ?? 5173)
 
 await app.listen({ host: '0.0.0.0', port }, (err) => {
   if (err) {
