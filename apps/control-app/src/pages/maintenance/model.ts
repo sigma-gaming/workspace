@@ -1,43 +1,53 @@
 import { createMutation, createQuery } from '@farfetched/core'
+import { createField, createForm } from '@libs/forms'
 import { NotificationData } from '@mantine/notifications'
-import { createEvent, createStore, sample } from 'effector'
+import { sample } from 'effector'
+import { z } from 'zod'
 import { $$notifications } from '../../entities/notifications'
 import { routes } from '../../routing'
 import { controlApi } from '../../shared/api/control'
 
 const getMaintenanceQuery = createQuery({
   name: 'maintenance/get',
-  handler: controlApi.settings.getMaintenance.query,
+  handler: controlApi.maintenance.getMaintenance.query,
 })
 
 const updateMaintenanceMutation = createMutation({
   name: 'maintenance/update',
-  handler: controlApi.settings.updateMaintenance.mutate,
+  handler: controlApi.maintenance.updateMaintenance.mutate,
 })
-
-const submit = createEvent<void>()
-const maintenanceChanged = createEvent<boolean>()
 
 const $loading = getMaintenanceQuery.$pending
 const $submitting = updateMaintenanceMutation.$pending
 
-const $maintenance = createStore(false)
-  .on(
-    getMaintenanceQuery.finished.success,
-    (_, { result }) => result.maintenanceMode,
-  )
-  .on(maintenanceChanged, (_, value) => value)
+const fields = {
+  maintenance: createField({
+    emptyValue: false,
+  }),
+}
+
+const form = createForm({
+  fields,
+  schema: z.object({
+    maintenance: z.boolean(),
+  }),
+})
+
+sample({
+  source: getMaintenanceQuery.finished.success,
+  fn: ({ result }) => ({ maintenance: result.maintenanceMode }),
+  target: form.initialize,
+})
+
+sample({
+  source: form.submitted,
+  fn: ({ maintenance }) => ({ value: maintenance }),
+  target: updateMaintenanceMutation.start,
+})
 
 sample({
   clock: routes.maintenance.opened,
   target: getMaintenanceQuery.start,
-})
-
-sample({
-  clock: submit,
-  source: $maintenance,
-  fn: (value) => ({ value }),
-  target: updateMaintenanceMutation.start,
 })
 
 sample({
@@ -52,9 +62,8 @@ sample({
 })
 
 export const $$maintenancePage = {
-  $maintenance,
+  fields,
+  form,
   $submitting,
   $loading,
-  submit,
-  maintenanceChanged,
 }

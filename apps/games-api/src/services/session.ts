@@ -8,11 +8,11 @@ import cookie, { serialize } from 'cookie'
 import { desc, eq, inArray } from 'drizzle-orm'
 import { FastifyRequest } from 'fastify'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
-import { caches } from '../shared/cache'
 import { db } from '../shared/db'
 import { env } from '../shared/env'
+import { caches } from '../shared/redis'
 
-export const getSession = async (req: FastifyRequest): Promise<Session> => {
+const getSession = async (req: FastifyRequest): Promise<Session> => {
   if (!req.headers.cookie) {
     return { state: SessionState.Empty, user: null }
   }
@@ -66,11 +66,17 @@ export const getSession = async (req: FastifyRequest): Promise<Session> => {
   })
 }
 
-export const getUser = (session: Session): User => {
+const getUser = (session: Session): User => {
   if (session.state === SessionState.Expired)
     throw new SessionExpiredException()
   if (session.state === SessionState.Empty)
     throw new NotAuthenticatedException()
+  return session.user
+}
+
+const getUserSafe = (session: Session): User | null => {
+  if (session.state === SessionState.Expired) return null
+  if (session.state === SessionState.Empty) return null
   return session.user
 }
 
@@ -190,5 +196,6 @@ export const SessionService = {
   createSession,
   getSession,
   getUser,
+  getUserSafe,
   removeSession,
 }

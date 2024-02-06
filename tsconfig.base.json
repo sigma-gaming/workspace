@@ -42,11 +42,17 @@
       "@libs/games-model": [
         "libs/games-model/src/index.ts"
       ],
-      "@libs/games-cache": [
-        "libs/games-cache/src/index.ts"
+      "@libs/games-redis": [
+        "libs/games-redis/src/index.ts"
       ],
       "@libs/games-queue": [
         "libs/games-queue/src/index.ts"
+      ],
+      "@libs/logger": [
+        "libs/logger/src/index.ts"
+      ],
+      "@libs/forms": [
+        "libs/forms/src/index.ts"
       ],
       "@tooling/build": [
         "tooling/build/src/index.ts"

@@ -4,8 +4,8 @@ import {
   Transactions,
 } from '@libs/games-db-schema'
 import { desc, eq } from 'drizzle-orm'
-import { caches } from '../shared/cache'
 import { db } from '../shared/db'
+import { caches } from '../shared/redis'
 
 export const getLastTransaction = async (
   userId: string,

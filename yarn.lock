@@ -55,10 +55,10 @@ __metadata:
   resolution: "@apps/games-api@workspace:apps/games-api"
   dependencies:
     "@libs/exceptions": "workspace:*"
-    "@libs/games-cache": "workspace:*"
     "@libs/games-db": "workspace:*"
     "@libs/games-db-schema": "workspace:*"
     "@libs/games-model": "workspace:*"
+    "@libs/games-redis": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -2764,12 +2764,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@libs/games-cache@workspace:*, @libs/games-cache@workspace:libs/games-cache":
+"@libs/forms@workspace:libs/forms":
   version: 0.0.0-use.local
-  resolution: "@libs/games-cache@workspace:libs/games-cache"
-  dependencies:
-    "@libs/games-db-schema": "workspace:*"
-    "@libs/games-model": "workspace:*"
+  resolution: "@libs/forms@workspace:libs/forms"
   languageName: unknown
   linkType: soft
 
@@ -2800,6 +2797,21 @@ __metadata:
   dependencies:
     "@libs/games-db-schema": "workspace:*"
     "@libs/games-model": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"@libs/games-redis@workspace:*, @libs/games-redis@workspace:libs/games-redis":
+  version: 0.0.0-use.local
+  resolution: "@libs/games-redis@workspace:libs/games-redis"
+  dependencies:
+    "@libs/games-db-schema": "workspace:*"
+    "@libs/games-model": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"@libs/logger@workspace:libs/logger":
+  version: 0.0.0-use.local
+  resolution: "@libs/logger@workspace:libs/logger"
   languageName: unknown
   linkType: soft
 

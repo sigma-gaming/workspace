@@ -1,5 +1,12 @@
 import { createMutation } from '@farfetched/core'
 import { BadRequestException, ValidationException } from '@libs/exceptions'
+import {
+  createField,
+  createForm,
+  FormErrors,
+  InferFormValues,
+  normalizeFieldErrors,
+} from '@libs/forms'
 import { AccountProvider } from '@libs/games-db-schema'
 import { getFullName, ProfileValidation } from '@libs/games-model'
 import { TRPCClientError } from '@trpc/client'
@@ -8,13 +15,6 @@ import { z } from 'zod'
 import { $$notifications } from '../../entities/notifications'
 import { $$profile } from '../../entities/profile/index.ts'
 import { gamesApi } from '../../shared/api/games'
-import {
-  createField,
-  createForm,
-  FormErrors,
-  InferFormValues,
-  normalizeFieldErrors,
-} from './form.ts'
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',

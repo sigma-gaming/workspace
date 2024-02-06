@@ -5,6 +5,7 @@ import { $$balance } from '../entities/balance'
 import { $$commonEvents } from '../entities/common-events'
 import { $$profile } from '../entities/profile'
 import { $$user } from '../entities/user'
+import { $$notificationEvents } from '../features/notification-events'
 import { router } from '../routing'
 
 export const started = createEvent()
@@ -24,6 +25,11 @@ sample({
 sample({
   clock: started,
   target: $$commonEvents.subscribe,
+})
+
+sample({
+  clock: started,
+  target: $$notificationEvents.subscribe,
 })
 
 export const $$app = {

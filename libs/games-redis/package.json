@@ -1,5 +1,5 @@
 {
-  "name": "@libs/games-cache",
+  "name": "@libs/games-redis",
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,

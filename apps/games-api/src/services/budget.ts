@@ -1,8 +1,8 @@
 import { Budget, Transactions, TransactionType } from '@libs/games-db-schema'
 import { and, eq, gt, lte, sql } from 'drizzle-orm'
-import { caches } from '../shared/cache'
 import { db } from '../shared/db'
 import { logger } from '../shared/logger'
+import { caches } from '../shared/redis'
 
 export const getBudget = async (): Promise<Budget> => {
   const cached = await caches.budget.get()

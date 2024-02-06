@@ -4,8 +4,8 @@ import {
   Transactions,
 } from '@libs/games-db-schema'
 import { desc, eq, sql } from 'drizzle-orm'
-import { caches } from '../shared/cache'
 import { db } from '../shared/db'
+import { caches } from '../shared/redis'
 
 const getLastTransactionQuery = db.query.Transactions.findFirst({
   where: eq(Transactions.userId, sql.placeholder('userId')),

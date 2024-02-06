@@ -10,8 +10,8 @@ import { z } from 'zod'
 import { BudgetService } from '../../services/budget'
 import { SessionService } from '../../services/session'
 import { TransactionService } from '../../services/transaction'
-import { caches } from '../../shared/cache'
 import { logger } from '../../shared/logger'
+import { caches } from '../../shared/redis'
 import { procedure } from '../trpc'
 
 const rtpMultiplier = 0.96

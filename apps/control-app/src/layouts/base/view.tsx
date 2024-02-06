@@ -1,5 +1,10 @@
 import { Card, rem, Text, Title } from '@mantine/core'
-import { IconBarrierBlock, IconCoins, IconDashboard } from '@tabler/icons-react'
+import {
+  IconBarrierBlock,
+  IconCoins,
+  IconDashboard,
+  IconNotification,
+} from '@tabler/icons-react'
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
 import { memo, PropsWithChildren, ReactNode, SVGProps } from 'react'
@@ -53,6 +58,12 @@ const Left = memo(() => {
         icon={<IconCoins style={{ width: rem(24), height: rem(24) }} />}
       >
         Бюджет
+      </MenuLink>
+      <MenuLink
+        to={routes.notifications}
+        icon={<IconNotification style={{ width: rem(24), height: rem(24) }} />}
+      >
+        Уведомления
       </MenuLink>
       <MenuLink
         to={routes.maintenance}

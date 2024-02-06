@@ -1,10 +1,10 @@
 import { createMutation } from '@farfetched/core'
 import { BadRequestException, fromTrpc } from '@libs/exceptions'
+import { createField, createForm } from '@libs/forms'
 import { createEvent, createStore, sample } from 'effector'
 import { z } from 'zod'
 import { $$balance } from '../../../entities/balance'
 import { gamesApi } from '../../../shared/api/games'
-import { createField, createForm } from '../../settings/form.ts'
 
 const playGameMutation = createMutation({
   name: 'games/dices/play',

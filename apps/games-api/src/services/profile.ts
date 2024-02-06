@@ -8,8 +8,8 @@ import {
 } from '@libs/games-db-schema'
 import { getFullName, ProfileDetailed } from '@libs/games-model'
 import { eq } from 'drizzle-orm'
-import { caches } from '../shared/cache'
 import { db } from '../shared/db'
+import { caches } from '../shared/redis'
 
 interface Reused {
   profile?: Profile

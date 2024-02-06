@@ -10,7 +10,7 @@
     "copy-env": "copy-env",
     "dev": "yarn build:dev && concurrently 'yarn:dev:*' -c auto -k",
     "dev:build": "NODE_ENV=development webpack --watch",
-    "dev:start": "NODE_ENV=development nodemon dist/main.js",
+    "dev:start": "NODE_ENV=development nodemon --signal SIGTERM dist/main.js",
     "build": "NODE_ENV=production webpack",
     "build:dev": "NODE_ENV=development webpack",
     "start": "NODE_ENV=production node dist/main.js",
@@ -21,10 +21,10 @@
   },
   "dependencies": {
     "@libs/exceptions": "workspace:*",
-    "@libs/games-cache": "workspace:*",
     "@libs/games-db": "workspace:*",
     "@libs/games-db-schema": "workspace:*",
     "@libs/games-model": "workspace:*",
+    "@libs/games-redis": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

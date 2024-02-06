@@ -1,3 +1,4 @@
+import { Logger } from '@libs/logger'
 import { Lock, Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
 
@@ -60,11 +61,13 @@ export interface Cache {
   }) => TKey extends void ? GlobalEntity<TValue> : KeyEntity<TKey, TValue>
 }
 
-export function createCache(options: {
+export function createCache(dependencies: {
   redis: Redis
   redlock: Redlock
+  logger: Logger
 }): Cache {
-  const { redis, redlock } = options
+  const { redis, redlock } = dependencies
+  const logger = dependencies.logger.child('RedisCache')
 
   async function exists(key: string): Promise<boolean> {
     const response = await redis.exists(key)
@@ -94,8 +97,8 @@ export function createCache(options: {
       await redis.call('JSON.SET', key, '$', JSON.stringify(value))
       if (ttl !== Infinity) await redis.expire(key, ttl)
     } catch (error) {
-      console.error('Failed to set cache')
-      console.error(error)
+      logger.error('Failed to set cache')
+      logger.error(error)
     }
 
     return value
@@ -105,7 +108,7 @@ export function createCache(options: {
     try {
       await redis.call('JSON.SET', key, field, JSON.stringify(value))
     } catch (error) {
-      console.error('Failed to set cache field')
+      logger.error('Failed to set cache field')
       throw error
     }
 
@@ -121,7 +124,7 @@ export function createCache(options: {
       const response = await redis.call('JSON.NUMINCRBY', key, field, value)
       return JSON.parse(String(response))
     } catch (error) {
-      console.error('Failed to inc cache field')
+      logger.error('Failed to inc cache field')
       throw error
     }
   }

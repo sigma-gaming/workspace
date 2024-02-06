@@ -2,11 +2,13 @@ import { Budget, Transaction } from '@libs/games-db-schema'
 import { ProfileDetailed, Session } from '@libs/games-model'
 import { Cache } from './cache'
 
-interface Options {
-  version: string
-}
+export function createCaches(
+  options: { version: string },
+  dependencies: { cache: Cache },
+) {
+  const { version } = options
+  const { cache } = dependencies
 
-export function createCaches(cache: Cache, { version }: Options) {
   const budget = cache.entity<void, Budget>({
     keygen: () => `${version}:global:budget`,
     options: {

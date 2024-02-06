@@ -10,9 +10,9 @@ import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
 import { TelegramBotService } from '../../../services/telegram-bot'
-import { caches } from '../../../shared/cache'
 import { db } from '../../../shared/db'
 import { env } from '../../../shared/env'
+import { caches } from '../../../shared/redis'
 import { procedure } from '../../trpc'
 
 const TgAuthResultSchema = z.object({

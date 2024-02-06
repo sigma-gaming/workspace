@@ -10,11 +10,11 @@ import { useUnit } from 'effector-react'
 import { $$maintenancePage } from './model'
 
 export const MaintenancePageView = () => {
-  const maintenance = useUnit($$maintenancePage.$maintenance)
-  const maintenanceChanged = useUnit($$maintenancePage.maintenanceChanged)
+  const maintenance = useUnit($$maintenancePage.fields.maintenance.$value)
+  const updateMaintenance = useUnit($$maintenancePage.fields.maintenance.update)
   const loading = useUnit($$maintenancePage.$loading)
   const submitting = useUnit($$maintenancePage.$submitting)
-  const submit = useUnit($$maintenancePage.submit)
+  const submit = useUnit($$maintenancePage.form.submit)
 
   return (
     <Card
@@ -33,7 +33,7 @@ export const MaintenancePageView = () => {
       <Skeleton className="sm:w-fit" visible={loading}>
         <Switch
           checked={maintenance}
-          onChange={(event) => maintenanceChanged(event.target.checked)}
+          onChange={(event) => updateMaintenance(event.target.checked)}
           label="Режим технических работ"
         />
       </Skeleton>

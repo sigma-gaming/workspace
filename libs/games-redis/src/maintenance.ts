@@ -1,11 +1,14 @@
+import { Logger } from '@libs/logger'
 import { Redis } from 'ioredis'
 import { Cache } from './cache'
 
-export function createMaintenanceCache(options: {
-  cache: Cache
+export function createMaintenanceCache(dependencies: {
   redis: Redis
+  cache: Cache
+  logger: Logger
 }) {
-  const { cache, redis } = options
+  const { cache, redis } = dependencies
+  const logger = dependencies.logger.child('MaintenanceCache')
 
   const entity = cache.entity<void, boolean>({
     keygen: () => `global:maintenance`,
@@ -23,10 +26,10 @@ export function createMaintenanceCache(options: {
           const value = await entity.get()
           return Boolean(value)
         } catch (error) {
-          console.log('[Maintenance Storage] Failed to get maintenance mode:')
-          console.error(error)
+          logger.info('Failed to get maintenance mode:')
+          logger.error(error)
           await new Promise((resolve) => setTimeout(resolve, 1000))
-          console.log('[Maintenance Storage] Retrying in 1 second...')
+          logger.info('Retrying in 1 second...')
         }
       }
 

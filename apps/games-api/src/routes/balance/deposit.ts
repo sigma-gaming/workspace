@@ -3,7 +3,7 @@ import { TransactionType } from '@libs/games-db-schema'
 import { BudgetService } from '../../services/budget'
 import { SessionService } from '../../services/session'
 import { TransactionService } from '../../services/transaction'
-import { caches } from '../../shared/cache'
+import { caches } from '../../shared/redis'
 import { procedure } from '../trpc'
 
 export const deposit = procedure.mutation(async ({ ctx }) => {

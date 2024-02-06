@@ -11,9 +11,9 @@ import { and, eq } from 'drizzle-orm'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { SessionService } from '../../../services/session'
-import { caches } from '../../../shared/cache'
 import { db } from '../../../shared/db'
 import { env } from '../../../shared/env'
+import { caches } from '../../../shared/redis'
 import { procedure } from '../../trpc'
 
 const PayloadSchema = z.object({

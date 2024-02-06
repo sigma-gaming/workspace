@@ -1,0 +1,1 @@
+export { $$notificationEvents } from './model'

@@ -8,9 +8,9 @@ import cookie from 'cookie'
 import { eq } from 'drizzle-orm'
 import { FastifyRequest } from 'fastify'
 import { TokenExpiredError, verify } from 'jsonwebtoken'
-import { caches } from '../shared/cache'
 import { db } from '../shared/db'
 import { env } from '../shared/env'
+import { caches } from '../shared/redis'
 
 export const getSession = async (req: FastifyRequest): Promise<Session> => {
   if (!req.headers.cookie) {

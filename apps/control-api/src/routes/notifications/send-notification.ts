@@ -1,9 +1,9 @@
 import {
   NotificationContentSchema,
   NotificationTargetSchema,
-} from '@libs/games-queue'
+} from '@libs/games-redis'
 import { z } from 'zod'
-import { queues } from '../../shared/queue'
+import { pubsubs } from '../../shared/redis'
 import { procedure } from '../trpc'
 
 export const send = procedure
@@ -14,5 +14,5 @@ export const send = procedure
     }),
   )
   .mutation(async ({ input }) => {
-    queues.notifications.send(input)
+    pubsubs.notifications.publish(input)
   })
