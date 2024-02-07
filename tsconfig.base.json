@@ -54,6 +54,9 @@
       "@libs/forms": [
         "libs/forms/src/index.ts"
       ],
+      "@libs/ui": [
+        "libs/ui/src/index.ts"
+      ],
       "@tooling/build": [
         "tooling/build/src/index.ts"
       ],

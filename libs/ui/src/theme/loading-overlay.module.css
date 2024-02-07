@@ -1,0 +1,13 @@
+.overlay {
+  background-color: var(--mantine-overlay-bg);
+  animation: appear 200ms ease-out forwards;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

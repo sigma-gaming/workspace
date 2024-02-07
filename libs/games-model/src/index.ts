@@ -1,4 +1,5 @@
 export * from './account'
 export * from './balance'
+export * from './notifications'
 export * from './profile'
 export * from './session'

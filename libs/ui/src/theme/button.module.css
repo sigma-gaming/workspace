@@ -1,0 +1,10 @@
+.root {
+  font-family: Rubik, sans-serif;
+  font-weight: 500;
+
+  &:disabled {
+    color: var(--button-color);
+    background-color: var(--button-bg, var(--mantine-primary-color-filled));
+    opacity: 0.5;
+  }
+}

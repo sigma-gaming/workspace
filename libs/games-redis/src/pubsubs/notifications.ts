@@ -1,3 +1,4 @@
+import { NotificationContent } from '@libs/games-model'
 import { Logger } from '@libs/logger'
 import { Redis } from 'ioredis'
 import { z } from 'zod'
@@ -13,17 +14,9 @@ export const NotificationTargetSchema = z.discriminatedUnion('type', [
   }),
 ])
 
-export const NotificationContentSchema = z.object({
-  title: z.string(),
-  message: z.string(),
-  color: z.enum(['info', 'success', 'warning', 'error']).optional(),
-  autoClose: z.union([z.number(), z.boolean()]).optional(),
-  withCloseButton: z.boolean().optional(),
-})
-
 export interface NotificationEventPayload {
   target: z.infer<typeof NotificationTargetSchema>
-  content: z.infer<typeof NotificationContentSchema>
+  content: NotificationContent
 }
 
 export function createNotificationsPubSub(dependencies: {
