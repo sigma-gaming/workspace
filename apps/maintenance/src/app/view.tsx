@@ -1,7 +1,7 @@
 import '@mantine/core/styles.css'
 import './global.css'
+import { ThemeProvider } from '@libs/ui'
 import { HomePageView } from '../pages/home'
-import { ThemeProvider } from '../shared/ui/theme'
 
 export const AppView = () => {
   return (

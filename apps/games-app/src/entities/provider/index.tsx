@@ -1,11 +1,8 @@
 import { AccountProvider } from '@libs/games-db-schema'
+import { LinkButton, LinkButtonProps } from '@libs/ui'
 import { v4 } from 'uuid'
 import { env } from '../../shared/env'
-import { Icons } from '../../shared/ui/general/icons'
-import {
-  LinkButton,
-  LinkButtonProps,
-} from '../../shared/ui/general/link-button'
+import { Icons } from '../../shared/ui/icons'
 
 interface ProviderInfo {
   label: string

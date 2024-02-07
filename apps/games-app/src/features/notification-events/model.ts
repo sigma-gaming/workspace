@@ -1,4 +1,4 @@
-import { NotificationEventPayload } from '@libs/games-redis'
+import { mapColor } from '@libs/games-model'
 import { Unsubscribable } from '@trpc/server/observable'
 import {
   attach,
@@ -12,12 +12,6 @@ import { gamesApi } from '../../shared/api/games'
 
 const subscribe = createEvent()
 const unsubscribe = createEvent()
-
-function mapColor(kind: NotificationEventPayload['content']['color']) {
-  if (kind === 'warning') return 'orange'
-  if (kind === 'success') return 'green'
-  if (kind === 'error') return 'red'
-}
 
 const subscribeFx = createEffect(() => {
   return gamesApi.events.notifications.subscribe(undefined, {

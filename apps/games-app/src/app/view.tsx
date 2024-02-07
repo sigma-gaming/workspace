@@ -1,6 +1,7 @@
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
 import './global.css'
+import { ThemeProvider } from '@libs/ui'
 import { Notifications } from '@mantine/notifications'
 import { createRoutesView, RouterProvider } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
@@ -9,7 +10,6 @@ import { PAGES } from '../pages'
 import { NotFoundPageView } from '../pages/not-found'
 import { router } from '../routing'
 import { RouteLayout } from '../routing/types.ts'
-import { ThemeProvider } from '../shared/ui/theme'
 
 export const PageViews = createRoutesView({
   routes: PAGES.map(({ layout, ...record }) => record),

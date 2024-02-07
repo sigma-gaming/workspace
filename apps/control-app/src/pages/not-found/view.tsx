@@ -1,8 +1,8 @@
+import { LinkAnchor } from '@libs/ui'
 import { rem, Text, Title } from '@mantine/core'
 import { IconError404 } from '@tabler/icons-react'
 import { CenteredLayout } from '../../layouts/centered'
 import { routes } from '../../routing'
-import { LinkAnchor } from '../../shared/ui/general/link-anchor'
 
 export const NotFoundPageView = () => {
   return (

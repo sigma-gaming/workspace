@@ -1,7 +1,5 @@
-import {
-  NotificationContentSchema,
-  NotificationTargetSchema,
-} from '@libs/games-redis'
+import { NotificationContentSchema } from '@libs/games-model'
+import { NotificationTargetSchema } from '@libs/games-redis'
 import { z } from 'zod'
 import { pubsubs } from '../../shared/redis'
 import { procedure } from '../trpc'

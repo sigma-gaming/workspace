@@ -1,5 +1,6 @@
 import { createMutation } from '@farfetched/core'
 import { createField, createForm } from '@libs/forms'
+import { NotificationColor } from '@libs/games-model'
 import { NotificationEventPayload } from '@libs/games-redis'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
@@ -14,12 +15,10 @@ const sendNotificationMutation = createMutation({
 
 const $submitting = sendNotificationMutation.$pending
 
-type Color = NonNullable<NotificationEventPayload['content']['color']>
-
 const fields = {
   title: createField({ emptyValue: '' }),
   message: createField({ emptyValue: '' }),
-  color: createField<Color>({ emptyValue: 'info' }),
+  color: createField<NotificationColor>({ emptyValue: 'info' }),
   autoClose: createField({ emptyValue: 0 }),
   withCloseButton: createField({ emptyValue: true }),
 }
@@ -28,9 +27,11 @@ const form = createForm({
   fields,
   schema: z.object({
     title: z.string().min(1, 'Заголовок не может быть пустым'),
-    message: z.string().min(1, 'Сообщение не может быть пустым'),
+    message: z.string().min(1, 'Текст не может быть пустым'),
     color: z.enum(['info', 'success', 'warning', 'error']),
-    autoClose: z.number().transform((value) => (value === 0 ? false : value)),
+    autoClose: z
+      .number()
+      .transform((value) => (value === 0 ? false : value * 1000)),
     withCloseButton: z.boolean(),
   }),
 })
