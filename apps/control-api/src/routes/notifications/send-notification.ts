@@ -1,16 +1,9 @@
-import { Notifications } from '@libs/games-db-schema'
 import { NotificationSchema } from '@libs/games-model'
-import { db } from '../../shared/db'
-import { pubsubs } from '../../shared/redis'
+import { NotificationService } from '../../services/notification'
 import { procedure } from '../trpc'
 
 export const send = procedure
   .input(NotificationSchema)
   .mutation(async ({ input }) => {
-    const [notification] = await db
-      .insert(Notifications)
-      .values(input)
-      .returning()
-
-    await pubsubs.notifications.publish(notification)
+    await NotificationService.send(input)
   })

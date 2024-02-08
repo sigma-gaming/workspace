@@ -5,10 +5,10 @@ import { pubsubs } from '../../shared/redis'
 import { procedure } from '../trpc'
 
 pubsubs.notifications.subscribe((notification) => {
-  if (!notification.userId) {
-    emitToAll(notification)
-  } else {
+  if (notification.userId) {
     emitToUser(notification.userId, notification)
+  } else {
+    emitToAll(notification)
   }
 })
 
@@ -48,7 +48,6 @@ function emitToAll(notification: Notification) {
 export const subscription = procedure.subscription(({ ctx }) => {
   const user = SessionService.getUserSafe(ctx.session)
   const userId = user?.id ?? 'anonymous'
-  console.log({ userId })
 
   return observable<Notification>((observer) => {
     registerObserver(userId, observer)

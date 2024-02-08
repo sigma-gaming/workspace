@@ -1,4 +1,4 @@
-import { Budget, Transaction } from '@libs/games-db-schema'
+import { Budget, Notification, Transaction } from '@libs/games-db-schema'
 import { ProfileDetailed, Session } from '@libs/games-model'
 import { Cache } from './cache'
 
@@ -28,10 +28,20 @@ export function createCaches(
     keygen: (userId: string) => `${version}:last-transaction:${userId}`,
   })
 
+  const globalNotifications = cache.entity<void, Notification[]>({
+    keygen: () => `${version}:global:notifications`,
+  })
+
+  const personalNotifications = cache.entity<string, Notification[]>({
+    keygen: (userId: string) => `${version}:notifications:${userId}`,
+  })
+
   return {
     budget,
     detailedProfile,
     session,
     lastTransaction,
+    globalNotifications,
+    personalNotifications,
   }
 }

@@ -90,7 +90,7 @@ export const NotificationsPageView = () => {
       />
 
       <NumberInput
-        label="Секунды до закрытия"
+        label="Время до автоматического закрытия (секунды)"
         description="0 — не закрывать автоматически"
         value={autoCloseSeconds}
         onChange={(value) => updateAutoCloseSeconds(Number(value))}
@@ -107,8 +107,8 @@ export const NotificationsPageView = () => {
       />
 
       <NumberInput
-        label="Минуты до истечения"
-        description="При значении больше 0 уведомление будет показано не только активным пользователям, но и тем кто до истечения времени откроет приложение"
+        label="Время актуальности (минуты)"
+        description="0 - будет показано только тем, кто онлайн в момент отправки"
         value={expirationMinutes}
         onChange={(value) => updateExpirationMinutes(Number(value))}
         error={errors.expirationMinutes[0]}
