@@ -12,5 +12,5 @@ export const send = procedure
       .values(input)
       .returning()
 
-    pubsubs.notifications.publish(notification)
+    await pubsubs.notifications.publish(notification)
   })

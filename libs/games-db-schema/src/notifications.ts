@@ -10,7 +10,7 @@ import { notificationKindEnum } from './enums'
 import { Users } from './users'
 
 export const Notifications = pgTable('Notifications', {
-  id: integer('id').default(1).primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),

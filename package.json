@@ -25,6 +25,7 @@
     "dev:games:migrate": "nx run @libs/games-db:migration:dev",
     "dev:control-app": "nx run @apps/control-app:dev",
     "dev:control-api": "nx run @apps/control-api:dev",
+    "dev": "nx run-many -t dev --parallel 10",
     "check": "yarn constraints && yarn nx run-many -t build test lint typecheck --parallel 3",
     "check:affected": "yarn constraints && yarn nx affected -t build test lint typecheck --parallel 3",
     "changeset:publish": "changeset tag && git push --follow-tags",
