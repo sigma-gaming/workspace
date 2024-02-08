@@ -6,11 +6,19 @@ import {
   splitLink,
   wsLink,
 } from '@trpc/client'
+import { createEffect } from 'effector'
 import { GamesAPIRouter } from '@apps/games-api'
 import { env } from '../../env'
 
 const wsClient = createWSClient({
   url: env.gamesApi.wsUrl + '/trpc',
+})
+
+/**
+ * Used when the authentication state has changed to restart the socket with a new Cookie
+ */
+export const restartGamesApiSocketFx = createEffect(() => {
+  wsClient.getConnection().close()
 })
 
 export const gamesApi = createTRPCProxyClient<GamesAPIRouter>({

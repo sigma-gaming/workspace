@@ -5,7 +5,7 @@ import {
 } from '../../events/maintenance'
 import { procedure } from '../trpc'
 
-export const common = procedure.subscription(() => {
+export const subscription = procedure.subscription(() => {
   return observable<MaintenancePublicEvent>((emit) => {
     const { unsubscribe } = maintenanceEvents.subscribePublic((event) => {
       emit.next(event)

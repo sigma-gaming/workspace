@@ -24,12 +24,12 @@ sample({
 
 sample({
   clock: started,
-  target: $$commonEvents.subscribe,
+  target: $$commonEvents.initialize,
 })
 
 sample({
   clock: started,
-  target: $$notificationEvents.subscribe,
+  target: $$notificationEvents.initialize,
 })
 
 export const $$app = {

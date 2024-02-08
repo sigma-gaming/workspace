@@ -5,6 +5,8 @@ import { $$balance } from '../../entities/balance'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { router } from '../../routing'
+import { restartGamesApiSocketFx } from '../../shared/api/games'
+import { $$notificationEvents } from '../notification-events'
 
 interface FactoryParams {
   clock: Event<unknown>
@@ -34,7 +36,12 @@ const factory = createFactory(({ clock, authenticate }: FactoryParams) => {
 
   sample({
     clock: authenticateFx.doneData,
-    target: [$$user.request, $$balance.request, $$profile.request],
+    target: [
+      $$user.request,
+      $$balance.request,
+      $$profile.request,
+      restartGamesApiSocketFx,
+    ],
   })
 
   sample({

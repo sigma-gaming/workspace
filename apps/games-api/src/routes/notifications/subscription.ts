@@ -45,9 +45,10 @@ function emitToAll(notification: Notification) {
   })
 }
 
-export const notifications = procedure.subscription(({ ctx }) => {
+export const subscription = procedure.subscription(({ ctx }) => {
   const user = SessionService.getUserSafe(ctx.session)
   const userId = user?.id ?? 'anonymous'
+  console.log({ userId })
 
   return observable<Notification>((observer) => {
     registerObserver(userId, observer)

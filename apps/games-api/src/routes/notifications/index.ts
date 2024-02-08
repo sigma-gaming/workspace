@@ -1,6 +1,8 @@
 import { createRouter } from '../trpc'
+import { getActual } from './get-actual'
 import { subscription } from './subscription'
 
-export const eventsRouter = createRouter({
+export const notificationsRouter = createRouter({
+  getActual,
   subscription,
 })

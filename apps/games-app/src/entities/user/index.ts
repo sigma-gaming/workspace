@@ -3,7 +3,7 @@ import { fromTrpc, NotAuthenticatedException } from '@libs/exceptions'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and } from 'patronum'
-import { gamesApi } from '../../shared/api/games'
+import { gamesApi, restartGamesApiSocketFx } from '../../shared/api/games'
 import { env } from '../../shared/env'
 
 const request = createEvent()
@@ -57,6 +57,11 @@ sample({
   clock: logout,
   fn: () => true,
   target: [clientLogoutFx, userQuery.reset, $expired, logoutMutation.start],
+})
+
+sample({
+  clock: logoutMutation.finished.success,
+  target: restartGamesApiSocketFx,
 })
 
 export const $$user = {

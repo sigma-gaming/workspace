@@ -9,11 +9,11 @@ import {
 import { $$maintenance } from '../../features/maintenance'
 import { gamesApi } from '../../shared/api/games'
 
-const subscribe = createEvent()
-const unsubscribe = createEvent()
+const initialize = createEvent()
+const reset = createEvent()
 
 const subscribeFx = createEffect(() => {
-  return gamesApi.events.common.subscribe(undefined, {
+  return gamesApi.events.subscription.subscribe(undefined, {
     onData(event) {
       if (event.name === 'started') {
         $$maintenance.activate()
@@ -35,16 +35,16 @@ const unsubscribeFx = attach({
 })
 
 sample({
-  clock: subscribe,
+  clock: initialize,
   target: subscribeFx,
 })
 
 sample({
-  clock: unsubscribe,
+  clock: reset,
   target: unsubscribeFx,
 })
 
 export const $$commonEvents = {
-  subscribe,
-  unsubscribe,
+  initialize,
+  reset,
 }
