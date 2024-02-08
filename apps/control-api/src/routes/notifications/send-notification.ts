@@ -1,16 +1,16 @@
-import { NotificationContentSchema } from '@libs/games-model'
-import { NotificationTargetSchema } from '@libs/games-redis'
-import { z } from 'zod'
+import { Notifications } from '@libs/games-db-schema'
+import { NotificationSchema } from '@libs/games-model'
+import { db } from '../../shared/db'
 import { pubsubs } from '../../shared/redis'
 import { procedure } from '../trpc'
 
 export const send = procedure
-  .input(
-    z.object({
-      target: NotificationTargetSchema,
-      content: NotificationContentSchema,
-    }),
-  )
+  .input(NotificationSchema)
   .mutation(async ({ input }) => {
-    pubsubs.notifications.publish(input)
+    const [notification] = await db
+      .insert(Notifications)
+      .values(input)
+      .returning()
+
+    pubsubs.notifications.publish(notification)
   })

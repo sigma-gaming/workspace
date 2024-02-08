@@ -1,4 +1,5 @@
-import { mapColor, NotificationColor } from '@libs/games-model'
+import { NotificationKind } from '@libs/games-db-schema'
+import { mapColor } from '@libs/games-model'
 import {
   Button,
   Card,
@@ -6,7 +7,6 @@ import {
   NumberInput,
   rem,
   Select,
-  Space,
   Switch,
   Text,
   TextInput,
@@ -23,10 +23,12 @@ export const NotificationsPageView = () => {
   const updateTitle = useUnit(fields.title.update)
   const message = useUnit(fields.message.$value)
   const updateMessage = useUnit(fields.message.update)
-  const color = useUnit(fields.color.$value)
-  const updateColor = useUnit(fields.color.update)
-  const autoClose = useUnit(fields.autoClose.$value)
-  const updateAutoClose = useUnit(fields.autoClose.update)
+  const kind = useUnit(fields.kind.$value)
+  const updateKind = useUnit(fields.kind.update)
+  const autoCloseSeconds = useUnit(fields.autoCloseSeconds.$value)
+  const updateAutoCloseSeconds = useUnit(fields.autoCloseSeconds.update)
+  const expirationMinutes = useUnit(fields.expirationMinutes.$value)
+  const updateExpirationMinutes = useUnit(fields.expirationMinutes.update)
   const withCloseButton = useUnit(fields.withCloseButton.$value)
   const updateWithCloseButton = useUnit(fields.withCloseButton.update)
 
@@ -34,11 +36,11 @@ export const NotificationsPageView = () => {
   const errors = useUnit(form.$errors)
   const submitting = useUnit($$notificationsPage.$submitting)
 
-  const colorOptions: Array<{ label: string; value: NotificationColor }> = [
-    { label: 'Информация', value: 'info' },
-    { label: 'Успех', value: 'success' },
-    { label: 'Предупреждение', value: 'warning' },
-    { label: 'Ошибка', value: 'error' },
+  const colorOptions: Array<{ label: string; value: NotificationKind }> = [
+    { label: 'Информация', value: NotificationKind.Info },
+    { label: 'Успех', value: NotificationKind.Success },
+    { label: 'Предупреждение', value: NotificationKind.Warning },
+    { label: 'Ошибка', value: NotificationKind.Failure },
   ]
 
   return (
@@ -74,25 +76,25 @@ export const NotificationsPageView = () => {
       <Select
         label="Цвет"
         leftSection={
-          <Text c={mapColor(color) + '.7'}>
+          <Text c={mapColor(kind) + '.7'}>
             <IconCircleFilled
               style={{ color: 'inherit', width: rem(16), height: rem(16) }}
             />
           </Text>
         }
         data={colorOptions}
-        value={color}
-        onChange={(color) => updateColor(color as NotificationColor)}
+        value={kind}
+        onChange={(color) => updateKind(color as NotificationKind)}
         allowDeselect={false}
-        error={errors.color[0]}
+        error={errors.kind[0]}
       />
 
       <NumberInput
         label="Секунды до закрытия"
         description="0 — не закрывать автоматически"
-        value={autoClose}
-        onChange={(value) => updateAutoClose(Number(value))}
-        error={errors.autoClose[0]}
+        value={autoCloseSeconds}
+        onChange={(value) => updateAutoCloseSeconds(Number(value))}
+        error={errors.autoCloseSeconds[0]}
         min={0}
         allowDecimal={false}
       />
@@ -102,6 +104,16 @@ export const NotificationsPageView = () => {
         onChange={(event) => updateWithCloseButton(event.target.checked)}
         label="Кнопка закрытия"
         error={errors.withCloseButton[0]}
+      />
+
+      <NumberInput
+        label="Минуты до истечения"
+        description="При значении больше 0 уведомление будет показано не только активным пользователям, но и тем кто до истечения времени откроет приложение"
+        value={expirationMinutes}
+        onChange={(value) => updateExpirationMinutes(Number(value))}
+        error={errors.expirationMinutes[0]}
+        min={0}
+        allowDecimal={false}
       />
 
       <Button type="submit" disabled={submitting} fullWidth={true}>

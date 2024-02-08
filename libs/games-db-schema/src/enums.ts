@@ -1,5 +1,11 @@
 import { pgEnum } from 'drizzle-orm/pg-core'
-import { AccountProvider, Game, TransactionType, UserRole } from './enums-raw'
+import {
+  AccountProvider,
+  Game,
+  NotificationKind,
+  TransactionType,
+  UserRole,
+} from './enums-raw'
 import { enumValues } from './lib/enums'
 
 /**
@@ -20,3 +26,8 @@ export const transactionTypeEnum = pgEnum(
 )
 
 export const gameEnum = pgEnum('Game', enumValues(Game))
+
+export const notificationKindEnum = pgEnum(
+  'NotificationKind',
+  enumValues(NotificationKind),
+)

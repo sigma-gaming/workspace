@@ -1,27 +1,22 @@
-import { NotificationsQueuePayload } from '@libs/games-queue'
+import { Notification } from '@libs/games-db-schema'
 import { observable, Observer } from '@trpc/server/observable'
 import { SessionService } from '../../services/session'
 import { pubsubs } from '../../shared/redis'
 import { procedure } from '../trpc'
 
-type NotificationContent = NotificationsQueuePayload['content']
-
-pubsubs.notifications.subscribe((payload) => {
-  if (payload.target.type === 'global') {
-    emitToAll(payload.content)
-  } else if (payload.target.type === 'personal') {
-    emitToUser(payload.target.userId, payload.content)
+pubsubs.notifications.subscribe((notification) => {
+  if (!notification.userId) {
+    emitToAll(notification)
+  } else {
+    emitToUser(notification.userId, notification)
   }
 })
 
-const observersByUserId = new Map<
-  string,
-  Observer<NotificationContent, unknown>[]
->()
+const observersByUserId = new Map<string, Observer<Notification, unknown>[]>()
 
 function registerObserver(
   userId: string,
-  observer: Observer<NotificationContent, unknown>,
+  observer: Observer<Notification, unknown>,
 ) {
   const observers = observersByUserId.get(userId) ?? []
   observersByUserId.set(userId, [...observers, observer])
@@ -29,7 +24,7 @@ function registerObserver(
 
 function unregisterObserver(
   userId: string,
-  observer: Observer<NotificationContent, unknown>,
+  observer: Observer<Notification, unknown>,
 ) {
   const observers = observersByUserId.get(userId) ?? []
 
@@ -39,14 +34,14 @@ function unregisterObserver(
   )
 }
 
-function emitToUser(userId: string, content: NotificationContent) {
+function emitToUser(userId: string, notification: Notification) {
   const observers = observersByUserId.get(userId) ?? []
-  observers.forEach((observer) => observer.next(content))
+  observers.forEach((observer) => observer.next(notification))
 }
 
-function emitToAll(content: NotificationContent) {
+function emitToAll(notification: Notification) {
   observersByUserId.forEach((observers) => {
-    observers.forEach((observer) => observer.next(content))
+    observers.forEach((observer) => observer.next(notification))
   })
 }
 
@@ -54,11 +49,8 @@ export const notifications = procedure.subscription(({ ctx }) => {
   const user = SessionService.getUserSafe(ctx.session)
   const userId = user?.id ?? 'anonymous'
 
-  return observable<NotificationContent>((observer) => {
+  return observable<Notification>((observer) => {
     registerObserver(userId, observer)
-
-    return () => {
-      unregisterObserver(userId, observer)
-    }
+    return () => unregisterObserver(userId, observer)
   })
 })

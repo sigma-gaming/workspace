@@ -1,21 +1,20 @@
+import { NotificationKind } from '@libs/games-db-schema'
 import { z } from 'zod'
 
-const NotificationColorSchema = z.enum(['info', 'success', 'warning', 'error'])
-
-export const NotificationContentSchema = z.object({
+export const NotificationSchema = z.object({
+  expiresAt: z.string(),
   title: z.string(),
   message: z.string(),
-  color: NotificationColorSchema.optional(),
-  autoClose: z.union([z.number(), z.boolean()]).optional(),
-  withCloseButton: z.boolean().optional(),
+  kind: z.nativeEnum(NotificationKind),
+  autoClose: z.boolean(),
+  autoCloseMs: z.number(),
+  withCloseButton: z.boolean(),
+  userId: z.string().uuid().optional().nullable(),
 })
 
-export type NotificationContent = z.infer<typeof NotificationContentSchema>
-export type NotificationColor = z.infer<typeof NotificationColorSchema>
-
-export function mapColor(kind: NotificationColor = 'info') {
-  if (kind === 'warning') return 'orange'
-  if (kind === 'success') return 'green'
-  if (kind === 'error') return 'red'
+export function mapColor(kind: NotificationKind = NotificationKind.Info) {
+  if (kind === NotificationKind.Warning) return 'orange'
+  if (kind === NotificationKind.Success) return 'green'
+  if (kind === NotificationKind.Failure) return 'red'
   return 'primary'
 }

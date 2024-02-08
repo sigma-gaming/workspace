@@ -20,3 +20,10 @@ export enum TransactionType {
 export enum Game {
   Dice = 'Dice',
 }
+
+export enum NotificationKind {
+  Success = 'Success',
+  Info = 'Info',
+  Warning = 'Warning',
+  Failure = 'Failure',
+}

@@ -24,6 +24,12 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
+      "@tooling/build": [
+        "tooling/build/src/index.ts"
+      ],
+      "@tooling/env": [
+        "tooling/env/src/index.ts"
+      ],
       "@apps/games-api": [
         "apps/games-api/src/client.ts"
       ],
@@ -56,12 +62,6 @@
       ],
       "@libs/ui": [
         "libs/ui/src/index.ts"
-      ],
-      "@tooling/build": [
-        "tooling/build/src/index.ts"
-      ],
-      "@tooling/env": [
-        "tooling/env/src/index.ts"
       ]
     }
   }

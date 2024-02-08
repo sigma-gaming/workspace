@@ -1,7 +1,6 @@
 import { createMutation } from '@farfetched/core'
 import { createField, createForm } from '@libs/forms'
-import { NotificationColor } from '@libs/games-model'
-import { NotificationEventPayload } from '@libs/games-redis'
+import { NotificationInsert, NotificationKind } from '@libs/games-db-schema'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
 import { z } from 'zod'
@@ -18,9 +17,10 @@ const $submitting = sendNotificationMutation.$pending
 const fields = {
   title: createField({ emptyValue: '' }),
   message: createField({ emptyValue: '' }),
-  color: createField<NotificationColor>({ emptyValue: 'info' }),
-  autoClose: createField({ emptyValue: 0 }),
+  kind: createField<NotificationKind>({ emptyValue: NotificationKind.Info }),
+  autoCloseSeconds: createField({ emptyValue: 0 }),
   withCloseButton: createField({ emptyValue: true }),
+  expirationMinutes: createField({ emptyValue: 0 }),
 }
 
 const form = createForm({
@@ -28,19 +28,27 @@ const form = createForm({
   schema: z.object({
     title: z.string().min(1, 'Заголовок не может быть пустым'),
     message: z.string().min(1, 'Текст не может быть пустым'),
-    color: z.enum(['info', 'success', 'warning', 'error']),
-    autoClose: z
-      .number()
-      .transform((value) => (value === 0 ? false : value * 1000)),
+    expirationMinutes: z.number(),
+    kind: z.nativeEnum(NotificationKind),
+    autoCloseSeconds: z.number(),
     withCloseButton: z.boolean(),
+    userId: z.string().uuid().optional(),
   }),
 })
 
 sample({
   source: form.submitted,
-  fn: (content): NotificationEventPayload => ({
-    target: { type: 'global' },
-    content,
+  fn: ({
+    autoCloseSeconds,
+    expirationMinutes,
+    ...rest
+  }): NotificationInsert => ({
+    ...rest,
+    autoClose: autoCloseSeconds > 0,
+    autoCloseMs: autoCloseSeconds * 1000,
+    expiresAt: new Date(
+      Date.now() + expirationMinutes * 60 * 1000,
+    ).toISOString(),
   }),
   target: sendNotificationMutation.start,
 })

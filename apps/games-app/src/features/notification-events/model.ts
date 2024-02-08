@@ -15,10 +15,13 @@ const unsubscribe = createEvent()
 
 const subscribeFx = createEffect(() => {
   return gamesApi.events.notifications.subscribe(undefined, {
-    onData(content) {
+    onData({ title, message, kind, autoClose, autoCloseMs, withCloseButton }) {
       $$notifications.show({
-        ...content,
-        color: mapColor(content.color),
+        title,
+        message,
+        color: mapColor(kind),
+        autoClose: autoClose ? autoCloseMs : false,
+        withCloseButton,
       })
     },
   })
