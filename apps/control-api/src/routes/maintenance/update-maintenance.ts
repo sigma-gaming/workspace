@@ -11,5 +11,5 @@ export const updateMaintenance = procedure
   .mutation(async ({ input }) => {
     await maintenanceCache.setMaintenanceMode(input.value)
 
-    return { success: true, maintenanceMode: input.value }
+    return { status: 'success', maintenanceMode: input.value }
   })

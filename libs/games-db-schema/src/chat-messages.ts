@@ -3,10 +3,12 @@ import { chatMessageTypeEnum } from './enums'
 import { ChatMessageAttachmentType } from './enums-raw'
 import { Users } from './users'
 
-export interface ChatMessageAttachment {
+export interface ChatMessageAttachmentGame {
   type: ChatMessageAttachmentType.Game
   transactionId: string
 }
+
+export type ChatMessageAttachment = ChatMessageAttachmentGame
 
 export const ChatMessages = pgTable('ChatMessages', {
   id: uuid('id').defaultRandom().primaryKey(),

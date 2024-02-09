@@ -29,7 +29,7 @@ const createTransactionQuery = db
   .returning()
   .prepare('createTransactionQuery')
 
-export const getLastTransaction = async (
+const getLastTransaction = async (
   userId: string,
 ): Promise<Transaction | null> => {
   const cached = await caches.lastTransaction.get(userId)
@@ -47,7 +47,17 @@ export const getLastTransaction = async (
   return transaction ?? null
 }
 
-export const createTransaction = async (
+const getTransaction = async (
+  transactionId: string,
+): Promise<Transaction | null> => {
+  const transaction = await db.query.Transactions.findFirst({
+    where: eq(Transactions.id, transactionId),
+  })
+
+  return transaction ?? null
+}
+
+const createTransaction = async (
   userId: string,
   payload: Required<Omit<TransactionInsert, 'id' | 'createdAt' | 'userId'>>,
 ): Promise<Transaction> => {
@@ -62,6 +72,7 @@ export const createTransaction = async (
 }
 
 export const TransactionService = {
+  getTransaction,
   getLastTransaction,
   createTransaction,
 }
