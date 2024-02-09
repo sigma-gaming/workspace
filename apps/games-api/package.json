@@ -25,6 +25,7 @@
     "@libs/games-db-schema": "workspace:*",
     "@libs/games-model": "workspace:*",
     "@libs/games-redis": "workspace:*",
+    "@libs/logger": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

@@ -1,6 +1,7 @@
 import { pgEnum } from 'drizzle-orm/pg-core'
 import {
   AccountProvider,
+  ChatMessageType,
   Game,
   NotificationKind,
   TransactionType,
@@ -30,4 +31,9 @@ export const gameEnum = pgEnum('Game', enumValues(Game))
 export const notificationKindEnum = pgEnum(
   'NotificationKind',
   enumValues(NotificationKind),
+)
+
+export const chatMessageTypeEnum = pgEnum(
+  'ChatMessageType',
+  enumValues(ChatMessageType),
 )

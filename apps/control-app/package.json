@@ -16,7 +16,10 @@
   },
   "dependencies": {
     "@libs/exceptions": "workspace:*",
+    "@libs/forms": "workspace:*",
+    "@libs/games-db-schema": "workspace:*",
     "@libs/games-model": "workspace:*",
+    "@libs/ui": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

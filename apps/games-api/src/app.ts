@@ -10,7 +10,6 @@ import { appRouter, createContext } from './routes'
 import { BudgetService } from './services/budget'
 import { env } from './shared/env'
 import { fastifyLogger, logger } from './shared/logger'
-import { shutdownRabbitmq } from './shared/rabbitmq'
 import { maintenanceCache, shutdownRedis } from './shared/redis'
 
 const app = Fastify({
@@ -81,8 +80,9 @@ async function handleExit() {
 
   logger.info('Saving the budget..')
   await BudgetService.syncBudget(true)
+  logger.info('Budget saved successfully')
 
-  await Promise.all([app.close(), shutdownRedis(), shutdownRabbitmq()])
+  await Promise.all([app.close(), shutdownRedis()])
 
   logger.info('Exiting..')
   process.exit(0)

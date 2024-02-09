@@ -8,7 +8,6 @@ import { CronJobs } from './cronjobs'
 import { appRouter, createContext } from './routes'
 import { env } from './shared/env'
 import { fastifyLogger, logger } from './shared/logger'
-import { shutdownRabbitmq } from './shared/rabbitmq'
 import { shutdownRedis } from './shared/redis'
 
 const app = Fastify({
@@ -72,7 +71,7 @@ async function handleExit() {
     logger.info(`Cron job ${job.name} stopped`)
   })
 
-  await Promise.all([app.close(), shutdownRedis(), shutdownRabbitmq()])
+  await Promise.all([app.close(), shutdownRedis()])
 
   logger.info('Exiting..')
   process.exit(0)

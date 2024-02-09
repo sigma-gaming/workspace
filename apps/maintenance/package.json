@@ -15,8 +15,6 @@
     "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
-    "@libs/exceptions": "workspace:*",
-    "@libs/games-model": "workspace:*",
-    "@tooling/env": "workspace:*"
+    "@libs/ui": "workspace:*"
   }
 }

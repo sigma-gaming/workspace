@@ -1,5 +1,6 @@
 import { loadEnv, parseEnv } from '@tooling/env'
 import { z } from 'zod'
+import { logger } from '../logger'
 
 const EnvSchema = z
   .object({
@@ -76,4 +77,5 @@ export const env = parseEnv({
   source: process.env,
   schema: EnvSchema,
   exitProcessOnFail: true,
+  logger,
 })

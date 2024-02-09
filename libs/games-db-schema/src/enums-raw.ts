@@ -27,3 +27,12 @@ export enum NotificationKind {
   Warning = 'Warning',
   Failure = 'Failure',
 }
+
+export enum ChatMessageType {
+  UserMessage = 'UserMessage',
+  SystemMessage = 'SystemMessage',
+}
+
+export enum ChatMessageAttachmentType {
+  Game = 'Game',
+}

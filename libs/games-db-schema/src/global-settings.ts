@@ -1,4 +1,4 @@
-import { boolean, integer, pgTable, timestamp } from 'drizzle-orm/pg-core'
+import { integer, pgTable, timestamp } from 'drizzle-orm/pg-core'
 
 export const GlobalSettings = pgTable('GlobalSettings', {
   id: integer('id').default(1).primaryKey(),
@@ -14,7 +14,6 @@ export const GlobalSettings = pgTable('GlobalSettings', {
   })
     .notNull()
     .defaultNow(),
-  maintenanceMode: boolean('maintenanceMode').notNull().default(false),
 })
 
 export type GlobalSettings = typeof GlobalSettings.$inferSelect

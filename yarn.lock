@@ -35,7 +35,10 @@ __metadata:
   dependencies:
     "@libs/exceptions": "workspace:*"
     "@libs/games-db": "workspace:*"
+    "@libs/games-db-schema": "workspace:*"
     "@libs/games-model": "workspace:*"
+    "@libs/games-redis": "workspace:*"
+    "@libs/logger": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -45,7 +48,10 @@ __metadata:
   resolution: "@apps/control-app@workspace:apps/control-app"
   dependencies:
     "@libs/exceptions": "workspace:*"
+    "@libs/forms": "workspace:*"
+    "@libs/games-db-schema": "workspace:*"
     "@libs/games-model": "workspace:*"
+    "@libs/ui": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -59,6 +65,7 @@ __metadata:
     "@libs/games-db-schema": "workspace:*"
     "@libs/games-model": "workspace:*"
     "@libs/games-redis": "workspace:*"
+    "@libs/logger": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -68,7 +75,10 @@ __metadata:
   resolution: "@apps/games-app@workspace:apps/games-app"
   dependencies:
     "@libs/exceptions": "workspace:*"
+    "@libs/forms": "workspace:*"
+    "@libs/games-db-schema": "workspace:*"
     "@libs/games-model": "workspace:*"
+    "@libs/ui": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
   linkType: soft
@@ -77,9 +87,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@apps/maintenance@workspace:apps/maintenance"
   dependencies:
-    "@libs/exceptions": "workspace:*"
-    "@libs/games-model": "workspace:*"
-    "@tooling/env": "workspace:*"
+    "@libs/ui": "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -2764,7 +2772,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@libs/forms@workspace:libs/forms":
+"@libs/forms@workspace:*, @libs/forms@workspace:libs/forms":
   version: 0.0.0-use.local
   resolution: "@libs/forms@workspace:libs/forms"
   languageName: unknown
@@ -2809,13 +2817,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@libs/logger@workspace:libs/logger":
+"@libs/logger@workspace:*, @libs/logger@workspace:libs/logger":
   version: 0.0.0-use.local
   resolution: "@libs/logger@workspace:libs/logger"
   languageName: unknown
   linkType: soft
 
-"@libs/ui@workspace:libs/ui":
+"@libs/ui@workspace:*, @libs/ui@workspace:libs/ui":
   version: 0.0.0-use.local
   resolution: "@libs/ui@workspace:libs/ui"
   languageName: unknown
