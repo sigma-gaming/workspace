@@ -1,21 +1,16 @@
-import { BadRequestException } from '@libs/exceptions'
+import { gamesDb } from '@games/db'
 import {
   AccountProvider,
   Accounts,
   Profiles,
   ProfileUpdate,
-} from '@libs/games-db-schema'
-import {
-  getFullName,
-  ProfileDetailed,
-  ProfileValidation,
-} from '@libs/games-model'
+} from '@games/db-schema'
+import { getFullName, ProfileDetailed, ProfileValidation } from '@games/model'
+import { gamesCaches } from '@games/redis'
+import { profileService, sessionService } from '@games/services'
+import { BadRequestException } from '@libs/exceptions'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { ProfileService } from '../../services/profile'
-import { SessionService } from '../../services/session'
-import { db } from '../../shared/db'
-import { caches } from '../../shared/redis'
 import { procedure } from '../trpc'
 
 interface UpdateProfileOutput {
@@ -32,11 +27,11 @@ export const updateProfile = procedure
     }),
   )
   .mutation(async ({ ctx, input }): Promise<UpdateProfileOutput> => {
-    const user = SessionService.getUser(ctx.session)
+    const user = sessionService.getUser(ctx.session)
     const { username } = input
 
     if (username) {
-      const currentProfile = await db.query.Profiles.findFirst({
+      const currentProfile = await gamesDb.query.Profiles.findFirst({
         where: eq(Profiles.username, username),
       })
 
@@ -48,7 +43,7 @@ export const updateProfile = procedure
       }
     }
 
-    const accounts = await db.query.Accounts.findMany({
+    const accounts = await gamesDb.query.Accounts.findMany({
       where: eq(Accounts.userId, user.id),
     })
 
@@ -81,17 +76,17 @@ export const updateProfile = procedure
       updates.name = null
     }
 
-    const [profile] = await db
+    const [profile] = await gamesDb
       .update(Profiles)
       .set(updates)
       .where(eq(Profiles.userId, user.id))
       .returning()
 
-    await caches.detailedProfile.del(user.id)
+    await gamesCaches.detailedProfile.del(user.id)
 
     return {
       status: 'success',
-      detailedProfile: await ProfileService.getDetailedProfile(user, {
+      detailedProfile: await profileService.getDetailedProfile(user, {
         profile,
       }),
     }

@@ -11,7 +11,8 @@
   "workspaces": [
     "apps/*",
     "libs/*",
-    "tooling/*"
+    "tooling/*",
+    "games-libs/*"
   ],
   "engines": {
     "node": "20"
@@ -22,7 +23,7 @@
     "dev:services:reset": "yarn dev:compose down -v && yarn dev:services",
     "dev:games-app": "nx run @apps/games-app:dev",
     "dev:games-api": "nx run @apps/games-api:dev",
-    "dev:games:migrate": "nx run @libs/games-db:migration:dev",
+    "dev:games:migrate": "nx run @games/db:migration:dev",
     "dev:control-app": "nx run @apps/control-app:dev",
     "dev:control-api": "nx run @apps/control-api:dev",
     "dev": "nx run-many -t dev --parallel 10",
@@ -71,9 +72,11 @@
     "rabbitmq-client": "^4.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "reflect-metadata": "^0.2.1",
     "superjson": "^2.2.1",
     "tailwindcss": "^3.4.0",
     "ts-morph": "^20.0.0",
+    "tsyringe": "^4.8.0",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },

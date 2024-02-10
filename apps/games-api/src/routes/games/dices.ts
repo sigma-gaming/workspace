@@ -3,21 +3,23 @@ import {
   InternalServerException,
   RouteException,
 } from '@libs/exceptions'
-import { Game, TransactionType } from '@libs/games-db-schema'
-import { rub } from '@libs/games-model'
+import { Game, TransactionType } from '@games/db-schema'
+import { rub } from '@games/model'
+import { gamesCaches } from '@games/redis'
+import {
+  budgetService,
+  sessionService,
+  transactionService,
+} from '@games/services'
+import { logger } from '@libs/logger'
 import crypto from 'node:crypto'
 import { z } from 'zod'
-import { BudgetService } from '../../services/budget'
-import { SessionService } from '../../services/session'
-import { TransactionService } from '../../services/transaction'
-import { logger } from '../../shared/logger'
-import { caches } from '../../shared/redis'
 import { procedure } from '../trpc'
 
 const rtpMultiplier = 0.96
 
 export async function runGame(bet: number, sides: number[]) {
-  const { unwantedLoss, maxLoss } = await BudgetService.getBudget()
+  const { unwantedLoss, maxLoss } = await budgetService.getBudget()
   const uniqueSides = new Set(sides)
   const multiplier = (6 / uniqueSides.size) * rtpMultiplier
   const winAmount = Math.ceil(bet * multiplier - bet)
@@ -48,7 +50,7 @@ export const dices = procedure
     }),
   )
   .mutation(async ({ input, ctx }) => {
-    const user = SessionService.getUser(ctx.session)
+    const user = sessionService.getUser(ctx.session)
 
     if (input.bet < rub(1)) {
       throw new BadRequestException({
@@ -57,10 +59,10 @@ export const dices = procedure
       })
     }
 
-    const lock = await caches.lastTransaction.lock(user.id, 10000)
+    const lock = await gamesCaches.lastTransaction.lock(user.id, 10000)
 
     try {
-      const lastTransaction = await TransactionService.getLastTransaction(
+      const lastTransaction = await transactionService.getLastTransaction(
         user.id,
       )
 
@@ -85,7 +87,7 @@ export const dices = procedure
       const won = hasWon ? winAmount : 0
       const lost = hasWon ? 0 : input.bet
 
-      const newTransaction = await TransactionService.createTransaction(
+      const newTransaction = await transactionService.createTransaction(
         user.id,
         {
           type: hasWon ? TransactionType.Win : TransactionType.Loss,

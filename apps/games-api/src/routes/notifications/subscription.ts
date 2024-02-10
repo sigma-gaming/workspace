@@ -1,10 +1,10 @@
-import { Notification } from '@libs/games-db-schema'
+import { Notification } from '@games/db-schema'
+import { gamesPubsubs } from '@games/redis'
+import { sessionService } from '@games/services'
 import { observable, Observer } from '@trpc/server/observable'
-import { SessionService } from '../../services/session'
-import { pubsubs } from '../../shared/redis'
 import { procedure } from '../trpc'
 
-pubsubs.notifications.subscribe((notification) => {
+gamesPubsubs.notifications.subscribe((notification) => {
   if (notification.userId) {
     emitToUser(notification.userId, notification)
   } else {
@@ -46,7 +46,7 @@ function emitToAll(notification: Notification) {
 }
 
 export const subscription = procedure.subscription(({ ctx }) => {
-  const user = SessionService.getUserSafe(ctx.session)
+  const user = sessionService.getUserSafe(ctx.session)
   const userId = user?.id ?? 'anonymous'
 
   return observable<Notification>((observer) => {

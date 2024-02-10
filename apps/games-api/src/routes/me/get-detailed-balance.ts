@@ -1,13 +1,12 @@
-import { BalanceDetailed } from '@libs/games-model'
-import { SessionService } from '../../services/session'
-import { TransactionService } from '../../services/transaction'
+import { BalanceDetailed } from '@games/model'
+import { sessionService, transactionService } from '@games/services'
 import { procedure } from '../trpc'
 
 export const getDetailedBalance = procedure.query(
   async ({ ctx }): Promise<BalanceDetailed> => {
-    const user = SessionService.getUser(ctx.session)
+    const user = sessionService.getUser(ctx.session)
 
-    const recentTransaction = await TransactionService.getLastTransaction(
+    const recentTransaction = await transactionService.getLastTransaction(
       user.id,
     )
 

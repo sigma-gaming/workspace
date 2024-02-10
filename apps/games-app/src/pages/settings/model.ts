@@ -7,8 +7,8 @@ import {
   InferFormValues,
   normalizeFieldErrors,
 } from '@libs/forms'
-import { AccountProvider } from '@libs/games-db-schema'
-import { getFullName, ProfileValidation } from '@libs/games-model'
+import { AccountProvider } from '@games/db-schema'
+import { getFullName, ProfileValidation } from '@games/model'
 import { TRPCClientError } from '@trpc/client'
 import { sample } from 'effector'
 import { z } from 'zod'

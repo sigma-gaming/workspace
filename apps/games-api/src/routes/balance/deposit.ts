@@ -1,23 +1,25 @@
 import { InternalServerException, RouteException } from '@libs/exceptions'
-import { TransactionType } from '@libs/games-db-schema'
-import { BudgetService } from '../../services/budget'
-import { SessionService } from '../../services/session'
-import { TransactionService } from '../../services/transaction'
-import { caches } from '../../shared/redis'
+import { TransactionType } from '@games/db-schema'
+import { gamesCaches } from '@games/redis'
+import {
+  budgetService,
+  sessionService,
+  transactionService,
+} from '@games/services'
 import { procedure } from '../trpc'
 
 export const deposit = procedure.mutation(async ({ ctx }) => {
-  const user = SessionService.getUser(ctx.session)
+  const user = sessionService.getUser(ctx.session)
   const amount = 1000000
 
-  const lock = await caches.lastTransaction.lock(user.id, 10000)
+  const lock = await gamesCaches.lastTransaction.lock(user.id, 10000)
 
   try {
-    const lastTransaction = await TransactionService.getLastTransaction(user.id)
+    const lastTransaction = await transactionService.getLastTransaction(user.id)
 
     const lastBalance = lastTransaction?.closingBalance ?? 0
 
-    const newTransaction = await TransactionService.createTransaction(user.id, {
+    const newTransaction = await transactionService.createTransaction(user.id, {
       type: TransactionType.Deposit,
       game: null,
       amount,
@@ -29,7 +31,7 @@ export const deposit = procedure.mutation(async ({ ctx }) => {
       totalRTP: lastTransaction?.totalRTP ?? 0,
     })
 
-    await BudgetService.increaseBudget(amount)
+    await budgetService.increaseBudget(amount)
 
     return {
       status: 'success',

@@ -14,9 +14,10 @@ module.exports = configure({
   extend: {
     ignorePatterns: ['!**/*', 'node_modules', 'dist', 'public'],
     rules: {
+      'import/extensions': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unnecessary-condition': 'off',
-      'import/extensions': 'off',
+      'sonarjs/no-identical-functions': 'off',
     },
   },
 })

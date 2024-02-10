@@ -1,4 +1,4 @@
-import { maintenanceCache } from '../../shared/redis'
+import { maintenanceCache } from '@games/redis'
 import { procedure } from '../trpc'
 
 export const getMaintenance = procedure.query(async () => {

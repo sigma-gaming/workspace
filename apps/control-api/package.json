@@ -20,11 +20,13 @@
     "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
+    "@games/db": "workspace:*",
+    "@games/db-schema": "workspace:*",
+    "@games/model": "workspace:*",
+    "@games/redis": "workspace:*",
+    "@games/services": "workspace:*",
+    "@libs/di": "workspace:*",
     "@libs/exceptions": "workspace:*",
-    "@libs/games-db": "workspace:*",
-    "@libs/games-db-schema": "workspace:*",
-    "@libs/games-model": "workspace:*",
-    "@libs/games-redis": "workspace:*",
     "@libs/logger": "workspace:*",
     "@tooling/env": "workspace:*"
   }

@@ -1,14 +1,13 @@
 import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
+import { env } from '@games/services'
+import { shutdownServices } from '@libs/di'
+import { fastifyLogger, logger } from '@libs/logger'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import fs from 'node:fs'
 import path from 'node:path'
-import { CronJobs } from './cronjobs'
 import { appRouter, createContext } from './routes'
-import { env } from './shared/env'
-import { fastifyLogger, logger } from './shared/logger'
-import { shutdownRedis } from './shared/redis'
 
 const app = Fastify({
   logger: false,
@@ -47,13 +46,8 @@ app.get('/ready', async () => {
   return 'Ready'
 })
 
-app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
+app.listen({ host: '0.0.0.0', port: 5051 }).then(() => {
   logger.info(`🚀 Server ready at ${env.controlApi.url}`)
-})
-
-CronJobs.forEach((job) => {
-  job.instance.start()
-  logger.info(`🚀 Cron job ${job.name} started`)
 })
 
 let exited = false
@@ -64,14 +58,8 @@ async function handleExit() {
 
   logger.info('Exit signal received')
 
-  logger.info('Stopping cron jobs..')
-
-  CronJobs.forEach((job) => {
-    job.instance.stop()
-    logger.info(`Cron job ${job.name} stopped`)
-  })
-
-  await Promise.all([app.close(), shutdownRedis()])
+  await app.close()
+  await shutdownServices()
 
   logger.info('Exiting..')
   process.exit(0)

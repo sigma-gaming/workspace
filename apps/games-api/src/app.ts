@@ -1,16 +1,17 @@
 import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
+import { maintenanceCache } from '@games/redis'
+import { env } from '@games/services'
+import { cronJobRegistry } from '@libs/cron-jobs'
+import { shutdownServices } from '@libs/di'
+import { fastifyLogger, logger } from '@libs/logger'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import fs from 'node:fs'
 import path from 'node:path'
-import { CronJobs } from './cronjobs'
+import { syncBudgetJob } from './cronjobs/budget'
 import { maintenanceEvents } from './events/maintenance'
 import { appRouter, createContext } from './routes'
-import { BudgetService } from './services/budget'
-import { env } from './shared/env'
-import { fastifyLogger, logger } from './shared/logger'
-import { maintenanceCache, shutdownRedis } from './shared/redis'
 
 const app = Fastify({
   logger: false,
@@ -54,12 +55,9 @@ app.get('/ready', async (_, reply) => {
   return 'Ready'
 })
 
-CronJobs.forEach((job) => {
-  job.instance.start()
-  logger.info(`🚀 Cron job ${job.name} started`)
-})
+cronJobRegistry.register('SyncBudget', syncBudgetJob).start()
 
-app.listen({ host: '0.0.0.0', port: env.port }).then(() => {
+app.listen({ host: '0.0.0.0', port: 5050 }).then(() => {
   logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
 })
 
@@ -71,18 +69,10 @@ async function handleExit() {
 
   logger.info('Exit signal received')
 
-  logger.info('Stopping cron jobs..')
+  cronJobRegistry.stop()
 
-  CronJobs.forEach((job) => {
-    job.instance.stop()
-    logger.info(`Cron job ${job.name} stopped`)
-  })
-
-  logger.info('Saving the budget..')
-  await BudgetService.syncBudget(true)
-  logger.info('Budget saved successfully')
-
-  await Promise.all([app.close(), shutdownRedis()])
+  await app.close()
+  await shutdownServices()
 
   logger.info('Exiting..')
   process.exit(0)

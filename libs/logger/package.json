@@ -10,5 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "yarn lint --fix"
+  },
+  "dependencies": {
+    "@libs/di": "workspace:*"
   }
 }

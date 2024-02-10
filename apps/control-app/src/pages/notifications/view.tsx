@@ -1,5 +1,5 @@
-import { NotificationKind } from '@libs/games-db-schema'
-import { mapColor } from '@libs/games-model'
+import { NotificationKind } from '@games/db-schema'
+import { mapColor } from '@games/model'
 import {
   Button,
   Card,

@@ -1,19 +1,18 @@
-import { InternalServerException } from '@libs/exceptions'
+import { gamesDb } from '@games/db'
 import {
   AccountInsert,
   AccountProvider,
   Accounts,
   Profiles,
   Users,
-} from '@libs/games-db-schema'
+} from '@games/db-schema'
+import { gamesCaches } from '@games/redis'
+import { env, sessionService } from '@games/services'
+import { InternalServerException } from '@libs/exceptions'
 import axios from 'axios'
 import { and, eq } from 'drizzle-orm'
 import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
-import { SessionService } from '../../../services/session'
-import { db } from '../../../shared/db'
-import { env } from '../../../shared/env'
-import { caches } from '../../../shared/redis'
 import { procedure } from '../../trpc'
 
 const PayloadSchema = z.object({
@@ -78,7 +77,7 @@ export const vk = procedure
         return ExchangeSilentAuthTokenSchema.parse(response.data)
       })
 
-      let account = await db.query.Accounts.findFirst({
+      let account = await gamesDb.query.Accounts.findFirst({
         where: and(
           eq(Accounts.provider, AccountProvider.VK),
           eq(Accounts.providerUserId, user_id.toString()),
@@ -119,12 +118,12 @@ export const vk = procedure
        * If user is logged in and account is not found, create account and connect it to user
        */
       if (session.user && !account) {
-        await db.insert(Accounts).values({
+        await gamesDb.insert(Accounts).values({
           userId: session.user.id,
           ...accountSharedInput,
         })
 
-        await caches.detailedProfile.del(session.user.id)
+        await gamesCaches.detailedProfile.del(session.user.id)
 
         return { status: 'success' }
       }
@@ -133,7 +132,7 @@ export const vk = procedure
        * If user is not logged in and account is not found, perform registration
        */
       if (!account) {
-        account = await db.transaction(async (tx) => {
+        account = await gamesDb.transaction(async (tx) => {
           const userId = randomUUID()
           const profileId = randomUUID()
 
@@ -154,7 +153,7 @@ export const vk = procedure
         })
       }
 
-      const { cookie } = await SessionService.createSession({
+      const { cookie } = await sessionService.createSession({
         userId: account.userId,
         provider: AccountProvider.VK,
       })

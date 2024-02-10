@@ -1,9 +1,9 @@
-import { NotificationSchema } from '@libs/games-model'
-import { NotificationService } from '../../services/notification'
+import { NotificationSchema } from '@games/model'
+import { notificationService } from '@games/services'
 import { procedure } from '../trpc'
 
 export const send = procedure
   .input(NotificationSchema)
   .mutation(async ({ input }) => {
-    await NotificationService.send(input)
+    await notificationService.send(input)
   })

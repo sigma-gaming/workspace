@@ -1,9 +1,10 @@
+import { budgetService } from '@games/services'
 import { CronJob } from 'cron'
-import { BudgetService } from '../services/budget'
 
 export const syncBudgetJob = CronJob.from({
   cronTime: '*/5 * * * *',
+  start: false,
   onTick: async () => {
-    await BudgetService.syncBudget()
+    await budgetService.syncBudget()
   },
 })

@@ -15,10 +15,10 @@
     "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
+    "@games/db-schema": "workspace:*",
+    "@games/model": "workspace:*",
     "@libs/exceptions": "workspace:*",
     "@libs/forms": "workspace:*",
-    "@libs/games-db-schema": "workspace:*",
-    "@libs/games-model": "workspace:*",
     "@libs/ui": "workspace:*",
     "@tooling/env": "workspace:*"
   }

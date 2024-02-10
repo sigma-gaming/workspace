@@ -1,5 +1,5 @@
+import { maintenanceCache } from '@games/redis'
 import { z } from 'zod'
-import { maintenanceCache } from '../../shared/redis'
 import { procedure } from '../trpc'
 
 export const updateMaintenance = procedure

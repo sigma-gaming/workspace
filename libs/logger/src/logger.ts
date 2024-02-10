@@ -1,3 +1,4 @@
+import { createSingletonProxy } from '@libs/di'
 import {
   createLogger as createNeodxLogger,
   DefaultLoggerLevel,
@@ -10,11 +11,98 @@ import {
   RawReplyDefaultExpression,
   RawRequestDefaultExpression,
 } from 'fastify'
+import { IncomingMessage } from 'node:http'
+import { inject, InjectionToken, singleton } from 'tsyringe'
 import { v4 as uuid } from 'uuid'
-import { Connect } from 'vite'
-import IncomingMessage = Connect.IncomingMessage
 
 export type Logger = NeodxLogger<DefaultLoggerLevel>
+
+export interface LoggerOptions {
+  pretty?: boolean
+}
+
+export const LoggerOptionsToken: InjectionToken<LoggerOptions> =
+  Symbol('LoggerOptionsToken')
+
+@singleton()
+export class LoggerService {
+  logger: Logger
+
+  constructor(@inject(LoggerOptionsToken) options: LoggerOptions) {
+    this.logger = createNeodxLogger({
+      target: options.pretty ? pretty() : json(),
+    })
+  }
+}
+
+export const logger = createSingletonProxy(
+  LoggerService,
+  (service) => service.logger,
+)
+
+@singleton()
+export class FastifyLoggerService {
+  httpLogger: (
+    req: RawRequestDefaultExpression,
+    res: RawReplyDefaultExpression,
+    done: () => void,
+  ) => void
+
+  constructor(@inject(LoggerOptionsToken) private options: LoggerOptions) {
+    this.httpLogger = createHttpLogger<
+      RawRequestDefaultExpression,
+      RawReplyDefaultExpression
+    >({
+      simple: options.pretty,
+      logger,
+      shouldLogRequest: true,
+      getRequestId: (req) => {
+        const existingID = req.headers['x-trace-id']
+        if (existingID) return existingID.toString()
+        const id = uuid()
+        req.headers['x-trace-id'] = id
+        return id
+      },
+      getRequestMeta: (ctx) => ({
+        req: serializeReq(ctx.req),
+      }),
+      getResponseMeta: (ctx) => ({
+        statusCode: ctx.res.statusCode,
+        responseTime: ctx.responseTime,
+        req: serializeReq(ctx.req),
+      }),
+    })
+  }
+
+  genReqId = (req: IncomingMessage) => {
+    const existingID = req.headers['x-trace-id']
+    if (existingID) return existingID.toString()
+    const id = uuid()
+    req.headers['x-trace-id'] = id
+    return id
+  }
+
+  attach = (app: FastifyInstance) => {
+    app.addHook('onRequest', (request, reply, done) => {
+      this.httpLogger(request.raw, reply.raw, done)
+    })
+
+    app.addHook('onSend', (request, reply, payloadUnknown, done) => {
+      const requestId = request.id
+      const payload = typeof payloadUnknown === 'string' ? payloadUnknown : null
+
+      if (reply.statusCode >= 400) {
+        logger.error({ requestId, payload })
+      } else if (!this.options.pretty && reply.statusCode >= 200) {
+        logger.info({ requestId, payload })
+      }
+
+      return done()
+    })
+  }
+}
+
+export const fastifyLogger = createSingletonProxy(FastifyLoggerService)
 
 export function createLogger(options: { pretty?: boolean }): Logger {
   return createNeodxLogger({

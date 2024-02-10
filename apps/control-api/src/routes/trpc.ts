@@ -5,11 +5,11 @@ import {
   RouteException,
   ValidationException,
 } from '@libs/exceptions'
+import { env } from '@games/services'
+import { logger } from '@libs/logger'
 import { ResourceLockedError } from '@sesamecare-oss/redlock'
 import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
-import { env } from '../shared/env'
-import { logger } from '../shared/logger'
 import { Context } from './context'
 
 const t = initTRPC.context<Context>().create({

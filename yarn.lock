@@ -33,11 +33,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@apps/control-api@workspace:apps/control-api"
   dependencies:
+    "@games/db": "workspace:*"
+    "@games/db-schema": "workspace:*"
+    "@games/model": "workspace:*"
+    "@games/redis": "workspace:*"
+    "@games/services": "workspace:*"
+    "@libs/di": "workspace:*"
     "@libs/exceptions": "workspace:*"
-    "@libs/games-db": "workspace:*"
-    "@libs/games-db-schema": "workspace:*"
-    "@libs/games-model": "workspace:*"
-    "@libs/games-redis": "workspace:*"
     "@libs/logger": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
@@ -47,10 +49,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@apps/control-app@workspace:apps/control-app"
   dependencies:
+    "@games/db-schema": "workspace:*"
+    "@games/model": "workspace:*"
     "@libs/exceptions": "workspace:*"
     "@libs/forms": "workspace:*"
-    "@libs/games-db-schema": "workspace:*"
-    "@libs/games-model": "workspace:*"
     "@libs/ui": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
@@ -60,11 +62,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@apps/games-api@workspace:apps/games-api"
   dependencies:
+    "@games/db": "workspace:*"
+    "@games/db-schema": "workspace:*"
+    "@games/model": "workspace:*"
+    "@games/redis": "workspace:*"
+    "@libs/di": "workspace:*"
     "@libs/exceptions": "workspace:*"
-    "@libs/games-db": "workspace:*"
-    "@libs/games-db-schema": "workspace:*"
-    "@libs/games-model": "workspace:*"
-    "@libs/games-redis": "workspace:*"
     "@libs/logger": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
@@ -74,10 +77,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@apps/games-app@workspace:apps/games-app"
   dependencies:
+    "@games/db-schema": "workspace:*"
+    "@games/model": "workspace:*"
     "@libs/exceptions": "workspace:*"
     "@libs/forms": "workspace:*"
-    "@libs/games-db-schema": "workspace:*"
-    "@libs/games-model": "workspace:*"
     "@libs/ui": "workspace:*"
     "@tooling/env": "workspace:*"
   languageName: unknown
@@ -2642,6 +2645,61 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@games/db-schema@workspace:*, @games/db-schema@workspace:games-libs/db-schema":
+  version: 0.0.0-use.local
+  resolution: "@games/db-schema@workspace:games-libs/db-schema"
+  languageName: unknown
+  linkType: soft
+
+"@games/db@workspace:*, @games/db@workspace:games-libs/db":
+  version: 0.0.0-use.local
+  resolution: "@games/db@workspace:games-libs/db"
+  dependencies:
+    "@games/db-schema": "workspace:*"
+    "@libs/di": "workspace:*"
+    "@tooling/env": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"@games/model@workspace:*, @games/model@workspace:games-libs/model":
+  version: 0.0.0-use.local
+  resolution: "@games/model@workspace:games-libs/model"
+  languageName: unknown
+  linkType: soft
+
+"@games/queue@workspace:games-libs/queue":
+  version: 0.0.0-use.local
+  resolution: "@games/queue@workspace:games-libs/queue"
+  dependencies:
+    "@games/db-schema": "workspace:*"
+    "@games/model": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"@games/redis@workspace:*, @games/redis@workspace:games-libs/redis":
+  version: 0.0.0-use.local
+  resolution: "@games/redis@workspace:games-libs/redis"
+  dependencies:
+    "@games/db-schema": "workspace:*"
+    "@games/model": "workspace:*"
+    "@libs/di": "workspace:*"
+    "@libs/logger": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"@games/services@workspace:*, @games/services@workspace:games-libs/services":
+  version: 0.0.0-use.local
+  resolution: "@games/services@workspace:games-libs/services"
+  dependencies:
+    "@games/db": "workspace:*"
+    "@games/db-schema": "workspace:*"
+    "@games/model": "workspace:*"
+    "@games/redis": "workspace:*"
+    "@libs/di": "workspace:*"
+    "@libs/logger": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "@grammyjs/types@npm:3.4.4":
   version: 3.4.4
   resolution: "@grammyjs/types@npm:3.4.4"
@@ -2766,6 +2824,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@libs/cron-jobs@workspace:libs/cron-jobs":
+  version: 0.0.0-use.local
+  resolution: "@libs/cron-jobs@workspace:libs/cron-jobs"
+  dependencies:
+    "@libs/di": "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"@libs/di@workspace:*, @libs/di@workspace:libs/di":
+  version: 0.0.0-use.local
+  resolution: "@libs/di@workspace:libs/di"
+  languageName: unknown
+  linkType: soft
+
 "@libs/exceptions@workspace:*, @libs/exceptions@workspace:libs/exceptions":
   version: 0.0.0-use.local
   resolution: "@libs/exceptions@workspace:libs/exceptions"
@@ -2778,48 +2850,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@libs/games-db-schema@workspace:*, @libs/games-db-schema@workspace:libs/games-db-schema":
-  version: 0.0.0-use.local
-  resolution: "@libs/games-db-schema@workspace:libs/games-db-schema"
-  languageName: unknown
-  linkType: soft
-
-"@libs/games-db@workspace:*, @libs/games-db@workspace:libs/games-db":
-  version: 0.0.0-use.local
-  resolution: "@libs/games-db@workspace:libs/games-db"
-  dependencies:
-    "@libs/games-db-schema": "workspace:*"
-    "@tooling/env": "workspace:*"
-  languageName: unknown
-  linkType: soft
-
-"@libs/games-model@workspace:*, @libs/games-model@workspace:libs/games-model":
-  version: 0.0.0-use.local
-  resolution: "@libs/games-model@workspace:libs/games-model"
-  languageName: unknown
-  linkType: soft
-
-"@libs/games-queue@workspace:libs/games-queue":
-  version: 0.0.0-use.local
-  resolution: "@libs/games-queue@workspace:libs/games-queue"
-  dependencies:
-    "@libs/games-db-schema": "workspace:*"
-    "@libs/games-model": "workspace:*"
-  languageName: unknown
-  linkType: soft
-
-"@libs/games-redis@workspace:*, @libs/games-redis@workspace:libs/games-redis":
-  version: 0.0.0-use.local
-  resolution: "@libs/games-redis@workspace:libs/games-redis"
-  dependencies:
-    "@libs/games-db-schema": "workspace:*"
-    "@libs/games-model": "workspace:*"
-  languageName: unknown
-  linkType: soft
-
 "@libs/logger@workspace:*, @libs/logger@workspace:libs/logger":
   version: 0.0.0-use.local
   resolution: "@libs/logger@workspace:libs/logger"
+  dependencies:
+    "@libs/di": "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -3470,11 +3505,13 @@ __metadata:
     rabbitmq-client: "npm:^4.5.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
+    reflect-metadata: "npm:^0.2.1"
     superjson: "npm:^2.2.1"
     tailwindcss: "npm:^3.4.0"
     ts-loader: "npm:^9.5.1"
     ts-morph: "npm:^20.0.0"
     tsconfig-paths-webpack-plugin: "npm:^4.1.0"
+    tsyringe: "npm:^4.8.0"
     typescript: "npm:^5.1.3"
     uuid: "npm:^9.0.1"
     vite: "npm:^5.0.5"
@@ -11243,6 +11280,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"reflect-metadata@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "reflect-metadata@npm:0.2.1"
+  checksum: 6ca3c674bb43cf8ec3a3f5f38c8730a6116335f8e562fcdcdf3a492af168c5a7f0e8f17476a5710c3fe6bf9b5d22e8a463f14c0e26e326339cab65e099900ef7
+  languageName: node
+  linkType: hard
+
 "reflect.getprototypeof@npm:^1.0.4":
   version: 1.0.4
   resolution: "reflect.getprototypeof@npm:1.0.4"
@@ -12698,10 +12742,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:^1.9.3":
+  version: 1.14.1
+  resolution: "tslib@npm:1.14.1"
+  checksum: 69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^2.0.0, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: e03a8a4271152c8b26604ed45535954c0a45296e32445b4b87f8a5abdb2421f40b59b4ca437c4346af0f28179780d604094eb64546bee2019d903d01c6c19bdb
+  languageName: node
+  linkType: hard
+
+"tsyringe@npm:^4.8.0":
+  version: 4.8.0
+  resolution: "tsyringe@npm:4.8.0"
+  dependencies:
+    tslib: "npm:^1.9.3"
+  checksum: e13810e8ff39c4093acd0649bc5db3c164825827631e1522cd9d5ca8694a018447fa1c24f059ea54e93b1020767b1131b9dc9ce598dabfc9aa41c11544bbfe19
   languageName: node
   linkType: hard
 

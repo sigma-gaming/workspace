@@ -1,5 +1,5 @@
-import { AccountProvider } from '@libs/games-db-schema'
-import { getFullName } from '@libs/games-model'
+import { AccountProvider } from '@games/db-schema'
+import { getFullName } from '@games/model'
 import {
   Anchor,
   Avatar,

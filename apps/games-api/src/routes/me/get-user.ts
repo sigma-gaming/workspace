@@ -1,7 +1,7 @@
-import { User } from '@libs/games-db-schema'
-import { SessionService } from '../../services/session'
+import { User } from '@games/db-schema'
+import { sessionService } from '@games/services'
 import { procedure } from '../trpc'
 
 export const getUser = procedure.query(async ({ ctx }): Promise<User> => {
-  return SessionService.getUser(ctx.session)
+  return sessionService.getUser(ctx.session)
 })

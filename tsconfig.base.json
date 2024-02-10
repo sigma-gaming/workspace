@@ -21,6 +21,8 @@
     "resolveJsonModule": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
@@ -39,29 +41,38 @@
       "@libs/exceptions": [
         "libs/exceptions/src/index.ts"
       ],
-      "@libs/games-db": [
-        "libs/games-db/src/index.ts"
+      "@games/db": [
+        "games-libs/db/src/index.ts"
       ],
-      "@libs/games-db-schema": [
-        "libs/games-db-schema/src/index.ts"
+      "@games/db-schema": [
+        "games-libs/db-schema/src/index.ts"
       ],
-      "@libs/games-model": [
-        "libs/games-model/src/index.ts"
+      "@games/model": [
+        "games-libs/model/src/index.ts"
       ],
-      "@libs/games-redis": [
-        "libs/games-redis/src/index.ts"
+      "@games/services": [
+        "games-libs/services/src/index.ts"
       ],
-      "@libs/games-queue": [
-        "libs/games-queue/src/index.ts"
+      "@games/redis": [
+        "games-libs/redis/src/index.ts"
+      ],
+      "@games/queue": [
+        "games-libs/queue/src/index.ts"
       ],
       "@libs/logger": [
         "libs/logger/src/index.ts"
+      ],
+      "@libs/cron-jobs": [
+        "libs/cron-jobs/src/index.ts"
       ],
       "@libs/forms": [
         "libs/forms/src/index.ts"
       ],
       "@libs/ui": [
         "libs/ui/src/index.ts"
+      ],
+      "@libs/di": [
+        "libs/di/src/index.ts"
       ]
     }
   }

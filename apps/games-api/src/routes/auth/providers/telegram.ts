@@ -1,18 +1,16 @@
 import crypto, { randomUUID } from 'crypto'
+import { gamesDb } from '@games/db'
 import {
   AccountInsert,
   AccountProvider,
   Accounts,
   Profiles,
   Users,
-} from '@libs/games-db-schema'
+} from '@games/db-schema'
+import { gamesCaches } from '@games/redis'
+import { env, sessionService, telegramBotService } from '@games/services'
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { SessionService } from '../../../services/session'
-import { TelegramBotService } from '../../../services/telegram-bot'
-import { db } from '../../../shared/db'
-import { env } from '../../../shared/env'
-import { caches } from '../../../shared/redis'
 import { procedure } from '../../trpc'
 
 const TgAuthResultSchema = z.object({
@@ -71,7 +69,7 @@ export const telegram = procedure
         throw new Error('tgAuthResult is already expired')
       }
 
-      let account = await db.query.Accounts.findFirst({
+      let account = await gamesDb.query.Accounts.findFirst({
         where: and(
           eq(Accounts.provider, AccountProvider.Telegram),
           eq(Accounts.providerUserId, tgAuthResult.id),
@@ -101,12 +99,12 @@ export const telegram = procedure
        * If user is logged in and account is not found, create account and connect it to user
        */
       if (session.user && !account) {
-        await db.insert(Accounts).values({
+        await gamesDb.insert(Accounts).values({
           userId: session.user.id,
           ...accountSharedInput,
         })
 
-        void TelegramBotService.messageUser(Number(tgAuthResult.id), [
+        void telegramBotService.messageUser(Number(tgAuthResult.id), [
           `Привет, ${tgAuthResult.first_name}!`,
           'Твой Telegram успешно привязан к аккаунту Sigma Games - наслаждайся бонусами =)',
           'Данный бот будет присылать тебе самую важную информацию о проекте:' +
@@ -114,7 +112,7 @@ export const telegram = procedure
           'Также не забудь подписаться на наш канал: @SigmaGamesFeed',
         ])
 
-        await caches.detailedProfile.del(session.user.id)
+        await gamesCaches.detailedProfile.del(session.user.id)
 
         return { status: 'success' }
       }
@@ -123,7 +121,7 @@ export const telegram = procedure
        * If user is not logged in and account is not found, perform registration
        */
       if (!account) {
-        account = account = await db.transaction(async (tx) => {
+        account = account = await gamesDb.transaction(async (tx) => {
           const userId = randomUUID()
           const profileId = randomUUID()
 
@@ -143,7 +141,7 @@ export const telegram = procedure
           return account
         })
 
-        void TelegramBotService.messageUser(Number(tgAuthResult.id), [
+        void telegramBotService.messageUser(Number(tgAuthResult.id), [
           `Добро пожаловать на Sigma Games, ${tgAuthResult.first_name}!`,
           'Мы автоматически привязали твой Telegram к аккаунту на сайте - наслаждайся бонусами =)',
           'Данный бот будет присылать тебе самую важную информацию о проекте:' +
@@ -152,7 +150,7 @@ export const telegram = procedure
         ])
       }
 
-      const { cookie } = await SessionService.createSession({
+      const { cookie } = await sessionService.createSession({
         userId: account.userId,
         provider: AccountProvider.Telegram,
       })
