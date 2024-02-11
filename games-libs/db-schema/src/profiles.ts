@@ -1,9 +1,9 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { accountProviderEnum } from './enums'
 import { Users } from './users'
 
 export const Profiles = pgTable('Profiles', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: serial('id').primaryKey(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),
@@ -19,4 +19,5 @@ export const Profiles = pgTable('Profiles', {
 })
 
 export type Profile = typeof Profiles.$inferSelect
+export type ProfileInsert = typeof Profiles.$inferInsert
 export type ProfileUpdate = Partial<Profile>

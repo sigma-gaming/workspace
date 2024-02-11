@@ -1,11 +1,6 @@
+import { Budget, Notification, Transaction } from '@games/db-schema'
+import { ChatMessageDetailed, ProfileDetailed, Session } from '@games/model'
 import { createSingletonProxy } from '@libs/di'
-import {
-  Budget,
-  ChatMessage,
-  Notification,
-  Transaction,
-} from '@games/db-schema'
-import { ProfileDetailed, Session } from '@games/model'
 import { inject, InjectionToken, singleton } from 'tsyringe'
 import { CacheService, GlobalEntity, KeyEntity } from './service'
 
@@ -19,7 +14,7 @@ export class CacheRegistry {
   lastTransaction: KeyEntity<string, Transaction>
   globalNotifications: GlobalEntity<Notification[]>
   personalNotifications: KeyEntity<string, Notification[]>
-  lastChatMessages: GlobalEntity<ChatMessage[]>
+  lastChatMessages: GlobalEntity<ChatMessageDetailed[]>
 
   constructor(
     private cacheService: CacheService,
@@ -55,7 +50,10 @@ export class CacheRegistry {
       keygen: (userId: string) => `${version}:notifications:${userId}`,
     })
 
-    this.lastChatMessages = this.cacheService.entity<void, ChatMessage[]>({
+    this.lastChatMessages = this.cacheService.entity<
+      void,
+      ChatMessageDetailed[]
+    >({
       keygen: () => `${version}:global:last-chat-messages`,
     })
   }

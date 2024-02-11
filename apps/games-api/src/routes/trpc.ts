@@ -1,3 +1,4 @@
+import { env } from '@games/services'
 import {
   InternalServerException,
   mapTrpcErrorToException,
@@ -5,7 +6,6 @@ import {
   RouteException,
   ValidationException,
 } from '@libs/exceptions'
-import { env } from '@games/services'
 import { logger } from '@libs/logger'
 import { ResourceLockedError } from '@sesamecare-oss/redlock'
 import { initTRPC } from '@trpc/server'

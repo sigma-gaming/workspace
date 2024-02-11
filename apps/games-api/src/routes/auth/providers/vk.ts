@@ -134,15 +134,16 @@ export const vk = procedure
       if (!account) {
         account = await gamesDb.transaction(async (tx) => {
           const userId = randomUUID()
-          const profileId = randomUUID()
+
+          const [{ id: profileId }] = await tx
+            .insert(Profiles)
+            .values({
+              userId,
+              usedProvider: AccountProvider.VK,
+            })
+            .returning()
 
           await tx.insert(Users).values({ id: userId, profileId })
-
-          await tx.insert(Profiles).values({
-            id: profileId,
-            userId,
-            usedProvider: AccountProvider.VK,
-          })
 
           const [account] = await tx
             .insert(Accounts)

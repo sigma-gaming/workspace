@@ -33,10 +33,25 @@ export class PubSubService implements OnApplicationShutdown {
 
   create<TPayload>(options: { channelName: string }): PubSub<TPayload> {
     const { channelName } = options
+    let subscribed = false
     const listeners = new Set<RedisMessageHandler>()
+
+    const subscribeHandler: Callback<unknown> = (error, count) => {
+      if (error) {
+        subscribed = false
+        const message = `Failed to subscribe to "${channelName}" channel: ${error}`
+        this.logger.error(message)
+        return
+      }
+
+      const message = `Subscribed to "${channelName}" channel (${count})`
+      this.logger.info(message)
+      this.subscribedPubSubs.add(channelName)
+    }
 
     const unsubscribeHandler: Callback<unknown> = (error) => {
       if (error) {
+        subscribed = true
         const message = `[Redis] Failed to unsubscribe from "${channelName}" channel: ${error}`
         this.logger.error(message)
         return
@@ -50,17 +65,10 @@ export class PubSubService implements OnApplicationShutdown {
         return this.redis.publish(channelName, JSON.stringify(payload))
       },
       subscribe: (handler) => {
-        this.subRedis.subscribe(channelName, (error, count) => {
-          if (error) {
-            const message = `Failed to subscribe to "${channelName}" channel: ${error}`
-            this.logger.error(message)
-            return
-          }
-
-          const message = `Subscribed to "${channelName}" channel (${count})`
-          this.logger.info(message)
-          this.subscribedPubSubs.add(channelName)
-        })
+        if (!subscribed) {
+          subscribed = true // optimistic update, revert on error
+          this.subRedis.subscribe(channelName, subscribeHandler)
+        }
 
         const listener: RedisMessageHandler = async (channel, message) => {
           if (channel !== channelName) {
@@ -78,7 +86,10 @@ export class PubSubService implements OnApplicationShutdown {
           this.subRedis.off('message', listener)
           listeners.delete(listener)
 
-          this.subRedis.unsubscribe(channelName, unsubscribeHandler)
+          if (listeners.size === 0) {
+            subscribed = false // optimistic update, revert on error
+            this.subRedis.unsubscribe(channelName, unsubscribeHandler)
+          }
         }
       },
       unsubscribeAll: () => {

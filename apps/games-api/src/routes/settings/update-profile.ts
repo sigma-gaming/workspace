@@ -86,7 +86,8 @@ export const updateProfile = procedure
 
     return {
       status: 'success',
-      detailedProfile: await profileService.getDetailedProfile(user, {
+      detailedProfile: await profileService.getDetailedProfile(user.id, {
+        user,
         profile,
       }),
     }

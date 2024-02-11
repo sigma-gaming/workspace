@@ -36,6 +36,13 @@
       "when": 1707438065178,
       "tag": "0004_tiny_nehzno",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1707671298654,
+      "tag": "0005_fearless_maximus",
+      "breakpoints": true
     }
   ]
 }

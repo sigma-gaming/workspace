@@ -10,9 +10,10 @@ COPY apps ./apps
 COPY libs ./libs
 COPY games-libs ./games-libs
 COPY tooling ./tooling
-RUN yarn install --immutable
 
+RUN yarn install --immutable
 COPY . ./
+
 RUN yarn nx run @apps/control-app:build
 COPY . ./
 

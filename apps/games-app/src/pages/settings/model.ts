@@ -1,4 +1,6 @@
 import { createMutation } from '@farfetched/core'
+import { AccountProvider } from '@games/db-schema'
+import { getFullName, ProfileValidation } from '@games/model'
 import { BadRequestException, ValidationException } from '@libs/exceptions'
 import {
   createField,
@@ -7,8 +9,6 @@ import {
   InferFormValues,
   normalizeFieldErrors,
 } from '@libs/forms'
-import { AccountProvider } from '@games/db-schema'
-import { getFullName, ProfileValidation } from '@games/model'
 import { TRPCClientError } from '@trpc/client'
 import { sample } from 'effector'
 import { z } from 'zod'

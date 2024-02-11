@@ -1,5 +1,6 @@
 import { authRouter } from './auth'
 import { balanceRouter } from './balance'
+import { chatRouter } from './chat'
 import { eventsRouter } from './events'
 import { gamesRouter } from './games'
 import { meRouter } from './me'
@@ -15,6 +16,7 @@ export const appRouter = createRouter({
   games: gamesRouter,
   events: eventsRouter,
   notifications: notificationsRouter,
+  chat: chatRouter,
 })
 
 export type AppRouter = typeof appRouter

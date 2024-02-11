@@ -1,5 +1,3 @@
-import { createSingletonProxy } from '@libs/di'
-import { NotFoundException } from '@libs/exceptions'
 import { gamesDb } from '@games/db'
 import {
   Account,
@@ -7,13 +5,17 @@ import {
   Profile,
   Profiles,
   User,
+  Users,
 } from '@games/db-schema'
 import { getFullName, ProfileDetailed } from '@games/model'
 import { gamesCaches } from '@games/redis'
+import { createSingletonProxy } from '@libs/di'
+import { InternalServerException, NotFoundException } from '@libs/exceptions'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 
 interface Reused {
+  user?: User
   profile?: Profile
   accounts?: Account[]
 }
@@ -21,28 +23,34 @@ interface Reused {
 @singleton()
 export class ProfileService {
   async getDetailedProfile(
-    user: User,
+    userId: User['id'],
     reused?: Reused,
   ): Promise<ProfileDetailed> {
-    const cached = await gamesCaches.detailedProfile.get(user.id)
+    const cached = await gamesCaches.detailedProfile.get(userId)
 
     if (cached) {
       return cached
     }
 
+    const user =
+      reused?.user ??
+      (await gamesDb.query.Users.findFirst({
+        where: eq(Users.id, userId),
+      }))
+
     const profile =
       reused?.profile ??
       (await gamesDb.query.Profiles.findFirst({
-        where: eq(Profiles.userId, user.id),
+        where: eq(Profiles.userId, userId),
       }))
 
     const accounts =
       reused?.accounts ??
       (await gamesDb.query.Accounts.findMany({
-        where: eq(Accounts.userId, user.id),
+        where: eq(Accounts.userId, userId),
       }))
 
-    if (!profile) {
+    if (!user || !profile) {
       throw new NotFoundException()
     }
 
@@ -50,9 +58,12 @@ export class ProfileService {
       (account) => account.provider === profile.usedProvider,
     )
 
+    if (!profileAccount) {
+      throw new InternalServerException()
+    }
+
     const calculateName = () => {
       if (profile.name) return profile.name
-      if (!profileAccount) return null
 
       return getFullName(
         profileAccount.providerUserFirstName,
@@ -64,10 +75,11 @@ export class ProfileService {
       ...profile,
       name: calculateName(),
       image: profileAccount?.providerUserImage ?? null,
+      roles: user.roles,
       accounts,
     }
 
-    await gamesCaches.detailedProfile.set(user.id, detailedProfile)
+    await gamesCaches.detailedProfile.set(userId, detailedProfile)
 
     return detailedProfile
   }

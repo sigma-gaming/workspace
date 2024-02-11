@@ -1,5 +1,3 @@
-import { createSingletonProxy } from '@libs/di'
-import { BadRequestException, InternalServerException } from '@libs/exceptions'
 import { gamesDb } from '@games/db'
 import {
   ChatMessageAttachment,
@@ -8,8 +6,12 @@ import {
   ChatMessages,
   ChatMessageType,
 } from '@games/db-schema'
+import { ChatMessageDetailed } from '@games/model'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
+import { createSingletonProxy } from '@libs/di'
+import { BadRequestException, InternalServerException } from '@libs/exceptions'
 import { singleton } from 'tsyringe'
+import { profileService } from './profile'
 import { TransactionService } from './transaction'
 
 @singleton()
@@ -36,13 +38,18 @@ export class ChatService {
     }
   }
 
+  async getLastMessages() {
+    const lastMessages = await gamesCaches.lastChatMessages.get()
+    return lastMessages ?? []
+  }
+
   async sendMessage(options: {
     userId?: string
     payload: {
       text?: string
       attachments?: ChatMessageAttachment[]
     }
-  }) {
+  }): Promise<ChatMessageDetailed> {
     const lock = await gamesCaches.lastChatMessages.lock(10000)
 
     try {
@@ -83,17 +90,36 @@ export class ChatService {
         })
         .returning()
 
+      const detailedChatMessage: ChatMessageDetailed = {
+        chatMessage: message,
+      }
+
+      if (userId) {
+        const detailedProfile = await profileService.getDetailedProfile(userId)
+
+        detailedChatMessage.user = {
+          id: userId,
+          roles: detailedProfile.roles,
+          profile: {
+            id: detailedProfile.id,
+            name: detailedProfile.name,
+            username: detailedProfile.username,
+            image: detailedProfile.image,
+          },
+        }
+      }
+
       const lastChatMessages = (await gamesCaches.lastChatMessages.get()) ?? []
-      lastChatMessages.push(message)
+      lastChatMessages.push(detailedChatMessage)
 
       while (lastChatMessages.length > 100) {
         lastChatMessages.shift()
       }
 
       await gamesCaches.lastChatMessages.set(lastChatMessages)
-      await gamesPubsubs.chatMessages.publish(message)
+      await gamesPubsubs.chatMessages.publish(detailedChatMessage)
 
-      return message
+      return detailedChatMessage
     } finally {
       await lock.release()
     }

@@ -123,15 +123,16 @@ export const telegram = procedure
       if (!account) {
         account = account = await gamesDb.transaction(async (tx) => {
           const userId = randomUUID()
-          const profileId = randomUUID()
+
+          const [{ id: profileId }] = await tx
+            .insert(Profiles)
+            .values({
+              userId,
+              usedProvider: AccountProvider.Telegram,
+            })
+            .returning()
 
           await tx.insert(Users).values({ id: userId, profileId })
-
-          await tx.insert(Profiles).values({
-            id: profileId,
-            userId,
-            usedProvider: AccountProvider.Telegram,
-          })
 
           const [account] = await tx
             .insert(Accounts)

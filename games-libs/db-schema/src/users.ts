@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { integer, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { userRoleEnum } from './enums'
 
 export const Users = pgTable('Users', {
@@ -15,7 +15,7 @@ export const Users = pgTable('Users', {
     .notNull()
     .default(sql`'{"User"}'`),
 
-  profileId: uuid('profileId'),
+  profileId: integer('profileId'),
 })
 
 export type User = typeof Users.$inferSelect
