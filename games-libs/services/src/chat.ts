@@ -117,7 +117,7 @@ export class ChatService {
       }
 
       await gamesCaches.lastChatMessages.set(lastChatMessages)
-      await gamesPubsubs.chatMessages.publish(detailedChatMessage)
+      console.log(await gamesPubsubs.chatMessages.publish(detailedChatMessage))
 
       return detailedChatMessage
     } finally {

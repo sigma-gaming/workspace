@@ -7,6 +7,7 @@ import { $$profile } from '../entities/profile'
 import { $$user } from '../entities/user'
 import { $$notificationEvents } from '../features/notification-events'
 import { router } from '../routing'
+import { $$chatWidget } from '../widgets/chat'
 
 export const started = createEvent()
 
@@ -24,12 +25,11 @@ sample({
 
 sample({
   clock: started,
-  target: $$commonEvents.initialize,
-})
-
-sample({
-  clock: started,
-  target: $$notificationEvents.initialize,
+  target: [
+    $$commonEvents.initialize,
+    $$notificationEvents.initialize,
+    $$chatWidget.initialize,
+  ],
 })
 
 export const $$app = {

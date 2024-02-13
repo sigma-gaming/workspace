@@ -1,10 +1,10 @@
 import { createRouter } from '../trpc'
-import { getActual } from './get-actual'
+import { getActualMessages } from './get-actual-messages'
 import { sendMessage } from './send-message'
 import { subscription } from './subscription'
 
 export const chatRouter = createRouter({
-  getActual,
+  getActualMessages,
   sendMessage,
   subscription,
 })

@@ -66,7 +66,7 @@
     "ioredis": "^5.3.2",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
-    "patronum": "^2.1.1",
+    "patronum": "^2.2.0",
     "pino": "^8.16.2",
     "postgres": "^3.4.3",
     "rabbitmq-client": "^4.5.0",

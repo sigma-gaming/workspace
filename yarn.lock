@@ -3492,7 +3492,7 @@ __metadata:
     jsonwebtoken: "npm:^9.0.2"
     nodemon: "npm:^3.0.1"
     nx: "npm:17.0.2"
-    patronum: "npm:^2.1.1"
+    patronum: "npm:^2.2.0"
     pino: "npm:^8.16.2"
     pino-pretty: "npm:^10.2.3"
     pino-webpack-plugin: "npm:^2.0.0"
@@ -10538,12 +10538,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"patronum@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "patronum@npm:2.1.1"
+"patronum@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "patronum@npm:2.2.0"
   peerDependencies:
     effector: ^23
-  checksum: 42be200ab0d7530daa060b97bcf698c24cbbc7d5a9e084cda79d447998eec9076d333d8d583e2b59f3200572ef46c929e213530939f9d1dd3c6d467d5bfb667a
+  checksum: ff75232bbb4b11617ac94d25f4c766f0744683c01279cc32cc618dad93474b030fc81e506c65104736806e297190934ceb83a118b56ff6292f03a5700ea78f2e
   languageName: node
   linkType: hard
 

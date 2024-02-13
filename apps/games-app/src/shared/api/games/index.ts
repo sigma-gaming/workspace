@@ -2,6 +2,7 @@ import {
   createTRPCProxyClient,
   createWSClient,
   httpBatchLink,
+  httpLink,
   loggerLink,
   splitLink,
   wsLink,
@@ -35,7 +36,7 @@ export const gamesApi = createTRPCProxyClient<GamesAPIRouter>({
       true: wsLink<GamesAPIRouter>({
         client: wsClient,
       }),
-      false: httpBatchLink<GamesAPIRouter>({
+      false: httpLink<GamesAPIRouter>({
         url: env.gamesApi.url + '/trpc',
         fetch(url, options) {
           return fetch(url, {
