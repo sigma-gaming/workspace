@@ -55,6 +55,9 @@ export class CacheRegistry {
       ChatMessageDetailed[]
     >({
       keygen: () => `${version}:global:last-chat-messages`,
+      options: {
+        ttl: 60 * 60 * 24 * 3, // 3 days
+      },
     })
   }
 }
