@@ -119,7 +119,7 @@ const Profile = () => {
 }
 
 const SocialNetworks = () => {
-  const loaded = useUnit($$user.$loaded)
+  const loaded = useUnit($$profile.$loaded)
   const accounts = useUnit($$profile.$accounts)
 
   const vkAccount = accounts.find(
