@@ -11,7 +11,7 @@ export const MaintenanceOverlay = () => {
   }
 
   return (
-    <CenteredLayout className="z-[100000] bg-[#220032]">
+    <CenteredLayout className="z-[100000] bg-[#411a62]">
       <div className="flex flex-col items-center gap-8 max-w-[320px]">
         <Loader size="xl" />
         <Text className="text-center" size="lg" lh="xs">

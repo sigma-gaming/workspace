@@ -63,6 +63,8 @@ interface Form<
   submitted: Event<TValidated>
   updateErrors: EventCallable<Partial<FormErrors<TValues>>>
   setErrors: EventCallable<Partial<FormErrors<TValues>>>
+  reset: EventCallable<void>
+  empty: EventCallable<void>
   $values: Store<TValues>
   $cleanValues: Store<CleanValues<TValues, TCleanEmpty>>
   $dirty: Store<Record<keyof TValues, boolean>>
@@ -342,6 +344,8 @@ export function createForm<
     submitted: submitted as Event<TValidated>,
     updateErrors,
     setErrors,
+    reset,
+    empty,
     $values,
     $cleanValues,
     $dirty,

@@ -10,6 +10,7 @@ import {
   MantineProvider,
   Menu,
   Modal,
+  Pill,
   Popover,
   Skeleton,
   Title,
@@ -22,6 +23,7 @@ import inputWrapperClassNames from './input-wrapper.module.css'
 import loadingOverlayClassNames from './loading-overlay.module.css'
 import menuClassNames from './menu.module.css'
 import modalClassNames from './modal.module.css'
+import pillClassNames from './pill.module.css'
 import popoverClassNames from './popover.module.css'
 import skeletonClassNames from './skeleton.module.css'
 import titleClassNames from './title.module.css'
@@ -86,6 +88,9 @@ export const theme = createTheme({
     LoadingOverlay: LoadingOverlay.extend({
       classNames: loadingOverlayClassNames,
     }),
+    Pill: Pill.extend({
+      classNames: pillClassNames,
+    }),
   },
 })
 
@@ -93,11 +98,12 @@ const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {},
   dark: {
-    '--mantine-color-borders': '#4e2567',
+    '--mantine-color-borders': '#562281',
     '--mantine-color-text': '#ededed',
-    '--mantine-color-bg': '#2a003d',
+    '--mantine-color-bg': '#381452',
     '--mantine-overlay-bg': 'rgb(78 37 104 / 80%)',
     '--mantine-color-error': '#fd473a',
+    '--mantine-color-dimmed': '#a2a2a2',
   },
 })
 

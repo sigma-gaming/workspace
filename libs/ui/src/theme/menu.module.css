@@ -2,7 +2,7 @@
   @apply font-interface;
   border: none;
   background-color: var(--mantine-color-bg);
-  box-shadow: 0 0 0 2px var(--mantine-color-borders);
+  box-shadow: 0 0 0 1px var(--mantine-color-borders);
 }
 
 .divider {

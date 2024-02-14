@@ -91,7 +91,7 @@ sample({
 
 sample({
   clock: form.submitted,
-  target: sendMessageFx,
+  target: [sendMessageFx, form.empty],
 })
 
 sample({
