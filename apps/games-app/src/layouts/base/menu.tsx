@@ -1,4 +1,4 @@
-import { Card, rem, Text } from '@mantine/core'
+import { rem, Text, Title } from '@mantine/core'
 import { IconCategory2, IconDice3 } from '@tabler/icons-react'
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
@@ -7,20 +7,40 @@ import { routes } from '../../routing'
 
 export const Menu = () => {
   return (
-    <Card className="md:w-72 mx-4 md:mx-0 px-0 py-2 md:py-4 h-fit md:rounded-l-none">
+    <div className="flex flex-col gap-1">
       <MenuLink
         to={routes.home}
         icon={<IconCategory2 style={{ width: rem(24), height: rem(24) }} />}
       >
         Главная
       </MenuLink>
-      <MenuLink
-        to={routes.dicesGame}
-        icon={<IconDice3 style={{ width: rem(24), height: rem(24) }} />}
+      <MenuSection label="Игры">
+        <MenuLink
+          to={routes.dicesGame}
+          icon={<IconDice3 style={{ width: rem(24), height: rem(24) }} />}
+        >
+          Dices
+        </MenuLink>
+      </MenuSection>
+    </div>
+  )
+}
+
+const MenuSection = ({
+  label,
+  children,
+}: PropsWithChildren<{ label: string }>) => {
+  return (
+    <div className="flex flex-col gap-1 mt-4">
+      <Title
+        className="px-4 uppercase text-sm mb-1 font-interface"
+        order={3}
+        c="#434460"
       >
-        Dices
-      </MenuLink>
-    </Card>
+        {label}
+      </Title>
+      {children}
+    </div>
   )
 }
 
@@ -35,11 +55,13 @@ const MenuLink = ({
   return (
     <Link
       to={to}
-      className="px-4 md:px-10 py-2 md:py-3 inline-flex gap-4 text-center items-center"
-      activeClassName="bg-sigma-100"
+      className="px-4 py-3 flex gap-4 items-center rounded-2xl text-[#7E7F9C] bg-[#221F2C]"
     >
       {icon}
-      <Text className="text-md md:text-lg" fw={600}>
+      <Text
+        className="text-md md:text-lg text-[#B6B7CE] font-interface"
+        fw={500}
+      >
         {children}
       </Text>
     </Link>

@@ -3,10 +3,10 @@
 }
 
 .input {
-  background-color: var(--mantine-color-bg);
+  background-color: #1B1C2F;
 }
 
 html body .input[data-disabled] {
-  background-color: var(--mantine-color-bg);
+  background-color: #1B1C2F;
   opacity: 0.6;
 }

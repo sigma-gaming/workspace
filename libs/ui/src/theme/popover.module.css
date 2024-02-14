@@ -1,4 +1,6 @@
 .dropdown {
   @apply font-interface;
-  background-color: var(--mantine-color-bg);
+  background-color: #25273E;
+  border: none;
+  box-shadow: 0 0 0 1px var(--mantine-color-borders);
 }

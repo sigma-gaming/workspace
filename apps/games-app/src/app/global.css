@@ -7,7 +7,7 @@
 
 html,
 body {
-  @apply bg-[#411a62] text-[#ededed];
+  @apply bg-[color:var(--color-bg-main)] text-[#ededed];
 }
 
 html,

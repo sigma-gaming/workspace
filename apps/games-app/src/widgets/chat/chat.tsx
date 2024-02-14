@@ -1,40 +1,57 @@
-import { Button, Card, TextInput, Title } from '@mantine/core'
-import clsx from 'clsx'
+import { Avatar, Button, Text, Title } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { UIEventHandler, useEffect, useRef } from 'react'
 import { $$chatWidget } from './model'
-import css from './style.module.css'
 
 export const Chat = () => {
   const text = useUnit($$chatWidget.fields.text.$value)
   const updateText = useUnit($$chatWidget.fields.text.update)
   const submit = useUnit($$chatWidget.form.submit)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   return (
-    <Card
-      className={clsx(
-        css.container,
-        'justify-self-stretch hidden xl:flex flex-col justify-between md:w-72 mx-4 md:mx-0 rounded-r-none',
-      )}
-    >
+    <div className="fixed top-[80px] right-0 bottom-0 w-[320px] p-6 flex flex-col">
       <Title order={3}>Чат</Title>
       <MessageList />
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <form
+        className="relative h-[120px] bg-[#1B1C2F] rounded-2xl cursor-text"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            textareaRef.current?.focus()
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault()
+            submit()
+          }
+        }}
         onSubmit={(event) => {
           event.preventDefault()
           submit()
         }}
       >
-        <TextInput
+        <textarea
+          ref={textareaRef}
+          className="w-full p-3 text-sm bg-transparent placeholder-[#4E4F6D] resize-none outline-none"
           value={text}
           onChange={(event) => updateText(event.target.value)}
-          placeholder="Введите текст сообщения"
+          spellCheck={false}
+          rows={2}
+          placeholder="Введите сообщение..."
         />
-        <Button className="mt-2" fullWidth={true} type="submit">
+        <Button
+          className="absolute bottom-3 right-3"
+          radius={12}
+          size="sm"
+          type="submit"
+          disabled={text.length === 0}
+        >
           Отправить
         </Button>
       </form>
-    </Card>
+    </div>
   )
 }
 
@@ -92,15 +109,38 @@ const MessageList = () => {
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-auto my-2"
+      className="flex-1 overflow-auto my-2 flex flex-col gap-2 rounded-2xl"
       onScroll={handleScroll}
     >
-      {messages.map((message) => (
-        <div key={message.chatMessage.id} data-chat-message={true}>
-          {message.user?.profile.name}: {message.chatMessage.text}
-        </div>
-      ))}
-      {/* <div ref={bottomRef} /> */}
+      {messages.map(({ chatMessage, user }) => {
+        const initials = user?.profile?.name
+          ?.split(' ')
+          .slice(0, 2)
+          .map((word) => word[0].toUpperCase())
+          .join('')
+
+        return (
+          <div
+            key={chatMessage.id}
+            className="flex gap-3 p-3 bg-[#1B1C2F] rounded-2xl"
+            data-chat-message={true}
+          >
+            {user && (
+              <Avatar src={user.profile.image} size={32}>
+                {initials}
+              </Avatar>
+            )}
+            <div className="flex flex-col gap-2 mt-1">
+              <Text c="#9494a5" fw="bold" lh={1} size="sm">
+                {user?.profile.name ?? 'Система'}
+              </Text>
+              <Text c="#fcf8f9" lh={1} size="md">
+                {chatMessage.text}
+              </Text>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
