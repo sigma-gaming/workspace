@@ -10,8 +10,11 @@ import {
   MantineProvider,
   Menu,
   Modal,
+  MultiSelect,
+  NumberInput,
   Pill,
   Popover,
+  Select,
   Skeleton,
   Title,
 } from '@mantine/core'
@@ -23,8 +26,11 @@ import inputWrapperClassNames from './input-wrapper.module.css'
 import loadingOverlayClassNames from './loading-overlay.module.css'
 import menuClassNames from './menu.module.css'
 import modalClassNames from './modal.module.css'
+import multiSelectClassNames from './multi-select.module.css'
+import numberInputClassNames from './number-input.module.css'
 import pillClassNames from './pill.module.css'
 import popoverClassNames from './popover.module.css'
+import selectClassNames from './select.module.css'
 import skeletonClassNames from './skeleton.module.css'
 import titleClassNames from './title.module.css'
 
@@ -90,6 +96,15 @@ export const theme = createTheme({
     }),
     Pill: Pill.extend({
       classNames: pillClassNames,
+    }),
+    MultiSelect: MultiSelect.extend({
+      classNames: multiSelectClassNames,
+    }),
+    NumberInput: NumberInput.extend({
+      classNames: numberInputClassNames,
+    }),
+    Select: Select.extend({
+      classNames: selectClassNames,
     }),
   },
 })

@@ -55,7 +55,7 @@ const MenuLink = ({
   return (
     <Link
       to={to}
-      className="px-4 py-3 flex gap-4 items-center rounded-2xl text-[#7E7F9C] bg-[#221F2C]"
+      className="px-4 py-3 flex gap-4 items-center rounded-2xl text-[#7E7F9C] bg-[#221F2C] hover:bg-[#292636] transition-colors"
     >
       {icon}
       <Text

@@ -9,6 +9,10 @@
   @apply mx-3 my-[10px];
 }
 
+.item {
+  @apply transition-colors;
+}
+
 .item:disabled {
   opacity: 0.75;
 }

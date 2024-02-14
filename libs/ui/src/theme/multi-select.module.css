@@ -1,0 +1,11 @@
+.section[data-position="right"] {
+  @apply pointer-events-none;
+}
+
+.option {
+  @apply transition-colors;
+}
+
+.option:hover {
+  @apply bg-[#2f314c];
+}

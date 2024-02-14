@@ -1,0 +1,7 @@
+.option {
+  @apply transition-colors;
+}
+
+.option:hover {
+  @apply bg-[#2f314c];
+}

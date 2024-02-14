@@ -3,10 +3,11 @@
 }
 
 .input {
-  background-color: #1B1C2F;
+  background-color: #25273E;
+  border-color: #25273E;
 }
 
 html body .input[data-disabled] {
-  background-color: #1B1C2F;
+  background-color: #25273E;
   opacity: 0.6;
 }

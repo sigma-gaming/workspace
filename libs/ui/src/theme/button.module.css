@@ -1,6 +1,6 @@
 .root {
-  font-family: Rubik, sans-serif;
-  font-weight: 500;
+  @apply font-interface font-medium;
+  @apply transition-colors;
 
   &:disabled {
     color: var(--button-color);

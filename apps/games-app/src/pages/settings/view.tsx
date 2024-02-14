@@ -168,7 +168,12 @@ const SocialNetworks = () => {
                 )
 
                 return (
-                  <Card key={provider}>
+                  <Card
+                    key={provider}
+                    classNames={{
+                      root: '!bg-[#25273E] rounded-xl',
+                    }}
+                  >
                     <div className="flex flex-col sm:flex-row gap-4">
                       {providerUserImage && (
                         <Avatar
@@ -195,34 +200,32 @@ const SocialNetworks = () => {
           : Array.from({ length: 2 }).map((_, index) => {
               return (
                 // eslint-disable-next-line react/no-array-index-key
-                <Card key={index} className="justify-center">
-                  <Group>
-                    <Skeleton circle height={56} width={56} />
-                    <Stack gap={12}>
-                      <Skeleton width={100} height={20} />
-                      <Skeleton width={200} height={16} />
-                    </Stack>
-                  </Group>
-                </Card>
+                <Skeleton key={index} className="rounded-xl justify-center">
+                  <Card className="justify-center">
+                    <Group>
+                      <Skeleton circle height={56} width={56} />
+                      <Stack gap={12}>
+                        <Skeleton width={100} height={20} />
+                        <Skeleton width={200} height={16} />
+                      </Stack>
+                    </Group>
+                  </Card>
+                </Skeleton>
               )
             })}
       </div>
 
-      {!hasAllAccounts && (
+      {loaded && !hasAllAccounts && (
         <div className="flex flex-col sm:flex-row gap-4">
           {!vkAccount && (
-            <Skeleton className="sm:w-fit" visible={!loaded}>
-              <VkButton size="sm" fullWidth={true}>
-                Привязать VK ID
-              </VkButton>
-            </Skeleton>
+            <VkButton size="sm" fullWidth={true}>
+              Привязать VK ID
+            </VkButton>
           )}
           {!telegramAccount && (
-            <Skeleton className="sm:w-fit" visible={!loaded}>
-              <TelegramButton size="sm" fullWidth={true}>
-                Привязать Telegram
-              </TelegramButton>
-            </Skeleton>
+            <TelegramButton size="sm" fullWidth={true}>
+              Привязать Telegram
+            </TelegramButton>
           )}
         </div>
       )}
