@@ -121,7 +121,7 @@ const resolver: CSSVariablesResolver = () => ({
     '--mantine-color-borders': '#2e304d',
     '--mantine-color-text': '#ededed',
     '--mantine-color-bg': '#381452',
-    '--mantine-overlay-bg': 'rgb(78 37 104 / 80%)',
+    '--mantine-overlay-bg': 'rgb(37 39 60 / 80%)',
     '--mantine-color-error': '#fd473a',
     '--mantine-color-dimmed': '#a2a2a2',
     '--mantine-color-placeholder': 'rgb(255 255 255 / 25%)',
