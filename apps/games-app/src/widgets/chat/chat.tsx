@@ -36,7 +36,7 @@ export const Chat = () => {
       >
         <textarea
           ref={textareaRef}
-          className="w-full p-3 text-sm bg-transparent placeholder-[#4E4F6D] resize-none outline-none"
+          className="w-full px-4 py-3 bg-transparent placeholder-[#4E4F6D] resize-none outline-none"
           value={text}
           onChange={(event) => updateText(event.target.value)}
           spellCheck={false}

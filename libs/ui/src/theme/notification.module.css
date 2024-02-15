@@ -1,0 +1,8 @@
+.root {
+  background-color: #25273C;
+  box-shadow: 0 0 0 1px var(--mantine-color-borders);
+}
+
+.closeButton:hover {
+  background-color: #36384B;
+}

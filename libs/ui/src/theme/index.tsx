@@ -11,6 +11,7 @@ import {
   Menu,
   Modal,
   MultiSelect,
+  Notification,
   NumberInput,
   Pill,
   Popover,
@@ -27,6 +28,7 @@ import loadingOverlayClassNames from './loading-overlay.module.css'
 import menuClassNames from './menu.module.css'
 import modalClassNames from './modal.module.css'
 import multiSelectClassNames from './multi-select.module.css'
+import notificationClassNames from './notification.module.css'
 import numberInputClassNames from './number-input.module.css'
 import pillClassNames from './pill.module.css'
 import popoverClassNames from './popover.module.css'
@@ -58,6 +60,9 @@ export const theme = createTheme({
       defaultProps: {
         c: 'primary.3',
       },
+    }),
+    Notification: Notification.extend({
+      classNames: notificationClassNames,
     }),
     Title: Title.extend({
       classNames: titleClassNames,
