@@ -120,7 +120,7 @@ const MessageList = () => {
         return (
           <div
             key={chatMessage.id}
-            className="flex gap-3 p-3 bg-[#1B1C2F] rounded-2xl"
+            className="flex gap-3 p-3 pr-4 bg-[#1B1C2F] rounded-2xl"
             data-chat-message={true}
           >
             {user && (
