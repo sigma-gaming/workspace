@@ -6,7 +6,6 @@ import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { router } from '../../routing'
 import { restartGamesApiSocketFx } from '../../shared/api/games'
-import { $$notificationEvents } from '../notification-events'
 
 interface FactoryParams {
   clock: Event<unknown>

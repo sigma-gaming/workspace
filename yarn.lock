@@ -2861,6 +2861,8 @@ __metadata:
 "@libs/ui@workspace:*, @libs/ui@workspace:libs/ui":
   version: 0.0.0-use.local
   resolution: "@libs/ui@workspace:libs/ui"
+  dependencies:
+    "@tooling/build": "workspace:*"
   languageName: unknown
   linkType: soft
 

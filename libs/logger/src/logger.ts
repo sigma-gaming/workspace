@@ -40,6 +40,14 @@ export const logger = createSingletonProxy(
   (service) => service.logger,
 )
 
+function generateReqId(req: IncomingMessage) {
+  const existingID = req.headers['x-trace-id']
+  if (existingID) return existingID.toString()
+  const id = uuid()
+  req.headers['x-trace-id'] = id
+  return id
+}
+
 @singleton()
 export class FastifyLoggerService {
   httpLogger: (
@@ -56,13 +64,7 @@ export class FastifyLoggerService {
       simple: options.pretty,
       logger,
       shouldLogRequest: true,
-      getRequestId: (req) => {
-        const existingID = req.headers['x-trace-id']
-        if (existingID) return existingID.toString()
-        const id = uuid()
-        req.headers['x-trace-id'] = id
-        return id
-      },
+      getRequestId: generateReqId,
       getRequestMeta: (ctx) => ({
         req: serializeReq(ctx.req),
       }),
@@ -74,13 +76,7 @@ export class FastifyLoggerService {
     })
   }
 
-  genReqId = (req: IncomingMessage) => {
-    const existingID = req.headers['x-trace-id']
-    if (existingID) return existingID.toString()
-    const id = uuid()
-    req.headers['x-trace-id'] = id
-    return id
-  }
+  genReqId = generateReqId
 
   attach = (app: FastifyInstance) => {
     app.addHook('onRequest', (request, reply, done) => {
@@ -143,13 +139,7 @@ export function createFastifyLogger(options: {
     simple: options.pretty,
     logger: options.logger,
     shouldLogRequest: true,
-    getRequestId: (req) => {
-      const existingID = req.headers['x-trace-id']
-      if (existingID) return existingID.toString()
-      const id = uuid()
-      req.headers['x-trace-id'] = id
-      return id
-    },
+    getRequestId: generateReqId,
     getRequestMeta: (ctx) => ({
       req: serializeReq(ctx.req),
     }),
