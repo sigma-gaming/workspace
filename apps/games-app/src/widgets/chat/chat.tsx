@@ -1,3 +1,4 @@
+import { getUserInitials } from '@games/model'
 import { Avatar, Button, Text, Title } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { UIEventHandler, useEffect, useRef } from 'react'
@@ -113,11 +114,7 @@ const MessageList = () => {
       onScroll={handleScroll}
     >
       {messages.map(({ chatMessage, user }) => {
-        const initials = user?.profile?.name
-          ?.split(' ')
-          .slice(0, 2)
-          .map((word) => word[0].toUpperCase())
-          .join('')
+        const initials = getUserInitials(user?.profile?.name)
 
         return (
           <div

@@ -5,7 +5,11 @@ import {
   Profiles,
   ProfileUpdate,
 } from '@games/db-schema'
-import { getFullName, ProfileDetailed, ProfileValidation } from '@games/model'
+import {
+  getUserFullName,
+  ProfileDetailed,
+  ProfileValidation,
+} from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { profileService, sessionService } from '@games/services'
 import { BadRequestException } from '@libs/exceptions'
@@ -63,7 +67,7 @@ export const updateProfile = procedure
       usedProvider: input.provider,
     }
 
-    const nameFromProvider = getFullName(
+    const nameFromProvider = getUserFullName(
       selectedProvider.providerUserFirstName,
       selectedProvider.providerUserLastName,
     )

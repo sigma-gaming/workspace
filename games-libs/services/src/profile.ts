@@ -7,7 +7,7 @@ import {
   User,
   Users,
 } from '@games/db-schema'
-import { getFullName, ProfileDetailed } from '@games/model'
+import { getUserFullName, ProfileDetailed } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
 import { InternalServerException, NotFoundException } from '@libs/exceptions'
@@ -65,7 +65,7 @@ export class ProfileService {
     const calculateName = () => {
       if (profile.name) return profile.name
 
-      return getFullName(
+      return getUserFullName(
         profileAccount.providerUserFirstName,
         profileAccount.providerUserLastName,
       )

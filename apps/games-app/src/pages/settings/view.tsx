@@ -1,8 +1,8 @@
 import { AccountProvider } from '@games/db-schema'
-import { getFullName } from '@games/model'
+import { getUserFullName, getUserInitials } from '@games/model'
+import { AvatarBordered } from '@libs/ui'
 import {
   Anchor,
-  Avatar,
   Button,
   Card,
   Group,
@@ -149,10 +149,12 @@ const SocialNetworks = () => {
                 providerUserLastName,
                 providerUserImage,
               }) => {
-                const fullName = getFullName(
+                const fullName = getUserFullName(
                   providerUserFirstName,
                   providerUserLastName,
                 )
+
+                const initials = getUserInitials(fullName)
 
                 const { label, profileUrl } = ProviderInfoMap[provider]
 
@@ -174,17 +176,11 @@ const SocialNetworks = () => {
                       root: '!bg-[#25273E] rounded-xl',
                     }}
                   >
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col items-center sm:flex-row gap-4">
                       {providerUserImage && (
-                        <Avatar
-                          src={providerUserImage}
-                          size={48}
-                          classNames={{
-                            root: 'overflow-visible m-1',
-                            image:
-                              'rounded-full outline outline-2 outline-offset-2 outline-sigma-600',
-                          }}
-                        />
+                        <AvatarBordered src={providerUserImage} size={56}>
+                          {initials}
+                        </AvatarBordered>
                       )}
                       <Stack gap={4}>
                         <Title order={4}>{label}</Title>

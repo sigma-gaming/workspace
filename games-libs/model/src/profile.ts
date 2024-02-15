@@ -9,11 +9,21 @@ export interface ProfileDetailed extends Profile {
   accounts: AccountPublic[]
 }
 
-export function getFullName(
+export function getUserFullName(
   firstName?: string | null,
   lastName?: string | null,
 ): string {
   return [firstName, lastName].filter(Boolean).join(' ')
+}
+
+export function getUserInitials(name: string | null | undefined) {
+  if (!name) return null
+
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('')
 }
 
 export const ProfileValidation = {

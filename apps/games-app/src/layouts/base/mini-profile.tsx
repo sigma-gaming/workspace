@@ -1,13 +1,6 @@
-import {
-  Avatar,
-  Button,
-  Menu,
-  Modal,
-  rem,
-  Skeleton,
-  Stack,
-  Text,
-} from '@mantine/core'
+import { getUserInitials } from '@games/model'
+import { AvatarBordered } from '@libs/ui'
+import { Button, Menu, Modal, rem, Skeleton, Stack, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconCoins,
@@ -40,11 +33,7 @@ export const MiniProfile = () => {
     return <ExpiredProfile />
   }
 
-  const initials = profile?.name
-    ?.split(' ')
-    .slice(0, 2)
-    .map((word) => word[0].toUpperCase())
-    .join('')
+  const initials = getUserInitials(profile?.name)
 
   return (
     <Menu width={240} position="bottom-end" offset={16} disabled={userLoading}>
@@ -69,17 +58,14 @@ export const MiniProfile = () => {
           </Stack>
 
           <Skeleton visible={userLoading} height={56} circle>
-            <Avatar
+            <AvatarBordered
               src={profile?.image}
               component="button"
               name="Меню пользователя"
-              size={48}
-              classNames={{
-                root: 'm-1 outline outline-2 outline-offset-2 outline-sigma-600',
-              }}
+              size={56}
             >
               {initials}
-            </Avatar>
+            </AvatarBordered>
           </Skeleton>
         </div>
       </Menu.Target>

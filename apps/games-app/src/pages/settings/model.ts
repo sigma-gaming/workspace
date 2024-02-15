@@ -1,6 +1,6 @@
 import { createMutation } from '@farfetched/core'
 import { AccountProvider } from '@games/db-schema'
-import { getFullName, ProfileValidation } from '@games/model'
+import { getUserFullName, ProfileValidation } from '@games/model'
 import { BadRequestException, ValidationException } from '@libs/exceptions'
 import {
   createField,
@@ -98,7 +98,7 @@ sample({
   fn: (accounts, provider) => {
     const account = accounts.find((account) => account.provider === provider)
 
-    return getFullName(
+    return getUserFullName(
       account?.providerUserFirstName,
       account?.providerUserLastName,
     )
