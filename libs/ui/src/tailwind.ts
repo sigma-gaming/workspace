@@ -2,6 +2,15 @@ import { Config } from 'tailwindcss'
 import plugin from 'tailwindcss/plugin'
 import { tailwindColors } from './colors'
 
+const patchPlugin = plugin(({ addUtilities }) => {
+  addUtilities({
+    '.break-words': {
+      'word-break': 'break-word',
+      'overflow-wrap': 'break-word',
+    },
+  })
+})
+
 const scrollbarPlugin = plugin(({ addUtilities }) => {
   addUtilities({
     '.scrollbar-hide': {
@@ -35,7 +44,7 @@ const scrollbarPlugin = plugin(({ addUtilities }) => {
 export function createConfig(config: { content: string[] }): Config {
   return {
     content: ['../../libs/ui/**/*.{ts,tsx}', ...config.content],
-    plugins: [scrollbarPlugin],
+    plugins: [patchPlugin, scrollbarPlugin],
     theme: {
       extend: {
         fontFamily: {

@@ -1,6 +1,6 @@
 import { Skeleton } from '@mantine/core'
 import clsx from 'clsx'
-import { PropsWithChildren, ReactNode } from 'react'
+import { PropsWithChildren, ReactNode, useState } from 'react'
 
 type RootRenderProps = PropsWithChildren<{
   className: string
@@ -26,19 +26,29 @@ export const Avatar = ({
   bordered = false,
   renderRoot = (props) => <div {...props} />,
 }: Props) => {
+  // const src = null
+  const [failed, setFailed] = useState(false)
+
   if (loading) {
     return <Skeleton width={size} height={size} circle />
   }
 
-  const content = src ? (
-    <img className="rounded-full" src={src} alt={alt} />
+  const showImage = src && !failed
+
+  const content = showImage ? (
+    <img
+      className="rounded-full text-[0px]"
+      src={src}
+      alt={alt}
+      onError={() => setFailed(true)}
+    />
   ) : (
     fallback
   )
 
   return renderRoot({
     className: clsx(
-      'block rounded-full overflow-hidden',
+      'block shrink-0 rounded-full overflow-hidden',
       bordered && 'border-2 p-[2px] border-primary-5',
     ),
     style: { width: size, height: size, fontSize: Math.max(12, size / 2.5) },

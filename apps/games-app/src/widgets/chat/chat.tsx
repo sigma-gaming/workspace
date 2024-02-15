@@ -17,7 +17,7 @@ export const Chat = () => {
       <MessageList />
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <form
-        className="relative h-[120px] bg-[#1B1C2F] rounded-2xl cursor-text"
+        className="relative h-[142px] px-4 py-3 bg-[#1B1C2F] rounded-2xl cursor-text"
         onClick={(event) => {
           if (event.target === event.currentTarget) {
             textareaRef.current?.focus()
@@ -36,15 +36,15 @@ export const Chat = () => {
       >
         <textarea
           ref={textareaRef}
-          className="w-full px-4 py-3 bg-transparent placeholder-[#4E4F6D] resize-none outline-none"
+          className="w-full bg-transparent placeholder-[#4E4F6D] resize-none outline-none scrollbar-hide"
           value={text}
           onChange={(event) => updateText(event.target.value)}
           spellCheck={false}
-          rows={2}
+          rows={3}
           placeholder="Введите сообщение..."
         />
         <Button
-          className="absolute bottom-3 right-3"
+          className="absolute bottom-3 right-4"
           radius={12}
           size="sm"
           type="submit"
@@ -131,11 +131,17 @@ const MessageList = () => {
                 size={32}
               />
             )}
-            <div className="flex flex-col gap-2 mt-1">
-              <Text c="#9494a5" fw="bold" lh={1} size="sm">
+            <div className="flex flex-col gap-1 mt-1 font-interface">
+              <Text
+                className="cursor-default font-interface"
+                c="#9494a5"
+                fw={500}
+                lh={1}
+                size="sm"
+              >
                 {user?.profile.name ?? 'Система'}
               </Text>
-              <Text c="#fcf8f9" lh={1} size="md">
+              <Text className="break-words" c="#fcf8f9" lh="xs" size="sm">
                 {chatMessage.text}
               </Text>
             </div>
