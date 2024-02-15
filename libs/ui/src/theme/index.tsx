@@ -44,7 +44,7 @@ export const theme = createTheme({
       '#f8ecff',
       '#ead7f9',
       '#d0adee',
-      '#b77fe3',
+      '#ad6ddf',
       '#a15ada',
       '#9341d5',
       '#8c35d3',
@@ -119,6 +119,7 @@ const resolver: CSSVariablesResolver = () => ({
     '--mantine-overlay-bg': 'rgb(78 37 104 / 80%)',
     '--mantine-color-error': '#fd473a',
     '--mantine-color-dimmed': '#a2a2a2',
+    '--mantine-color-placeholder': 'rgb(255 255 255 / 25%)',
   },
 })
 

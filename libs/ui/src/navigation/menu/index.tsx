@@ -1,32 +1,19 @@
-import { rem, Text, Title } from '@mantine/core'
-import { IconCategory2, IconDice3 } from '@tabler/icons-react'
+import { Text, Title } from '@mantine/core'
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
+import clsx from 'clsx'
 import { PropsWithChildren, ReactNode } from 'react'
-import { routes } from '../../routing'
 
-export const Menu = () => {
+export const Menu = ({
+  className,
+  children,
+}: PropsWithChildren<{ className?: string }>) => {
   return (
-    <div className="flex flex-col gap-1">
-      <MenuLink
-        to={routes.home}
-        icon={<IconCategory2 style={{ width: rem(24), height: rem(24) }} />}
-      >
-        Главная
-      </MenuLink>
-      <MenuSection label="Игры">
-        <MenuLink
-          to={routes.dicesGame}
-          icon={<IconDice3 style={{ width: rem(24), height: rem(24) }} />}
-        >
-          Dices
-        </MenuLink>
-      </MenuSection>
-    </div>
+    <div className={clsx(className, 'flex flex-col gap-1')}>{children}</div>
   )
 }
 
-const MenuSection = ({
+export const MenuSection = ({
   label,
   children,
 }: PropsWithChildren<{ label: string }>) => {
@@ -44,7 +31,7 @@ const MenuSection = ({
   )
 }
 
-const MenuLink = ({
+export const MenuLink = ({
   to,
   icon,
   children,

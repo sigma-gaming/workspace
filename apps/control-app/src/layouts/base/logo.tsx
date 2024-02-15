@@ -1,29 +1,6 @@
-import { Title } from '@mantine/core'
-import { Link } from 'atomic-router-react'
-import { memo, SVGProps } from 'react'
-import { routes } from '../../routing/index.ts'
-import { MiniProfile } from './mini-profile.tsx'
+import { SVGProps } from 'react'
 
-export const Header = memo(() => {
-  return (
-    <header className="flex gap-6 items-center justify-between px-4 py-6 md:py-8">
-      <div className="flex gap-3 items-center">
-        <Link
-          to={routes.home}
-          className="md:w-full md:px-4 flex items-center justify-between gap-2"
-        >
-          <Logo />
-          <Title className="hidden md:block" order={1}>
-            Sigma
-          </Title>
-        </Link>
-      </div>
-      <MiniProfile />
-    </header>
-  )
-})
-
-const Logo = (props: SVGProps<SVGSVGElement>) => {
+export const Logo = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width="48"

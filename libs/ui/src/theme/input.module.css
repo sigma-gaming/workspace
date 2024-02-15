@@ -7,6 +7,10 @@
   border-color: #25273E;
 }
 
+.input:placeholder {
+  color: #fff !important;
+}
+
 html body .input[data-disabled] {
   background-color: #25273E;
   opacity: 0.6;

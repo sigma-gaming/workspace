@@ -1,10 +1,11 @@
-import { Title } from '@mantine/core'
+import { Menu, MenuLink, MenuSection } from '@libs/ui'
+import { rem, Title } from '@mantine/core'
+import { IconCategory2, IconDice3 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import { PropsWithChildren } from 'react'
 import { routes } from '../../routing/index.ts'
 import { Chat } from '../../widgets/chat'
 import { Logo } from './logo.tsx'
-import { Menu } from './menu.tsx'
 import { MiniProfile } from './mini-profile.tsx'
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
@@ -29,7 +30,22 @@ const Left = () => {
           Sigma
         </Title>
       </Link>
-      <Menu />
+      <Menu>
+        <MenuLink
+          to={routes.home}
+          icon={<IconCategory2 style={{ width: rem(24), height: rem(24) }} />}
+        >
+          Главная
+        </MenuLink>
+        <MenuSection label="Игры">
+          <MenuLink
+            to={routes.dicesGame}
+            icon={<IconDice3 style={{ width: rem(24), height: rem(24) }} />}
+          >
+            Dices
+          </MenuLink>
+        </MenuSection>
+      </Menu>
     </div>
   )
 }
