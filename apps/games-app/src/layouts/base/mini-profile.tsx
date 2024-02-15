@@ -83,7 +83,7 @@ export const MiniProfile = () => {
         )}
 
         <Menu.Item
-          c="green.6"
+          className="text-green-400"
           onClick={() => $$balance.deposit()}
           closeMenuOnClick={false}
           disabled={balanceDepositing}
@@ -131,7 +131,7 @@ export const MiniProfile = () => {
           Настройки
         </Menu.Item>
         <Menu.Item
-          c="red.6"
+          className="text-red-400"
           onClick={() => $$user.logout()}
           disabled={loggingOut}
           leftSection={

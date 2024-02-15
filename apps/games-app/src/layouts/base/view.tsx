@@ -36,7 +36,7 @@ const Left = () => {
 
 const Right = () => {
   return (
-    <div className="fixed top-0 right-0 bottom-0 w-[320px] p-6">
+    <div className="fixed top-0 right-0 bottom-0 w-[320px] p-6 flex flex-col items-end">
       <MiniProfile />
       <div className="flex-1">
         <Chat />

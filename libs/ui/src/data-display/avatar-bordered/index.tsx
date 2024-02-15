@@ -5,11 +5,10 @@ export const AvatarBordered = createPolymorphicComponent<'div', AvatarProps>(
   forwardRef<HTMLDivElement, AvatarProps>(({ children, ...rest }, ref) => {
     return (
       <Avatar
-        ref={ref}
         {...rest}
+        ref={ref}
         classNames={{
-          image: 'rounded-full border border-2 p-[2px] border-sigma-600',
-          ...rest.classNames,
+          image: 'rounded-full border-2 p-[2px] border-sigma-600',
         }}
       >
         {children}
