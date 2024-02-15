@@ -1,5 +1,5 @@
 import { getUserInitials } from '@games/model'
-import { AvatarBordered } from '@libs/ui'
+import { Avatar } from '@libs/ui'
 import { Button, Menu, Modal, rem, Skeleton, Stack, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
@@ -57,16 +57,19 @@ export const MiniProfile = () => {
             </Skeleton>
           </Stack>
 
-          <Skeleton visible={userLoading} height={56} circle>
-            <AvatarBordered
-              src={profile?.image}
-              component="button"
-              name="Меню пользователя"
-              size={56}
-            >
-              {initials}
-            </AvatarBordered>
-          </Skeleton>
+          <Avatar
+            src={profile?.image}
+            alt="Аватар пользователя"
+            renderRoot={({ children, ...props }) => (
+              <button name="Меню пользователя" {...props}>
+                {children}
+              </button>
+            )}
+            size={56}
+            loading={userLoading}
+            fallback={initials}
+            bordered={true}
+          />
         </div>
       </Menu.Target>
 

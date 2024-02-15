@@ -1,6 +1,6 @@
 import { AccountProvider } from '@games/db-schema'
 import { getUserFullName, getUserInitials } from '@games/model'
-import { AvatarBordered } from '@libs/ui'
+import { Avatar } from '@libs/ui'
 import {
   Anchor,
   Button,
@@ -178,9 +178,13 @@ const SocialNetworks = () => {
                   >
                     <div className="flex flex-col items-center sm:flex-row gap-4">
                       {providerUserImage && (
-                        <AvatarBordered src={providerUserImage} size={56}>
-                          {initials}
-                        </AvatarBordered>
+                        <Avatar
+                          src={providerUserImage}
+                          fallback={initials}
+                          alt={`Аватар ${label}`}
+                          size={56}
+                          bordered={true}
+                        />
                       )}
                       <Stack gap={4}>
                         <Title order={4}>{label}</Title>

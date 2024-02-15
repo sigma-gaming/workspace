@@ -3,7 +3,7 @@ const config = {
   content: [
     './src/**/*.{ts,tsx}',
     './index.html',
-    '../../libs/ui/src/**/*.{ts,tsx}',
+    '../../libs/ui/src/**/*.{ts,tsx,css}',
   ],
   theme: {
     extend: {

@@ -1,5 +1,3 @@
-import '@mantine/core/styles.css'
-import '@mantine/notifications/styles.css'
 import './global.css'
 import { ThemeProvider } from '@libs/ui'
 import { Notifications } from '@mantine/notifications'

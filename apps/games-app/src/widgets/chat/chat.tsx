@@ -1,5 +1,6 @@
 import { getUserInitials } from '@games/model'
-import { Avatar, Button, Text, Title } from '@mantine/core'
+import { Avatar } from '@libs/ui'
+import { Button, Text, Title } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { UIEventHandler, useEffect, useRef } from 'react'
 import { $$chatWidget } from './model'
@@ -123,9 +124,12 @@ const MessageList = () => {
             data-chat-message={true}
           >
             {user && (
-              <Avatar src={user.profile.image} size={32}>
-                {initials}
-              </Avatar>
+              <Avatar
+                src={user.profile.image}
+                alt={`Аватар ${user.profile.name}`}
+                fallback={initials}
+                size={32}
+              />
             )}
             <div className="flex flex-col gap-2 mt-1">
               <Text c="#9494a5" fw="bold" lh={1} size="sm">
