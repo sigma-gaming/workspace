@@ -43,7 +43,7 @@ export const MenuLink = ({
     <Link
       to={to}
       className="px-4 py-3 flex gap-4 items-center rounded-2xl text-[#B6B7CE] bg-[#221F2C] hover:bg-[#292636] transition-colors"
-      activeClassName="text-white bg-sigma-100 hover:bg-sigma-100"
+      activeClassName="cursor-default text-white bg-primary-7 hover:bg-primary-7"
     >
       <div className="opacity-75">{icon}</div>
       <Text className="text-md md:text-lg font-interface" fw={500}>

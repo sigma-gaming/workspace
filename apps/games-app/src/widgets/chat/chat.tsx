@@ -111,7 +111,7 @@ const MessageList = () => {
   return (
     <div
       ref={containerRef}
-      className="flex-1 overflow-auto my-2 flex flex-col gap-2 rounded-2xl"
+      className="flex-1 overflow-auto scrollbar-hide my-2 flex flex-col gap-2 rounded-2xl"
       onScroll={handleScroll}
     >
       {messages.map(({ chatMessage, user }) => {

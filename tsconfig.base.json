@@ -71,6 +71,9 @@
       "@libs/ui": [
         "libs/ui/src/index.ts"
       ],
+      "@libs/ui/tailwind": [
+        "libs/ui/src/tailwind.ts"
+      ],
       "@libs/di": [
         "libs/di/src/index.ts"
       ]

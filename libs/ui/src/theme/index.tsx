@@ -20,6 +20,7 @@ import {
   Title,
 } from '@mantine/core'
 import { PropsWithChildren } from 'react'
+import { colors } from '../colors'
 import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
 import inputClassNames from './input.module.css'
@@ -41,20 +42,7 @@ export const theme = createTheme({
   primaryShade: 7,
   fontFamily: 'DM Sans, sans-serif',
   defaultRadius: 'md',
-  colors: {
-    primary: [
-      '#f8ecff',
-      '#ead7f9',
-      '#d0adee',
-      '#ad6ddf',
-      '#a15ada',
-      '#9341d5',
-      '#8c35d3',
-      '#7928bb',
-      '#6b22a8',
-      '#5d1a94',
-    ],
-  },
+  colors,
   components: {
     Anchor: Anchor.extend({
       defaultProps: {
