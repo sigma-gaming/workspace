@@ -41,7 +41,7 @@ export const AppView = () => {
   return (
     <RouterProvider router={router}>
       <ThemeProvider>
-        <Notifications limit={3} />
+        <Notifications limit={3} position="bottom-left" containerWidth={320} />
         <OptimizedPages />
       </ThemeProvider>
     </RouterProvider>
