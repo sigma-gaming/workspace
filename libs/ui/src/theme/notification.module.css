@@ -3,6 +3,10 @@
   box-shadow: 0 0 0 1px var(--mantine-color-borders);
 }
 
+.description {
+  color: var(--mantine-color-text);
+}
+
 .closeButton:hover {
   background-color: #36384B;
 }

@@ -21,7 +21,7 @@ export const Chat = () => {
         className={clsx(
           'relative h-[142px] px-4 py-3 bg-[#1B1C2F] cursor-text transition-colors',
           'border rounded-2xl border-[#1B1C2E]',
-          'focus-within:border-[color:var(--mantine-color-input-focus)]',
+          'focus-within:border-[color:var(--mantine-color-input-border-focus)]',
         )}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
@@ -41,7 +41,10 @@ export const Chat = () => {
       >
         <textarea
           ref={textareaRef}
-          className="w-full bg-transparent placeholder-[#4E4F6D] resize-none outline-none scrollbar-hide"
+          className={clsx(
+            'w-full bg-transparent resize-none outline-none scrollbar-hide',
+            'text-[color:var(--mantine-color-text)] placeholder-[color:var(--mantine-color-placeholder)]',
+          )}
           value={text}
           onChange={(event) => updateText(event.target.value)}
           spellCheck={false}
@@ -139,14 +142,14 @@ const MessageList = () => {
             <div className="flex flex-col gap-1 mt-1 font-interface">
               <Text
                 className="cursor-default font-interface"
-                c="#9494a5"
+                c="#7D7E9C"
                 fw={500}
                 lh={1}
                 size="sm"
               >
                 {user?.profile.name ?? 'Система'}
               </Text>
-              <Text className="break-words" c="#fcf8f9" lh="xs" size="sm">
+              <Text className="break-words" lh="xs" size="sm">
                 {chatMessage.text}
               </Text>
             </div>

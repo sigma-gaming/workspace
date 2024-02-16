@@ -17,6 +17,7 @@ import {
   Popover,
   Select,
   Skeleton,
+  Switch,
   Title,
 } from '@mantine/core'
 import { PropsWithChildren } from 'react'
@@ -35,6 +36,7 @@ import pillClassNames from './pill.module.css'
 import popoverClassNames from './popover.module.css'
 import selectClassNames from './select.module.css'
 import skeletonClassNames from './skeleton.module.css'
+import switchClassNames from './switch.module.css'
 import titleClassNames from './title.module.css'
 
 export const theme = createTheme({
@@ -99,6 +101,9 @@ export const theme = createTheme({
     Select: Select.extend({
       classNames: selectClassNames,
     }),
+    Switch: Switch.extend({
+      classNames: switchClassNames,
+    }),
   },
 })
 
@@ -107,15 +112,16 @@ const resolver: CSSVariablesResolver = () => ({
   light: {},
   dark: {
     '--mantine-color-borders': '#2e304d',
-    '--mantine-color-text': '#ededed',
+    '--mantine-color-text': '#C0C1D9',
+    '--mantine-color-page-bg': '#191623',
     '--mantine-color-bg': '#381452',
     '--mantine-overlay-bg': 'rgb(37 39 60 / 80%)',
     '--mantine-color-error': '#fd473a',
-    '--mantine-color-dimmed': '#a2a2a2',
-    '--mantine-color-placeholder': 'rgb(255 255 255 / 25%)',
-    '--mantine-color-input-default': '#25273E',
-    '--mantine-color-input-focus': 'var(--mantine-primary-color-filled)',
-    '--mantine-color-input-error': 'var(--mantine-color-error)',
+    '--mantine-color-dimmed': '#9494a5',
+    '--mantine-color-placeholder': 'rgb(125 126 155 / 70%)',
+    '--mantine-color-input-bg': '#25273E',
+    '--mantine-color-input-border-focus': 'var(--mantine-primary-color-filled)',
+    '--mantine-color-input-border-error': 'var(--mantine-color-error)',
   },
 })
 

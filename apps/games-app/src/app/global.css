@@ -7,7 +7,7 @@
 
 html,
 body {
-  @apply bg-[color:var(--color-bg-main)] text-[#ededed];
+  @apply bg-[color:var(--mantine-color-page-bg)] text-[color:var(--mantine-color-text)];
 }
 
 html,

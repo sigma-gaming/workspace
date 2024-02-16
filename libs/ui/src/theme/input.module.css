@@ -4,16 +4,16 @@
 
 .input {
   @apply transition-colors;
-  background-color: #25273E;
-  border-color: var(--mantine-color-input-default);
+  background-color: var(--mantine-color-input-bg);
+  border-color: var(--mantine-color-input-bg);
 }
 
 .input:focus-within {
-  border-color: var(--mantine-color-input-focus);
+  border-color: var(--mantine-color-input-border-focus);
 }
 
 .input[data-error="true"] {
-  border-color: var(--mantine-color-input-error);
+  border-color: var(--mantine-color-input-border-error);
 }
 
 .input:placeholder {
@@ -21,6 +21,6 @@
 }
 
 html body .input[data-disabled] {
-  background-color: #25273E;
+  background-color: var(--mantine-color-input-bg);
   opacity: 0.6;
 }
