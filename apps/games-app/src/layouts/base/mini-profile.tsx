@@ -1,6 +1,6 @@
 import { getUserInitials } from '@games/model'
 import { Avatar } from '@libs/ui'
-import { Button, Menu, Modal, rem, Skeleton, Stack, Text } from '@mantine/core'
+import { Button, Menu, Modal, rem, Skeleton, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconCoins,

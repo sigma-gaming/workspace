@@ -3,8 +3,17 @@
 }
 
 .input {
+  @apply transition-colors;
   background-color: #25273E;
   border-color: #25273E;
+}
+
+.input:focus-within {
+  border-color: var(--mantine-primary-color-filled);
+}
+
+.input[data-error="true"] {
+  border-color: var(--mantine-color-error);
 }
 
 .input:placeholder {
