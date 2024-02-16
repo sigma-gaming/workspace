@@ -113,6 +113,9 @@ const resolver: CSSVariablesResolver = () => ({
     '--mantine-color-error': '#fd473a',
     '--mantine-color-dimmed': '#a2a2a2',
     '--mantine-color-placeholder': 'rgb(255 255 255 / 25%)',
+    '--mantine-color-input-default': '#25273E',
+    '--mantine-color-input-focus': 'var(--mantine-primary-color-filled)',
+    '--mantine-color-input-error': 'var(--mantine-color-error)',
   },
 })
 

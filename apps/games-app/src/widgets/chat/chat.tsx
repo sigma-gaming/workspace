@@ -1,6 +1,7 @@
 import { getUserInitials } from '@games/model'
 import { Avatar } from '@libs/ui'
 import { Button, Text, Title } from '@mantine/core'
+import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { UIEventHandler, useEffect, useRef } from 'react'
 import { $$chatWidget } from './model'
@@ -17,7 +18,11 @@ export const Chat = () => {
       <MessageList />
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <form
-        className="relative h-[142px] px-4 py-3 bg-[#1B1C2F] rounded-2xl cursor-text"
+        className={clsx(
+          'relative h-[142px] px-4 py-3 bg-[#1B1C2F] cursor-text transition-colors',
+          'border rounded-2xl border-[#1B1C2E]',
+          'focus-within:border-[color:var(--mantine-color-input-focus)]',
+        )}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
             textareaRef.current?.focus()

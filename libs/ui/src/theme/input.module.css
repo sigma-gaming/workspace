@@ -5,15 +5,15 @@
 .input {
   @apply transition-colors;
   background-color: #25273E;
-  border-color: #25273E;
+  border-color: var(--mantine-color-input-default);
 }
 
 .input:focus-within {
-  border-color: var(--mantine-primary-color-filled);
+  border-color: var(--mantine-color-input-focus);
 }
 
 .input[data-error="true"] {
-  border-color: var(--mantine-color-error);
+  border-color: var(--mantine-color-input-error);
 }
 
 .input:placeholder {
