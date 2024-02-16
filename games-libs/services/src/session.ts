@@ -71,11 +71,13 @@ export class SessionService {
       })
     }
 
-    return await gamesCaches.session.set(token, {
+    const created = await gamesCaches.session.set(token, {
       state: SessionState.Authenticated,
       user: session.user,
       token,
     })
+
+    return created
   }
 
   getUser = (session: Session): User => {

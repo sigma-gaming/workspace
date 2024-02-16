@@ -1,4 +1,4 @@
-import crypto, { randomUUID } from 'crypto'
+import crypto from 'crypto'
 import { gamesDb } from '@games/db'
 import {
   AccountInsert,
@@ -122,7 +122,7 @@ export const telegram = procedure
        */
       if (!account) {
         account = account = await gamesDb.transaction(async (tx) => {
-          const userId = randomUUID()
+          const [{ id: userId }] = await tx.insert(Users).values({}).returning()
 
           const [{ id: profileId }] = await tx
             .insert(Profiles)
@@ -132,7 +132,7 @@ export const telegram = procedure
             })
             .returning()
 
-          await tx.insert(Users).values({ id: userId, profileId })
+          await tx.update(Users).set({ profileId }).where(eq(Users.id, userId))
 
           const [account] = await tx
             .insert(Accounts)

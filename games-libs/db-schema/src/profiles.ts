@@ -14,7 +14,7 @@ export const Profiles = pgTable('Profiles', {
   username: text('username').unique(),
   usedProvider: accountProviderEnum('usedProvider').notNull(),
   userId: uuid('userId')
-    .references(() => Users.id)
+    .references(() => Users.id, { onDelete: 'cascade' })
     .notNull(),
 })
 

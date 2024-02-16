@@ -1,6 +1,6 @@
 {
-  "id": "5a1f555c-f5d6-4b73-b5b3-c0cace4c9c7e",
-  "prevId": "0a658757-c972-4bfc-be33-89fe6858620e",
+  "id": "967ad210-ecd4-41c2-a9fd-a0926a31111a",
+  "prevId": "91aab919-a083-4b18-b094-c61049df4ce6",
   "version": "5",
   "dialect": "pg",
   "tables": {
@@ -84,7 +84,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -206,7 +206,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -323,7 +323,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -391,7 +391,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -448,7 +448,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -600,7 +600,7 @@
         },
         "profileId": {
           "name": "profileId",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }

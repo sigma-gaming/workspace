@@ -20,7 +20,7 @@ export const ChatMessages = pgTable('ChatMessages', {
   text: text('text'),
   attachments: json('attachments').$type<ChatMessageAttachment[]>().default([]),
 
-  userId: uuid('userId').references(() => Users.id),
+  userId: uuid('userId').references(() => Users.id, { onDelete: 'cascade' }),
 })
 
 export type ChatMessage = typeof ChatMessages.$inferSelect

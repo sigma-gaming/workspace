@@ -9,7 +9,7 @@ export const Sessions = pgTable('Sessions', {
     mode: 'string',
   }).notNull(),
   userId: uuid('userId')
-    .references(() => Users.id)
+    .references(() => Users.id, { onDelete: 'cascade' })
     .notNull(),
 })
 

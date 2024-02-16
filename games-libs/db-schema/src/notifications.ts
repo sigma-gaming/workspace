@@ -24,7 +24,7 @@ export const Notifications = pgTable('Notifications', {
   autoClose: boolean('autoClose').notNull(),
   autoCloseMs: integer('autoCloseMs').notNull(),
   withCloseButton: boolean('withCloseButton').notNull(),
-  userId: uuid('userId').references(() => Users.id),
+  userId: uuid('userId').references(() => Users.id, { onDelete: 'cascade' }),
 })
 
 export type Notification = typeof Notifications.$inferSelect

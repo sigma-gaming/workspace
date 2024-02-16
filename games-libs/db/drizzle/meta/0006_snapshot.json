@@ -1,6 +1,6 @@
 {
-  "id": "5a1f555c-f5d6-4b73-b5b3-c0cace4c9c7e",
-  "prevId": "0a658757-c972-4bfc-be33-89fe6858620e",
+  "id": "91aab919-a083-4b18-b094-c61049df4ce6",
+  "prevId": "5a1f555c-f5d6-4b73-b5b3-c0cace4c9c7e",
   "version": "5",
   "dialect": "pg",
   "tables": {
@@ -600,7 +600,7 @@
         },
         "profileId": {
           "name": "profileId",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }

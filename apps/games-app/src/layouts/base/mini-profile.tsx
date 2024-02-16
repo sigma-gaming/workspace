@@ -39,7 +39,7 @@ export const MiniProfile = () => {
     <Menu width={240} position="bottom-end" offset={16} disabled={userLoading}>
       <Menu.Target>
         <div className="flex gap-4 items-center justify-end pl-4 cursor-pointer">
-          <Stack gap={6} align="end">
+          <div className="flex flex-col gap-1.5 items-end">
             <Skeleton visible={balanceLoading} width="fit-content" radius="sm">
               <Text className="leading-none" size="sm" c="dimmed">
                 Баланс
@@ -55,7 +55,7 @@ export const MiniProfile = () => {
                 <AnimatedBalance />
               </Text>
             </Skeleton>
-          </Stack>
+          </div>
 
           <Avatar
             src={profile?.image}

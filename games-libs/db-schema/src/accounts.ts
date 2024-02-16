@@ -17,7 +17,7 @@ export const Accounts = pgTable('Accounts', {
   providerUserLastName: text('providerUserLastName'),
   providerUserImage: text('providerUserImage'),
   userId: uuid('userId')
-    .references(() => Users.id)
+    .references(() => Users.id, { onDelete: 'cascade' })
     .notNull(),
 })
 

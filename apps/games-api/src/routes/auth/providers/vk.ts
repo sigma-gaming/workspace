@@ -11,7 +11,6 @@ import { env, sessionService } from '@games/services'
 import { InternalServerException } from '@libs/exceptions'
 import axios from 'axios'
 import { and, eq } from 'drizzle-orm'
-import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { procedure } from '../../trpc'
 
@@ -133,7 +132,7 @@ export const vk = procedure
        */
       if (!account) {
         account = await gamesDb.transaction(async (tx) => {
-          const userId = randomUUID()
+          const [{ id: userId }] = await tx.insert(Users).values({}).returning()
 
           const [{ id: profileId }] = await tx
             .insert(Profiles)
@@ -143,7 +142,7 @@ export const vk = procedure
             })
             .returning()
 
-          await tx.insert(Users).values({ id: userId, profileId })
+          await tx.update(Users).set({ profileId }).where(eq(Users.id, userId))
 
           const [account] = await tx
             .insert(Accounts)
