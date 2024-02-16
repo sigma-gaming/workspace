@@ -20,9 +20,8 @@ export const MenuSection = ({
   return (
     <div className="flex flex-col gap-1 mt-4">
       <Title
-        className="px-4 uppercase text-sm mb-1 font-interface"
+        className="px-4 uppercase text-sm mb-1 font-interface text-[color:var(--mantine-color-placeholder)]"
         order={3}
-        c="#434460"
       >
         {label}
       </Title>
