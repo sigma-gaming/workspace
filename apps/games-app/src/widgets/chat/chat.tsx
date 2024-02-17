@@ -13,7 +13,7 @@ export const Chat = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   return (
-    <div className="fixed top-[80px] right-0 bottom-0 w-[320px] p-6 flex flex-col">
+    <div className="flex flex-col h-full">
       <Title order={3}>Чат</Title>
       <MessageList />
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}

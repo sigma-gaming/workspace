@@ -113,7 +113,7 @@ const resolver: CSSVariablesResolver = () => ({
   dark: {
     '--mantine-color-borders': '#2e304d',
     '--mantine-color-text': '#C0C1D9',
-    '--mantine-color-page-bg': '#191623',
+    '--mantine-color-body': '#191623',
     '--mantine-color-bg': '#381452',
     '--mantine-overlay-bg': 'rgb(37 39 60 / 80%)',
     '--mantine-color-error': '#fd473a',

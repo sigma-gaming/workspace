@@ -4,14 +4,3 @@
 
 @tailwind components;
 @tailwind utilities;
-
-html,
-body {
-  @apply bg-[color:var(--mantine-color-page-bg)] text-[color:var(--mantine-color-text)];
-}
-
-html,
-body,
-#root {
-  @apply m-0 h-full;
-}

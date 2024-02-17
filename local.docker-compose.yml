@@ -6,7 +6,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: 12345
+      POSTGRES_PASSWORD: SECRET_REMOVED
 
   rabbitmq:
     image: rabbitmq:3.8.9-management-alpine
