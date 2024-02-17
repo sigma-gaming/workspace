@@ -3475,6 +3475,7 @@ __metadata:
     concurrently: "npm:^8.2.2"
     cookie: "npm:^0.6.0"
     cron: "npm:^3.1.6"
+    dayjs: "npm:^1.11.10"
     dotenv-cli: "npm:^7.3.0"
     drizzle-kit: "npm:^0.20.13"
     drizzle-orm: "npm:^0.29.3"
@@ -5824,6 +5825,13 @@ __metadata:
   version: 4.6.3
   resolution: "dateformat@npm:4.6.3"
   checksum: e2023b905e8cfe2eb8444fb558562b524807a51cdfe712570f360f873271600b5c94aebffaf11efb285e2c072264a7cf243eadb68f3eba0f8cc85fb86cd25df6
+  languageName: node
+  linkType: hard
+
+"dayjs@npm:^1.11.10":
+  version: 1.11.10
+  resolution: "dayjs@npm:1.11.10"
+  checksum: 4de9af50639d47df87f2e15fa36bb07e0f9ed1e9c52c6caa1482788ee9a384d668f1dbd00c54f82aaab163db07d61d2899384b8254da3a9184fc6deca080e2fe
   languageName: node
   linkType: hard
 

@@ -2,6 +2,7 @@ import { getUserInitials } from '@games/model'
 import { Avatar } from '@libs/ui'
 import { Button, Text, Title } from '@mantine/core'
 import clsx from 'clsx'
+import dayjs from 'dayjs'
 import { useUnit } from 'effector-react'
 import { UIEventHandler, useEffect, useRef } from 'react'
 import { $$chatWidget } from './model'
@@ -140,15 +141,20 @@ const MessageList = () => {
               />
             )}
             <div className="flex flex-col gap-1 mt-1 font-interface">
-              <Text
-                className="cursor-default font-interface"
-                c="#7D7E9C"
-                fw={500}
-                lh={1}
-                size="sm"
-              >
-                {user?.profile.name ?? 'Система'}
-              </Text>
+              <div className="flex gap-2">
+                <Text
+                  className="cursor-default font-interface truncate max-w-[150px]"
+                  c="#7D7E9C"
+                  fw={500}
+                  lh={1}
+                  size="sm"
+                >
+                  {user?.profile.name ?? 'Система'}
+                </Text>
+                <Text lh={1} size="sm" c="#4F506F">
+                  {dayjs(chatMessage.createdAt).format('HH:mm')}
+                </Text>
+              </div>
               <Text className="break-words" lh="xs" size="sm">
                 {chatMessage.text}
               </Text>
