@@ -16,7 +16,7 @@ export const DicesGamePageView = () => {
       style={{ gap: 'var(--mantine-spacing-md)' }}
       onSubmit={(event) => {
         event.preventDefault()
-        $$dicesPage.startPlay()
+        $$dicesPage.playPressed()
       }}
     >
       <Title order={3}>Dices</Title>
@@ -50,7 +50,7 @@ export const DicesGamePageView = () => {
       <Button type="submit" disabled={playing || autoplaying} fullWidth={true}>
         Играть
       </Button>
-      <Button onClick={() => $$dicesPage.autoplayToggled()} fullWidth={true}>
+      <Button onClick={() => $$dicesPage.autoplayPressed()} fullWidth={true}>
         {autoplaying ? 'Остановить' : 'Автоигра'}
       </Button>
     </Card>

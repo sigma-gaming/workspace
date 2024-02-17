@@ -2,8 +2,11 @@ import { createMutation } from '@farfetched/core'
 import { BadRequestException, fromTrpc } from '@libs/exceptions'
 import { createField, createForm } from '@libs/forms'
 import { createEvent, createStore, sample } from 'effector'
+import { condition } from 'patronum'
 import { z } from 'zod'
 import { $$balance } from '../../../entities/balance'
+import { $$notifications } from '../../../entities/notifications'
+import { $$user } from '../../../entities/user'
 import { gamesApi } from '../../../shared/api/games'
 
 const playGameMutation = createMutation({
@@ -13,6 +16,8 @@ const playGameMutation = createMutation({
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
 
+const playPressed = createEvent()
+const autoplayPressed = createEvent()
 const startPlay = createEvent()
 const autoplayToggled = createEvent()
 
@@ -41,6 +46,34 @@ export const form = createForm({
       .min(1, 'Выберите как минимум одну грань')
       .max(6),
   }),
+})
+
+condition({
+  source: sample({
+    clock: playPressed,
+    source: $$user.$expired,
+  }),
+  if: Boolean,
+  then: $$notifications.show.prepend(() => ({
+    title: 'Действие недоступно',
+    message: 'Чтобы играть, войдите в аккаунт',
+    color: 'red',
+  })),
+  else: startPlay,
+})
+
+condition({
+  source: sample({
+    clock: autoplayPressed,
+    source: $$user.$expired,
+  }),
+  if: Boolean,
+  then: $$notifications.show.prepend(() => ({
+    title: 'Действие недоступно',
+    message: 'Чтобы играть, войдите в аккаунт',
+    color: 'red',
+  })),
+  else: autoplayToggled,
 })
 
 sample({
@@ -91,6 +124,6 @@ export const $$dicesPage = {
   form,
   $playing,
   $autoplaying,
-  startPlay,
-  autoplayToggled,
+  playPressed,
+  autoplayPressed,
 }

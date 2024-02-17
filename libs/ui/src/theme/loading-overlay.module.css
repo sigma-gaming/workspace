@@ -1,5 +1,5 @@
 .overlay {
-  background-color: var(--mantine-overlay-bg);
+  background-color: var(--mantine-color-overlay);
   animation: appear 200ms ease-out forwards;
 }
 

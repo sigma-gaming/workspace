@@ -1,5 +1,11 @@
+.overlay {
+  @apply transform-gpu;
+}
+
 .content {
-  background-color: #330e4d;
+  @apply will-change-transform;
+  background-color: #25273C;
+  box-shadow: 0 0 0 1px var(--mantine-color-borders);
 }
 
 .header {
@@ -7,7 +13,7 @@
 }
 
 .title {
-  @apply text-lg font-semibold;
+  @apply text-lg font-semibold text-white;
 }
 
 .body {
@@ -15,9 +21,10 @@
 }
 
 .close {
-  color: white;
+  @apply transition-colors;
+  color: var(--mantine-color-text);
 
   &:hover {
-    background-color: #471769;
+    background-color: #36384B;
   }
 }

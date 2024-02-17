@@ -11,7 +11,7 @@ export const MaintenanceOverlay = () => {
   }
 
   return (
-    <CenteredLayout className="z-[100000] bg-[color:var(--color-bg-main)]">
+    <CenteredLayout className="z-[100000] bg-[color:var(--mantine-color-body)]">
       <div className="flex flex-col items-center gap-8 max-w-[320px]">
         <Loader size="xl" />
         <Text className="text-center" size="lg" lh="xs">
