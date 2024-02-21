@@ -1,6 +1,7 @@
 import { Config } from 'tailwindcss'
 import plugin from 'tailwindcss/plugin'
 import { tailwindColors } from './colors'
+import { screens } from './screens'
 
 const basePlugin = plugin(({ addBase }) => {
   addBase({
@@ -16,6 +17,14 @@ const patchPlugin = plugin(({ addUtilities }) => {
     '.break-words': {
       'word-break': 'break-word',
       'overflow-wrap': 'break-word',
+    },
+  })
+})
+
+const utilsPlugin = plugin(({ addUtilities }) => {
+  addUtilities({
+    '.shadow-border': {
+      boxShadow: '0 0 0 1px var(--mantine-color-borders)',
     },
   })
 })
@@ -53,8 +62,12 @@ const scrollbarPlugin = plugin(({ addUtilities }) => {
 export function createConfig(config: { content: string[] }): Config {
   return {
     content: ['../../libs/ui/**/*.{ts,tsx}', ...config.content],
-    plugins: [basePlugin, patchPlugin, scrollbarPlugin],
+    plugins: [basePlugin, patchPlugin, utilsPlugin, scrollbarPlugin],
+
     theme: {
+      screens: Object.fromEntries(
+        screens.map(({ name, width }) => [name, `${width}px`]),
+      ),
       extend: {
         fontFamily: {
           text: `DM Sans, sans-serif`,

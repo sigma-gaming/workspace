@@ -1,5 +1,5 @@
 import './global.css'
-import { ThemeProvider } from '@libs/ui'
+import { ThemeProvider, useMedia } from '@libs/ui'
 import { Notifications } from '@mantine/notifications'
 import { createRoutesView, RouterProvider } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
@@ -39,10 +39,17 @@ const OptimizedPages = () => {
 }
 
 export const AppView = () => {
+  const isMobile = useMedia({ to: 'md' })
+
   return (
     <RouterProvider router={router}>
       <ThemeProvider>
-        <Notifications limit={3} position="bottom-left" containerWidth={320} />
+        <Notifications
+          limit={3}
+          position="bottom-left"
+          containerWidth={320}
+          bottom={isMobile ? 76 : 'var(--mantine-spacing-md)'}
+        />
         <OptimizedPages />
         <MaintenanceOverlay />
       </ThemeProvider>

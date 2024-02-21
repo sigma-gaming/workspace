@@ -3,9 +3,8 @@
 }
 
 .content {
-  @apply will-change-transform;
+  @apply will-change-transform shadow-border;
   background-color: #25273C;
-  box-shadow: 0 0 0 1px var(--mantine-color-borders);
 }
 
 .header {

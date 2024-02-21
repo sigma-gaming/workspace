@@ -10,7 +10,6 @@ import {
   Select,
   Skeleton,
   Space,
-  Stack,
   Text,
   TextInput,
   Title,
@@ -30,7 +29,7 @@ export const SettingsPageView = () => {
   return (
     <>
       <Profile />
-      <Space h="xl" />
+      <Space h={36} />
       <SocialNetworks />
     </>
   )
@@ -176,7 +175,7 @@ const SocialNetworks = () => {
                       root: '!bg-[#25273E] rounded-xl',
                     }}
                   >
-                    <div className="flex flex-col items-center sm:flex-row gap-4">
+                    <div className="flex flex-row items-center gap-4">
                       {providerUserImage && (
                         <Avatar
                           src={providerUserImage}
@@ -186,12 +185,12 @@ const SocialNetworks = () => {
                           bordered={true}
                         />
                       )}
-                      <Stack gap={4}>
+                      <div className="flex flex-col gap-1">
                         <Title order={4}>{label}</Title>
-                        <Text ff="Rubik, sans-serif">
+                        <Text ff="Rubik, sans-serif" className="leading-[1.25]">
                           {fullName} {profileLink && <>({profileLink})</>}
                         </Text>
-                      </Stack>
+                      </div>
                     </div>
                   </Card>
                 )
@@ -204,10 +203,10 @@ const SocialNetworks = () => {
                   <Card className="justify-center">
                     <Group>
                       <Skeleton circle height={56} width={56} />
-                      <Stack gap={12}>
+                      <div className="flex flex-col gap-3">
                         <Skeleton width={100} height={20} />
                         <Skeleton width={200} height={16} />
-                      </Stack>
+                      </div>
                     </Group>
                   </Card>
                 </Skeleton>

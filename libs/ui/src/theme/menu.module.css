@@ -1,8 +1,7 @@
 .dropdown {
-  @apply font-interface;
+  @apply font-interface shadow-border;
   border: none;
   background-color: #25273E;
-  box-shadow: 0 0 0 1px var(--mantine-color-borders);
 }
 
 .divider {

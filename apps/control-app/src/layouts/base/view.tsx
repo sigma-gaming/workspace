@@ -13,7 +13,7 @@ import { Logo } from './logo.tsx'
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
   return (
-    <div className="min-h-full flex flex-col pb-8">
+    <div className="min-h-full flex flex-col">
       <Left />
       <main className="pl-[280px] pr-6 pt-[104px] pb-6">{children}</main>
     </div>

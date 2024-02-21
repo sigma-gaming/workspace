@@ -1,5 +1,5 @@
 import { getUserInitials } from '@games/model'
-import { Avatar } from '@libs/ui'
+import { Avatar, useMedia } from '@libs/ui'
 import { Button, Menu, Modal, rem, Skeleton, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
@@ -21,6 +21,7 @@ import { routes } from '../../routing'
 import { formatRUB } from '../../shared/lib/format/currency.ts'
 
 export const MiniProfile = () => {
+  const isMobile = useMedia({ to: 'md' })
   const userExpired = useUnit($$user.$expired)
   const loggingOut = useUnit($$user.$loggingOut)
   const balanceDepositing = useUnit($$balance.$depositing)
@@ -36,7 +37,12 @@ export const MiniProfile = () => {
   const initials = getUserInitials(profile?.name)
 
   return (
-    <Menu width={240} position="bottom-end" offset={16} disabled={userLoading}>
+    <Menu
+      width={240}
+      position="bottom-end"
+      offset={isMobile ? 32 : 16}
+      disabled={userLoading}
+    >
       <Menu.Target>
         <div className="flex gap-4 items-center justify-end pl-4 cursor-pointer">
           <div className="flex flex-col gap-1.5 items-end">
@@ -65,7 +71,7 @@ export const MiniProfile = () => {
                 {children}
               </button>
             )}
-            size={56}
+            size={isMobile ? 48 : 56}
             loading={userLoading}
             fallback={initials}
             bordered={true}
