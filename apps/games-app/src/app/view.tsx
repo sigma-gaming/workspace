@@ -48,7 +48,7 @@ export const AppView = () => {
           limit={3}
           position="bottom-left"
           containerWidth={320}
-          bottom={isMobile ? 76 : 'var(--mantine-spacing-md)'}
+          bottom={isMobile ? 64 : 'var(--mantine-spacing-md)'}
         />
         <OptimizedPages />
         <MaintenanceOverlay />
