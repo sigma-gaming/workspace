@@ -1,6 +1,6 @@
 import { bigint, integer, pgTable, timestamp } from 'drizzle-orm/pg-core'
 
-export const Budget = pgTable('Budget', {
+export const BudgetTable = pgTable('Budget', {
   id: integer('id').default(1).primaryKey(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
@@ -20,4 +20,4 @@ export const Budget = pgTable('Budget', {
   maxLoss: bigint('maxLoss', { mode: 'number' }).notNull().default(100_000_00),
 })
 
-export type Budget = typeof Budget.$inferSelect
+export type BudgetSelect = typeof BudgetTable.$inferSelect

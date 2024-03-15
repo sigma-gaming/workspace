@@ -1,10 +1,13 @@
 import { relations } from 'drizzle-orm'
-import { Notifications } from './notifications'
-import { Users } from './users'
+import { NotificationTable } from './notifications'
+import { UserTable } from './users'
 
-export const notificationsRelations = relations(Notifications, ({ one }) => ({
-  user: one(Users, {
-    fields: [Notifications.userId],
-    references: [Users.id],
+export const notificationRelations = relations(
+  NotificationTable,
+  ({ one }) => ({
+    user: one(UserTable, {
+      fields: [NotificationTable.userId],
+      references: [UserTable.id],
+    }),
   }),
-}))
+)

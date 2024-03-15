@@ -1,7 +1,7 @@
-import { Account } from '@games/db-schema'
+import { AccountSelect } from '@games/db-schema'
 
 export type AccountPublic = Pick<
-  Account,
+  AccountSelect,
   | 'provider'
   | 'providerUsername'
   | 'providerUserFirstName'

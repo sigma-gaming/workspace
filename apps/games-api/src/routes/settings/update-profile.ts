@@ -1,8 +1,8 @@
 import { gamesDb } from '@games/db'
 import {
   AccountProvider,
-  Accounts,
-  Profiles,
+  AccountTable,
+  ProfileTable,
   ProfileUpdate,
 } from '@games/db-schema'
 import {
@@ -35,8 +35,8 @@ export const updateProfile = procedure
     const { username } = input
 
     if (username) {
-      const currentProfile = await gamesDb.query.Profiles.findFirst({
-        where: eq(Profiles.username, username),
+      const currentProfile = await gamesDb.query.ProfileTable.findFirst({
+        where: eq(ProfileTable.username, username),
       })
 
       if (currentProfile && currentProfile.userId !== user.id) {
@@ -47,8 +47,8 @@ export const updateProfile = procedure
       }
     }
 
-    const accounts = await gamesDb.query.Accounts.findMany({
-      where: eq(Accounts.userId, user.id),
+    const accounts = await gamesDb.query.AccountTable.findMany({
+      where: eq(AccountTable.userId, user.id),
     })
 
     const selectedProvider = accounts.find(
@@ -81,9 +81,9 @@ export const updateProfile = procedure
     }
 
     const [profile] = await gamesDb
-      .update(Profiles)
+      .update(ProfileTable)
       .set(updates)
-      .where(eq(Profiles.userId, user.id))
+      .where(eq(ProfileTable.userId, user.id))
       .returning()
 
     await gamesCaches.detailedProfile.del(user.id)

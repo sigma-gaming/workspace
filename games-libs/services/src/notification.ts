@@ -1,8 +1,8 @@
 import { gamesDb } from '@games/db'
 import {
-  Notification,
   NotificationInsert,
-  Notifications,
+  NotificationSelect,
+  NotificationTable,
 } from '@games/db-schema'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
@@ -11,20 +11,20 @@ import { singleton } from 'tsyringe'
 
 @singleton()
 export class NotificationService {
-  getActual = async (userId?: string): Promise<Notification[]> => {
-    const actual: Notification[] = []
+  getActual = async (userId?: string): Promise<NotificationSelect[]> => {
+    const actual: NotificationSelect[] = []
     const now = new Date().toISOString()
 
     if (userId) {
       let personal = await gamesCaches.personalNotifications.get(userId)
 
       if (!personal) {
-        personal = await gamesDb.query.Notifications.findMany({
+        personal = await gamesDb.query.NotificationTable.findMany({
           where: and(
-            eq(Notifications.userId, userId),
-            gte(Notifications.expiresAt, now),
+            eq(NotificationTable.userId, userId),
+            gte(NotificationTable.expiresAt, now),
           ),
-          orderBy: asc(Notifications.createdAt),
+          orderBy: asc(NotificationTable.createdAt),
         })
 
         await gamesCaches.personalNotifications.set(userId, personal)
@@ -36,12 +36,12 @@ export class NotificationService {
     let global = await gamesCaches.globalNotifications.get()
 
     if (!global) {
-      global = await gamesDb.query.Notifications.findMany({
+      global = await gamesDb.query.NotificationTable.findMany({
         where: and(
-          isNull(Notifications.userId),
-          gte(Notifications.expiresAt, now),
+          isNull(NotificationTable.userId),
+          gte(NotificationTable.expiresAt, now),
         ),
-        orderBy: asc(Notifications.createdAt),
+        orderBy: asc(NotificationTable.createdAt),
       })
 
       await gamesCaches.globalNotifications.set(global)
@@ -53,7 +53,7 @@ export class NotificationService {
 
   send = async (payload: NotificationInsert) => {
     const [notification] = await gamesDb
-      .insert(Notifications)
+      .insert(NotificationTable)
       .values(payload)
       .returning()
 

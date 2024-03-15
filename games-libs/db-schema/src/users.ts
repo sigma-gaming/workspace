@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm'
 import { integer, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { userRoleEnum } from './enums'
 
-export const Users = pgTable('Users', {
+export const UserTable = pgTable('User', {
   id: uuid('id').defaultRandom().primaryKey(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
@@ -18,5 +18,5 @@ export const Users = pgTable('Users', {
   profileId: integer('profileId'),
 })
 
-export type User = typeof Users.$inferSelect
-export type UserInsert = typeof Users.$inferInsert
+export type UserSelect = typeof UserTable.$inferSelect
+export type UserInsert = typeof UserTable.$inferInsert

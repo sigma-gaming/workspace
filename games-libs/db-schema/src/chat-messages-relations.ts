@@ -1,10 +1,10 @@
 import { relations } from 'drizzle-orm'
-import { ChatMessages } from './chat-messages'
-import { Users } from './users'
+import { ChatMessageTable } from './chat-messages'
+import { UserTable } from './users'
 
-export const chatMessagesRelations = relations(ChatMessages, ({ one }) => ({
-  user: one(Users, {
-    fields: [ChatMessages.userId],
-    references: [Users.id],
+export const chatMessageRelations = relations(ChatMessageTable, ({ one }) => ({
+  user: one(UserTable, {
+    fields: [ChatMessageTable.userId],
+    references: [UserTable.id],
   }),
 }))

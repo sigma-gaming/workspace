@@ -1,8 +1,8 @@
-import { Profile, UserRole } from '@games/db-schema'
+import { ProfileSelect, UserRole } from '@games/db-schema'
 import { z } from 'zod'
 import { AccountPublic } from './account'
 
-export interface ProfileDetailed extends Profile {
+export interface ProfileDetailed extends ProfileSelect {
   name: string
   image: string | null
   roles: UserRole[]

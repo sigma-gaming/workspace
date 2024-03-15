@@ -1,8 +1,8 @@
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { accountProviderEnum } from './enums'
-import { Users } from './users'
+import { UserTable } from './users'
 
-export const Accounts = pgTable('Accounts', {
+export const AccountTable = pgTable('Account', {
   id: uuid('id').defaultRandom().primaryKey(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
@@ -17,9 +17,9 @@ export const Accounts = pgTable('Accounts', {
   providerUserLastName: text('providerUserLastName'),
   providerUserImage: text('providerUserImage'),
   userId: uuid('userId')
-    .references(() => Users.id, { onDelete: 'cascade' })
+    .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
 })
 
-export type Account = typeof Accounts.$inferSelect
-export type AccountInsert = typeof Accounts.$inferInsert
+export type AccountSelect = typeof AccountTable.$inferSelect
+export type AccountInsert = typeof AccountTable.$inferInsert

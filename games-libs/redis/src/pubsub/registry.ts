@@ -1,20 +1,19 @@
-import { Notification } from '@games/db-schema'
-import { ChatMessageDetailed } from '@games/model'
+import { ChatMessageSelect, NotificationSelect } from '@games/db-schema'
 import { createSingletonProxy } from '@libs/di'
 import { singleton } from 'tsyringe'
 import { PubSub, PubSubService } from './service'
 
 @singleton()
 export class PubSubRegistry {
-  notifications: PubSub<Notification>
-  chatMessages: PubSub<ChatMessageDetailed>
+  notifications: PubSub<NotificationSelect>
+  chatMessages: PubSub<ChatMessageSelect>
 
   constructor(pubsubService: PubSubService) {
-    this.notifications = pubsubService.create<Notification>({
+    this.notifications = pubsubService.create<NotificationSelect>({
       channelName: 'notifications',
     })
 
-    this.chatMessages = pubsubService.create<ChatMessageDetailed>({
+    this.chatMessages = pubsubService.create<ChatMessageSelect>({
       channelName: 'chat-messages',
     })
   }

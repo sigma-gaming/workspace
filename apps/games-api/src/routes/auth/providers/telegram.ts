@@ -3,9 +3,9 @@ import { gamesDb } from '@games/db'
 import {
   AccountInsert,
   AccountProvider,
-  Accounts,
-  Profiles,
-  Users,
+  AccountTable,
+  ProfileTable,
+  UserTable,
 } from '@games/db-schema'
 import { gamesCaches } from '@games/redis'
 import { env, sessionService, telegramBotService } from '@games/services'
@@ -69,10 +69,10 @@ export const telegram = procedure
         throw new Error('tgAuthResult is already expired')
       }
 
-      let account = await gamesDb.query.Accounts.findFirst({
+      let account = await gamesDb.query.AccountTable.findFirst({
         where: and(
-          eq(Accounts.provider, AccountProvider.Telegram),
-          eq(Accounts.providerUserId, tgAuthResult.id),
+          eq(AccountTable.provider, AccountProvider.Telegram),
+          eq(AccountTable.providerUserId, tgAuthResult.id),
         ),
       })
 
@@ -99,7 +99,7 @@ export const telegram = procedure
        * If user is logged in and account is not found, create account and connect it to user
        */
       if (session.user && !account) {
-        await gamesDb.insert(Accounts).values({
+        await gamesDb.insert(AccountTable).values({
           userId: session.user.id,
           ...accountSharedInput,
         })
@@ -122,20 +122,20 @@ export const telegram = procedure
        */
       if (!account) {
         account = account = await gamesDb.transaction(async (tx) => {
-          const [{ id: userId }] = await tx.insert(Users).values({}).returning()
+          const [{ id: userId }] = await tx.insert(UserTable).values({}).returning()
 
           const [{ id: profileId }] = await tx
-            .insert(Profiles)
+            .insert(ProfileTable)
             .values({
               userId,
               usedProvider: AccountProvider.Telegram,
             })
             .returning()
 
-          await tx.update(Users).set({ profileId }).where(eq(Users.id, userId))
+          await tx.update(UserTable).set({ profileId }).where(eq(UserTable.id, userId))
 
           const [account] = await tx
-            .insert(Accounts)
+            .insert(AccountTable)
             .values({ userId, ...accountSharedInput })
             .returning()
 

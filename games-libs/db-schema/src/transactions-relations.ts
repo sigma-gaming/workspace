@@ -1,10 +1,10 @@
 import { relations } from 'drizzle-orm'
-import { Transactions } from './transactions'
-import { Users } from './users'
+import { TransactionTable } from './transactions'
+import { UserTable } from './users'
 
-export const transactionsRelations = relations(Transactions, ({ one }) => ({
-  user: one(Users, {
-    fields: [Transactions.userId],
-    references: [Users.id],
+export const transactionRelations = relations(TransactionTable, ({ one }) => ({
+  user: one(UserTable, {
+    fields: [TransactionTable.userId],
+    references: [UserTable.id],
   }),
 }))

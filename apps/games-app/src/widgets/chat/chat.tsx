@@ -1,3 +1,4 @@
+import { ChatMessageType } from '@games/db-schema'
 import { getUserInitials } from '@games/model'
 import { Avatar } from '@libs/ui'
 import { Button, Text, Title } from '@mantine/core'
@@ -123,22 +124,24 @@ const MessageList = () => {
       className="flex-1 overflow-auto scrollbar-hide my-2 flex flex-col gap-2 rounded-2xl"
       onScroll={handleScroll}
     >
-      {messages.map(({ chatMessage, user }) => {
-        const initials = getUserInitials(user?.profile?.name)
+      {messages.map((message) => {
+        const initials = getUserInitials(message.senderName)
 
         return (
           <div
-            key={chatMessage.id}
+            key={message.id}
             className="flex gap-3 p-3 pr-4 bg-[#1B1C2F] rounded-2xl"
             data-chat-message={true}
           >
-            {user && (
+            {message.type === ChatMessageType.UserMessage ? (
               <Avatar
-                src={user.profile.image}
-                alt={`Аватар ${user.profile.name}`}
+                src={message.senderImage}
+                alt={`Аватар ${message.senderName}`}
                 fallback={initials}
                 size={32}
               />
+            ) : (
+              <Avatar src={null} alt="Аватар системы" fallback="S" size={32} />
             )}
             <div className="flex flex-col gap-1 mt-1 font-interface">
               <div className="flex gap-2">
@@ -149,14 +152,16 @@ const MessageList = () => {
                   lh={1}
                   size="sm"
                 >
-                  {user?.profile.name ?? 'Система'}
+                  {message.type === ChatMessageType.UserMessage
+                    ? message.senderName
+                    : 'Система'}
                 </Text>
                 <Text lh={1} size="sm" c="#4F506F">
-                  {dayjs(chatMessage.createdAt).format('HH:mm')}
+                  {dayjs(message.createdAt).format('HH:mm')}
                 </Text>
               </div>
               <Text className="break-words" lh="xs" size="sm">
-                {chatMessage.text}
+                {message.text}
               </Text>
             </div>
           </div>

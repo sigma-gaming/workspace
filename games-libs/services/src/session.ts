@@ -1,5 +1,10 @@
 import { gamesDb } from '@games/db'
-import { AccountProvider, Sessions, User, Users } from '@games/db-schema'
+import {
+  AccountProvider,
+  SessionTable,
+  UserSelect,
+  UserTable,
+} from '@games/db-schema'
 import { Session, SessionState } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
@@ -59,8 +64,8 @@ export class SessionService {
       })
     }
 
-    const session = await gamesDb.query.Sessions.findFirst({
-      where: eq(Sessions.token, token),
+    const session = await gamesDb.query.SessionTable.findFirst({
+      where: eq(SessionTable.token, token),
       with: { user: true },
     })
 
@@ -80,7 +85,7 @@ export class SessionService {
     return created
   }
 
-  getUser = (session: Session): User => {
+  getUser = (session: Session): UserSelect => {
     if (session.state === SessionState.Expired)
       throw new SessionExpiredException()
     if (session.state === SessionState.Empty)
@@ -88,7 +93,7 @@ export class SessionService {
     return session.user
   }
 
-  getUserSafe = (session: Session): User | null => {
+  getUserSafe = (session: Session): UserSelect | null => {
     if (session.state === SessionState.Expired) return null
     if (session.state === SessionState.Empty) return null
     return session.user
@@ -101,15 +106,15 @@ export class SessionService {
     const expiresAt = new Date(Date.now() + 1000 * expiresIn)
     const token = jwt.sign({ userId }, this.env.jwt.secret, { expiresIn })
 
-    const user = await gamesDb.query.Users.findFirst({
-      where: eq(Users.id, userId),
+    const user = await gamesDb.query.UserTable.findFirst({
+      where: eq(UserTable.id, userId),
     })
 
     if (!user) {
       throw new NotAuthenticatedException()
     }
 
-    await gamesDb.insert(Sessions).values({
+    await gamesDb.insert(SessionTable).values({
       userId,
       token,
       expiresAt: expiresAt.toISOString(),
@@ -123,16 +128,16 @@ export class SessionService {
 
     await gamesCaches.session.set(token, session)
 
-    const extraSessions = await gamesDb.query.Sessions.findMany({
-      where: eq(Sessions.userId, userId),
-      orderBy: desc(Sessions.expiresAt),
+    const extraSessions = await gamesDb.query.SessionTable.findMany({
+      where: eq(SessionTable.userId, userId),
+      orderBy: desc(SessionTable.expiresAt),
       offset: 5, // Max 5 sessions per user
     })
 
     if (extraSessions.length > 0) {
-      await gamesDb.delete(Sessions).where(
+      await gamesDb.delete(SessionTable).where(
         inArray(
-          Sessions.id,
+          SessionTable.id,
           extraSessions.map((s) => s.id),
         ),
       )
@@ -169,7 +174,9 @@ export class SessionService {
   async removeSession(session: Session) {
     if (session.token) {
       try {
-        await gamesDb.delete(Sessions).where(eq(Sessions.token, session.token))
+        await gamesDb
+          .delete(SessionTable)
+          .where(eq(SessionTable.token, session.token))
       } catch {
         // Session doesn't exist
       }

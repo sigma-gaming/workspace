@@ -1,5 +1,9 @@
 import { gamesDb } from '@games/db'
-import { Transaction, TransactionInsert, Transactions } from '@games/db-schema'
+import {
+  TransactionInsert,
+  TransactionSelect,
+  TransactionTable,
+} from '@games/db-schema'
 import { gamesCaches } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
 import { desc, eq, sql } from 'drizzle-orm'
@@ -7,7 +11,9 @@ import { singleton } from 'tsyringe'
 
 @singleton()
 export class TransactionService {
-  getLastTransaction = async (userId: string): Promise<Transaction | null> => {
+  getLastTransaction = async (
+    userId: string,
+  ): Promise<TransactionSelect | null> => {
     const cached = await gamesCaches.lastTransaction.get(userId)
 
     if (cached) {
@@ -25,9 +31,9 @@ export class TransactionService {
 
   getTransaction = async (
     transactionId: string,
-  ): Promise<Transaction | null> => {
-    const transaction = await gamesDb.query.Transactions.findFirst({
-      where: eq(Transactions.id, transactionId),
+  ): Promise<TransactionSelect | null> => {
+    const transaction = await gamesDb.query.TransactionTable.findFirst({
+      where: eq(TransactionTable.id, transactionId),
     })
 
     return transaction ?? null
@@ -36,7 +42,7 @@ export class TransactionService {
   createTransaction = async (
     userId: string,
     payload: Required<Omit<TransactionInsert, 'id' | 'createdAt' | 'userId'>>,
-  ): Promise<Transaction> => {
+  ): Promise<TransactionSelect> => {
     const [newTransaction] = await this.createTransactionQuery.execute({
       userId,
       ...payload,
@@ -47,13 +53,13 @@ export class TransactionService {
     return newTransaction
   }
 
-  getLastTransactionQuery = gamesDb.query.Transactions.findFirst({
-    where: eq(Transactions.userId, sql.placeholder('userId')),
-    orderBy: desc(Transactions.createdAt),
+  getLastTransactionQuery = gamesDb.query.TransactionTable.findFirst({
+    where: eq(TransactionTable.userId, sql.placeholder('userId')),
+    orderBy: desc(TransactionTable.createdAt),
   }).prepare('transactionQuery')
 
   createTransactionQuery = gamesDb
-    .insert(Transactions)
+    .insert(TransactionTable)
     .values({
       userId: sql.placeholder('userId'),
       type: sql.placeholder('type'),

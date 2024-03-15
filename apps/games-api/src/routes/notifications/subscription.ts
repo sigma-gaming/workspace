@@ -1,4 +1,4 @@
-import { Notification } from '@games/db-schema'
+import { NotificationSelect } from '@games/db-schema'
 import { gamesPubsubs } from '@games/redis'
 import { sessionService } from '@games/services'
 import { observable, Observer } from '@trpc/server/observable'
@@ -12,11 +12,14 @@ gamesPubsubs.notifications.subscribe((notification) => {
   }
 })
 
-const observersByUserId = new Map<string, Observer<Notification, unknown>[]>()
+const observersByUserId = new Map<
+  string,
+  Observer<NotificationSelect, unknown>[]
+>()
 
 function registerObserver(
   userId: string,
-  observer: Observer<Notification, unknown>,
+  observer: Observer<NotificationSelect, unknown>,
 ) {
   const observers = observersByUserId.get(userId) ?? []
   observersByUserId.set(userId, [...observers, observer])
@@ -24,7 +27,7 @@ function registerObserver(
 
 function unregisterObserver(
   userId: string,
-  observer: Observer<Notification, unknown>,
+  observer: Observer<NotificationSelect, unknown>,
 ) {
   const observers = observersByUserId.get(userId) ?? []
 
@@ -34,12 +37,12 @@ function unregisterObserver(
   )
 }
 
-function emitToUser(userId: string, notification: Notification) {
+function emitToUser(userId: string, notification: NotificationSelect) {
   const observers = observersByUserId.get(userId) ?? []
   observers.forEach((observer) => observer.next(notification))
 }
 
-function emitToAll(notification: Notification) {
+function emitToAll(notification: NotificationSelect) {
   observersByUserId.forEach((observers) => {
     observers.forEach((observer) => observer.next(notification))
   })
@@ -49,7 +52,7 @@ export const subscription = procedure.subscription(({ ctx }) => {
   const user = sessionService.getUserSafe(ctx.session)
   const userId = user?.id ?? 'anonymous'
 
-  return observable<Notification>((observer) => {
+  return observable<NotificationSelect>((observer) => {
     registerObserver(userId, observer)
     return () => unregisterObserver(userId, observer)
   })

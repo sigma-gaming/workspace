@@ -3,13 +3,16 @@ import {
   ChatMessageAttachment,
   ChatMessageAttachmentGame,
   ChatMessageAttachmentType,
-  ChatMessages,
+  ChatMessageInsert,
+  ChatMessageSelect,
+  ChatMessageTable,
   ChatMessageType,
+  UserRole,
 } from '@games/db-schema'
-import { ChatMessageDetailed } from '@games/model'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
 import { BadRequestException, InternalServerException } from '@libs/exceptions'
+import { desc } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 import { profileService } from './profile'
 import { TransactionService } from './transaction'
@@ -38,9 +41,28 @@ export class ChatService {
     }
   }
 
-  async getLastMessages() {
+  private async getLastMessagesUnlocked(): Promise<ChatMessageSelect[]> {
     const lastMessages = await gamesCaches.lastChatMessages.get()
-    return lastMessages ?? []
+    if (lastMessages) return lastMessages
+
+    const messages = await gamesDb.query.ChatMessageTable.findMany({
+      orderBy: desc(ChatMessageTable.createdAt),
+      limit: 100,
+    })
+
+    await gamesCaches.lastChatMessages.set(messages)
+
+    return messages
+  }
+
+  async getLastMessages(): Promise<ChatMessageSelect[]> {
+    const lock = await gamesCaches.lastChatMessages.lock(10000)
+
+    try {
+      return await this.getLastMessagesUnlocked()
+    } finally {
+      await lock.release()
+    }
   }
 
   async sendMessage(options: {
@@ -49,7 +71,7 @@ export class ChatService {
       text?: string
       attachments?: ChatMessageAttachment[]
     }
-  }): Promise<ChatMessageDetailed> {
+  }): Promise<ChatMessageSelect> {
     const lock = await gamesCaches.lastChatMessages.lock(10000)
 
     try {
@@ -78,48 +100,45 @@ export class ChatService {
         }
       }
 
-      const [message] = await gamesDb
-        .insert(ChatMessages)
-        .values({
-          type: userId
-            ? ChatMessageType.UserMessage
-            : ChatMessageType.SystemMessage,
-          attachments,
-          text,
-          userId,
-        })
-        .returning()
-
-      const detailedChatMessage: ChatMessageDetailed = {
-        chatMessage: message,
-      }
+      let chatMessageInsert: ChatMessageInsert
 
       if (userId) {
         const detailedProfile = await profileService.getDetailedProfile(userId)
 
-        detailedChatMessage.user = {
-          id: userId,
-          roles: detailedProfile.roles,
-          profile: {
-            id: detailedProfile.id,
-            name: detailedProfile.name,
-            username: detailedProfile.username,
-            image: detailedProfile.image,
-          },
+        chatMessageInsert = {
+          type: ChatMessageType.UserMessage,
+          text,
+          attachments,
+          senderName: detailedProfile.name,
+          senderUsername: detailedProfile.username,
+          senderImage: detailedProfile.image,
+          senderRoles: detailedProfile.roles,
+        }
+      } else {
+        chatMessageInsert = {
+          type: ChatMessageType.SystemMessage,
+          text,
+          attachments,
+          senderRoles: [UserRole.Admin],
         }
       }
 
-      const lastChatMessages = (await gamesCaches.lastChatMessages.get()) ?? []
-      lastChatMessages.push(detailedChatMessage)
+      const [message] = await gamesDb
+        .insert(ChatMessageTable)
+        .values(chatMessageInsert)
+        .returning()
+
+      const lastChatMessages = await this.getLastMessagesUnlocked()
+      lastChatMessages.push(message)
 
       while (lastChatMessages.length > 100) {
         lastChatMessages.shift()
       }
 
       await gamesCaches.lastChatMessages.set(lastChatMessages)
-      await gamesPubsubs.chatMessages.publish(detailedChatMessage)
+      await gamesPubsubs.chatMessages.publish(message)
 
-      return detailedChatMessage
+      return message
     } finally {
       await lock.release()
     }

@@ -8,7 +8,7 @@ import { routes } from '../../routing/index.ts'
 import { Chat } from '../../widgets/chat'
 import { Logo } from './logo.tsx'
 import { MiniProfile } from './mini-profile.tsx'
-import { MobileMenu } from './mobile-menu.tsx'
+import { MobileTabs } from './mobile-tabs.tsx'
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
   const isMobile = useMedia({ to: 'md' })
@@ -30,7 +30,7 @@ export const BaseLayout = ({ children }: PropsWithChildren) => {
       </main>
       {leftVisible && <Left />}
       {rightVisible && <Right />}
-      {isMobile && <MobileMenu />}
+      {isMobile && <MobileTabs />}
     </div>
   )
 }

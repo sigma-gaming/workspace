@@ -1,11 +1,11 @@
 import { gamesDb } from '@games/db'
 import {
-  Account,
-  Accounts,
-  Profile,
-  Profiles,
-  User,
-  Users,
+  AccountSelect,
+  AccountTable,
+  ProfileSelect,
+  ProfileTable,
+  UserSelect,
+  UserTable,
 } from '@games/db-schema'
 import { getUserFullName, ProfileDetailed } from '@games/model'
 import { gamesCaches } from '@games/redis'
@@ -15,15 +15,15 @@ import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 
 interface Reused {
-  user?: User
-  profile?: Profile
-  accounts?: Account[]
+  user?: UserSelect
+  profile?: ProfileSelect
+  accounts?: AccountSelect[]
 }
 
 @singleton()
 export class ProfileService {
   async getDetailedProfile(
-    userId: User['id'],
+    userId: UserSelect['id'],
     reused?: Reused,
   ): Promise<ProfileDetailed> {
     const cached = await gamesCaches.detailedProfile.get(userId)
@@ -34,20 +34,20 @@ export class ProfileService {
 
     const user =
       reused?.user ??
-      (await gamesDb.query.Users.findFirst({
-        where: eq(Users.id, userId),
+      (await gamesDb.query.UserTable.findFirst({
+        where: eq(UserTable.id, userId),
       }))
 
     const profile =
       reused?.profile ??
-      (await gamesDb.query.Profiles.findFirst({
-        where: eq(Profiles.userId, userId),
+      (await gamesDb.query.ProfileTable.findFirst({
+        where: eq(ProfileTable.userId, userId),
       }))
 
     const accounts =
       reused?.accounts ??
-      (await gamesDb.query.Accounts.findMany({
-        where: eq(Accounts.userId, userId),
+      (await gamesDb.query.AccountTable.findMany({
+        where: eq(AccountTable.userId, userId),
       }))
 
     if (!user || !profile) {

@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import { Users } from './users'
+import { UserTable } from './users'
 
-export const Sessions = pgTable('Sessions', {
+export const SessionTable = pgTable('Session', {
   id: uuid('id').defaultRandom().primaryKey(),
   token: text('token').unique().notNull(),
   expiresAt: timestamp('expiresAt', {
@@ -9,8 +9,8 @@ export const Sessions = pgTable('Sessions', {
     mode: 'string',
   }).notNull(),
   userId: uuid('userId')
-    .references(() => Users.id, { onDelete: 'cascade' })
+    .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
 })
 
-export type Session = typeof Sessions.$inferSelect
+export type SessionSelect = typeof SessionTable.$inferSelect

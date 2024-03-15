@@ -1,7 +1,7 @@
 import { json, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import { chatMessageTypeEnum } from './enums'
+import { chatMessageTypeEnum, userRoleEnum } from './enums'
 import { ChatMessageAttachmentType } from './enums-raw'
-import { Users } from './users'
+import { UserTable } from './users'
 
 export interface ChatMessageAttachmentGame {
   type: ChatMessageAttachmentType.Game
@@ -10,7 +10,7 @@ export interface ChatMessageAttachmentGame {
 
 export type ChatMessageAttachment = ChatMessageAttachmentGame
 
-export const ChatMessages = pgTable('ChatMessages', {
+export const ChatMessageTable = pgTable('ChatMessage', {
   id: uuid('id').defaultRandom().primaryKey(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
@@ -20,8 +20,15 @@ export const ChatMessages = pgTable('ChatMessages', {
   text: text('text'),
   attachments: json('attachments').$type<ChatMessageAttachment[]>().default([]),
 
-  userId: uuid('userId').references(() => Users.id, { onDelete: 'cascade' }),
+  senderName: text('senderName'),
+  senderUsername: text('senderUsername'),
+  senderImage: text('senderImage'),
+  senderRoles: userRoleEnum('senderRoles').array(),
+
+  userId: uuid('userId').references(() => UserTable.id, {
+    onDelete: 'cascade',
+  }),
 })
 
-export type ChatMessage = typeof ChatMessages.$inferSelect
-export type ChatMessageInsert = typeof ChatMessages.$inferInsert
+export type ChatMessageSelect = typeof ChatMessageTable.$inferSelect
+export type ChatMessageInsert = typeof ChatMessageTable.$inferInsert

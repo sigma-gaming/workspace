@@ -1,9 +1,5 @@
-import { ChatMessageAttachment } from '@games/db-schema'
-import {
-  ChatMessageDetailed,
-  ChatMessageUser,
-  ChatValidation,
-} from '@games/model'
+import { ChatMessageAttachment, ChatMessageSelect } from '@games/db-schema'
+import { ChatValidation } from '@games/model'
 import { createField, createForm } from '@libs/forms'
 import { invoke } from '@withease/factories'
 import { createEffect, createEvent, createStore, sample } from 'effector'
@@ -13,13 +9,13 @@ import { createSubscription } from '../../shared/lib/trpc/subscription'
 const initialize = createEvent()
 const reset = createEvent()
 
-const getActualMessagesFx = createEffect(gamesApi.chat.getActualMessages.query)
+const getActualMessagesFx = createEffect(gamesApi.chat.getLastMessages.query)
 const sendMessageFx = createEffect(gamesApi.chat.sendMessage.mutate)
 
 const {
   subscribe: subscribeToMessages,
   unsubscribe: unsubscribeFromMessages,
-  receivedData: detailedMessageReceived,
+  receivedData: messageReceived,
 } = invoke(() =>
   createSubscription({
     subscription: gamesApi.chat.subscription,
@@ -40,22 +36,11 @@ export const form = createForm({
   schema: ChatValidation.MessagePayloadSchema,
 })
 
-const $messages = createStore<ChatMessageDetailed[]>([]).reset(reset)
+const $messages = createStore<ChatMessageSelect[]>([]).reset(reset)
 
 const $messageIds = $messages.map(
-  (messages) => new Set(messages.map((message) => message.chatMessage.id)),
+  (messages) => new Set(messages.map((message) => message.id)),
 )
-
-const $usersById = $messages.map((messages) => {
-  const usersById = new Map<string, ChatMessageUser>()
-
-  for (const message of messages) {
-    if (!message.user) continue
-    usersById.set(message.user.id, message.user)
-  }
-
-  return usersById
-})
 
 sample({
   clock: initialize,
@@ -66,13 +51,11 @@ sample({
   clock: getActualMessagesFx.doneData,
   source: { messages: $messages, ids: $messageIds },
   fn: ({ messages, ids }, actualMessages) => {
-    const newMessages = actualMessages.filter(
-      (message) => !ids.has(message.chatMessage.id),
-    )
+    const newMessages = actualMessages.filter((message) => !ids.has(message.id))
 
     const updatedMessages = messages.concat(newMessages).sort((a, b) => {
-      const dateA = new Date(a.chatMessage.createdAt).getTime()
-      const dateB = new Date(b.chatMessage.createdAt).getTime()
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
       return dateA - dateB
     })
 
@@ -82,9 +65,9 @@ sample({
 })
 
 sample({
-  clock: detailedMessageReceived,
+  clock: messageReceived,
   source: { messages: $messages, ids: $messageIds },
-  filter: ({ ids }, message) => !ids.has(message.chatMessage.id),
+  filter: ({ ids }, message) => !ids.has(message.id),
   fn: ({ messages }, message) => messages.concat(message),
   target: $messages,
 })
@@ -106,5 +89,4 @@ export const $$chatWidget = {
   fields,
   $messages,
   $messageIds,
-  $usersById,
 }

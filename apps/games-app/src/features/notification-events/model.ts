@@ -1,5 +1,5 @@
 import { createQuery } from '@farfetched/core'
-import { Notification } from '@games/db-schema'
+import { NotificationTable } from '@games/db-schema'
 import { mapColor } from '@games/model'
 import { Unsubscribable } from '@trpc/server/observable'
 import {

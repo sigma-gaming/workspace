@@ -1,16 +1,16 @@
 import { relations } from 'drizzle-orm'
-import { Accounts } from './accounts'
-import { Profiles } from './profiles'
-import { Sessions } from './sessions'
-import { Transactions } from './transactions'
-import { Users } from './users'
+import { AccountTable } from './accounts'
+import { ProfileTable } from './profiles'
+import { SessionTable } from './sessions'
+import { TransactionTable } from './transactions'
+import { UserTable } from './users'
 
-export const UsersRelations = relations(Users, ({ one, many }) => ({
-  profile: one(Profiles, {
-    fields: [Users.profileId],
-    references: [Profiles.id],
+export const UserRelations = relations(UserTable, ({ one, many }) => ({
+  profile: one(ProfileTable, {
+    fields: [UserTable.profileId],
+    references: [ProfileTable.id],
   }),
-  accounts: many(Accounts),
-  sessions: many(Sessions),
-  transactions: many(Transactions),
+  accounts: many(AccountTable),
+  sessions: many(SessionTable),
+  transactions: many(TransactionTable),
 }))

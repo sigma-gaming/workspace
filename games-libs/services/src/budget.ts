@@ -1,5 +1,10 @@
 import { gamesDb } from '@games/db'
-import { Budget, Transactions, TransactionType } from '@games/db-schema'
+import {
+  BudgetSelect,
+  BudgetTable,
+  TransactionTable,
+  TransactionType,
+} from '@games/db-schema'
 import { gamesCaches } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
 import { logger } from '@libs/logger'
@@ -8,19 +13,19 @@ import { singleton } from 'tsyringe'
 
 @singleton()
 export class BudgetService {
-  getBudget = async (): Promise<Budget> => {
+  getBudget = async (): Promise<BudgetSelect> => {
     const cached = await gamesCaches.budget.get()
 
     if (cached) {
       return cached
     }
 
-    let budget = await gamesDb.query.Budget.findFirst()
+    let budget = await gamesDb.query.BudgetTable.findFirst()
 
     if (!budget) {
       logger.info('Budget not found in db, creating a new one')
 
-      const created = await gamesDb.insert(Budget).values({}).returning()
+      const created = await gamesDb.insert(BudgetTable).values({}).returning()
       budget = created[0]
     }
 
@@ -53,10 +58,10 @@ export class BudgetService {
         return
       }
 
-      const transactions = await gamesDb.query.Transactions.findMany({
+      const transactions = await gamesDb.query.TransactionTable.findMany({
         where: and(
-          gt(Transactions.createdAt, lastSyncAt.toISOString()),
-          lte(Transactions.createdAt, currentSyncAt.toISOString()),
+          gt(TransactionTable.createdAt, lastSyncAt.toISOString()),
+          lte(TransactionTable.createdAt, currentSyncAt.toISOString()),
         ),
       })
 
@@ -73,12 +78,12 @@ export class BudgetService {
       }, 0)
 
       const [updatedBudget] = await gamesDb
-        .update(Budget)
+        .update(BudgetTable)
         .set({
-          available: sql`${Budget.available} + ${diff}`,
+          available: sql`${BudgetTable.available} + ${diff}`,
           lastSyncAt: currentSyncAt.toISOString(),
         })
-        .where(eq(Budget.id, 1))
+        .where(eq(BudgetTable.id, 1))
         .returning()
 
       await gamesCaches.budget.set(updatedBudget)

@@ -1,0 +1,1 @@
+ALTER TABLE "ChatMessages" ALTER COLUMN "roles" DROP NOT NULL;

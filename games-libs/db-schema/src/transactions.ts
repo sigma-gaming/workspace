@@ -1,8 +1,8 @@
 import { bigint, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { gameEnum, transactionTypeEnum } from './enums'
-import { Users } from './users'
+import { UserTable } from './users'
 
-export const Transactions = pgTable('Transactions', {
+export const TransactionTable = pgTable('Transaction', {
   id: uuid('id').defaultRandom().primaryKey(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
@@ -23,9 +23,9 @@ export const Transactions = pgTable('Transactions', {
   totalRTP: bigint('totalRTP', { mode: 'number' }).notNull().default(0),
 
   userId: uuid('userId')
-    .references(() => Users.id)
+    .references(() => UserTable.id)
     .notNull(),
 })
 
-export type Transaction = typeof Transactions.$inferSelect
-export type TransactionInsert = typeof Transactions.$inferInsert
+export type TransactionSelect = typeof TransactionTable.$inferSelect
+export type TransactionInsert = typeof TransactionTable.$inferInsert

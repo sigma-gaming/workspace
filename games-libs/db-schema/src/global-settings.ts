@@ -1,6 +1,6 @@
 import { integer, pgTable, timestamp } from 'drizzle-orm/pg-core'
 
-export const GlobalSettings = pgTable('GlobalSettings', {
+export const GlobalSettingsTable = pgTable('GlobalSettings', {
   id: integer('id').default(1).primaryKey(),
   createdAt: timestamp('createdAt', {
     withTimezone: true,
@@ -16,4 +16,4 @@ export const GlobalSettings = pgTable('GlobalSettings', {
     .defaultNow(),
 })
 
-export type GlobalSettings = typeof GlobalSettings.$inferSelect
+export type GlobalSettingsSelect = typeof GlobalSettingsTable.$inferSelect

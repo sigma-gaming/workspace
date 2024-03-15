@@ -1,17 +1,5 @@
-import { ChatMessage, ChatMessageAttachmentType, User } from '@games/db-schema'
+import { ChatMessageAttachmentType } from '@games/db-schema'
 import { z } from 'zod'
-import { ProfileDetailed } from './profile'
-
-export interface ChatMessageUser {
-  id: User['id']
-  roles: User['roles']
-  profile: Pick<ProfileDetailed, 'id' | 'name' | 'username' | 'image'>
-}
-
-export interface ChatMessageDetailed {
-  chatMessage: ChatMessage
-  user?: ChatMessageUser
-}
 
 export const ChatValidation = {
   MessagePayloadSchema: z.object({

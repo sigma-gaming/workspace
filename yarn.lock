@@ -3508,6 +3508,7 @@ __metadata:
     rabbitmq-client: "npm:^4.5.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
+    react-geiger: "npm:^1.0.2"
     reflect-metadata: "npm:^0.2.1"
     superjson: "npm:^2.2.1"
     tailwindcss: "npm:^3.4.0"
@@ -3629,6 +3630,13 @@ __metadata:
   version: 1.0.4
   resolution: "@tsconfig/node16@npm:1.0.4"
   checksum: 05f8f2734e266fb1839eb1d57290df1664fe2aa3b0fdd685a9035806daa635f7519bf6d5d9b33f6e69dd545b8c46bd6e2b5c79acb2b1f146e885f7f11a42a5bb
+  languageName: node
+  linkType: hard
+
+"@tsconfig/vite-react@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "@tsconfig/vite-react@npm:3.0.1"
+  checksum: 73da98de378e93ef4d18f3c98b86bab759a642ade226a72e837f270159dccfddd644473c257b36b3a0adf1049b0559d02e813f5f1e6d644e099de48c9f2fa09f
   languageName: node
   linkType: hard
 
@@ -11046,6 +11054,17 @@ __metadata:
   peerDependencies:
     react: ^18.2.0
   checksum: 66dfc5f93e13d0674e78ef41f92ed21dfb80f9c4ac4ac25a4b51046d41d4d2186abc915b897f69d3d0ebbffe6184e7c5876f2af26bfa956f179225d921be713a
+  languageName: node
+  linkType: hard
+
+"react-geiger@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "react-geiger@npm:1.0.2"
+  dependencies:
+    "@tsconfig/vite-react": "npm:^3.0.1"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 653a77e530f4eb44456a8cda807f80a75fa7b8f5254aaa587872d23689cc50b7d93d154c1a54afd20f6853f1002efd439e23f050d4714a069ca3da5a040acb96
   languageName: node
   linkType: hard
 

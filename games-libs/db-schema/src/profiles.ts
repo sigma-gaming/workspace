@@ -1,8 +1,8 @@
 import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { accountProviderEnum } from './enums'
-import { Users } from './users'
+import { UserTable } from './users'
 
-export const Profiles = pgTable('Profiles', {
+export const ProfileTable = pgTable('Profile', {
   id: serial('id').primaryKey(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
@@ -14,10 +14,10 @@ export const Profiles = pgTable('Profiles', {
   username: text('username').unique(),
   usedProvider: accountProviderEnum('usedProvider').notNull(),
   userId: uuid('userId')
-    .references(() => Users.id, { onDelete: 'cascade' })
+    .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
 })
 
-export type Profile = typeof Profiles.$inferSelect
-export type ProfileInsert = typeof Profiles.$inferInsert
-export type ProfileUpdate = Partial<Profile>
+export type ProfileSelect = typeof ProfileTable.$inferSelect
+export type ProfileInsert = typeof ProfileTable.$inferInsert
+export type ProfileUpdate = Partial<ProfileSelect>
