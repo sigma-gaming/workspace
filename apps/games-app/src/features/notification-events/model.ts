@@ -1,5 +1,5 @@
 import { createQuery } from '@farfetched/core'
-import { NotificationTable } from '@games/db-schema'
+import { NotificationSelect } from '@games/db-schema'
 import { mapColor } from '@games/model'
 import { Unsubscribable } from '@trpc/server/observable'
 import {
@@ -73,7 +73,7 @@ sample({
 sample({
   clock: getActualQuery.finished.success,
   fn: ({ result }) => result,
-  target: createEffect((notifications: Notification[]) => {
+  target: createEffect((notifications: NotificationSelect[]) => {
     const shown = localStorage.getItem('notifications/shown')?.split(',') ?? []
 
     notifications

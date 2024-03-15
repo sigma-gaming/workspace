@@ -132,7 +132,10 @@ export const vk = procedure
        */
       if (!account) {
         account = await gamesDb.transaction(async (tx) => {
-          const [{ id: userId }] = await tx.insert(UserTable).values({}).returning()
+          const [{ id: userId }] = await tx
+            .insert(UserTable)
+            .values({})
+            .returning()
 
           const [{ id: profileId }] = await tx
             .insert(ProfileTable)
@@ -142,7 +145,10 @@ export const vk = procedure
             })
             .returning()
 
-          await tx.update(UserTable).set({ profileId }).where(eq(UserTable.id, userId))
+          await tx
+            .update(UserTable)
+            .set({ profileId })
+            .where(eq(UserTable.id, userId))
 
           const [account] = await tx
             .insert(AccountTable)
