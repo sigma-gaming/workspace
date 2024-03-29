@@ -1,6 +1,25 @@
 import { Button, Card, MultiSelect, NumberInput, Title } from '@mantine/core'
+import { useRive } from '@rive-app/react-canvas'
 import { useUnit } from 'effector-react'
+import { memo, useEffect } from 'react'
 import { $$dicesPage } from './model.ts'
+
+const AnimatedDice = memo(() => {
+  const { rive, RiveComponent } = useRive({
+    src: '/games/dices.riv',
+    autoplay: false,
+  })
+
+  useEffect(() => {
+    $$dicesPage.riveChanged(rive)
+  }, [rive])
+
+  return (
+    <div className="w-full h-64">
+      <RiveComponent />
+    </div>
+  )
+})
 
 export const DicesGamePageView = () => {
   const bet = useUnit($$dicesPage.fields.bet.$value)
@@ -20,6 +39,8 @@ export const DicesGamePageView = () => {
       }}
     >
       <Title order={3}>Dices</Title>
+
+      <AnimatedDice />
 
       <NumberInput
         label="Ставка"

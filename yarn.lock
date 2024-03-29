@@ -3323,6 +3323,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rive-app/canvas@npm:2.10.3":
+  version: 2.10.3
+  resolution: "@rive-app/canvas@npm:2.10.3"
+  checksum: b7b4f40467c916a484d8f0d08ce9868666dce3423cb9887b48a9725926c2dd516706bbaef17025ffa4fa6e11cc4adb2db6cd4e15e12277f37b911aca5b62cec9
+  languageName: node
+  linkType: hard
+
+"@rive-app/react-canvas@npm:^4.8.3":
+  version: 4.8.3
+  resolution: "@rive-app/react-canvas@npm:4.8.3"
+  dependencies:
+    "@rive-app/canvas": "npm:2.10.3"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 82bcbba147c082dec89535e3c29a9d5f42d9522132d538ebf447b8e789db8c903083f84960fb27e69ce8ef58336a50b770011a1d0d41dee1482631a8c60903d4
+  languageName: node
+  linkType: hard
+
 "@rollup/pluginutils@npm:^5.0.5":
   version: 5.0.5
   resolution: "@rollup/pluginutils@npm:5.0.5"
@@ -3450,6 +3468,7 @@ __metadata:
     "@nx/js": "npm:17.0.2"
     "@nx/workspace": "npm:17.0.2"
     "@prisma/client": "npm:^5.8.1"
+    "@rive-app/react-canvas": "npm:^4.8.3"
     "@sesamecare-oss/redlock": "npm:^1.2.0"
     "@tabler/icons-react": "npm:^2.44.0"
     "@trpc/client": "npm:^10.44.1"

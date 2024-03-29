@@ -1,8 +1,9 @@
 import { createMutation } from '@farfetched/core'
 import { BadRequestException, fromTrpc } from '@libs/exceptions'
 import { createField, createForm } from '@libs/forms'
-import { createEvent, createStore, sample } from 'effector'
-import { condition } from 'patronum'
+import { Rive } from '@rive-app/react-canvas'
+import { attach, createEvent, createStore, sample } from 'effector'
+import { condition, delay } from 'patronum'
 import { z } from 'zod'
 import { $$balance } from '../../../entities/balance'
 import { $$notifications } from '../../../entities/notifications'
@@ -20,9 +21,19 @@ const playPressed = createEvent()
 const autoplayPressed = createEvent()
 const startPlay = createEvent()
 const autoplayToggled = createEvent()
+const riveChanged = createEvent<Rive | null>()
 
 const $playing = playGameMutation.$pending
 const $autoplaying = createStore(false).on(autoplayToggled, (state) => !state)
+const $rive = createStore<Rive | null>(null).on(riveChanged, (_, rive) => rive)
+
+const playAnimationFx = attach({
+  source: $rive,
+  effect(rive, animation?: string) {
+    if (!rive) return
+    rive.play(animation)
+  },
+})
 
 const fields = {
   bet: createField({
@@ -94,6 +105,14 @@ sample({
 
 sample({
   clock: playGameMutation.finished.success,
+  source: $rive,
+  filter: Boolean,
+  fn: (_, { result }) => `Shake_${result.side}`,
+  target: playAnimationFx,
+})
+
+sample({
+  clock: delay(playGameMutation.finished.success, 1000),
   filter: $autoplaying,
   target: startPlay,
 })
@@ -126,4 +145,5 @@ export const $$dicesPage = {
   $autoplaying,
   playPressed,
   autoplayPressed,
+  riveChanged,
 }

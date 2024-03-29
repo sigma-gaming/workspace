@@ -19,8 +19,8 @@
   },
   "scripts": {
     "dev:compose": "docker compose -f local.docker-compose.yml",
-    "dev:services": "yarn dev:compose up -d",
-    "dev:services:reset": "yarn dev:compose down -v && yarn dev:services",
+    "dev:docker": "yarn dev:compose up -d",
+    "dev:docker:reset": "yarn dev:compose down -v && yarn dev:docker",
     "dev:games-app": "nx run @apps/games-app:dev",
     "dev:games-api": "nx run @apps/games-api:dev",
     "dev:games:migrate": "nx run @games/db:migration:dev",
@@ -44,6 +44,7 @@
     "@mantine/notifications": "^7.3.2",
     "@neodx/log": "^0.3.0",
     "@prisma/client": "^5.8.1",
+    "@rive-app/react-canvas": "^4.8.3",
     "@sesamecare-oss/redlock": "^1.2.0",
     "@tabler/icons-react": "^2.44.0",
     "@trpc/client": "^10.44.1",
