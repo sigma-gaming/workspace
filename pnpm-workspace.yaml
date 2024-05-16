@@ -1,0 +1,7 @@
+packages:
+  - 'apps/*'
+  - 'apis/*'
+  - 'dbs/*'
+  - 'tooling/*'
+  - 'libs/*'
+  - 'games-libs/*'

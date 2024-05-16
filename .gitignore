@@ -20,16 +20,8 @@ workspace.tar*
 *.launch
 *.sublime-workspace
 
-# Yarn
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
-
 # misc
 npm-debug.log
-yarn-error.log
 
 # System Files
 .DS_Store

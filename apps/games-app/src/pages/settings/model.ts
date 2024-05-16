@@ -1,5 +1,5 @@
+import { AccountProvider } from '@dbs/games-schema'
 import { createMutation } from '@farfetched/core'
-import { AccountProvider } from '@games/db-schema'
 import { getUserFullName, ProfileValidation } from '@games/model'
 import { BadRequestException, ValidationException } from '@libs/exceptions'
 import {

@@ -1,3 +1,4 @@
+import { ControlAPIRouter } from '@apis/control-api'
 import {
   createTRPCProxyClient,
   createWSClient,
@@ -6,7 +7,6 @@ import {
   splitLink,
   wsLink,
 } from '@trpc/client'
-import { ControlAPIRouter } from '@apps/control-api'
 import { env } from '../../env'
 
 const wsClient = createWSClient({

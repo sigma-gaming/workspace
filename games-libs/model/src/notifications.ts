@@ -1,4 +1,4 @@
-import { NotificationKind } from '@games/db-schema'
+import { NotificationKind } from '@dbs/games-schema'
 import { z } from 'zod'
 
 export const NotificationSchema = z.object({

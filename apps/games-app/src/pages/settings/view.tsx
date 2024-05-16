@@ -1,4 +1,4 @@
-import { AccountProvider } from '@games/db-schema'
+import { AccountProvider } from '@dbs/games-schema'
 import { getUserFullName, getUserInitials } from '@games/model'
 import { Avatar } from '@libs/ui'
 import {

@@ -1,0 +1,32 @@
+{
+  "name": "@apis/games-api",
+  "version": "0.0.12",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "./src/client.ts",
+  "module": "./src/client.ts",
+  "types": "./src/client.ts",
+  "scripts": {
+    "copy-env": "copy-env",
+    "dev": "pnpm build:dev && concurrently 'pnpm:dev:*' -c auto -k",
+    "dev:build": "NODE_ENV=development webpack --watch",
+    "dev:start": "NODE_ENV=development nodemon --signal SIGTERM dist/main.js",
+    "build": "NODE_ENV=production webpack",
+    "build:dev": "NODE_ENV=development webpack",
+    "start": "NODE_ENV=production node dist/main.js",
+    "preview": "NODE_ENV=development nodemon dist/main.js --inspect",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint:fix": "pnpm lint --fix"
+  },
+  "dependencies": {
+    "@dbs/games-db": "workspace:*",
+    "@dbs/games-schema": "workspace:*",
+    "@games/model": "workspace:*",
+    "@games/redis": "workspace:*",
+    "@libs/di": "workspace:*",
+    "@libs/exceptions": "workspace:*",
+    "@libs/logger": "workspace:*",
+    "@tooling/env": "workspace:*"
+  }
+}

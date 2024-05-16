@@ -1,4 +1,4 @@
-import { ChatMessageSelect, NotificationSelect } from '@games/db-schema'
+import { ChatMessageSelect, NotificationSelect } from '@dbs/games-schema'
 import { createSingletonProxy } from '@libs/di'
 import { singleton } from 'tsyringe'
 import { PubSub, PubSubService } from './service'

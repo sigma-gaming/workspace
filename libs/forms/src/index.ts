@@ -73,9 +73,8 @@ interface Form<
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type InferFormValues<TForm> = TForm extends Form<infer TValues, any, any>
-  ? TValues
-  : never
+export type InferFormValues<TForm> =
+  TForm extends Form<infer TValues, any, any> ? TValues : never
 
 export type FormErrors<TValues extends FormValues> = Record<
   keyof TValues,

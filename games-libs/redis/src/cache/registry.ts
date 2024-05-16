@@ -3,7 +3,7 @@ import {
   ChatMessageSelect,
   NotificationSelect,
   TransactionSelect,
-} from '@games/db-schema'
+} from '@dbs/games-schema'
 import { ProfileDetailed, Session } from '@games/model'
 import { createSingletonProxy } from '@libs/di'
 import { inject, InjectionToken, singleton } from 'tsyringe'

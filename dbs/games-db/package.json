@@ -1,0 +1,26 @@
+{
+  "name": "@dbs/games-db",
+  "version": "0.0.0-internal",
+  "license": "MIT",
+  "private": true,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "copy-env": "copy-env",
+    "migration:generate": "dotenv -e .env.development -- drizzle-kit generate:pg",
+    "migration:apply": "node migrate.mjs",
+    "migration:apply:dev": "dotenv -e .env.development -- pnpm migration:apply",
+    "migration:dev": "pnpm migration:generate && pnpm migration:apply:dev",
+    "reset": "dotenv -e .env.development -- node reset.mjs",
+    "studio": "dotenv -e .env.development -- drizzle-kit studio",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint:fix": "pnpm lint --fix"
+  },
+  "dependencies": {
+    "@dbs/games-schema": "workspace:*",
+    "@libs/di": "workspace:*",
+    "@tooling/env": "workspace:*"
+  }
+}

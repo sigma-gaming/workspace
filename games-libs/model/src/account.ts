@@ -1,4 +1,4 @@
-import { AccountSelect } from '@games/db-schema'
+import { AccountSelect } from '@dbs/games-schema'
 
 export type AccountPublic = Pick<
   AccountSelect,

@@ -118,13 +118,6 @@
         "build"
       ]
     },
-    "migration:apply": {
-      "inputs": [
-        "shared",
-        "config",
-        "migrations"
-      ]
-    },
     "migration:dev": {
       "dependsOn": [
         "copy-env"
@@ -141,8 +134,7 @@
       "dependsOn": [
         "ci",
         "build",
-        "^build",
-        "^migration:apply"
+        "^build"
       ]
     }
   },

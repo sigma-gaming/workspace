@@ -1,4 +1,4 @@
-import { gamesDb } from '@games/db'
+import { gamesDb } from '@dbs/games-db'
 import {
   ChatMessageAttachment,
   ChatMessageAttachmentGame,
@@ -8,7 +8,7 @@ import {
   ChatMessageTable,
   ChatMessageType,
   UserRole,
-} from '@games/db-schema'
+} from '@dbs/games-schema'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
 import { BadRequestException, InternalServerException } from '@libs/exceptions'

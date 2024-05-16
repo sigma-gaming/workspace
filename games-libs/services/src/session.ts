@@ -1,10 +1,10 @@
-import { gamesDb } from '@games/db'
+import { gamesDb } from '@dbs/games-db'
 import {
   AccountProvider,
   SessionTable,
   UserSelect,
   UserTable,
-} from '@games/db-schema'
+} from '@dbs/games-schema'
 import { Session, SessionState } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'

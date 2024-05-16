@@ -1,4 +1,4 @@
-import { NotificationKind } from '@games/db-schema'
+import { NotificationKind } from '@dbs/games-schema'
 import { mapColor } from '@games/model'
 import {
   Button,

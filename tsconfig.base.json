@@ -32,20 +32,20 @@
       "@tooling/env": [
         "tooling/env/src/index.ts"
       ],
-      "@apps/games-api": [
-        "apps/games-api/src/client.ts"
+      "@apis/games-api": [
+        "apis/games-api/src/client.ts"
       ],
-      "@apps/control-api": [
-        "apps/control-api/src/client.ts"
+      "@apis/control-api": [
+        "apis/control-api/src/client.ts"
       ],
       "@libs/exceptions": [
         "libs/exceptions/src/index.ts"
       ],
-      "@games/db": [
-        "games-libs/db/src/index.ts"
+      "@dbs/games-db": [
+        "dbs/games-db/src/index.ts"
       ],
-      "@games/db-schema": [
-        "games-libs/db-schema/src/index.ts"
+      "@dbs/games-schema": [
+        "dbs/games-schema/src/index.ts"
       ],
       "@games/model": [
         "games-libs/model/src/index.ts"

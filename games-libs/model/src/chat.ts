@@ -1,4 +1,4 @@
-import { ChatMessageAttachmentType } from '@games/db-schema'
+import { ChatMessageAttachmentType } from '@dbs/games-schema'
 import { z } from 'zod'
 
 export const ChatValidation = {

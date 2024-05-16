@@ -1,4 +1,4 @@
-import { ChatMessageAttachment, ChatMessageSelect } from '@games/db-schema'
+import { ChatMessageAttachment, ChatMessageSelect } from '@dbs/games-schema'
 import { ChatValidation } from '@games/model'
 import { createField, createForm } from '@libs/forms'
 import { invoke } from '@withease/factories'

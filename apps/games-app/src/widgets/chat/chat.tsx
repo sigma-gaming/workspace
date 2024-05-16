@@ -1,4 +1,4 @@
-import { ChatMessageType } from '@games/db-schema'
+import { ChatMessageType } from '@dbs/games-schema'
 import { getUserInitials } from '@games/model'
 import { Avatar } from '@libs/ui'
 import { Button, Text, Title } from '@mantine/core'

@@ -9,10 +9,10 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
-    "lint:fix": "yarn lint --fix"
+    "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
-    "@games/db-schema": "workspace:*",
+    "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",
     "@libs/di": "workspace:*",
     "@libs/logger": "workspace:*"

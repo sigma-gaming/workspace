@@ -1,10 +1,10 @@
-import { gamesDb } from '@games/db'
+import { gamesDb } from '@dbs/games-db'
 import {
   BudgetSelect,
   BudgetTable,
   TransactionTable,
   TransactionType,
-} from '@games/db-schema'
+} from '@dbs/games-schema'
 import { gamesCaches } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
 import { logger } from '@libs/logger'

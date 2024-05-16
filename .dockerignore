@@ -1,10 +1,10 @@
 # compiled output
 **/.env.development
-dist
+**/dist
 generated
 tmp
 /out-tsc
 .nx
 
 # dependencies
-node_modules
+**/node_modules

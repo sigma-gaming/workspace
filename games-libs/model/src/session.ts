@@ -1,4 +1,4 @@
-import { UserSelect } from '@games/db-schema'
+import { UserSelect } from '@dbs/games-schema'
 
 export enum SessionState {
   Empty,

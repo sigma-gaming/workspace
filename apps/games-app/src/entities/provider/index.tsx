@@ -1,4 +1,4 @@
-import { AccountProvider } from '@games/db-schema'
+import { AccountProvider } from '@dbs/games-schema'
 import { LinkButton, LinkButtonProps } from '@libs/ui'
 import { v4 } from 'uuid'
 import { env } from '../../shared/env'

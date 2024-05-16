@@ -1,5 +1,5 @@
+import { NotificationInsert, NotificationKind } from '@dbs/games-schema'
 import { createMutation } from '@farfetched/core'
-import { NotificationInsert, NotificationKind } from '@games/db-schema'
 import { createField, createForm } from '@libs/forms'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'

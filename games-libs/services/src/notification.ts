@@ -1,9 +1,9 @@
-import { gamesDb } from '@games/db'
+import { gamesDb } from '@dbs/games-db'
 import {
   NotificationInsert,
   NotificationSelect,
   NotificationTable,
-} from '@games/db-schema'
+} from '@dbs/games-schema'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { createSingletonProxy } from '@libs/di'
 import { and, asc, eq, gte, isNull } from 'drizzle-orm'
