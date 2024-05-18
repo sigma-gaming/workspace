@@ -1,5 +1,4 @@
 import path from 'path'
-import { PinoWebpackPlugin } from 'pino-webpack-plugin'
 import { loadConfig } from 'tsconfig-paths'
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
 import webpack from 'webpack'
@@ -23,7 +22,6 @@ const config: webpack.Configuration = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
   },
-  plugins: [new PinoWebpackPlugin({ transports: ['pino-pretty'] })],
   externals: [
     nodeExternals({
       allowlist: (path) => {
