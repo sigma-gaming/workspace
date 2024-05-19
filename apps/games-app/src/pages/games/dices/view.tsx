@@ -23,7 +23,7 @@ const AnimatedDice = memo(() => {
   }, [rive])
 
   return (
-    <div className="w-full h-64">
+    <div className="grow h-64 xl:max-w-[calc(100%-256px)]">
       <RiveComponent />
     </div>
   )
@@ -39,36 +39,48 @@ export const DicesGamePageView = () => {
     <Card
       component="form"
       className="p-4 rounded-xl md:p-6 md:rounded-2xl"
-      style={{ gap: 'var(--mantine-spacing-md)' }}
       onSubmit={(event) => {
         event.preventDefault()
         $$dicesPage.playPressed()
       }}
     >
-      <Title order={3}>Dices</Title>
+      <Title className="mb-4" order={3}>
+        Dices
+      </Title>
 
-      <AnimatedDice />
+      <div className="flex flex-col xl:flex-row-reverse gap-4">
+        <AnimatedDice />
 
-      <NumberInput
-        label="Ставка"
-        value={bet}
-        onChange={(value) => $$dicesPage.fields.bet.update(Number(value))}
-        error={errors.bet[0]}
-        disabled={autoplaying}
-        min={1}
-        decimalScale={2}
-      />
+        <div className="flex flex-col gap-3 xl:w-[240px] xl:shrink-0">
+          <NumberInput
+            label="Ставка"
+            value={bet}
+            onChange={(value) => $$dicesPage.fields.bet.update(Number(value))}
+            error={errors.bet[0]}
+            disabled={autoplaying}
+            min={1}
+            decimalScale={2}
+          />
 
-      <InputLabel>Грани</InputLabel>
-      <SidesSelect />
-      {errors.sides[0] && <InputError>{errors.sides[0]}</InputError>}
+          <InputLabel>Грани</InputLabel>
+          <SidesSelect />
+          {errors.sides[0] && <InputError>{errors.sides[0]}</InputError>}
 
-      <Button type="submit" disabled={playing || autoplaying} fullWidth={true}>
-        Играть
-      </Button>
-      <Button onClick={() => $$dicesPage.autoplayPressed()} fullWidth={true}>
-        {autoplaying ? 'Остановить' : 'Автоигра'}
-      </Button>
+          <Button
+            type="submit"
+            disabled={playing || autoplaying}
+            fullWidth={true}
+          >
+            Играть
+          </Button>
+          <Button
+            onClick={() => $$dicesPage.autoplayPressed()}
+            fullWidth={true}
+          >
+            {autoplaying ? 'Остановить' : 'Автоигра'}
+          </Button>
+        </div>
+      </div>
     </Card>
   )
 }
@@ -88,7 +100,7 @@ const SidesSelect = () => {
   ]
 
   return (
-    <ul className="grid grid-cols-3 grid-flow-row gap-4">
+    <ul className="grid grid-cols-3 min-[396px]:grid-cols-4 min-[396px]:max-w-[360px] min-[576px]:grid-cols-6 min-[576px]:max-w-[540px] lg:grid-cols-4 lg:max-w-[360px] xl:grid-cols-3 xl:max-w-none grid-flow-row gap-4">
       {options.map(({ value }) => (
         <li key={value} className="block">
           <button
