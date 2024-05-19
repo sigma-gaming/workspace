@@ -22,6 +22,7 @@ const autoplayPressed = createEvent()
 const startPlay = createEvent()
 const autoplayToggled = createEvent()
 const riveChanged = createEvent<Rive | null>()
+const animationFinished = createEvent()
 
 const $playing = playGameMutation.$pending
 const $autoplaying = createStore(false).on(autoplayToggled, (state) => !state)
@@ -112,8 +113,13 @@ sample({
 })
 
 sample({
-  clock: delay(playGameMutation.finished.success, 1000),
-  filter: $autoplaying,
+  clock: delay(
+    sample({
+      clock: animationFinished,
+      filter: $autoplaying,
+    }),
+    250,
+  ),
   target: startPlay,
 })
 
@@ -146,4 +152,5 @@ export const $$dicesPage = {
   playPressed,
   autoplayPressed,
   riveChanged,
+  animationFinished,
 }

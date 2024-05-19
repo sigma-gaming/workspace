@@ -6,7 +6,7 @@ import {
   NumberInput,
   Title,
 } from '@mantine/core'
-import { useRive } from '@rive-app/react-canvas'
+import { EventType, useRive } from '@rive-app/react-canvas'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { memo, useEffect } from 'react'
@@ -20,6 +20,13 @@ const AnimatedDice = memo(() => {
 
   useEffect(() => {
     $$dicesPage.riveChanged(rive)
+
+    if (!rive) return
+
+    const handleStop = () => $$dicesPage.animationFinished()
+
+    rive.on(EventType.Stop, handleStop)
+    return () => rive.off(EventType.Stop, handleStop)
   }, [rive])
 
   return (
@@ -68,7 +75,8 @@ export const DicesGamePageView = () => {
 
           <Button
             type="submit"
-            disabled={playing || autoplaying}
+            disabled={autoplaying}
+            loading={playing}
             fullWidth={true}
           >
             Играть
@@ -77,7 +85,7 @@ export const DicesGamePageView = () => {
             onClick={() => $$dicesPage.autoplayPressed()}
             fullWidth={true}
           >
-            {autoplaying ? 'Остановить' : 'Автоигра'}
+            {autoplaying ? 'Остановить автоигру' : 'Автоигра'}
           </Button>
         </div>
       </div>
