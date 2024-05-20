@@ -41,7 +41,11 @@ const AnimatedDice = memo(() => {
 
   return (
     <div className="relative grow xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
-      <LoadingOverlay className="h-full" visible={!loaded} />
+      <LoadingOverlay
+        className="h-full"
+        visible={!loaded}
+        loaderProps={{ size: 'xl' }}
+      />
       <RiveComponent className="h-64" />
     </div>
   )
