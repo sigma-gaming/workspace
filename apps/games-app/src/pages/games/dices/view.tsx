@@ -3,6 +3,7 @@ import {
   Card,
   InputError,
   InputLabel,
+  LoadingOverlay,
   NumberInput,
   Title,
 } from '@mantine/core'
@@ -16,7 +17,10 @@ const AnimatedDice = memo(() => {
   const { rive, RiveComponent } = useRive({
     src: '/games/dices.riv',
     autoplay: false,
+    onLoad: () => $$dicesPage.animationLoaded(),
   })
+
+  const loaded = useUnit($$dicesPage.$animationLoaded)
 
   useEffect(() => {
     $$dicesPage.riveChanged(rive)
@@ -36,8 +40,9 @@ const AnimatedDice = memo(() => {
   }, [rive])
 
   return (
-    <div className="grow h-64 xl:max-w-[calc(100%-256px)]">
-      <RiveComponent />
+    <div className="relative grow xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
+      <LoadingOverlay className="h-full" visible={!loaded} />
+      <RiveComponent className="h-64" />
     </div>
   )
 })
