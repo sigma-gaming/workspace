@@ -22,11 +22,16 @@ const autoplayPressed = createEvent()
 const startPlay = createEvent()
 const autoplayToggled = createEvent()
 const riveChanged = createEvent<Rive | null>()
+const animationStarted = createEvent()
 const animationFinished = createEvent()
 
 const $playing = playGameMutation.$pending
 const $autoplaying = createStore(false).on(autoplayToggled, (state) => !state)
 const $rive = createStore<Rive | null>(null).on(riveChanged, (_, rive) => rive)
+
+const $animationPlaying = createStore(false)
+  .on(animationStarted, () => true)
+  .reset(animationFinished)
 
 const playAnimationFx = attach({
   source: $rive,
@@ -149,8 +154,10 @@ export const $$dicesPage = {
   form,
   $playing,
   $autoplaying,
+  $animationPlaying,
   playPressed,
   autoplayPressed,
   riveChanged,
+  animationStarted,
   animationFinished,
 }

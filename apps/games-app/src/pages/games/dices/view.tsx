@@ -23,10 +23,16 @@ const AnimatedDice = memo(() => {
 
     if (!rive) return
 
+    const handlePlay = () => $$dicesPage.animationStarted()
     const handleStop = () => $$dicesPage.animationFinished()
 
+    rive.on(EventType.Play, handlePlay)
     rive.on(EventType.Stop, handleStop)
-    return () => rive.off(EventType.Stop, handleStop)
+
+    return () => {
+      rive.off(EventType.Play, handlePlay)
+      rive.off(EventType.Stop, handleStop)
+    }
   }, [rive])
 
   return (
@@ -41,6 +47,7 @@ export const DicesGamePageView = () => {
   const errors = useUnit($$dicesPage.form.$errors)
   const playing = useUnit($$dicesPage.$playing)
   const autoplaying = useUnit($$dicesPage.$autoplaying)
+  const animationPlaying = useUnit($$dicesPage.$animationPlaying)
 
   return (
     <Card
@@ -75,7 +82,7 @@ export const DicesGamePageView = () => {
 
           <Button
             type="submit"
-            disabled={autoplaying}
+            disabled={autoplaying || animationPlaying}
             loading={playing}
             fullWidth={true}
           >
