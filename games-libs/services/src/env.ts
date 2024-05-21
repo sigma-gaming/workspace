@@ -50,7 +50,7 @@ const EnvSchema = z
     },
 
     gamesApi: {
-      version: 'dev',
+      version: 'dev-2',
       url: raw.PUBLIC_GAMES_API_URL,
     },
 
@@ -60,7 +60,7 @@ const EnvSchema = z
     },
 
     controlApi: {
-      version: 'dev',
+      version: 'dev-2',
       url: raw.PUBLIC_CONTROL_API_URL,
     },
 
