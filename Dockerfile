@@ -8,7 +8,6 @@ WORKDIR /build
 COPY . /build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm nx run-many -t build
-RUN ls apis/games-api/dist
 
 # Apps
 
