@@ -79,10 +79,20 @@ export const DicesGamePageView = () => {
                 min={1}
                 decimalScale={2}
               />
-              <ActionIcon className="text-sm" size={36} variant="light">
+              <ActionIcon
+                className="text-sm text-[var(--input-color)]"
+                size={36}
+                color="#25273E"
+                onClick={() => $$dicesPage.betDoubled()}
+              >
                 x2
               </ActionIcon>
-              <ActionIcon className="text-sm" size={36} variant="light">
+              <ActionIcon
+                className="text-sm text-[var(--input-color)]"
+                size={36}
+                color="#25273E"
+                onClick={() => $$dicesPage.betHalved()}
+              >
                 /2
               </ActionIcon>
             </div>

@@ -18,6 +18,8 @@ const playGameMutation = createMutation({
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
 
+const betDoubled = createEvent()
+const betHalved = createEvent()
 const playPressed = createEvent()
 const autoplayPressed = createEvent()
 const startPlay = createEvent()
@@ -112,6 +114,22 @@ sample({
 })
 
 sample({
+  clock: betDoubled,
+  source: fields.bet.$value,
+  fn: (bet) => Math.ceil(bet * 2 * 100) / 100,
+  target: fields.bet.update,
+})
+
+sample({
+  clock: betHalved,
+  source: fields.bet.$value,
+  fn: (bet) => Math.ceil((bet / 2) * 100) / 100,
+  target: fields.bet.update,
+})
+
+fields.bet.$value.watch(console.log)
+
+sample({
   clock: form.submitted,
   target: playGameMutation.start,
 })
@@ -185,4 +203,6 @@ export const $$dicesPage = {
   animationLoaded,
   animationStarted,
   animationFinished,
+  betDoubled,
+  betHalved,
 }
