@@ -3,11 +3,12 @@ import { BadRequestException, fromTrpc } from '@libs/exceptions'
 import { createField, createForm } from '@libs/forms'
 import { Rive } from '@rive-app/react-canvas'
 import { attach, createEvent, createStore, sample } from 'effector'
-import { condition, delay } from 'patronum'
+import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$balance } from '../../../entities/balance'
 import { $$notifications } from '../../../entities/notifications'
 import { $$user } from '../../../entities/user'
+import { routes } from '../../../routing'
 import { gamesApi } from '../../../shared/api/games'
 
 const playGameMutation = createMutation({
@@ -21,6 +22,7 @@ const playPressed = createEvent()
 const autoplayPressed = createEvent()
 const startPlay = createEvent()
 const autoplayToggled = createEvent()
+const autoplayChanged = createEvent<boolean>()
 const riveChanged = createEvent<Rive | null>()
 const animationLoaded = createEvent()
 const animationStarted = createEvent()
@@ -30,7 +32,7 @@ const reset = createEvent()
 const $playing = playGameMutation.$pending
 
 const $autoplaying = createStore(false)
-  .on(autoplayToggled, (state) => !state)
+  .on(autoplayChanged, (_, autoplay) => autoplay)
   .reset(reset)
 
 const $rive = createStore<Rive | null>(null).on(riveChanged, (_, rive) => rive)
@@ -76,36 +78,36 @@ export const form = createForm({
   }),
 })
 
+const showActionNotAllowed = $$notifications.show.prepend(() => ({
+  title: 'Действие недоступно',
+  message: 'Чтобы играть, войдите в аккаунт',
+  color: 'red',
+}))
+
 condition({
-  source: sample({
-    clock: playPressed,
-    source: $$user.$expired,
-  }),
-  if: Boolean,
-  then: $$notifications.show.prepend(() => ({
-    title: 'Действие недоступно',
-    message: 'Чтобы играть, войдите в аккаунт',
-    color: 'red',
-  })),
+  source: playPressed,
+  if: $$user.$expired,
+  then: showActionNotAllowed,
   else: startPlay,
 })
 
 condition({
-  source: sample({
-    clock: autoplayPressed,
-    source: $$user.$expired,
-  }),
-  if: Boolean,
-  then: $$notifications.show.prepend(() => ({
-    title: 'Действие недоступно',
-    message: 'Чтобы играть, войдите в аккаунт',
-    color: 'red',
-  })),
+  source: autoplayPressed,
+  if: $$user.$expired,
+  then: showActionNotAllowed,
   else: autoplayToggled,
+})
+
+condition({
+  source: autoplayToggled,
+  if: and(not($playing), not($autoplaying)),
+  then: autoplayChanged.prepend(() => true),
+  else: autoplayChanged.prepend(() => false),
 })
 
 sample({
   clock: startPlay,
+  filter: and(not($playing), not($animationPlaying)),
   target: form.submit,
 })
 
@@ -163,6 +165,11 @@ sample({
     [payload.path?.join('.') ?? 'root']: [payload.message ?? ''],
   }),
   target: form.setErrors,
+})
+
+sample({
+  clock: routes.dicesGame.closed,
+  target: reset,
 })
 
 export const $$dicesPage = {

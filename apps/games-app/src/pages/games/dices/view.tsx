@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Button,
   Card,
   InputError,
@@ -7,7 +8,7 @@ import {
   NumberInput,
   Title,
 } from '@mantine/core'
-import { EventType, useRive } from '@rive-app/react-canvas'
+import { useRive } from '@rive-app/react-canvas'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { memo, useEffect } from 'react'
@@ -18,25 +19,14 @@ const AnimatedDice = memo(() => {
     src: '/games/dices.riv',
     autoplay: false,
     onLoad: () => $$dicesPage.animationLoaded(),
+    onPlay: () => $$dicesPage.animationStarted(),
+    onStop: () => $$dicesPage.animationFinished(),
   })
 
   const loaded = useUnit($$dicesPage.$animationLoaded)
 
   useEffect(() => {
     $$dicesPage.riveChanged(rive)
-
-    if (!rive) return
-
-    const handlePlay = () => $$dicesPage.animationStarted()
-    const handleStop = () => $$dicesPage.animationFinished()
-
-    rive.on(EventType.Play, handlePlay)
-    rive.on(EventType.Stop, handleStop)
-
-    return () => {
-      rive.off(EventType.Play, handlePlay)
-      rive.off(EventType.Stop, handleStop)
-    }
   }, [rive])
 
   return (
@@ -75,15 +65,28 @@ export const DicesGamePageView = () => {
         <AnimatedDice />
 
         <div className="flex flex-col gap-3 xl:w-[240px] xl:shrink-0">
-          <NumberInput
-            label="Ставка"
-            value={bet}
-            onChange={(value) => $$dicesPage.fields.bet.update(Number(value))}
-            error={errors.bet[0]}
-            disabled={autoplaying}
-            min={1}
-            decimalScale={2}
-          />
+          <div className="flex flex-col">
+            <InputLabel>Ставка</InputLabel>
+            <div className="flex flex-row gap-2 items-end">
+              <NumberInput
+                className="grow"
+                value={bet}
+                onChange={(value) =>
+                  $$dicesPage.fields.bet.update(Number(value))
+                }
+                error={errors.bet[0]}
+                disabled={autoplaying}
+                min={1}
+                decimalScale={2}
+              />
+              <ActionIcon className="text-sm" size={36} variant="light">
+                x2
+              </ActionIcon>
+              <ActionIcon className="text-sm" size={36} variant="light">
+                /2
+              </ActionIcon>
+            </div>
+          </div>
 
           <InputLabel>Грани</InputLabel>
           <SidesSelect />
@@ -129,7 +132,7 @@ const SidesSelect = () => {
         <li key={value} className="block">
           <button
             type="button"
-            className="w-full outline-none"
+            className="block w-full outline-none"
             onClick={() =>
               update(
                 sides.includes(value)
