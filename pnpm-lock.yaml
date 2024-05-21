@@ -306,6 +306,9 @@ importers:
       '@games/redis':
         specifier: workspace:*
         version: link:../../games-libs/redis
+      '@games/services':
+        specifier: workspace:*
+        version: link:../../games-libs/services
       '@libs/di':
         specifier: workspace:*
         version: link:../../libs/di
