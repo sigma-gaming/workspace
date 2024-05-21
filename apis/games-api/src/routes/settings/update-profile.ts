@@ -39,12 +39,11 @@ export const updateProfile = procedure
         where: eq(ProfileTable.username, username),
       })
 
-      if (currentProfile && currentProfile.userId !== user.id) {
+      if (currentProfile && currentProfile.userId !== user.id)
         throw new BadRequestException({
           path: ['username'],
           message: 'Пользователь с таким никнеймом уже существует',
         })
-      }
     }
 
     const accounts = await gamesDb.query.AccountTable.findMany({
@@ -55,12 +54,11 @@ export const updateProfile = procedure
       (account) => account.provider === input.provider,
     )
 
-    if (!selectedProvider) {
+    if (!selectedProvider)
       throw new BadRequestException({
         path: ['provider'],
         message: 'Не привязан необходимый аккаунт',
       })
-    }
 
     const updates: ProfileUpdate = {
       username: input.username ?? null,
