@@ -55,7 +55,10 @@ const Header = () => {
   return (
     <div className="sticky top-0 z-50 h-[--header-height] py-2 bg-[#25273A] lg:bg-transparent flex items-center justify-between rounded-b-2xl lg:rounded-none shadow-border lg:shadow-none">
       <div className="w-[280px] pl-2 lg:pl-4 flex justify-start lg:justify-center">
-        <Link to={routes.home} className="flex items-center gap-2 p-2">
+        <Link
+          to={routes.home}
+          className="flex items-center gap-2 p-2 focus:outline-primary rounded-xl"
+        >
           <Logo />
           <Title className="hidden lg:block" order={1}>
             Sigma

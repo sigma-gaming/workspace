@@ -123,11 +123,12 @@ sample({
 sample({
   clock: betHalved,
   source: fields.bet.$value,
-  fn: (bet) => Math.ceil((bet / 2) * 100) / 100,
+  fn: (bet) => {
+    const next = Math.ceil((bet / 2) * 100) / 100
+    return Math.max(next, 1)
+  },
   target: fields.bet.update,
 })
-
-fields.bet.$value.watch(console.log)
 
 sample({
   clock: form.submitted,

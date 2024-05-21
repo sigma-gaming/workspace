@@ -70,6 +70,7 @@ export class ChatService {
     payload: {
       text?: string
       attachments?: ChatMessageAttachment[]
+      trackingId?: string
     }
   }): Promise<ChatMessageSelect> {
     const lock = await gamesCaches.lastChatMessages.lock(10000)
@@ -113,6 +114,7 @@ export class ChatService {
           senderUsername: detailedProfile.username,
           senderImage: detailedProfile.image,
           senderRoles: detailedProfile.roles,
+          trackingId: payload.trackingId,
         }
       } else {
         chatMessageInsert = {

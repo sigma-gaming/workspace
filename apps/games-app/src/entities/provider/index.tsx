@@ -60,6 +60,7 @@ export const VkButton = ({
     <LinkButton
       to={createVkUrl()}
       color="#3375F6"
+      className="!outline-[#3375F6]"
       leftSection={<Icons.Vk />}
       rightSection={<span />}
       justify="space-between"
@@ -78,6 +79,7 @@ export const TelegramButton = ({
     <LinkButton
       to={createTelegramUrl()}
       color="#51A2DD"
+      className="!outline-[#51A2DD]"
       leftSection={<Icons.Telegram />}
       rightSection={<span />}
       justify="space-between"

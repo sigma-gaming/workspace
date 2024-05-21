@@ -1,0 +1,1 @@
+ALTER TABLE "ChatMessage" ADD COLUMN "trackingId" uuid DEFAULT gen_random_uuid() NOT NULL;

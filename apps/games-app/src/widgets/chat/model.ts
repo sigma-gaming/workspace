@@ -1,8 +1,15 @@
-import { ChatMessageAttachment, ChatMessageSelect } from '@dbs/games-schema'
+import {
+  ChatMessageAttachment,
+  ChatMessageSelect,
+  ChatMessageType,
+} from '@dbs/games-schema'
 import { ChatValidation } from '@games/model'
 import { createField, createForm } from '@libs/forms'
 import { invoke } from '@withease/factories'
 import { createEffect, createEvent, createStore, sample } from 'effector'
+import { v4 as uuid } from 'uuid'
+import { $$profile } from '../../entities/profile'
+import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import { createSubscription } from '../../shared/lib/trpc/subscription'
 
@@ -33,10 +40,14 @@ const fields = {
 
 export const form = createForm({
   fields,
-  schema: ChatValidation.MessagePayloadSchema,
+  schema: ChatValidation.MessagePayloadSchema.omit({ trackingId: true }),
 })
 
-const $messages = createStore<ChatMessageSelect[]>([]).reset(reset)
+type ExtendedMessage = ChatMessageSelect & {
+  temporary?: boolean
+}
+
+const $messages = createStore<ExtendedMessage[]>([]).reset(reset)
 
 const $messageIds = $messages.map(
   (messages) => new Set(messages.map((message) => message.id)),
@@ -68,13 +79,61 @@ sample({
   clock: messageReceived,
   source: { messages: $messages, ids: $messageIds },
   filter: ({ ids }, message) => !ids.has(message.id),
-  fn: ({ messages }, message) => messages.concat(message),
+  fn: ({ messages }, receivedMessage) => {
+    const hasTemporaryMessage = messages.some(
+      (message) => message.trackingId === receivedMessage.trackingId,
+    )
+
+    if (!hasTemporaryMessage) {
+      return messages.concat(receivedMessage)
+    }
+
+    return messages.map((message) => {
+      if (message.trackingId !== receivedMessage.trackingId) {
+        return message
+      }
+
+      return receivedMessage
+    })
+  },
   target: $messages,
 })
 
+const submitted = sample({
+  source: form.submitted,
+  fn: (payload) => ({ ...payload, trackingId: uuid() }),
+})
+
 sample({
-  clock: form.submitted,
+  clock: submitted,
   target: [sendMessageFx, form.empty],
+})
+
+sample({
+  clock: submitted,
+  source: {
+    user: $$user.$user,
+    senderName: $$profile.$name,
+    profile: $$profile.$profile,
+    messages: $messages,
+  },
+  fn: ({ user, senderName, profile, messages }, payload) => {
+    return messages.concat({
+      id: uuid(),
+      createdAt: new Date().toISOString(),
+      type: ChatMessageType.UserMessage,
+      attachments: payload.attachments,
+      senderName,
+      senderUsername: profile!.username,
+      senderImage: profile!.image,
+      senderRoles: user!.roles,
+      userId: user!.id,
+      text: payload.text,
+      temporary: true,
+      trackingId: payload.trackingId,
+    })
+  },
+  target: $messages,
 })
 
 sample({

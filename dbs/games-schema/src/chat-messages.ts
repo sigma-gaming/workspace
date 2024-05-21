@@ -12,6 +12,7 @@ export type ChatMessageAttachment = ChatMessageAttachmentGame
 
 export const ChatMessageTable = pgTable('ChatMessage', {
   id: uuid('id').defaultRandom().primaryKey(),
+  trackingId: uuid('trackingId').notNull().defaultRandom(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),

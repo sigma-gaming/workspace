@@ -57,7 +57,7 @@ export const MenuLink = ({
   return (
     <Link
       to={to}
-      className="px-4 py-3 flex gap-4 items-center rounded-2xl text-[#B6B7CE] bg-[#221F2C] hover:bg-[#292636] active:translate-y-px transition-colors"
+      className="px-4 py-3 flex gap-4 items-center rounded-2xl text-[#B6B7CE] bg-[#221F2C] hover:bg-[#292636] active:translate-y-px transition-colors focus:outline-primary"
       activeClassName="cursor-default text-white bg-primary-7 hover:bg-primary-7 active:transform-none"
       onClick={onNavigate}
     >

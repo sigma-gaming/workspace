@@ -26,6 +26,12 @@ const utilsPlugin = plugin(({ addUtilities }) => {
     '.shadow-border': {
       boxShadow: '0 0 0 1px var(--mantine-color-borders)',
     },
+    '.outline-primary': {
+      'outline-style': 'solid',
+      'outline-width': '2px',
+      'outline-offset': '2px',
+      'outline-color': 'var(--mantine-color-primary-5)',
+    },
   })
 })
 

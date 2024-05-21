@@ -15,5 +15,6 @@ export const ChatValidation = {
         }),
       )
       .max(1, 'Доступно только одно вложение'),
+    trackingId: z.string().uuid(),
   }),
 }

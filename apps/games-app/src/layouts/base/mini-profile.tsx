@@ -10,6 +10,7 @@ import {
   IconWallet,
 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
+import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { animate } from 'framer-motion/dom'
 import { useLayoutEffect, useRef } from 'react'
@@ -44,7 +45,7 @@ export const MiniProfile = () => {
       disabled={userLoading}
     >
       <Menu.Target>
-        <div className="flex gap-4 items-center justify-end pl-4 cursor-pointer">
+        <div className="flex gap-4 items-center justify-end pl-4 cursor-pointer rounded-xl focus-within:outline-primary !outline-offset-4">
           <div className="flex flex-col gap-1.5 items-end">
             <Skeleton visible={balanceLoading} width="fit-content" radius="sm">
               <Text className="leading-none" size="sm" c="dimmed">
@@ -66,8 +67,12 @@ export const MiniProfile = () => {
           <Avatar
             src={profile?.image}
             alt="Аватар пользователя"
-            renderRoot={({ children, ...props }) => (
-              <button name="Меню пользователя" {...props}>
+            renderRoot={({ children, className, ...props }) => (
+              <button
+                name="Меню пользователя"
+                className={clsx(className, 'outline-none')}
+                {...props}
+              >
                 {children}
               </button>
             )}

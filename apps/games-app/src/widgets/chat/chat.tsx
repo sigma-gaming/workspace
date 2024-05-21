@@ -15,7 +15,7 @@ export const Chat = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col gap-2 h-full">
       <Title order={3}>Чат</Title>
       <MessageList />
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
@@ -23,7 +23,7 @@ export const Chat = () => {
         className={clsx(
           'relative h-[142px] px-4 py-3 bg-[#1B1C2F] cursor-text transition-colors',
           'border rounded-2xl border-[#1B1C2E]',
-          'focus-within:border-[color:var(--mantine-color-input-border-focus)]',
+          'focus-within:outline outline-2 outline-[color:var(--mantine-color-input-border-focus)] outline-offset-2',
         )}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
@@ -130,7 +130,10 @@ const MessageList = () => {
         return (
           <div
             key={message.id}
-            className="flex gap-3 p-3 pr-4 bg-[#1B1C2F] rounded-2xl"
+            className={clsx(
+              'flex gap-3 p-3 pr-4 bg-[#1B1C2F] rounded-2xl',
+              message.temporary && 'opacity-50',
+            )}
             data-chat-message={true}
           >
             {message.type === ChatMessageType.UserMessage ? (
