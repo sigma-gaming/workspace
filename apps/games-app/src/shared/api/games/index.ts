@@ -1,4 +1,3 @@
-import { GamesAPIRouter } from '@apis/games-api'
 import {
   createTRPCProxyClient,
   createWSClient,
@@ -7,6 +6,7 @@ import {
   splitLink,
   wsLink,
 } from '@trpc/client'
+import { GamesAPIRouter } from 'apps/games-api/src/client'
 import { createEffect } from 'effector'
 import { env } from '../../env'
 
