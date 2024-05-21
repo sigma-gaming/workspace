@@ -1,6 +1,5 @@
 packages:
   - 'apps/*'
-  - 'apis/*'
   - 'dbs/*'
   - 'tooling/*'
   - 'libs/*'

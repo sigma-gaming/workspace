@@ -33,10 +33,10 @@
         "tooling/env/src/index.ts"
       ],
       "@apis/games-api": [
-        "apis/games-api/src/client.ts"
+        "apps/games-api/src/client.ts"
       ],
       "@apis/control-api": [
-        "apis/control-api/src/client.ts"
+        "apps/control-api/src/client.ts"
       ],
       "@libs/exceptions": [
         "libs/exceptions/src/index.ts"

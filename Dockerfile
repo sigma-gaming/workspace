@@ -34,11 +34,11 @@ CMD [ "node", "--max_semi_space_size=64", "apps/maintenance-app/server.js" ]
 FROM base AS games-api
 WORKDIR /app
 COPY --from=build /build ./
-COPY apis/games-api/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
-CMD [ "node", "--max_semi_space_size=64", "apis/games-api/dist/main.js" ]
+COPY apps/games-api/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
+CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
 
 FROM base AS control-api
 WORKDIR /app
 COPY --from=build /build ./
-COPY apis/control-api/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
-CMD [ "node", "--max_semi_space_size=64", "apis/control-api/dist/main.js" ]
+COPY apps/control-api/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
+CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]

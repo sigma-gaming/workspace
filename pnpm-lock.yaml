@@ -262,37 +262,7 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
 
-  apis/control-api:
-    dependencies:
-      '@dbs/games-db':
-        specifier: workspace:*
-        version: link:../../dbs/games-db
-      '@dbs/games-schema':
-        specifier: workspace:*
-        version: link:../../dbs/games-schema
-      '@games/model':
-        specifier: workspace:*
-        version: link:../../games-libs/model
-      '@games/redis':
-        specifier: workspace:*
-        version: link:../../games-libs/redis
-      '@games/services':
-        specifier: workspace:*
-        version: link:../../games-libs/services
-      '@libs/di':
-        specifier: workspace:*
-        version: link:../../libs/di
-      '@libs/exceptions':
-        specifier: workspace:*
-        version: link:../../libs/exceptions
-      '@libs/logger':
-        specifier: workspace:*
-        version: link:../../libs/logger
-      '@tooling/env':
-        specifier: workspace:*
-        version: link:../../tooling/env
-
-  apis/games-api:
+  apps/control-api:
     dependencies:
       '@dbs/games-db':
         specifier: workspace:*
@@ -339,6 +309,36 @@ importers:
       '@libs/ui':
         specifier: workspace:*
         version: link:../../libs/ui
+      '@tooling/env':
+        specifier: workspace:*
+        version: link:../../tooling/env
+
+  apps/games-api:
+    dependencies:
+      '@dbs/games-db':
+        specifier: workspace:*
+        version: link:../../dbs/games-db
+      '@dbs/games-schema':
+        specifier: workspace:*
+        version: link:../../dbs/games-schema
+      '@games/model':
+        specifier: workspace:*
+        version: link:../../games-libs/model
+      '@games/redis':
+        specifier: workspace:*
+        version: link:../../games-libs/redis
+      '@games/services':
+        specifier: workspace:*
+        version: link:../../games-libs/services
+      '@libs/di':
+        specifier: workspace:*
+        version: link:../../libs/di
+      '@libs/exceptions':
+        specifier: workspace:*
+        version: link:../../libs/exceptions
+      '@libs/logger':
+        specifier: workspace:*
+        version: link:../../libs/logger
       '@tooling/env':
         specifier: workspace:*
         version: link:../../tooling/env

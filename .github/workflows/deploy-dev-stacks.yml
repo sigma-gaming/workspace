@@ -42,7 +42,7 @@ jobs:
       - name: Output affected apps
         id: affected
         run: |-
-          echo "apps=$(pnpm nx show projects --affected --json --projects '@apps/*,@apis/*')" >> $GITHUB_OUTPUT
+          echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
 
   publish:
     name: Publish to Google Cloud Registry
