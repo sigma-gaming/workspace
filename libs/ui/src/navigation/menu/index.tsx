@@ -34,7 +34,7 @@ export const MenuSection = ({
   return (
     <div className="flex flex-col gap-1 mt-4">
       <Title
-        className="px-4 uppercase text-sm mb-1 font-interface text-[color:var(--mantine-color-placeholder)]"
+        className="px-4 uppercase text-sm mb-1 font-interface text-[color:var(--mantine-color-dimmed)]"
         order={3}
       >
         {label}
@@ -57,7 +57,7 @@ export const MenuLink = ({
   return (
     <Link
       to={to}
-      className="px-4 py-3 flex gap-4 items-center rounded-2xl text-[#B6B7CE] bg-[#221F2C] hover:bg-[#292636] active:translate-y-px transition-colors focus:outline-primary"
+      className="px-4 py-4 md:py-3 flex gap-4 items-center rounded-2xl text-[#B6B7CE] bg-[#221F2C] hover:bg-[#292636] active:translate-y-px transition-colors focus:outline-primary"
       activeClassName="cursor-default text-white bg-primary-7 hover:bg-primary-7 active:transform-none"
       onClick={onNavigate}
     >
