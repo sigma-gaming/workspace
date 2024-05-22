@@ -19,7 +19,7 @@ export const MobileTabs = () => {
 
   return (
     <>
-      <div className="fixed z-50 left-0 right-0 bottom-0 flex h-[--tabs-height] bg-[#25273C] rounded-t-2xl shadow-border">
+      <div className="fixed z-50 left-0 right-0 bottom-0 flex h-[--tabs-height] bg-[#25273C] shadow-border">
         <button
           className="flex-1 flex items-center justify-center"
           onClick={() => toggle(Tab.Menu)}

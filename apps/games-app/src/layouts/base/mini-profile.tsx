@@ -45,17 +45,16 @@ export const MiniProfile = () => {
       disabled={userLoading}
     >
       <Menu.Target>
-        <div className="flex gap-4 items-center justify-end pl-4 cursor-pointer rounded-xl focus-within:outline-primary !outline-offset-4">
+        <div className="flex gap-3 md:gap-4 items-center justify-end pl-4 cursor-pointer rounded-xl focus-within:outline-primary !outline-offset-4">
           <div className="flex flex-col gap-1.5 items-end">
             <Skeleton visible={balanceLoading} width="fit-content" radius="sm">
-              <Text className="leading-none" size="sm" c="dimmed">
+              <Text className="leading-none text-xs md:text-sm" c="dimmed">
                 Баланс
               </Text>
             </Skeleton>
             <Skeleton visible={balanceLoading} width="fit-content">
               <Text
-                className="font-interface leading-none"
-                size="xl"
+                className="font-interface leading-none text-lg md:text-xl"
                 fw={500}
                 c="green.6"
               >
@@ -76,7 +75,7 @@ export const MiniProfile = () => {
                 {children}
               </button>
             )}
-            size={isMobile ? 48 : 56}
+            size={isMobile ? 44 : 56}
             loading={userLoading}
             fallback={initials}
             bordered={true}
