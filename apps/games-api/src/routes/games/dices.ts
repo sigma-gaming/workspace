@@ -16,7 +16,7 @@ import crypto from 'node:crypto'
 import { z } from 'zod'
 import { procedure } from '../trpc'
 
-const rtpMultiplier = 0.96
+const rtpMultiplier = 0.95
 
 export async function runGame(bet: number, sides: number[]) {
   const { unwantedLoss, maxLoss } = await budgetService.getBudget()
@@ -87,10 +87,14 @@ export const dices = procedure
       const won = hasWon ? winAmount : 0
       const lost = hasWon ? 0 : input.bet
 
+      const transactionType = hasWon
+        ? TransactionType.Win
+        : TransactionType.Loss
+
       const newTransaction = await transactionService.createTransaction(
         user.id,
         {
-          type: hasWon ? TransactionType.Win : TransactionType.Loss,
+          type: transactionType,
           game: Game.Dice,
           amount,
           openingBalance: lastBalance,
@@ -104,9 +108,12 @@ export const dices = procedure
 
       return {
         status: 'success',
+        transactionId: newTransaction.id,
+        transactionType,
         side,
         amount,
-        updatedBalance: newTransaction.closingBalance,
+        openingBalance: newTransaction.openingBalance,
+        closingBalance: newTransaction.closingBalance,
       }
     } catch (error) {
       if (error instanceof RouteException) {

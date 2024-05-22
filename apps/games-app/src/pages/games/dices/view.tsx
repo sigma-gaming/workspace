@@ -15,22 +15,21 @@ import { memo, useEffect } from 'react'
 import { $$dicesPage } from './model.ts'
 
 const AnimatedDice = memo(() => {
+  const loaded = useUnit($$dicesPage.$animationLoaded)
+
   const { rive, RiveComponent } = useRive({
     src: '/games/dices.riv',
-    autoplay: false,
     onLoad: () => $$dicesPage.animationLoaded(),
     onPlay: () => $$dicesPage.animationStarted(),
     onStop: () => $$dicesPage.animationFinished(),
   })
-
-  const loaded = useUnit($$dicesPage.$animationLoaded)
 
   useEffect(() => {
     $$dicesPage.riveChanged(rive)
   }, [rive])
 
   return (
-    <div className="relative grow xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
+    <div className="w-full">
       <LoadingOverlay
         className="h-full"
         visible={!loaded}
@@ -62,7 +61,9 @@ export const DicesGamePageView = () => {
       </Title>
 
       <div className="flex flex-col xl:flex-row-reverse gap-4">
-        <AnimatedDice />
+        <div className="relative grow xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
+          <AnimatedDice />
+        </div>
 
         <div className="flex flex-col gap-3 xl:w-[240px] xl:shrink-0">
           <InputLabel>Ставка</InputLabel>
@@ -81,18 +82,20 @@ export const DicesGamePageView = () => {
                 decimalScale={2}
               />
               <ActionIcon
-                className="text-sm text-[var(--input-color)]"
+                className="text-sm text-[var(--input-color)] disabled:bg-[color:var(--mantine-color-input-bg)] disabled:opacity-60"
                 size={36}
-                color="#25273E"
+                color="var(--mantine-color-input-bg)"
                 onClick={() => $$dicesPage.betDoubled()}
+                disabled={autoplaying}
               >
                 x2
               </ActionIcon>
               <ActionIcon
-                className="text-sm text-[var(--input-color)]"
+                className="text-sm text-[var(--input-color)] disabled:bg-[color:var(--mantine-color-input-bg)] disabled:opacity-60"
                 size={36}
-                color="#25273E"
+                color="var(--mantine-color-input-bg)"
                 onClick={() => $$dicesPage.betHalved()}
+                disabled={autoplaying}
               >
                 /2
               </ActionIcon>
@@ -176,7 +179,7 @@ const Dice = ({ className, side }: DiceProps) => {
     <div
       className={clsx(
         className,
-        'relative flex justify-center items-center w-full aspect-square bg-white rounded-[16%]',
+        'relative flex justify-center items-center w-full aspect-square bg-white rounded-[16%] select-none',
       )}
     >
       {side === 1 && (
@@ -240,7 +243,7 @@ const DiceDot = ({ className }: DiceDotProps) => {
     <span
       className={clsx(
         className,
-        'absolute block min-w-3 min-h-3 w-[16%] h-[16%] rounded-full bg-[#1B1C2F]',
+        'absolute block min-w-2 min-h-2 w-[16%] h-[16%] rounded-full bg-[#1B1C2F]',
       )}
     />
   )

@@ -16,7 +16,7 @@ const playGameMutation = createMutation({
   handler: gamesApi.games.dices.mutate,
 })
 
-$$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
+$$balance.receiveUpdates(playGameMutation, (data) => data.closingBalance)
 
 const betDoubled = createEvent()
 const betHalved = createEvent()
@@ -109,7 +109,6 @@ condition({
 
 sample({
   clock: startPlay,
-  filter: and(not($playing), not($animationPlaying)),
   target: form.submit,
 })
 
