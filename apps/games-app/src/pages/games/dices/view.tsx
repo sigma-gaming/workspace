@@ -103,20 +103,22 @@ export const DicesGamePageView = () => {
           <SidesSelect />
           {errors.sides[0] && <InputError>{errors.sides[0]}</InputError>}
 
-          <Button
-            type="submit"
-            disabled={autoplaying || animationPlaying}
-            loading={playing}
-            fullWidth={true}
-          >
-            Играть
-          </Button>
-          <Button
-            onClick={() => $$dicesPage.autoplayPressed()}
-            fullWidth={true}
-          >
-            {autoplaying ? 'Остановить автоигру' : 'Автоигра'}
-          </Button>
+          <div className="flex flex-col gap-3 mt-2">
+            <Button
+              type="submit"
+              disabled={autoplaying || animationPlaying}
+              loading={playing}
+              fullWidth={true}
+            >
+              Играть
+            </Button>
+            <Button
+              onClick={() => $$dicesPage.autoplayPressed()}
+              fullWidth={true}
+            >
+              {autoplaying ? 'Остановить автоигру' : 'Автоигра'}
+            </Button>
+          </div>
         </div>
       </div>
     </Card>

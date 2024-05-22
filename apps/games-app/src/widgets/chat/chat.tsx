@@ -1,6 +1,6 @@
 import { ChatMessageType } from '@dbs/games-schema'
 import { getUserInitials } from '@games/model'
-import { Avatar } from '@libs/ui'
+import { Avatar, useMedia } from '@libs/ui'
 import { Button, Text, Title } from '@mantine/core'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
@@ -13,6 +13,12 @@ export const Chat = () => {
   const updateText = useUnit($$chatWidget.fields.text.update)
   const submit = useUnit($$chatWidget.form.submit)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const isMobile = useMedia({ to: 'md' })
+
+  const handleSubmit = () => {
+    submit()
+    if (isMobile) textareaRef.current?.blur()
+  }
 
   return (
     <div className="flex flex-col gap-2 h-full">
@@ -33,12 +39,12 @@ export const Chat = () => {
         onKeyDown={(event) => {
           if (event.key === 'Enter') {
             event.preventDefault()
-            submit()
+            handleSubmit()
           }
         }}
         onSubmit={(event) => {
           event.preventDefault()
-          submit()
+          handleSubmit()
         }}
       >
         <textarea
