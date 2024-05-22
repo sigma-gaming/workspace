@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "workspaceLayout": {
-    "appsDir": "apis",
+    "appsDir": "apps",
     "libsDir": "libs"
   },
   "namedInputs": {
