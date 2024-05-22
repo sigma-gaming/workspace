@@ -65,11 +65,12 @@ export const DicesGamePageView = () => {
         <AnimatedDice />
 
         <div className="flex flex-col gap-3 xl:w-[240px] xl:shrink-0">
+          <InputLabel>Ставка</InputLabel>
           <div className="flex flex-col">
-            <InputLabel>Ставка</InputLabel>
-            <div className="flex flex-row gap-2 items-end">
+            <div className="flex flex-row gap-2 items-start">
               <NumberInput
                 className="grow"
+                classNames={{ wrapper: 'mt-0' }}
                 value={bet}
                 onChange={(value) =>
                   $$dicesPage.fields.bet.update(Number(value))

@@ -16,6 +16,13 @@
 
 .input[data-error="true"] {
   border-color: var(--mantine-color-input-border-error);
+  transition-property: color, background-color, text-decoration-color, fill, stroke;
+}
+
+.input[data-error="true"]:focus-within {
+  border-color: var(--mantine-color-input-bg);
+  outline-width: 2px;
+  outline-color: var(--mantine-color-input-border-error);
 }
 
 .input:placeholder {

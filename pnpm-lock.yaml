@@ -369,6 +369,9 @@ importers:
       '@libs/ui':
         specifier: workspace:*
         version: link:../../libs/ui
+      '@tooling/env':
+        specifier: workspace:*
+        version: link:../../tooling/env
 
   dbs/games-db:
     dependencies:

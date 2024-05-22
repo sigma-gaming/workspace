@@ -9,6 +9,7 @@ import {
   LoadingOverlay,
   MantineProvider,
   Menu,
+  MenuItem,
   Modal,
   MultiSelect,
   Notification,
@@ -79,6 +80,9 @@ export const theme = createTheme({
     }),
     Menu: Menu.extend({
       classNames: menuClassNames,
+      defaultProps: {
+        menuItemTabIndex: 0,
+      },
     }),
     Popover: Popover.extend({
       classNames: popoverClassNames,

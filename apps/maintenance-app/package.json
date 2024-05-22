@@ -15,6 +15,7 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
-    "@libs/ui": "workspace:*"
+    "@libs/ui": "workspace:*",
+    "@tooling/env": "workspace:*"
   }
 }
