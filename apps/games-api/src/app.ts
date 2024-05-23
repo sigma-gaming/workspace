@@ -57,14 +57,12 @@ app.get('/ready', async (_, reply) => {
 })
 
 setInterval(() => {
-  console.log(
-    JSON.stringify({
-      level: 5,
-      short_message: 'Test',
-      host: 'test',
-      version: '10.4.1',
-    }),
-  )
+  console.log({
+    level: 5,
+    short_message: 'Test',
+    host: 'test',
+    version: '10.4.1',
+  })
 }, 1000)
 
 cronJobRegistry.register('SyncBudget', syncBudgetJob).start()
