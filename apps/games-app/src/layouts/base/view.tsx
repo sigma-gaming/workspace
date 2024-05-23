@@ -11,7 +11,10 @@ import { MiniProfile } from './mini-profile.tsx'
 import { MobileTabs } from './mobile-tabs.tsx'
 
 function useHeaderHeight() {
-  if (useMedia({ from: 'lg' })) return '112px'
+  const fromLg = useMedia({ from: 'lg' })
+  const fromMd = useMedia({ from: 'sm' })
+  if (fromLg) return '112px'
+  if (fromMd) return '80px'
   return '64px'
 }
 
@@ -57,7 +60,7 @@ const Header = () => {
       <div className="w-[280px] pl-2 lg:pl-4 flex justify-start lg:justify-center">
         <Link
           to={routes.home}
-          className="flex items-center gap-2 p-2 focus:outline-primary rounded-xl"
+          className="flex items-center gap-2 p-2 focus-visible:outline-primary rounded-xl"
         >
           <Logo />
           <Title className="hidden lg:block" order={1}>

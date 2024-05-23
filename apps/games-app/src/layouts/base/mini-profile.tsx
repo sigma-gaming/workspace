@@ -21,6 +21,14 @@ import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { formatRUB } from '../../shared/lib/format/currency.ts'
 
+function useAvatarSize() {
+  const fromLg = useMedia({ from: 'lg' })
+  const fromMd = useMedia({ from: 'sm' })
+  if (fromLg) return 56
+  if (fromMd) return 50
+  return 44
+}
+
 export const MiniProfile = () => {
   const isMobile = useMedia({ to: 'md' })
   const userExpired = useUnit($$user.$expired)
@@ -30,6 +38,7 @@ export const MiniProfile = () => {
   const userLoading = useUnit($$user.$loading)
   const profile = useUnit($$profile.$profile)
   const balanceLoading = useUnit($$balance.$loading)
+  const avatarSize = useAvatarSize()
 
   if (userExpired) {
     return <ExpiredProfile />
@@ -45,16 +54,16 @@ export const MiniProfile = () => {
       disabled={userLoading}
     >
       <Menu.Target>
-        <div className="flex gap-3 md:gap-4 items-center justify-end pl-4 cursor-pointer rounded-xl focus-within:outline-primary !outline-offset-4">
-          <div className="flex flex-col gap-1.5 items-end">
+        <div className="flex gap-3 md:gap-4 items-center justify-end pl-4 cursor-pointer rounded-xl !outline-offset-4">
+          <div className="flex flex-col gap-1.5 lg:gap-[0] items-end">
             <Skeleton visible={balanceLoading} width="fit-content" radius="sm">
-              <Text className="leading-none text-xs md:text-sm" c="dimmed">
+              <Text className="leading-none text-xs lg:text-sm" c="dimmed">
                 Баланс
               </Text>
             </Skeleton>
             <Skeleton visible={balanceLoading} width="fit-content">
               <Text
-                className="font-interface leading-none text-lg md:text-xl"
+                className="font-interface leading-none text-lg lg:text-xl"
                 fw={500}
                 c="green.6"
               >
@@ -75,7 +84,7 @@ export const MiniProfile = () => {
                 {children}
               </button>
             )}
-            size={isMobile ? 44 : 56}
+            size={avatarSize}
             loading={userLoading}
             fallback={initials}
             bordered={true}
