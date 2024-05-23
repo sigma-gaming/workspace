@@ -106,3 +106,4 @@ jobs:
           repo: infra
           github_token: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
           workflow_file_name: deploy-stacks.yml
+          client_payload: '{"deploy-dev": true}'
