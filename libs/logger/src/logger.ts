@@ -87,12 +87,17 @@ export class FastifyLoggerService {
 
     app.addHook('onSend', (request, reply, payloadUnknown, done) => {
       const requestId = request.id
-      const payload = typeof payloadUnknown === 'string' ? payloadUnknown : null
+
+      const data = {
+        requestId,
+        response: typeof payloadUnknown === 'string' ? payloadUnknown : null,
+        req: serializeReq(request.raw),
+      }
 
       if (reply.statusCode >= 400) {
-        logger.error({ requestId, payload })
+        logger.error(data)
       } else if (!this.options.pretty && reply.statusCode >= 200) {
-        logger.info({ requestId, payload })
+        logger.info(data)
       }
 
       return done()
@@ -101,12 +106,6 @@ export class FastifyLoggerService {
 }
 
 export const fastifyLogger = createSingletonProxy(FastifyLoggerService)
-
-export function createLogger(options: { pretty?: boolean }): Logger {
-  return createNeodxLogger({
-    target: options.pretty ? pretty() : json(),
-  })
-}
 
 function serializeReq(req: IncomingMessage) {
   const sessionCookieIndex = req.headers.cookie?.indexOf('session') ?? -1
@@ -127,62 +126,5 @@ function serializeReq(req: IncomingMessage) {
       'x-trace-id': req.headers['x-trace-id'],
       cookie,
     },
-  }
-}
-
-export function createFastifyLogger(options: {
-  logger: Logger
-  pretty?: boolean
-}) {
-  const httpLogger = createHttpLogger<
-    RawRequestDefaultExpression,
-    RawReplyDefaultExpression
-  >({
-    colors: createColors(false, false),
-    simple: options.pretty,
-    logger: options.logger,
-    shouldLogRequest: true,
-    getRequestId: generateReqId,
-    getRequestMeta: (ctx) => ({
-      req: serializeReq(ctx.req),
-    }),
-    getResponseMeta: (ctx) => ({
-      statusCode: ctx.res.statusCode,
-      responseTime: ctx.responseTime,
-      req: serializeReq(ctx.req),
-    }),
-  })
-
-  const genReqId = (req: IncomingMessage) => {
-    const existingID = req.headers['x-trace-id']
-    if (existingID) return existingID.toString()
-    const id = uuid()
-    req.headers['x-trace-id'] = id
-    return id
-  }
-
-  const attach = (app: FastifyInstance) => {
-    app.addHook('onRequest', (request, reply, done) => {
-      httpLogger(request.raw, reply.raw, done)
-    })
-
-    app.addHook('onSend', (request, reply, payloadUnknown, done) => {
-      const requestId = request.id
-      const payload = typeof payloadUnknown === 'string' ? payloadUnknown : null
-
-      if (reply.statusCode >= 400) {
-        options.logger.error({ requestId, payload })
-      } else if (!options.pretty && reply.statusCode >= 200) {
-        options.logger.info({ requestId, payload })
-      }
-
-      return done()
-    })
-  }
-
-  return {
-    httpLogger,
-    genReqId,
-    attach,
   }
 }
