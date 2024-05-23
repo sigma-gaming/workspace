@@ -1,4 +1,5 @@
 import { createSingletonProxy } from '@libs/di'
+import { createColors } from '@neodx/colors'
 import {
   createLogger as createNeodxLogger,
   DefaultLoggerLevel,
@@ -61,6 +62,7 @@ export class FastifyLoggerService {
       RawRequestDefaultExpression,
       RawReplyDefaultExpression
     >({
+      colors: createColors(false, false),
       simple: options.pretty,
       logger,
       shouldLogRequest: true,
@@ -136,6 +138,7 @@ export function createFastifyLogger(options: {
     RawRequestDefaultExpression,
     RawReplyDefaultExpression
   >({
+    colors: createColors(false, false),
     simple: options.pretty,
     logger: options.logger,
     shouldLogRequest: true,

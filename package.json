@@ -44,6 +44,7 @@
     "@mantine/core": "^7.3.2",
     "@mantine/hooks": "^7.3.2",
     "@mantine/notifications": "^7.3.2",
+    "@neodx/colors": "^0.2.8",
     "@neodx/log": "^0.3.0",
     "@rive-app/react-canvas": "^4.8.3",
     "@sesamecare-oss/redlock": "^1.2.0",

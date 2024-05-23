@@ -32,6 +32,9 @@ importers:
       '@mantine/notifications':
         specifier: ^7.3.2
         version: 7.9.1(@mantine/core@7.9.1(@mantine/hooks@7.9.1(react@18.3.1))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mantine/hooks@7.9.1(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@neodx/colors':
+        specifier: ^0.2.8
+        version: 0.2.8
       '@neodx/log':
         specifier: ^0.3.0
         version: 0.3.0(@types/express@4.17.21)(express@4.19.2)
@@ -1845,6 +1848,9 @@ packages:
   '@neodx/colors@0.2.6':
     resolution: {integrity: sha512-oN/gcQdsr9mLbKMTU+fyVuvqr06yMPvR7y8gM5cQV2VNGFxyEFBzWLxUQonrdT5EVAsb9JNbTw0M2XHkg/sxtA==}
 
+  '@neodx/colors@0.2.8':
+    resolution: {integrity: sha512-p7PlnfL74mB9rMVmvs1pYi9RRjSQ5WV3msmvM+GRz5Fg6iF7wZmVFkKi4/n2zvywryf6/EmAzTp3kqvOxRmRJQ==}
+
   '@neodx/log@0.3.0':
     resolution: {integrity: sha512-Dg0Vav0ka0c5oc7ViWId0f/4Jph3QqkjLc2bi2oEPwJtH0OVHMh1bGC36z8AVuH5ojpzA44iwPpPQxNp+Bb6ZQ==}
     peerDependencies:
@@ -1864,6 +1870,9 @@ packages:
 
   '@neodx/std@0.2.0':
     resolution: {integrity: sha512-tzUkDegqPy+7Jts+0zJm+baiaOFN8yfwmt2jTOl2uQ4iuz5eeMzJ3Yaz2Uz87Yg7QhGBQld7P5T/8g/f/46IEg==}
+
+  '@neodx/std@0.3.1':
+    resolution: {integrity: sha512-zKQMEsXpfXy6P7/39qFFtOKH9Wc4A5zH939Dw6y5VG1jNps8HFPz5VbPGv1WM7dW9AK+XOMid9BspYlt3HQdmg==}
 
   '@next/eslint-plugin-next@13.5.6':
     resolution: {integrity: sha512-ng7pU/DDsxPgT6ZPvuprxrkeew3XaRf4LAT4FabaEO/hAbvVx4P7wqnqdbTdDn1kgTvsI4tpIgT4Awn/m0bGbg==}
@@ -7628,6 +7637,10 @@ snapshots:
     dependencies:
       '@neodx/std': 0.2.0
 
+  '@neodx/colors@0.2.8':
+    dependencies:
+      '@neodx/std': 0.3.1
+
   '@neodx/log@0.3.0(@types/express@4.17.21)(express@4.19.2)':
     dependencies:
       '@neodx/colors': 0.2.6
@@ -7637,6 +7650,8 @@ snapshots:
       express: 4.19.2
 
   '@neodx/std@0.2.0': {}
+
+  '@neodx/std@0.3.1': {}
 
   '@next/eslint-plugin-next@13.5.6':
     dependencies:
