@@ -4,6 +4,12 @@ import { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify'
 export async function createContext({ req, res }: CreateFastifyContextOptions) {
   const session = await sessionService.getSession(req)
 
+  if (session.user) {
+    const meta = req.meta ?? {}
+    meta.userId = session.user.id
+    req.meta = meta
+  }
+
   return { req, res, session }
 }
 
