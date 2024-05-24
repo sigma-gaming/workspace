@@ -91,6 +91,7 @@ export class FastifyLoggerService {
       const data = {
         requestId,
         displayMessage: `Replied to request ${requestId}`,
+        statusCode: reply.statusCode,
         reply: typeof payloadUnknown === 'string' ? payloadUnknown : null,
         req: serializeReq(request.raw),
       }
