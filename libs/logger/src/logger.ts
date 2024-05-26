@@ -163,7 +163,7 @@ function serializeRequest(request: FastifyRequest) {
 function serializeResponse(response: FastifyReply, payload: unknown) {
   return {
     statusCode: response.statusCode,
-    body: payload,
+    body: typeof payload === 'string' ? payload : '<non-string-type>',
     elapsedTime: Math.round(response.elapsedTime * 100) / 100,
   }
 }
