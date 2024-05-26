@@ -46,6 +46,7 @@ export class LoggerService {
       meta: {
         request: {
           id: request.id,
+          url: request.url,
         },
         user: {
           id: request.meta?.userId,
