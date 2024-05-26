@@ -31,12 +31,33 @@ export const LoggerOptionsToken: InjectionToken<LoggerOptions> =
 export class LoggerService {
   logger: Logger
 
-  constructor(@inject(LoggerOptionsToken) options: LoggerOptions) {
+  constructor(@inject(LoggerOptionsToken) private options: LoggerOptions) {
     this.logger = createNeodxLogger({
       target: options.pretty ? pretty() : json(),
     })
   }
+
+  createRequestLogger(request: FastifyRequest) {
+    if (this.options.pretty) {
+      return this.logger.child('Request')
+    }
+
+    return this.logger.child('Request', {
+      meta: {
+        request: {
+          id: request.id,
+        },
+        user: {
+          id: request.meta?.userId,
+          ip: request.ip,
+          ips: request.ips,
+        },
+      },
+    })
+  }
 }
+
+export const loggerService = createSingletonProxy(LoggerService)
 
 export const logger = createSingletonProxy(
   LoggerService,
@@ -81,27 +102,28 @@ export class FastifyLoggerService {
   genReqId = generateReqId
 
   attach = (app: FastifyInstance) => {
-    app.addHook('onSend', (requestFull, responseFull, payload, done) => {
+    app.addHook('onSend', (fastifyRequest, fastifyResponse, payload, done) => {
       if (this.options.pretty) {
-        return this.httpLogger(requestFull.raw, responseFull.raw, done)
+        return this.httpLogger(fastifyRequest.raw, fastifyResponse.raw, done)
       }
 
-      const request = serializeRequest(requestFull)
-      const response = serializeResponse(responseFull, payload)
+      const request = serializeRequest(fastifyRequest)
+      const response = serializeResponse(fastifyResponse, payload)
 
       const data = {
         shortMessage: `${request.method} ${request.url} (${response.elapsedTime}ms)`,
         request,
         response,
         user: {
-          id: requestFull.meta?.userId,
-          ip: requestFull.ip,
+          id: fastifyRequest.meta?.userId,
+          ip: fastifyRequest.ip,
+          ips: fastifyRequest.ips,
         },
       }
 
-      if (responseFull.statusCode >= 500) {
+      if (fastifyResponse.statusCode >= 500) {
         logger.error(data)
-      } else if (responseFull.statusCode >= 200) {
+      } else if (fastifyResponse.statusCode >= 200) {
         logger.info(data)
       }
 

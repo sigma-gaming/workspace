@@ -11,7 +11,6 @@ import {
   InternalServerException,
   RouteException,
 } from '@libs/exceptions'
-import { logger } from '@libs/logger'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 import { procedure } from '../trpc'
@@ -87,6 +86,8 @@ export const dices = procedure
       const won = hasWon ? winAmount : 0
       const lost = hasWon ? 0 : input.bet
 
+      ctx.logger.info('Test message', { amount, side })
+
       const transactionType = hasWon
         ? TransactionType.Win
         : TransactionType.Loss
@@ -120,7 +121,7 @@ export const dices = procedure
         throw error
       }
 
-      logger.error(error)
+      ctx.logger.error(error)
       throw new InternalServerException()
     } finally {
       await lock.release()
