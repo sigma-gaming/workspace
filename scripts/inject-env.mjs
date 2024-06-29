@@ -6,8 +6,7 @@ const ENV = Object.entries(process.env).reduce((acc, [key, value]) => {
   return acc
 }, {})
 
-
-const script = `window.ENV = ${JSON.stringify(ENV)}`
+const script = `window.PUBLIC_ENV = ${JSON.stringify(ENV)}`
 
 const indexHtmlPath = '/app/index.html'
 const content = fs.readFileSync(indexHtmlPath, { encoding: 'utf8' })
