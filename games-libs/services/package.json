@@ -16,7 +16,7 @@
     "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",
     "@games/redis": "workspace:*",
-    "@libs/di": "workspace:*",
-    "@libs/logger": "workspace:*"
+    "@core/di": "workspace:*",
+    "@core/logger": "workspace:*"
   }
 }

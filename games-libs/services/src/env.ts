@@ -1,4 +1,4 @@
-import { createSingletonProxy } from '@libs/di'
+import { createSingletonProxy } from '@core/di'
 import { loadEnv, parseEnv } from '@tooling/env'
 import { singleton } from 'tsyringe'
 import { z } from 'zod'
@@ -12,12 +12,10 @@ const EnvSchema = z
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_APP_VERSION: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
-    PUBLIC_GAMES_API_WS_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string(),
     PUBLIC_CONTROL_APP_URL: z.string(),
     PUBLIC_CONTROL_APP_VERSION: z.string(),
     PUBLIC_CONTROL_API_URL: z.string(),
-    PUBLIC_CONTROL_API_WS_URL: z.string(),
     PUBLIC_CONTROL_API_VERSION: z.string(),
     JWT_SECRET: z.string(),
 
@@ -51,7 +49,6 @@ const EnvSchema = z
     gamesApp: {
       version: raw.PUBLIC_GAMES_APP_VERSION,
       url: raw.PUBLIC_GAMES_APP_URL,
-      wsUrl: raw.PUBLIC_GAMES_API_WS_URL,
     },
 
     gamesApi: {
@@ -62,7 +59,6 @@ const EnvSchema = z
     controlApp: {
       version: raw.PUBLIC_CONTROL_APP_VERSION,
       url: raw.PUBLIC_CONTROL_APP_URL,
-      wsUrl: raw.PUBLIC_CONTROL_API_WS_URL,
     },
 
     controlApi: {

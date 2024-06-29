@@ -38,8 +38,8 @@
       "@apis/control-api": [
         "apps/control-api/src/client.ts"
       ],
-      "@libs/exceptions": [
-        "libs/exceptions/src/index.ts"
+      "@core/exceptions": [
+        "core/exceptions/src/index.ts"
       ],
       "@dbs/games-db": [
         "dbs/games-db/src/index.ts"
@@ -59,32 +59,32 @@
       "@games/queue": [
         "games-libs/queue/src/index.ts"
       ],
-      "@libs/logger": [
-        "libs/logger/src/index.ts"
+      "@core/logger": [
+        "core/logger/src/index.ts"
       ],
-      "@libs/cron-jobs": [
-        "libs/cron-jobs/src/index.ts"
+      "@core/cron-jobs": [
+        "core/cron-jobs/src/index.ts"
       ],
-      "@libs/forms": [
-        "libs/forms/src/index.ts"
+      "@core/forms": [
+        "core/forms/src/index.ts"
       ],
-      "@libs/ui": [
-        "libs/ui/src/index.ts"
+      "@core/ui": [
+        "core/ui/src/index.ts"
       ],
-      "@libs/ui/tailwind": [
-        "libs/ui/src/tailwind.ts"
+      "@core/ui/tailwind": [
+        "core/ui/src/tailwind.ts"
       ],
-      "@libs/di": [
-        "libs/di/src/index.ts"
+      "@core/di": [
+        "core/di/src/index.ts"
       ],
-      "@libs/events": [
-        "libs/events/src/index.ts"
+      "@core/events": [
+        "core/events/src/index.ts"
       ],
-      "@libs/hono-client": [
-        "libs/hono-client/src/index.ts"
+      "@core/hono-client": [
+        "core/hono-client/src/index.ts"
       ],
-      "@libs/hono-ws": [
-        "libs/hono-ws/src/index.ts"
+      "@core/hono-ws": [
+        "core/hono-ws/src/index.ts"
       ]
     }
   }

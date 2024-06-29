@@ -1,5 +1,5 @@
 {
-  "name": "@libs/forms",
+  "name": "@core/events",
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,

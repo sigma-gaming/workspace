@@ -1,4 +1,4 @@
-import { useMedia } from '@libs/ui'
+import { useMedia } from '@core/ui'
 import { Title } from '@mantine/core'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'

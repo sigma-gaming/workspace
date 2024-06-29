@@ -1,5 +1,5 @@
 import { ApiType, SocketEvent, SocketTopic } from '@apis/games-api'
-import { createApiSocket } from '@libs/hono-client'
+import { createApiSocket } from '@core/hono-client'
 import { hc } from 'hono/client'
 import { env } from '../../env'
 

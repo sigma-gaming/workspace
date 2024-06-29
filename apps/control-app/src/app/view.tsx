@@ -1,5 +1,5 @@
 import './global.css'
-import { ThemeProvider } from '@libs/ui'
+import { ThemeProvider } from '@core/ui'
 import { Notifications } from '@mantine/notifications'
 import { createRoutesView, RouterProvider } from 'atomic-router-react'
 import { useUnit } from 'effector-react'

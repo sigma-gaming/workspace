@@ -2,7 +2,7 @@ import {
   InternalServerException,
   recreateException,
   RouteException,
-} from '@libs/exceptions'
+} from '@core/exceptions'
 import { createEffect, Effect } from 'effector'
 import { ClientResponse } from 'hono/client'
 import { StatusCode } from 'hono/utils/http-status'

@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@dbs/games-schema": "workspace:*",
-    "@libs/di": "workspace:*",
+    "@core/di": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

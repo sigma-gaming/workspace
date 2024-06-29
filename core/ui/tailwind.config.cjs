@@ -1,4 +1,4 @@
-import { createConfig } from '@libs/ui/tailwind'
+import { createConfig } from '@core/ui/tailwind'
 
 /**
  * Used only for auto-completion

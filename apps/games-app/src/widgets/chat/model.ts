@@ -4,8 +4,8 @@ import {
   ChatMessageType,
 } from '@dbs/games-schema'
 import { ChatValidation } from '@games/model'
-import { createField, createForm } from '@libs/forms'
-import { createApiEffect } from '@libs/hono-client'
+import { createField, createForm } from '@core/forms'
+import { createApiEffect } from '@core/hono-client'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { v4 as uuid } from 'uuid'

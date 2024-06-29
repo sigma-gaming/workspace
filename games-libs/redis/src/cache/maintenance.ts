@@ -1,5 +1,5 @@
-import { createSingletonProxy } from '@libs/di'
-import { Logger, LoggerService } from '@libs/logger'
+import { createSingletonProxy } from '@core/di'
+import { Logger, LoggerService } from '@core/logger'
 import { Redis } from 'ioredis'
 import { singleton } from 'tsyringe'
 import { RedisService } from '../redis'

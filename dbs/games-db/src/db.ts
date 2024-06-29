@@ -1,5 +1,5 @@
 import * as schema from '@dbs/games-schema'
-import { createSingletonProxy } from '@libs/di'
+import { createSingletonProxy } from '@core/di'
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import { inject, InjectionToken, singleton } from 'tsyringe'

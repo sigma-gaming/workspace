@@ -10,8 +10,8 @@ import {
   UserRole,
 } from '@dbs/games-schema'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
-import { createSingletonProxy } from '@libs/di'
-import { BadRequestException, InternalServerException } from '@libs/exceptions'
+import { createSingletonProxy } from '@core/di'
+import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { desc } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 import { profileService } from './profile'

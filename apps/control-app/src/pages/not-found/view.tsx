@@ -1,4 +1,4 @@
-import { LinkAnchor } from '@libs/ui'
+import { LinkAnchor } from '@core/ui'
 import { rem, Text, Title } from '@mantine/core'
 import { IconError404 } from '@tabler/icons-react'
 import { CenteredLayout } from '../../layouts/centered'

@@ -9,8 +9,8 @@ import {
 } from '@dbs/games-schema'
 import { getUserFullName, ProfileDetailed } from '@games/model'
 import { gamesCaches } from '@games/redis'
-import { createSingletonProxy } from '@libs/di'
-import { InternalServerException, NotFoundException } from '@libs/exceptions'
+import { createSingletonProxy } from '@core/di'
+import { InternalServerException, NotFoundException } from '@core/exceptions'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 

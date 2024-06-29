@@ -9,7 +9,7 @@ import {
 import { gamesCaches } from '@games/redis'
 import { env, sessionService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
-import { BadRequestException } from '@libs/exceptions'
+import { BadRequestException } from '@core/exceptions'
 import axios from 'axios'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'

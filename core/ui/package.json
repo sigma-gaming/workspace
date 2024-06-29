@@ -1,5 +1,5 @@
 {
-  "name": "@libs/ui",
+  "name": "@core/ui",
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,

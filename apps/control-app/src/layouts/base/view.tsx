@@ -1,4 +1,4 @@
-import { Menu, MenuLink, MenuSection } from '@libs/ui'
+import { Menu, MenuLink, MenuSection } from '@core/ui'
 import { rem, Title } from '@mantine/core'
 import {
   IconBarrierBlock,

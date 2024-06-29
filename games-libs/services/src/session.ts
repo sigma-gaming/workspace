@@ -7,11 +7,11 @@ import {
 } from '@dbs/games-schema'
 import { Session, SessionState } from '@games/model'
 import { gamesCaches } from '@games/redis'
-import { createSingletonProxy } from '@libs/di'
+import { createSingletonProxy } from '@core/di'
 import {
   NotAuthenticatedException,
   SessionExpiredException,
-} from '@libs/exceptions'
+} from '@core/exceptions'
 import { parse } from 'cookie'
 import { desc, eq, inArray } from 'drizzle-orm'
 import { Context as HonoContext, HonoRequest } from 'hono'

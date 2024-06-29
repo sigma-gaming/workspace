@@ -5,7 +5,7 @@ import {
   sessionService,
   transactionService,
 } from '@games/services'
-import { InternalServerException, RouteException } from '@libs/exceptions'
+import { InternalServerException, RouteException } from '@core/exceptions'
 import { Hono } from 'hono'
 
 export const depositRoute = new Hono().post('/', async (ctx) => {

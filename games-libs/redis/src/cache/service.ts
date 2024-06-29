@@ -1,4 +1,4 @@
-import { Logger, LoggerService } from '@libs/logger'
+import { Logger, LoggerService } from '@core/logger'
 import { Lock, Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
 import { singleton } from 'tsyringe'

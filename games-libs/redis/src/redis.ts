@@ -1,5 +1,5 @@
-import { createSingletonProxy, OnApplicationShutdown } from '@libs/di'
-import { Logger, LoggerService } from '@libs/logger'
+import { createSingletonProxy, OnApplicationShutdown } from '@core/di'
+import { Logger, LoggerService } from '@core/logger'
 import { Redis } from 'ioredis'
 import { inject, InjectionToken, singleton } from 'tsyringe'
 

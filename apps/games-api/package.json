@@ -22,11 +22,11 @@
     "@games/model": "workspace:*",
     "@games/redis": "workspace:*",
     "@games/services": "workspace:*",
-    "@libs/di": "workspace:*",
-    "@libs/exceptions": "workspace:*",
-    "@libs/logger": "workspace:*",
+    "@core/di": "workspace:*",
+    "@core/exceptions": "workspace:*",
+    "@core/logger": "workspace:*",
     "@tooling/env": "workspace:*",
-    "@libs/events": "workspace:*",
-    "@libs/hono-ws": "workspace:*"
+    "@core/events": "workspace:*",
+    "@core/hono-ws": "workspace:*"
   }
 }

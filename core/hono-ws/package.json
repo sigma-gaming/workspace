@@ -1,7 +1,7 @@
 {
-  "name": "@libs/di",
+  "name": "@core/hono-ws",
   "version": "0.0.0-internal",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
   "main": "./src/index.ts",
   "module": "./src/index.ts",

@@ -1,7 +1,7 @@
 import { NotificationSelect } from '@dbs/games-schema'
 import { createQuery } from '@farfetched/core'
 import { mapColor } from '@games/model'
-import { createApiEffect } from '@libs/hono-client'
+import { createApiEffect } from '@core/hono-client'
 import { invoke } from '@withease/factories'
 import { createEffect, createEvent, sample } from 'effector'
 import { $$notifications } from '../../entities/notifications'

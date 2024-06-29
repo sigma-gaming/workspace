@@ -1,4 +1,4 @@
-import { createSingletonProxy } from '@libs/di'
+import { createSingletonProxy } from '@core/di'
 import { createColors } from '@neodx/colors'
 import {
   createLogger as createNeodxLogger,

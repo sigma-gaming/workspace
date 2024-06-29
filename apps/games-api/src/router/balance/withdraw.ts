@@ -9,7 +9,7 @@ import {
   BadRequestException,
   InternalServerException,
   RouteException,
-} from '@libs/exceptions'
+} from '@core/exceptions'
 import { Hono } from 'hono'
 
 export const withdrawRoute = new Hono().post('/', async (ctx) => {

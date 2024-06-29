@@ -11,7 +11,7 @@
   "workspaces": [
     "apps/*",
     "dbs/*",
-    "libs/*",
+    "core/*",
     "tooling/*",
     "games-libs/*"
   ],

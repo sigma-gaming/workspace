@@ -1,5 +1,5 @@
-import { OnApplicationShutdown } from '@libs/di'
-import { Logger, LoggerService } from '@libs/logger'
+import { OnApplicationShutdown } from '@core/di'
+import { Logger, LoggerService } from '@core/logger'
 import { Callback, Redis } from 'ioredis'
 import { singleton } from 'tsyringe'
 import { RedisService, SubRedisService } from '../redis'

@@ -282,6 +282,15 @@ importers:
 
   apps/control-api:
     dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../../core/exceptions
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db
@@ -297,45 +306,51 @@ importers:
       '@games/services':
         specifier: workspace:*
         version: link:../../games-libs/services
-      '@libs/di':
-        specifier: workspace:*
-        version: link:../../libs/di
-      '@libs/exceptions':
-        specifier: workspace:*
-        version: link:../../libs/exceptions
-      '@libs/logger':
-        specifier: workspace:*
-        version: link:../../libs/logger
       '@tooling/env':
         specifier: workspace:*
         version: link:../../tooling/env
 
   apps/control-app:
     dependencies:
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../../core/exceptions
+      '@core/forms':
+        specifier: workspace:*
+        version: link:../../core/forms
+      '@core/hono-client':
+        specifier: workspace:*
+        version: link:../../core/hono-client
+      '@core/ui':
+        specifier: workspace:*
+        version: link:../../core/ui
       '@dbs/games-schema':
         specifier: workspace:*
         version: link:../../dbs/games-schema
       '@games/model':
         specifier: workspace:*
         version: link:../../games-libs/model
-      '@libs/exceptions':
-        specifier: workspace:*
-        version: link:../../libs/exceptions
-      '@libs/forms':
-        specifier: workspace:*
-        version: link:../../libs/forms
-      '@libs/hono-client':
-        specifier: workspace:*
-        version: link:../../libs/hono-client
-      '@libs/ui':
-        specifier: workspace:*
-        version: link:../../libs/ui
       '@tooling/env':
         specifier: workspace:*
         version: link:../../tooling/env
 
   apps/games-api:
     dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/events':
+        specifier: workspace:*
+        version: link:../../core/events
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../../core/exceptions
+      '@core/hono-ws':
+        specifier: workspace:*
+        version: link:../../core/hono-ws
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db
@@ -351,66 +366,81 @@ importers:
       '@games/services':
         specifier: workspace:*
         version: link:../../games-libs/services
-      '@libs/di':
-        specifier: workspace:*
-        version: link:../../libs/di
-      '@libs/events':
-        specifier: workspace:*
-        version: link:../../libs/events
-      '@libs/exceptions':
-        specifier: workspace:*
-        version: link:../../libs/exceptions
-      '@libs/hono-ws':
-        specifier: workspace:*
-        version: link:../../libs/hono-ws
-      '@libs/logger':
-        specifier: workspace:*
-        version: link:../../libs/logger
       '@tooling/env':
         specifier: workspace:*
         version: link:../../tooling/env
 
   apps/games-app:
     dependencies:
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../../core/exceptions
+      '@core/forms':
+        specifier: workspace:*
+        version: link:../../core/forms
+      '@core/hono-client':
+        specifier: workspace:*
+        version: link:../../core/hono-client
+      '@core/ui':
+        specifier: workspace:*
+        version: link:../../core/ui
       '@dbs/games-schema':
         specifier: workspace:*
         version: link:../../dbs/games-schema
       '@games/model':
         specifier: workspace:*
         version: link:../../games-libs/model
-      '@libs/exceptions':
-        specifier: workspace:*
-        version: link:../../libs/exceptions
-      '@libs/forms':
-        specifier: workspace:*
-        version: link:../../libs/forms
-      '@libs/hono-client':
-        specifier: workspace:*
-        version: link:../../libs/hono-client
-      '@libs/ui':
-        specifier: workspace:*
-        version: link:../../libs/ui
       '@tooling/env':
         specifier: workspace:*
         version: link:../../tooling/env
 
   apps/maintenance-app:
     dependencies:
-      '@libs/ui':
+      '@core/ui':
         specifier: workspace:*
-        version: link:../../libs/ui
+        version: link:../../core/ui
       '@tooling/env':
         specifier: workspace:*
         version: link:../../tooling/env
 
+  core/cron-jobs:
+    dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../di
+
+  core/di: {}
+
+  core/events: {}
+
+  core/exceptions: {}
+
+  core/forms: {}
+
+  core/hono-client: {}
+
+  core/hono-ws: {}
+
+  core/logger:
+    dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../di
+
+  core/ui:
+    devDependencies:
+      '@tooling/build':
+        specifier: workspace:*
+        version: link:../../tooling/build
+
   dbs/games-db:
     dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
       '@dbs/games-schema':
         specifier: workspace:*
         version: link:../games-schema
-      '@libs/di':
-        specifier: workspace:*
-        version: link:../../libs/di
       '@tooling/env':
         specifier: workspace:*
         version: link:../../tooling/env
@@ -430,21 +460,27 @@ importers:
 
   games-libs/redis:
     dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
       '@dbs/games-schema':
         specifier: workspace:*
         version: link:../../dbs/games-schema
       '@games/model':
         specifier: workspace:*
         version: link:../model
-      '@libs/di':
-        specifier: workspace:*
-        version: link:../../libs/di
-      '@libs/logger':
-        specifier: workspace:*
-        version: link:../../libs/logger
 
   games-libs/services:
     dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db
@@ -457,42 +493,6 @@ importers:
       '@games/redis':
         specifier: workspace:*
         version: link:../redis
-      '@libs/di':
-        specifier: workspace:*
-        version: link:../../libs/di
-      '@libs/logger':
-        specifier: workspace:*
-        version: link:../../libs/logger
-
-  libs/cron-jobs:
-    dependencies:
-      '@libs/di':
-        specifier: workspace:*
-        version: link:../di
-
-  libs/di: {}
-
-  libs/events: {}
-
-  libs/exceptions: {}
-
-  libs/forms: {}
-
-  libs/hono-client: {}
-
-  libs/hono-ws: {}
-
-  libs/logger:
-    dependencies:
-      '@libs/di':
-        specifier: workspace:*
-        version: link:../di
-
-  libs/ui:
-    devDependencies:
-      '@tooling/build':
-        specifier: workspace:*
-        version: link:../../tooling/build
 
   tooling/build:
     dependencies:

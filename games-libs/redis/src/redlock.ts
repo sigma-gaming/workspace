@@ -1,4 +1,4 @@
-import { createSingletonProxy } from '@libs/di'
+import { createSingletonProxy } from '@core/di'
 import { Redlock } from '@sesamecare-oss/redlock'
 import { singleton } from 'tsyringe'
 import { RedisService } from './redis'

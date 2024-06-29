@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import { DbOptionsToken } from '@dbs/games-db'
 import { CacheVersionToken, RedisOptionsToken } from '@games/redis'
 import { env } from '@games/services'
-import { LoggerOptionsToken } from '@libs/logger'
+import { LoggerOptionsToken } from '@core/logger'
 import { container } from 'tsyringe'
 
 container.register(LoggerOptionsToken, {

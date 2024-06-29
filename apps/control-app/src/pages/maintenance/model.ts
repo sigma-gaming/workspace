@@ -1,6 +1,6 @@
 import { createMutation, createQuery } from '@farfetched/core'
-import { createField, createForm } from '@libs/forms'
-import { createApiEffect } from '@libs/hono-client'
+import { createField, createForm } from '@core/forms'
+import { createApiEffect } from '@core/hono-client'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
 import { z } from 'zod'

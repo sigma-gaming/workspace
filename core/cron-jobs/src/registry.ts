@@ -1,5 +1,5 @@
-import { createSingletonProxy } from '@libs/di'
-import { logger } from '@libs/logger'
+import { createSingletonProxy } from '@core/di'
+import { logger } from '@core/logger'
 import { CronJob } from 'cron'
 import { singleton } from 'tsyringe'
 

@@ -3,8 +3,8 @@ import {
   BadRequestException,
   exceptionFilter,
   notExceptionFilter,
-} from '@libs/exceptions'
-import { createApiEffect } from '@libs/hono-client'
+} from '@core/exceptions'
+import { createApiEffect } from '@core/hono-client'
 import { notifications } from '@mantine/notifications'
 import { createEffect, createEvent, sample } from 'effector'
 import { and, previous } from 'patronum'

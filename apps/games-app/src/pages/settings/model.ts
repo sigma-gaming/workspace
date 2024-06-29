@@ -1,15 +1,15 @@
 import { AccountProvider } from '@dbs/games-schema'
 import { createMutation } from '@farfetched/core'
 import { getUserFullName, ProfileValidation } from '@games/model'
-import { BadRequestException, ValidationException } from '@libs/exceptions'
+import { BadRequestException, ValidationException } from '@core/exceptions'
 import {
   createField,
   createForm,
   FormErrors,
   InferFormValues,
   normalizeFieldErrors,
-} from '@libs/forms'
-import { createApiEffect } from '@libs/hono-client'
+} from '@core/forms'
+import { createApiEffect } from '@core/hono-client'
 import { sample } from 'effector'
 import { z } from 'zod'
 import { $$notifications } from '../../entities/notifications'

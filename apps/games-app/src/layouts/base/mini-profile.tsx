@@ -1,5 +1,5 @@
 import { getUserInitials } from '@games/model'
-import { Avatar, useMedia } from '@libs/ui'
+import { Avatar, useMedia } from '@core/ui'
 import { Button, Menu, Modal, rem, Skeleton, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {

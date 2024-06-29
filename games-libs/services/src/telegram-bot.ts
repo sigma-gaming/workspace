@@ -1,4 +1,4 @@
-import { createSingletonProxy } from '@libs/di'
+import { createSingletonProxy } from '@core/di'
 import { Bot } from 'grammy'
 import { singleton } from 'tsyringe'
 import { EnvService } from './env'

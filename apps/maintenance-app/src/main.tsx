@@ -1,4 +1,4 @@
-import '@libs/ui'
+import '@core/ui'
 import ReactDOM from 'react-dom/client'
 import { AppView } from './app/view.tsx'
 

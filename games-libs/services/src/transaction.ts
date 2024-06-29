@@ -5,7 +5,7 @@ import {
   TransactionTable,
 } from '@dbs/games-schema'
 import { gamesCaches } from '@games/redis'
-import { createSingletonProxy } from '@libs/di'
+import { createSingletonProxy } from '@core/di'
 import { desc, eq, sql } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 

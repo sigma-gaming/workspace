@@ -1,4 +1,4 @@
-import { Menu, MenuLink, MenuSection } from '@libs/ui'
+import { Menu, MenuLink, MenuSection } from '@core/ui'
 import { rem } from '@mantine/core'
 import { IconCategory2, IconDice3 } from '@tabler/icons-react'
 import { routes } from '../../routing'

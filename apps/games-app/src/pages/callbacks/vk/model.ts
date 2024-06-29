@@ -1,4 +1,4 @@
-import { createApiEffect } from '@libs/hono-client'
+import { createApiEffect } from '@core/hono-client'
 import { invoke } from '@withease/factories'
 import { $$socialAuthentication } from '../../../features/social-authentication'
 import { routes } from '../../../routing'

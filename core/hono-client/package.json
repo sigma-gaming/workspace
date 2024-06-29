@@ -1,5 +1,5 @@
 {
-  "name": "@libs/logger",
+  "name": "@core/hono-client",
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,
@@ -10,8 +10,5 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"
-  },
-  "dependencies": {
-    "@libs/di": "workspace:*"
   }
 }

@@ -17,10 +17,10 @@
   "dependencies": {
     "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",
-    "@libs/hono-client": "workspace:*",
-    "@libs/exceptions": "workspace:*",
-    "@libs/forms": "workspace:*",
-    "@libs/ui": "workspace:*",
+    "@core/hono-client": "workspace:*",
+    "@core/exceptions": "workspace:*",
+    "@core/forms": "workspace:*",
+    "@core/ui": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

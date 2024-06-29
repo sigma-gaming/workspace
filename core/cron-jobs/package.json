@@ -1,5 +1,5 @@
 {
-  "name": "@libs/cron-jobs",
+  "name": "@core/cron-jobs",
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,
@@ -12,6 +12,6 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
-    "@libs/di": "workspace:*"
+    "@core/di": "workspace:*"
   }
 }

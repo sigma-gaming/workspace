@@ -1,6 +1,6 @@
 import { createQuery } from '@farfetched/core'
-import { NotAuthenticatedException } from '@libs/exceptions'
-import { createApiEffect } from '@libs/hono-client'
+import { NotAuthenticatedException } from '@core/exceptions'
+import { createApiEffect } from '@core/hono-client'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and } from 'patronum'
