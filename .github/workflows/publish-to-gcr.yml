@@ -80,11 +80,15 @@ jobs:
           string: ${{ matrix.packageName }}
           pattern: '^@?(?<folder>.*)\/(?<name>.*)$'
 
+      - name: Get current unix timestamp
+        id: timestamp
+        uses: release-kit/unix-timestamp@v1
+
       - name: Build image
         run: |-
           docker build . --target ${{ steps.parse.outputs.name }} \
             --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ github.sha }}
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
 
       - name: Push image
         run: docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest --all-tags
