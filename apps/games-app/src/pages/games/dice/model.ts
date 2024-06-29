@@ -13,8 +13,8 @@ import { routes } from '../../../routing'
 import { gamesApi } from '../../../shared/api/games'
 
 const playGameMutation = createMutation({
-  name: 'games/dices/play',
-  effect: createApiEffect(gamesApi.games.playDices.$post),
+  name: 'games/dice/play',
+  effect: createApiEffect(gamesApi.games.playDice.$post),
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.closingBalance)
@@ -187,11 +187,11 @@ sample({
 })
 
 sample({
-  clock: routes.dicesGame.closed,
+  clock: routes.diceGame.closed,
   target: reset,
 })
 
-export const $$dicesPage = {
+export const $$dicePage = {
   fields,
   form,
   $playing,

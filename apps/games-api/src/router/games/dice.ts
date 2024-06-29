@@ -43,7 +43,7 @@ export async function runGame(bet: number, sides: number[]) {
   throw new Error('Unreachable')
 }
 
-export const playDicesRoute = new Hono().post(
+export const playDiceRoute = new Hono().post(
   '/',
   zValidator(
     'json',

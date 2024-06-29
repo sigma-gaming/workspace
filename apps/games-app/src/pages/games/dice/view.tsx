@@ -12,20 +12,20 @@ import { useRive } from '@rive-app/react-canvas'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { memo, useEffect } from 'react'
-import { $$dicesPage } from './model.ts'
+import { $$dicePage } from './model.ts'
 
 const AnimatedDice = memo(() => {
-  const loaded = useUnit($$dicesPage.$animationLoaded)
+  const loaded = useUnit($$dicePage.$animationLoaded)
 
   const { rive, RiveComponent } = useRive({
-    src: '/games/dices.riv',
-    onLoad: () => $$dicesPage.animationLoaded(),
-    onPlay: () => $$dicesPage.animationStarted(),
-    onStop: () => $$dicesPage.animationFinished(),
+    src: '/games/dice.riv',
+    onLoad: () => $$dicePage.animationLoaded(),
+    onPlay: () => $$dicePage.animationStarted(),
+    onStop: () => $$dicePage.animationFinished(),
   })
 
   useEffect(() => {
-    $$dicesPage.riveChanged(rive)
+    $$dicePage.riveChanged(rive)
   }, [rive])
 
   return (
@@ -40,12 +40,12 @@ const AnimatedDice = memo(() => {
   )
 })
 
-export const DicesGamePageView = () => {
-  const bet = useUnit($$dicesPage.fields.bet.$value)
-  const errors = useUnit($$dicesPage.form.$errors)
-  const playing = useUnit($$dicesPage.$playing)
-  const autoplaying = useUnit($$dicesPage.$autoplaying)
-  const animationPlaying = useUnit($$dicesPage.$animationPlaying)
+export const DiceGamePageView = () => {
+  const bet = useUnit($$dicePage.fields.bet.$value)
+  const errors = useUnit($$dicePage.form.$errors)
+  const playing = useUnit($$dicePage.$playing)
+  const autoplaying = useUnit($$dicePage.$autoplaying)
+  const animationPlaying = useUnit($$dicePage.$animationPlaying)
 
   return (
     <Card
@@ -53,11 +53,11 @@ export const DicesGamePageView = () => {
       className="p-4 rounded-xl md:p-6 md:rounded-2xl"
       onSubmit={(event) => {
         event.preventDefault()
-        $$dicesPage.playPressed()
+        $$dicePage.playPressed()
       }}
     >
       <Title className="mb-4" order={3}>
-        Dices
+        Dice
       </Title>
 
       <div className="flex flex-col xl:flex-row-reverse gap-4">
@@ -74,7 +74,7 @@ export const DicesGamePageView = () => {
                 classNames={{ wrapper: 'mt-0' }}
                 value={bet}
                 onChange={(value) =>
-                  $$dicesPage.fields.bet.update(Number(value))
+                  $$dicePage.fields.bet.update(Number(value))
                 }
                 error={errors.bet[0]}
                 disabled={autoplaying}
@@ -85,7 +85,7 @@ export const DicesGamePageView = () => {
                 className="text-sm text-[var(--input-color)] disabled:bg-[color:var(--mantine-color-input-bg)] disabled:opacity-60"
                 size={36}
                 color="var(--mantine-color-input-bg)"
-                onClick={() => $$dicesPage.betDoubled()}
+                onClick={() => $$dicePage.betDoubled()}
                 disabled={autoplaying}
               >
                 x2
@@ -94,7 +94,7 @@ export const DicesGamePageView = () => {
                 className="text-sm text-[var(--input-color)] disabled:bg-[color:var(--mantine-color-input-bg)] disabled:opacity-60"
                 size={36}
                 color="var(--mantine-color-input-bg)"
-                onClick={() => $$dicesPage.betHalved()}
+                onClick={() => $$dicePage.betHalved()}
                 disabled={autoplaying}
               >
                 /2
@@ -116,7 +116,7 @@ export const DicesGamePageView = () => {
               Играть
             </Button>
             <Button
-              onClick={() => $$dicesPage.autoplayPressed()}
+              onClick={() => $$dicePage.autoplayPressed()}
               fullWidth={true}
             >
               {autoplaying ? 'Остановить автоигру' : 'Автоигра'}
@@ -129,9 +129,9 @@ export const DicesGamePageView = () => {
 }
 
 const SidesSelect = () => {
-  const sides = useUnit($$dicesPage.fields.sides.$value)
-  const update = useUnit($$dicesPage.fields.sides.update)
-  const autoplaying = useUnit($$dicesPage.$autoplaying)
+  const sides = useUnit($$dicePage.fields.sides.$value)
+  const update = useUnit($$dicePage.fields.sides.update)
+  const autoplaying = useUnit($$dicePage.$autoplaying)
 
   const options = [
     { label: '1', value: '1' },
