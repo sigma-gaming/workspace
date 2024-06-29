@@ -140,9 +140,6 @@ importers:
       superjson:
         specifier: ^2.2.1
         version: 2.2.1
-      tailwindcss:
-        specifier: ^3.4.0
-        version: 3.4.3(ts-node@10.9.2(@types/node@20.12.12)(typescript@5.4.5))
       ts-morph:
         specifier: ^20.0.0
         version: 20.0.0
@@ -249,6 +246,9 @@ importers:
       prettier:
         specifier: ^3.1.0
         version: 3.2.5
+      tailwindcss:
+        specifier: ^3.4.3
+        version: 3.4.3(ts-node@10.9.2(@types/node@20.12.12)(typescript@5.4.5))
       ts-loader:
         specifier: ^9.5.1
         version: 9.5.1(typescript@5.4.5)(webpack@5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4))

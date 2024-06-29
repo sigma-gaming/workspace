@@ -67,7 +67,7 @@ const scrollbarPlugin = plugin(({ addUtilities }) => {
 
 export function createConfig(config: { content: string[] }): Config {
   return {
-    content: ['../../libs/ui/**/*.{ts,tsx}', ...config.content],
+    content: ['../../core/ui/**/*.{ts,tsx}', ...config.content],
     plugins: [basePlugin, patchPlugin, utilsPlugin, scrollbarPlugin],
 
     theme: {
