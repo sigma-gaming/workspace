@@ -91,4 +91,6 @@ jobs:
             --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
 
       - name: Push image
-        run: docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest --all-tags
+        run: |-
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
