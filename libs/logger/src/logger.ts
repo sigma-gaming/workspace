@@ -14,6 +14,7 @@ import {
   RawReplyDefaultExpression,
   RawRequestDefaultExpression,
 } from 'fastify'
+import { HonoRequest } from 'hono'
 import { IncomingMessage } from 'node:http'
 import { inject, InjectionToken, singleton } from 'tsyringe'
 import { v4 as uuid } from 'uuid'
@@ -37,22 +38,22 @@ export class LoggerService {
     })
   }
 
-  createRequestLogger(request: FastifyRequest) {
+  forRequest(req: HonoRequest) {
     if (this.options.pretty) {
       return this.logger.child('Request')
     }
 
     return this.logger.child('Request', {
       meta: {
-        request: {
-          id: request.id,
-          url: request.url,
-        },
-        user: {
-          id: request.meta?.userId,
-          ip: request.ip,
-          ips: request.ips,
-        },
+        // request: {
+        //   id: req.id,
+        //   url: req.url,
+        // },
+        // user: {
+        //   id: req.meta?.userId,
+        //   ip: req.ip,
+        //   ips: req.ips,
+        // },
       },
     })
   }

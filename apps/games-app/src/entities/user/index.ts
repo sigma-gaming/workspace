@@ -1,9 +1,10 @@
 import { createQuery } from '@farfetched/core'
-import { fromTrpc, NotAuthenticatedException } from '@libs/exceptions'
+import { NotAuthenticatedException } from '@libs/exceptions'
+import { createApiEffect } from '@libs/hono-client'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and } from 'patronum'
-import { gamesApi, restartGamesApiSocketFx } from '../../shared/api/games'
+import { gamesApi, gamesApiSocket } from '../../shared/api/games'
 import { env } from '../../shared/env'
 
 const request = createEvent()
@@ -16,12 +17,12 @@ const clientLogoutFx = createEffect(() => {
 
 const userQuery = createQuery({
   name: 'user/get',
-  handler: gamesApi.me.getUser.query,
+  effect: createApiEffect(gamesApi.me.getUser.$get),
 })
 
 const logoutMutation = createQuery({
   name: 'user/logout',
-  handler: gamesApi.auth.logout.mutate,
+  effect: createApiEffect(gamesApi.auth.logout.$post),
 })
 
 const loaded = userQuery.finished.success
@@ -49,7 +50,7 @@ sample({
 
 sample({
   source: userQuery.finished.failure,
-  filter: ({ error }) => fromTrpc(error) instanceof NotAuthenticatedException,
+  filter: ({ error }) => error instanceof NotAuthenticatedException,
   target: logout,
 })
 
@@ -61,7 +62,7 @@ sample({
 
 sample({
   clock: logoutMutation.finished.success,
-  target: restartGamesApiSocketFx,
+  target: createEffect(() => gamesApiSocket.reconnect()),
 })
 
 export const $$user = {

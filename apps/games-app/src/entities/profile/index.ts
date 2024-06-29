@@ -1,5 +1,6 @@
 import { createQuery, Mutation, update } from '@farfetched/core'
 import { ProfileDetailed } from '@games/model'
+import { createApiEffect } from '@libs/hono-client'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
@@ -9,12 +10,11 @@ const refresh = createEvent()
 
 const profileQuery = createQuery({
   name: 'profile/get',
-  handler: gamesApi.me.getDetailedProfile.query,
+  effect: createApiEffect(gamesApi.me.getDetailedProfile.$get),
 })
 
 function receiveUpdates<T>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mutation: Mutation<any, T, unknown>,
+  mutation: Mutation<any, T, any>,
   selector: (data: T) => ProfileDetailed,
 ) {
   update(profileQuery, {

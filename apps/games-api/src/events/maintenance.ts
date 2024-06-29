@@ -1,4 +1,4 @@
-import { createEvents, publicEvent, PublicEventOf } from '../shared/lib/events'
+import { createEvents, publicEvent, PublicEventOf } from '@libs/events'
 
 const events = {
   started: publicEvent<void>(),

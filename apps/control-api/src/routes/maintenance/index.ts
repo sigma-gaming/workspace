@@ -1,8 +1,7 @@
-import { createRouter } from '../trpc'
-import { getMaintenance } from './get-maintenance'
-import { updateMaintenance } from './update-maintenance'
+import { Hono } from 'hono'
+import { getMaintenanceRoute } from './get-maintenance'
+import { updateMaintenanceRoute } from './update-maintenance'
 
-export const maintenanceRouter = createRouter({
-  getMaintenance,
-  updateMaintenance,
-})
+export const maintenanceRouter = new Hono()
+  .route('/get', getMaintenanceRoute)
+  .route('/update', updateMaintenanceRoute)

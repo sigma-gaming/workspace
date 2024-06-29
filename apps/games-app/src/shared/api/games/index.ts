@@ -1,49 +1,14 @@
-import {
-  createTRPCProxyClient,
-  createWSClient,
-  httpLink,
-  loggerLink,
-  splitLink,
-  wsLink,
-} from '@trpc/client'
-import { GamesAPIRouter } from 'apps/games-api/src/client'
-import { createEffect } from 'effector'
+import { ApiType, SocketEvent, SocketTopic } from '@apis/games-api'
+import { createApiSocket } from '@libs/hono-client'
+import { hc } from 'hono/client'
 import { env } from '../../env'
 
-const wsClient = createWSClient({
-  url: env.gamesApi.wsUrl + '/trpc',
+export const gamesApi = hc<ApiType>(env.gamesApi.url, {
+  fetch(input: RequestInfo | URL, requestInit?: RequestInit) {
+    return fetch(input, { ...requestInit, credentials: 'include' })
+  },
 })
 
-/**
- * Used when the authentication state has changed to restart the socket with a new Cookie
- */
-export const restartGamesApiSocketFx = createEffect(() => {
-  wsClient.getConnection().close()
-})
-
-export const gamesApi = createTRPCProxyClient<GamesAPIRouter>({
-  links: [
-    loggerLink({
-      enabled() {
-        return process.env.NODE_ENV === 'development'
-      },
-    }),
-    splitLink({
-      condition(op) {
-        return op.type === 'subscription'
-      },
-      true: wsLink<GamesAPIRouter>({
-        client: wsClient,
-      }),
-      false: httpLink<GamesAPIRouter>({
-        url: env.gamesApi.url + '/trpc',
-        fetch(url, options) {
-          return fetch(url, {
-            ...options,
-            credentials: 'include',
-          })
-        },
-      }),
-    }),
-  ],
-})
+export const gamesApiSocket = createApiSocket<SocketTopic, SocketEvent>(
+  gamesApi.websocket.$ws,
+)

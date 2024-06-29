@@ -1,5 +1,6 @@
 import { createMutation, createQuery } from '@farfetched/core'
 import { createField, createForm } from '@libs/forms'
+import { createApiEffect } from '@libs/hono-client'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
 import { z } from 'zod'
@@ -9,12 +10,12 @@ import { controlApi } from '../../shared/api/control'
 
 const getMaintenanceQuery = createQuery({
   name: 'maintenance/get',
-  handler: controlApi.maintenance.getMaintenance.query,
+  effect: createApiEffect(controlApi.maintenance.get.$get),
 })
 
 const updateMaintenanceMutation = createMutation({
   name: 'maintenance/update',
-  handler: controlApi.maintenance.updateMaintenance.mutate,
+  handler: createApiEffect(controlApi.maintenance.update.$post),
 })
 
 const $loading = getMaintenanceQuery.$pending

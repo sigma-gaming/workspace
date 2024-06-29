@@ -7,38 +7,41 @@ FROM base AS build
 WORKDIR /build
 COPY . /build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+ENV NODE_ENV=production
 RUN pnpm nx run-many -t build
 
 # Apps
 
-FROM base AS games-app
+FROM base AS app-base
 WORKDIR /app
-COPY --from=build /build ./
-COPY apps/games-app/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
-CMD [ "node", "--max_semi_space_size=64", "apps/games-app/server.js" ]
+RUN apk update
+RUN apk add nginx
+COPY ./scripts/inject-env.mjs /scripts/inject-env.mjs
+CMD node /scripts/inject-env.mjs; nginx -g "daemon off;"
 
-FROM base AS control-app
+FROM app-base AS games-app
 WORKDIR /app
-COPY --from=build /build ./
-COPY apps/control-app/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
-CMD [ "node", "--max_semi_space_size=64", "apps/control-app/server.js" ]
+COPY --from=build /build/apps/games-app/dist ./
+COPY --from=build /build/apps/games-app/nginx.conf /etc/nginx/nginx.conf
 
-FROM base AS maintenance-app
+FROM app-base AS control-app
 WORKDIR /app
-COPY --from=build /build ./
-COPY apps/maintenance-app/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
-CMD [ "node", "--max_semi_space_size=64", "apps/maintenance-app/server.js" ]
+COPY --from=build /build/apps/control-app/dist ./
+COPY --from=build /build/apps/control-app/nginx.conf /etc/nginx/nginx.conf
+
+FROM app-base AS maintenance-app
+WORKDIR /app
+COPY --from=build /build/apps/maintenance-app/dist ./
+COPY --from=build /build/apps/maintenance-app/nginx.conf /etc/nginx/nginx.conf
 
 # APIs
 
 FROM base AS games-api
-WORKDIR /app
+WORKDIR /workspace
 COPY --from=build /build ./
-COPY apps/games-api/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
 CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
 
 FROM base AS control-api
-WORKDIR /app
+WORKDIR /workspace
 COPY --from=build /build ./
-COPY apps/control-api/metrics-endpoint.json /var/cadvisor/metrics-endpoint.json
 CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]

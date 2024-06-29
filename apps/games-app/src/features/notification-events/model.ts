@@ -1,73 +1,48 @@
 import { NotificationSelect } from '@dbs/games-schema'
 import { createQuery } from '@farfetched/core'
 import { mapColor } from '@games/model'
-import { Unsubscribable } from '@trpc/server/observable'
-import {
-  attach,
-  createEffect,
-  createEvent,
-  createStore,
-  sample,
-} from 'effector'
+import { createApiEffect } from '@libs/hono-client'
+import { invoke } from '@withease/factories'
+import { createEffect, createEvent, sample } from 'effector'
 import { $$notifications } from '../../entities/notifications'
-import { gamesApi } from '../../shared/api/games'
+import { gamesApi, gamesApiSocket } from '../../shared/api/games'
 
 const initialize = createEvent()
 const reset = createEvent()
 
 const getActualQuery = createQuery({
   name: 'notifications/getActual',
-  handler: gamesApi.notifications.getActual.query,
+  effect: createApiEffect(gamesApi.notifications.getActual.$get),
 })
 
-const $subscription = createStore<Unsubscribable | null>(null)
-
-const subscribeFx = attach({
-  source: $subscription,
-  effect(subscription) {
-    if (subscription) {
-      // Unsubscribe from previous subscription
-      subscription.unsubscribe()
-    }
-
-    return gamesApi.notifications.subscription.subscribe(undefined, {
-      onData({
-        id,
-        title,
-        message,
-        kind,
-        autoClose,
-        autoCloseMs,
-        withCloseButton,
-      }) {
-        $$notifications.show({
-          title,
-          message,
-          color: mapColor(kind),
-          autoClose: autoClose ? autoCloseMs : false,
-          withCloseButton,
-        })
-
-        const shown =
-          localStorage.getItem('notifications/shown')?.split(',') ?? []
-        localStorage.setItem('notifications/shown', shown.concat(id).join(','))
-      },
-    })
-  },
+const { receivedData: notificationReceived } = invoke(() => {
+  return gamesApiSocket.subscriptionFactory({ topic: 'notification' })
 })
 
-$subscription.on(subscribeFx.doneData, (_, subscription) => subscription)
+sample({
+  source: notificationReceived,
+  fn: (payload) => ({
+    title: payload.title,
+    message: payload.message,
+    color: mapColor(payload.kind),
+    autoClose: payload.autoClose ? payload.autoCloseMs : false,
+    withCloseButton: payload.withCloseButton,
+  }),
+  target: $$notifications.show,
+})
 
-const unsubscribeFx = attach({
-  source: $subscription,
-  effect(subscription) {
-    return subscription?.unsubscribe()
-  },
+sample({
+  clock: notificationReceived,
+  fn: (payload) => payload.id,
+  target: createEffect((id: string) => {
+    const shown = localStorage.getItem('notifications/shown')?.split(',') ?? []
+    localStorage.setItem('notifications/shown', shown.concat(id).join(','))
+  }),
 })
 
 sample({
   clock: initialize,
-  target: [getActualQuery.start, subscribeFx],
+  target: getActualQuery.start,
 })
 
 sample({
@@ -88,7 +63,7 @@ sample({
 
 sample({
   clock: reset,
-  target: [getActualQuery.reset, unsubscribeFx],
+  target: getActualQuery.reset,
 })
 
 export const $$notificationEvents = {

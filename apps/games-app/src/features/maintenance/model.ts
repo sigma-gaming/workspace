@@ -1,6 +1,8 @@
-import { createEffect, createEvent, createStore, sample } from 'effector'
+import { invoke } from '@withease/factories'
+import { createEffect, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { delay } from 'patronum'
+import { gamesApiSocket } from '../../shared/api/games'
 import { env } from '../../shared/env'
 
 /**
@@ -21,13 +23,18 @@ const reloadPageFx = createEffect(() => {
   window.location.reload()
 })
 
-const activate = createEvent()
+const { receivedData: maintenanceStarted } = invoke(() => {
+  return gamesApiSocket.subscriptionFactory({ topic: 'maintenance/started' })
+})
 
 const reloadAt = Cookies.get('maintenanceReloadAt')
-const $active = createStore(Boolean(reloadAt)).on(activate, () => true)
+const $active = createStore(Boolean(reloadAt)).on(
+  maintenanceStarted,
+  () => true,
+)
 
 sample({
-  clock: activate,
+  clock: maintenanceStarted,
   target: saveToCookieFx,
 })
 
@@ -46,6 +53,5 @@ sample({
 })
 
 export const $$maintenance = {
-  activate,
   $active,
 }

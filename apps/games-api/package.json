@@ -1,8 +1,5 @@
 {
   "name": "@apis/games-api",
-  "version": "0.0.12",
-  "license": "UNLICENSED",
-  "private": true,
   "main": "./src/client.ts",
   "module": "./src/client.ts",
   "types": "./src/client.ts",
@@ -28,6 +25,8 @@
     "@libs/di": "workspace:*",
     "@libs/exceptions": "workspace:*",
     "@libs/logger": "workspace:*",
-    "@tooling/env": "workspace:*"
+    "@tooling/env": "workspace:*",
+    "@libs/events": "workspace:*",
+    "@libs/hono-ws": "workspace:*"
   }
 }

@@ -17,7 +17,9 @@ export class MaintenanceException extends RouteException {
   message = 'Maintenance mode enabled'
 }
 
-export class InternalServerException extends RouteException {
+export class InternalServerException extends RouteException<{
+  cause?: Error
+} | void> {
   name = 'InternalServerException'
   statusCode = 500
   message = 'Internal server error'

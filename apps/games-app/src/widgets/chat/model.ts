@@ -5,29 +5,23 @@ import {
 } from '@dbs/games-schema'
 import { ChatValidation } from '@games/model'
 import { createField, createForm } from '@libs/forms'
+import { createApiEffect } from '@libs/hono-client'
 import { invoke } from '@withease/factories'
-import { createEffect, createEvent, createStore, sample } from 'effector'
+import { createEvent, createStore, sample } from 'effector'
 import { v4 as uuid } from 'uuid'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
-import { gamesApi } from '../../shared/api/games'
-import { createSubscription } from '../../shared/lib/trpc/subscription'
+import { gamesApi, gamesApiSocket } from '../../shared/api/games'
 
 const initialize = createEvent()
 const reset = createEvent()
 
-const getActualMessagesFx = createEffect(gamesApi.chat.getLastMessages.query)
-const sendMessageFx = createEffect(gamesApi.chat.sendMessage.mutate)
+const getLastMessagesFx = createApiEffect(gamesApi.chat.getLastMessages.$get)
+const sendMessageFx = createApiEffect(gamesApi.chat.sendMessage.$post)
 
-const {
-  subscribe: subscribeToMessages,
-  unsubscribe: unsubscribeFromMessages,
-  receivedData: messageReceived,
-} = invoke(() =>
-  createSubscription({
-    subscription: gamesApi.chat.subscription,
-  }),
-)
+const { receivedData: messageReceived } = invoke(() => {
+  return gamesApiSocket.subscriptionFactory({ topic: 'chat/message' })
+})
 
 const fields = {
   text: createField({
@@ -55,11 +49,11 @@ const $messageIds = $messages.map(
 
 sample({
   clock: initialize,
-  target: [getActualMessagesFx, subscribeToMessages],
+  target: getLastMessagesFx,
 })
 
 sample({
-  clock: getActualMessagesFx.doneData,
+  clock: getLastMessagesFx.doneData,
   source: { messages: $messages, ids: $messageIds },
   fn: ({ messages, ids }, actualMessages) => {
     const newMessages = actualMessages.filter((message) => !ids.has(message.id))
@@ -134,11 +128,6 @@ sample({
     })
   },
   target: $messages,
-})
-
-sample({
-  clock: reset,
-  target: [unsubscribeFromMessages],
 })
 
 export const $$chatWidget = {

@@ -5,12 +5,15 @@ import { singleton } from 'tsyringe'
 import { RedisService, SubRedisService } from '../redis'
 
 type RedisMessageHandler = (channel: string, message: string) => void
-type Unsubscribe = () => void
+
+export interface PubSubSubscription {
+  unsubscribe: () => void
+}
 
 export interface PubSub<TPayload> {
   publish: (payload: TPayload) => Promise<number>
-  subscribe: (handler: (payload: TPayload) => void) => Unsubscribe
-  unsubscribeAll: Unsubscribe
+  subscribe: (handler: (payload: TPayload) => void) => PubSubSubscription
+  unsubscribeAll: () => void
 }
 
 @singleton()
@@ -82,7 +85,7 @@ export class PubSubService implements OnApplicationShutdown {
         this.subRedis.on('message', listener)
         listeners.add(listener)
 
-        return () => {
+        const unsubscribe = () => {
           this.subRedis.off('message', listener)
           listeners.delete(listener)
 
@@ -91,6 +94,8 @@ export class PubSubService implements OnApplicationShutdown {
             this.subRedis.unsubscribe(channelName, unsubscribeHandler)
           }
         }
+
+        return { unsubscribe }
       },
       unsubscribeAll: () => {
         listeners.forEach((listener) => {

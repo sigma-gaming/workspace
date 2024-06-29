@@ -12,7 +12,7 @@ module.exports = configure({
   ],
 
   extend: {
-    ignorePatterns: ['!**/*', 'node_modules', 'dist', 'public'],
+    ignorePatterns: ['!**/*', 'node_modules', 'dist', 'public', '.eslintrc.cjs'],
     rules: {
       'import/extensions': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

@@ -1,6 +1,7 @@
 import { NotificationInsert, NotificationKind } from '@dbs/games-schema'
 import { createMutation } from '@farfetched/core'
 import { createField, createForm } from '@libs/forms'
+import { createApiEffect } from '@libs/hono-client'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
 import { z } from 'zod'
@@ -9,7 +10,7 @@ import { controlApi } from '../../shared/api/control'
 
 const sendNotificationMutation = createMutation({
   name: 'notifications/send',
-  handler: controlApi.notifications.send.mutate,
+  effect: createApiEffect(controlApi.notifications.send.$post),
 })
 
 const $submitting = sendNotificationMutation.$pending

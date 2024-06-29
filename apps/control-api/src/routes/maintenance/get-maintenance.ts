@@ -1,6 +1,7 @@
 import { maintenanceCache } from '@games/redis'
-import { procedure } from '../trpc'
+import { Hono } from 'hono'
 
-export const getMaintenance = procedure.query(async () => {
-  return { maintenanceMode: await maintenanceCache.isMaintenanceMode() }
+export const getMaintenanceRoute = new Hono().get('/', async (ctx) => {
+  const maintenanceMode = await maintenanceCache.isMaintenanceMode()
+  return ctx.json({ maintenanceMode })
 })

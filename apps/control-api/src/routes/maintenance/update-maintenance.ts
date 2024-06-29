@@ -1,15 +1,19 @@
 import { maintenanceCache } from '@games/redis'
+import { zValidator } from '@hono/zod-validator'
+import { Hono } from 'hono'
 import { z } from 'zod'
-import { procedure } from '../trpc'
 
-export const updateMaintenance = procedure
-  .input(
+export const updateMaintenanceRoute = new Hono().post(
+  '/',
+  zValidator(
+    'json',
     z.object({
       value: z.boolean(),
     }),
-  )
-  .mutation(async ({ input }) => {
-    await maintenanceCache.setMaintenanceMode(input.value)
-
-    return { status: 'success', maintenanceMode: input.value }
-  })
+  ),
+  async (ctx) => {
+    const payload = ctx.req.valid('json')
+    await maintenanceCache.setMaintenanceMode(payload.value)
+    return ctx.json({ status: 'success', maintenanceMode: payload.value })
+  },
+)

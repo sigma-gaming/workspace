@@ -12,9 +12,10 @@ import {
   NotAuthenticatedException,
   SessionExpiredException,
 } from '@libs/exceptions'
-import cookie, { serialize } from 'cookie'
+import { parse } from 'cookie'
 import { desc, eq, inArray } from 'drizzle-orm'
-import { FastifyRequest } from 'fastify'
+import { Context as HonoContext, HonoRequest } from 'hono'
+import { deleteCookie, setCookie } from 'hono/cookie'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
 import { singleton } from 'tsyringe'
 import { Env, EnvService } from './env'
@@ -32,12 +33,14 @@ export class SessionService {
     this.env = envService.env
   }
 
-  getSession = async (req: FastifyRequest): Promise<Session> => {
-    if (!req.headers.cookie) {
+  getSession = async (req: HonoRequest): Promise<Session> => {
+    const cookie = req.header('cookie')
+
+    if (!cookie) {
       return { state: SessionState.Empty, user: null }
     }
 
-    const { session: token } = cookie.parse(req.headers.cookie)
+    const { session: token } = parse(cookie)
 
     if (!token) {
       return { state: SessionState.Empty, user: null }
@@ -80,6 +83,8 @@ export class SessionService {
       state: SessionState.Authenticated,
       user: session.user,
       token,
+      expiresAt: session.expiresAt,
+      provider: session.provider,
     })
 
     return created
@@ -118,12 +123,15 @@ export class SessionService {
       userId,
       token,
       expiresAt: expiresAt.toISOString(),
+      provider,
     })
 
     const session: Session = {
       state: SessionState.Authenticated,
       user,
       token,
+      expiresAt: expiresAt.toISOString(),
+      provider,
     }
 
     await gamesCaches.session.set(token, session)
@@ -143,32 +151,40 @@ export class SessionService {
       )
     }
 
-    const cookie = [
-      serialize('session', token, {
-        domain: this.env.domain,
-        path: '/',
-        expires: expiresAt,
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: true,
-      }),
-      serialize('sessionExpiresAt', expiresAt.toISOString(), {
-        domain: this.env.domain,
-        path: '/',
-        expires: expiresAt,
-        sameSite: 'lax',
-        secure: true,
-      }),
-      serialize('lastSocialProviderUsed', provider, {
-        domain: this.env.domain,
-        path: '/',
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 31 * 365),
-        sameSite: 'lax',
-        secure: true,
-      }),
-    ]
+    return session
+  }
 
-    return { cookie, session }
+  attachSession(ctx: HonoContext, session: Session) {
+    if (session.state !== SessionState.Authenticated) {
+      return
+    }
+
+    const expires = new Date(session.expiresAt)
+
+    setCookie(ctx, 'session', session.token, {
+      domain: this.env.domain,
+      path: '/',
+      expires,
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: true,
+    })
+
+    setCookie(ctx, 'sessionExpiresAt', session.expiresAt, {
+      domain: this.env.domain,
+      path: '/',
+      expires,
+      sameSite: 'lax',
+      secure: true,
+    })
+
+    setCookie(ctx, 'lastSocialProviderUsed', session.provider, {
+      domain: this.env.domain,
+      path: '/',
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+      sameSite: 'lax',
+      secure: true,
+    })
   }
 
   async removeSession(session: Session) {
@@ -183,26 +199,11 @@ export class SessionService {
 
       await gamesCaches.session.del(session.token)
     }
+  }
 
-    const cookie = [
-      serialize('session', '', {
-        domain: this.env.domain,
-        path: '/',
-        expires: new Date(0),
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: true,
-      }),
-      serialize('sessionExpiresAt', '', {
-        domain: this.env.domain,
-        path: '/',
-        expires: new Date(0),
-        sameSite: 'lax',
-        secure: true,
-      }),
-    ]
-
-    return { cookie }
+  detachSession(ctx: HonoContext) {
+    deleteCookie(ctx, 'session')
+    deleteCookie(ctx, 'sessionExpiresAt')
   }
 }
 

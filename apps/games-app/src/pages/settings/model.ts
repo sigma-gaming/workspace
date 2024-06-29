@@ -9,16 +9,16 @@ import {
   InferFormValues,
   normalizeFieldErrors,
 } from '@libs/forms'
-import { TRPCClientError } from '@trpc/client'
+import { createApiEffect } from '@libs/hono-client'
 import { sample } from 'effector'
 import { z } from 'zod'
 import { $$notifications } from '../../entities/notifications'
-import { $$profile } from '../../entities/profile/index.ts'
+import { $$profile } from '../../entities/profile'
 import { gamesApi } from '../../shared/api/games'
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
-  handler: gamesApi.settings.updateProfile.mutate,
+  effect: createApiEffect(gamesApi.settings.updateProfile.$post),
 })
 
 const $updatingProfile = updateProfileMutation.$pending
@@ -59,20 +59,15 @@ sample({
 sample({
   source: updateProfileMutation.finished.failure,
   fn: ({ error }): Partial<ProfileFormErrors> => {
-    const isTRPCClientError = error instanceof TRPCClientError
-    if (!isTRPCClientError) return {}
-
-    if (error.data.error === 'BadRequestException') {
-      const exception = new BadRequestException(error.data.payload)
+    if (error instanceof BadRequestException) {
       const errors: Record<string, string[]> = {}
-      const { path = ['root'], message } = exception.payload
+      const { path = ['root'], message } = error.payload
       errors[path.join('.')] = [message]
       return errors
     }
 
-    if (error.data.error === 'ValidationException') {
-      const exception = new ValidationException(error.data.payload)
-      const { fieldErrors } = exception.payload
+    if (error instanceof ValidationException) {
+      const { fieldErrors } = error.payload
       return normalizeFieldErrors(fieldErrors)
     }
 

@@ -1,6 +1,4 @@
-import { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
-import type { AppRouter } from './routes'
+import { app } from './app'
 
-export type GamesAPIRouter = AppRouter
-export type GamesAPIInput = inferRouterInputs<GamesAPIRouter>
-export type GamesAPIOutput = inferRouterOutputs<GamesAPIRouter>
+export type ApiType = typeof app
+export type { SocketEvent, SocketTopic } from './router/websocket'

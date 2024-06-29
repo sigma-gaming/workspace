@@ -1,6 +1,3 @@
-import { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
-import type { AppRouter } from './routes'
+import { app } from './app'
 
-export type ControlAPIRouter = AppRouter
-export type ControlAPIInputs = inferRouterInputs<ControlAPIRouter>
-export type ControlAPIOutputs = inferRouterOutputs<ControlAPIRouter>
+export type ApiType = typeof app

@@ -2,7 +2,6 @@ import { createEvent, sample } from 'effector'
 import { createBrowserHistory } from 'history'
 import { not } from 'patronum'
 import { $$balance } from '../entities/balance'
-import { $$commonEvents } from '../entities/common-events'
 import { $$profile } from '../entities/profile'
 import { $$user } from '../entities/user'
 import { $$notificationEvents } from '../features/notification-events'
@@ -25,11 +24,7 @@ sample({
 
 sample({
   clock: started,
-  target: [
-    $$commonEvents.initialize,
-    $$notificationEvents.initialize,
-    $$chatWidget.initialize,
-  ],
+  target: [$$notificationEvents.initialize, $$chatWidget.initialize],
 })
 
 export const $$app = {

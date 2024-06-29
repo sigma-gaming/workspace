@@ -1,6 +1,4 @@
-import { createRouter } from '../trpc'
-import { send } from './send-notification'
+import { Hono } from 'hono'
+import { sendRoute } from './send-notification'
 
-export const notificationsRouter = createRouter({
-  send,
-})
+export const notificationsRouter = new Hono().route('/send', sendRoute)

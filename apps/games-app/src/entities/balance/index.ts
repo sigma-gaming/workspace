@@ -2,9 +2,9 @@ import { createMutation, createQuery, Mutation, update } from '@farfetched/core'
 import {
   BadRequestException,
   exceptionFilter,
-  fromTrpc,
   notExceptionFilter,
 } from '@libs/exceptions'
+import { createApiEffect } from '@libs/hono-client'
 import { notifications } from '@mantine/notifications'
 import { createEffect, createEvent, sample } from 'effector'
 import { and, previous } from 'patronum'
@@ -13,22 +13,21 @@ import { $$notifications } from '../notifications'
 
 const balanceQuery = createQuery({
   name: 'balance/get',
-  handler: gamesApi.me.getDetailedBalance.query,
+  effect: createApiEffect(gamesApi.me.getDetailedBalance.$get),
 })
 
 const depositMutation = createMutation({
   name: 'balance/deposit',
-  handler: gamesApi.balance.deposit.mutate,
+  effect: createApiEffect(gamesApi.balance.deposit.$post),
 })
 
 const withdrawMutation = createMutation({
   name: 'balance/withdraw',
-  handler: gamesApi.balance.withdraw.mutate,
+  effect: createApiEffect(gamesApi.balance.withdraw.$post),
 })
 
 function receiveUpdates<T>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mutation: Mutation<any, T, unknown>,
+  mutation: Mutation<any, T, any>,
   selector: (data: T) => number,
 ) {
   update(balanceQuery, {
@@ -108,7 +107,7 @@ sample({
 
 const receivedException = sample({
   source: withdrawMutation.finished.failure,
-  fn: ({ error }) => fromTrpc(error),
+  fn: ({ error }) => error,
 })
 
 sample({

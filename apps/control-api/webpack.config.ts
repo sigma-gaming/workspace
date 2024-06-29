@@ -16,7 +16,7 @@ const internalModules = Object.keys(loadedTsconfig.paths)
 const config: webpack.Configuration = {
   mode: 'none',
   devtool: process.env.NODE_ENV === 'development' ? 'eval' : false,
-  entry: './src/bootstrap.ts',
+  entry: './src/main.ts',
   target: 'node',
   output: {
     path: path.resolve(__dirname, 'dist'),

@@ -1,4 +1,4 @@
-import { UserSelect } from '@dbs/games-schema'
+import { AccountProvider, UserSelect } from '@dbs/games-schema'
 
 export enum SessionState {
   Empty,
@@ -7,6 +7,12 @@ export enum SessionState {
 }
 
 export type Session =
-  | { state: SessionState.Authenticated; user: UserSelect; token: string }
+  | {
+      state: SessionState.Authenticated
+      user: UserSelect
+      token: string
+      expiresAt: string
+      provider: AccountProvider
+    }
   | { state: SessionState.Expired; user: null; token: string }
   | { state: SessionState.Empty; user: null; token?: string }

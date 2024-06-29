@@ -1,6 +1,7 @@
 import { createMutation } from '@farfetched/core'
-import { BadRequestException, fromTrpc } from '@libs/exceptions'
+import { BadRequestException } from '@libs/exceptions'
 import { createField, createForm } from '@libs/forms'
+import { createApiEffect } from '@libs/hono-client'
 import { Rive } from '@rive-app/react-canvas'
 import { attach, createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
@@ -13,7 +14,7 @@ import { gamesApi } from '../../../shared/api/games'
 
 const playGameMutation = createMutation({
   name: 'games/dices/play',
-  handler: gamesApi.games.dices.mutate,
+  effect: createApiEffect(gamesApi.games.playDices.$post),
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.closingBalance)
@@ -166,7 +167,7 @@ sample({
 
 const receivedApiError = sample({
   clock: playGameMutation.finished.failure,
-  fn: ({ error }) => fromTrpc(error),
+  fn: ({ error }) => error,
 })
 
 sample({

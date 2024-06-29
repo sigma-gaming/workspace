@@ -1,11 +1,11 @@
 {
-  "id": "6c789481-806f-4af6-a8df-b78b45987b73",
+  "id": "2182e740-e97e-4996-9a3e-220397b591bb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "Accounts": {
-      "name": "Accounts",
+    "Account": {
+      "name": "Account",
       "schema": "",
       "columns": {
         "id": {
@@ -74,17 +74,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Accounts_userId_Users_id_fk": {
-          "name": "Accounts_userId_Users_id_fk",
-          "tableFrom": "Accounts",
-          "tableTo": "Users",
+        "Account_userId_User_id_fk": {
+          "name": "Account_userId_User_id_fk",
+          "tableFrom": "Account",
+          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -150,6 +150,100 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "ChatMessage": {
+      "name": "ChatMessage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "trackingId": {
+          "name": "trackingId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "type": {
+          "name": "type",
+          "type": "ChatMessageType",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attachments": {
+          "name": "attachments",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "senderName": {
+          "name": "senderName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "senderUsername": {
+          "name": "senderUsername",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "senderImage": {
+          "name": "senderImage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "senderRoles": {
+          "name": "senderRoles",
+          "type": "UserRole[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ChatMessage_userId_User_id_fk": {
+          "name": "ChatMessage_userId_User_id_fk",
+          "tableFrom": "ChatMessage",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "GlobalSettings": {
       "name": "GlobalSettings",
       "schema": "",
@@ -174,13 +268,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
-        },
-        "maintenanceMode": {
-          "name": "maintenanceMode",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
         }
       },
       "indexes": {},
@@ -188,8 +275,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Profiles": {
-      "name": "Profiles",
+    "Notification": {
+      "name": "Notification",
       "schema": "",
       "columns": {
         "id": {
@@ -198,6 +285,91 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "NotificationKind",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "autoClose": {
+          "name": "autoClose",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "autoCloseMs": {
+          "name": "autoCloseMs",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "withCloseButton": {
+          "name": "withCloseButton",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Notification_userId_User_id_fk": {
+          "name": "Notification_userId_User_id_fk",
+          "tableFrom": "Notification",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "Profile": {
+      "name": "Profile",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
         },
         "createdAt": {
           "name": "createdAt",
@@ -240,24 +412,24 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Profiles_userId_Users_id_fk": {
-          "name": "Profiles_userId_Users_id_fk",
-          "tableFrom": "Profiles",
-          "tableTo": "Users",
+        "Profile_userId_User_id_fk": {
+          "name": "Profile_userId_User_id_fk",
+          "tableFrom": "Profile",
+          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "Profiles_username_unique": {
-          "name": "Profiles_username_unique",
+        "Profile_username_unique": {
+          "name": "Profile_username_unique",
           "nullsNotDistinct": false,
           "columns": [
             "username"
@@ -265,8 +437,8 @@
         }
       }
     },
-    "Sessions": {
-      "name": "Sessions",
+    "Session": {
+      "name": "Session",
       "schema": "",
       "columns": {
         "id": {
@@ -288,6 +460,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "provider": {
+          "name": "provider",
+          "type": "AccountProvider",
+          "primaryKey": false,
+          "notNull": true
+        },
         "userId": {
           "name": "userId",
           "type": "uuid",
@@ -297,24 +475,24 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Sessions_userId_Users_id_fk": {
-          "name": "Sessions_userId_Users_id_fk",
-          "tableFrom": "Sessions",
-          "tableTo": "Users",
+        "Session_userId_User_id_fk": {
+          "name": "Session_userId_User_id_fk",
+          "tableFrom": "Session",
+          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "Sessions_token_unique": {
-          "name": "Sessions_token_unique",
+        "Session_token_unique": {
+          "name": "Session_token_unique",
           "nullsNotDistinct": false,
           "columns": [
             "token"
@@ -322,8 +500,8 @@
         }
       }
     },
-    "Transactions": {
-      "name": "Transactions",
+    "Transaction": {
+      "name": "Transaction",
       "schema": "",
       "columns": {
         "id": {
@@ -371,6 +549,34 @@
           "primaryKey": false,
           "notNull": true
         },
+        "totalBet": {
+          "name": "totalBet",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalWin": {
+          "name": "totalWin",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalLost": {
+          "name": "totalLost",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalRTP": {
+          "name": "totalRTP",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
         "userId": {
           "name": "userId",
           "type": "uuid",
@@ -380,10 +586,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Transactions_userId_Users_id_fk": {
-          "name": "Transactions_userId_Users_id_fk",
-          "tableFrom": "Transactions",
-          "tableTo": "Users",
+        "Transaction_userId_User_id_fk": {
+          "name": "Transaction_userId_User_id_fk",
+          "tableFrom": "Transaction",
+          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
@@ -397,8 +603,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Users": {
-      "name": "Users",
+    "User": {
+      "name": "User",
       "schema": "",
       "columns": {
         "id": {
@@ -431,7 +637,7 @@
         },
         "profileId": {
           "name": "profileId",
-          "type": "uuid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         }
@@ -450,10 +656,26 @@
         "Telegram": "Telegram"
       }
     },
+    "ChatMessageType": {
+      "name": "ChatMessageType",
+      "values": {
+        "UserMessage": "UserMessage",
+        "SystemMessage": "SystemMessage"
+      }
+    },
     "Game": {
       "name": "Game",
       "values": {
         "Dice": "Dice"
+      }
+    },
+    "NotificationKind": {
+      "name": "NotificationKind",
+      "values": {
+        "Success": "Success",
+        "Info": "Info",
+        "Warning": "Warning",
+        "Failure": "Failure"
       }
     },
     "TransactionType": {

@@ -5,7 +5,7 @@ import { $$balance } from '../../entities/balance'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { router } from '../../routing'
-import { restartGamesApiSocketFx } from '../../shared/api/games'
+import { gamesApiSocket } from '../../shared/api/games'
 
 interface FactoryParams {
   clock: Event<unknown>
@@ -39,7 +39,7 @@ const factory = createFactory(({ clock, authenticate }: FactoryParams) => {
       $$user.request,
       $$balance.request,
       $$profile.request,
-      restartGamesApiSocketFx,
+      createEffect(() => gamesApiSocket.reconnect()),
     ],
   })
 
