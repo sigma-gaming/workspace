@@ -1,6 +1,6 @@
+import { Avatar } from '@core/ui'
 import { AccountProvider } from '@dbs/games-schema'
 import { getUserFullName, getUserInitials } from '@games/model'
-import { Avatar } from '@core/ui'
 import {
   Anchor,
   Button,

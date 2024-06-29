@@ -1,6 +1,6 @@
+import { Avatar, useMedia } from '@core/ui'
 import { ChatMessageType } from '@dbs/games-schema'
 import { getUserInitials } from '@games/model'
-import { Avatar, useMedia } from '@core/ui'
 import { Button, Text, Title } from '@mantine/core'
 import clsx from 'clsx'
 import dayjs from 'dayjs'

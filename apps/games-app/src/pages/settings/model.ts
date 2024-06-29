@@ -1,6 +1,3 @@
-import { AccountProvider } from '@dbs/games-schema'
-import { createMutation } from '@farfetched/core'
-import { getUserFullName, ProfileValidation } from '@games/model'
 import { BadRequestException, ValidationException } from '@core/exceptions'
 import {
   createField,
@@ -10,6 +7,9 @@ import {
   normalizeFieldErrors,
 } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
+import { AccountProvider } from '@dbs/games-schema'
+import { createMutation } from '@farfetched/core'
+import { getUserFullName, ProfileValidation } from '@games/model'
 import { sample } from 'effector'
 import { z } from 'zod'
 import { $$notifications } from '../../entities/notifications'

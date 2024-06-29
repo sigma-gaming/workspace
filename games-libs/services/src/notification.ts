@@ -1,3 +1,4 @@
+import { createSingletonProxy } from '@core/di'
 import { gamesDb } from '@dbs/games-db'
 import {
   NotificationInsert,
@@ -5,7 +6,6 @@ import {
   NotificationTable,
 } from '@dbs/games-schema'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
-import { createSingletonProxy } from '@core/di'
 import { and, asc, eq, gte, isNull } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 

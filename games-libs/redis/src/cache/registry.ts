@@ -1,3 +1,4 @@
+import { createSingletonProxy } from '@core/di'
 import {
   BudgetSelect,
   ChatMessageSelect,
@@ -5,7 +6,6 @@ import {
   TransactionSelect,
 } from '@dbs/games-schema'
 import { ProfileDetailed, Session } from '@games/model'
-import { createSingletonProxy } from '@core/di'
 import { inject, InjectionToken, singleton } from 'tsyringe'
 import { CacheService, GlobalEntity, KeyEntity } from './service'
 

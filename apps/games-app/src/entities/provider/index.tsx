@@ -1,5 +1,5 @@
-import { AccountProvider } from '@dbs/games-schema'
 import { LinkButton, LinkButtonProps } from '@core/ui'
+import { AccountProvider } from '@dbs/games-schema'
 import { v4 } from 'uuid'
 import { env } from '../../shared/env'
 import { Icons } from '../../shared/ui/icons'

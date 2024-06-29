@@ -1,3 +1,4 @@
+import { BadRequestException } from '@core/exceptions'
 import { gamesDb } from '@dbs/games-db'
 import {
   AccountProvider,
@@ -9,7 +10,6 @@ import { getUserFullName, ProfileValidation } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { profileService, sessionService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
-import { BadRequestException } from '@core/exceptions'
 import { eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'

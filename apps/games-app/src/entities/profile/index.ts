@@ -1,6 +1,6 @@
+import { createApiEffect } from '@core/hono-client'
 import { createQuery, Mutation, update } from '@farfetched/core'
 import { ProfileDetailed } from '@games/model'
-import { createApiEffect } from '@core/hono-client'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'

@@ -1,3 +1,4 @@
+import { BadRequestException } from '@core/exceptions'
 import { gamesDb } from '@dbs/games-db'
 import {
   AccountInsert,
@@ -9,7 +10,6 @@ import {
 import { gamesCaches } from '@games/redis'
 import { env, sessionService, telegramBotService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
-import { BadRequestException } from '@core/exceptions'
 import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import crypto from 'node:crypto'
