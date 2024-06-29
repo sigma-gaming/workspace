@@ -84,6 +84,7 @@ jobs:
         run: |-
           docker build . --target ${{ steps.parse.outputs.name }} \
             --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ github.sha }}
 
       - name: Push image
         run: docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest
