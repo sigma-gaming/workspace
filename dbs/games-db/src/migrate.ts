@@ -6,7 +6,7 @@ import postgres from 'postgres'
 const migrationsFolder =
   process.env.NODE_ENV === 'development'
     ? join(process.cwd(), '../../dbs/games-db/drizzle')
-    : '/app/dbs/games-db/drizzle'
+    : '/workspace/dbs/games-db/drizzle'
 
 export async function migrateGamesDB(databaseUrl: string) {
   try {
