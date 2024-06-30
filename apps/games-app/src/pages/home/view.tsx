@@ -1,8 +1,8 @@
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
 import { routes } from '../../routing'
-import diceSrc from './assets/dice.png'
-import pincode from './assets/pincode.png'
+import diceSrc from './assets/dice.webp'
+import pincode from './assets/pincode.webp'
 
 export const HomePageView = () => {
   return (
@@ -23,7 +23,7 @@ const GameCard = ({ route, label, imageSrc }: GameCardProps) => {
   return (
     <Link
       to={route}
-      className="relative block w-full h-full aspect-square rounded-2xl overflow-hidden"
+      className="relative block w-full h-full aspect-square rounded-2xl overflow-hidden transition-all ease-in-out hover:opacity-90 hover:-translate-y-0.5"
     >
       <img src={imageSrc} alt={label} />
       <div
