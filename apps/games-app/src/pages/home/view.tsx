@@ -23,27 +23,12 @@ const GameCard = ({ route, label, imageSrc }: GameCardProps) => {
   return (
     <Link
       to={route}
-      style={{
-        position: 'relative',
-        display: 'block',
-        width: '100%',
-        height: '100%',
-        minHeight: 80,
-        borderRadius: 12,
-        overflow: 'hidden',
-      }}
+      className="relative block w-full h-full aspect-square rounded-2xl overflow-hidden"
     >
       <img src={imageSrc} alt={label} />
       <div
+        className="absolute top-0 left-0 w-full h-full flex items-end px-4 py-3"
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'flex-end',
-          padding: '12px 16px',
           background:
             'linear-gradient(to top, rgba(23, 24, 36, 0.75) 7%, rgba(23, 24, 36, 0.25) 50%, transparent 100%)',
         }}
