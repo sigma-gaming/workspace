@@ -19,7 +19,7 @@ const EnvSchema = z
     JWT_SECRET: z.string(),
 
     POSTGRES_URL: z.string(),
-    REDIS_URL: z.string(),
+    REDIS_HOST: z.string(),
     REDIS_PASSWORD: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
@@ -39,7 +39,7 @@ const EnvSchema = z
     },
 
     redis: {
-      url: raw.REDIS_URL,
+      host: raw.REDIS_HOST,
       password: raw.REDIS_PASSWORD,
     },
 

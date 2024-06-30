@@ -4,7 +4,7 @@ import { Redis } from 'ioredis'
 import { inject, InjectionToken, singleton } from 'tsyringe'
 
 export interface RedisOptions {
-  url: string
+  host: string
   password: string
 }
 
@@ -20,7 +20,11 @@ export class RedisService implements OnApplicationShutdown {
     @inject(RedisOptionsToken) options: RedisOptions,
     loggerService: LoggerService,
   ) {
-    this.redis = new Redis(options.url, { password: options.password })
+    this.redis = new Redis({
+      host: options.host,
+      password: options.password,
+    })
+
     this.logger = loggerService.logger.child('GamesRedis')
   }
 
@@ -45,7 +49,12 @@ export class SubRedisService implements OnApplicationShutdown {
     @inject(RedisOptionsToken) options: RedisOptions,
     loggerService: LoggerService,
   ) {
-    this.redis = new Redis(options.url, { lazyConnect: true })
+    this.redis = new Redis({
+      host: options.host,
+      password: options.password,
+      lazyConnect: true,
+    })
+
     this.logger = loggerService.logger.child('GamesSubRedis')
   }
 
