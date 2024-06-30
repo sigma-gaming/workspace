@@ -9,5 +9,6 @@ export const sendRoute = new Hono().post(
   async (ctx) => {
     const payload = ctx.req.valid('json')
     await notificationService.send(payload)
+    return ctx.json({ status: 'success' })
   },
 )
