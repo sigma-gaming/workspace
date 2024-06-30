@@ -9,13 +9,11 @@ const EnvSchema = z
 
     PUBLIC_DOMAIN: z.string(),
     PUBLIC_GAMES_APP_URL: z.string(),
-    PUBLIC_GAMES_APP_VERSION: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
-    PUBLIC_GAMES_API_VERSION: z.string(),
+    PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
     PUBLIC_CONTROL_APP_URL: z.string(),
-    PUBLIC_CONTROL_APP_VERSION: z.string(),
     PUBLIC_CONTROL_API_URL: z.string(),
-    PUBLIC_CONTROL_API_VERSION: z.string(),
+    PUBLIC_CONTROL_API_VERSION: z.string().default('unknown'),
     JWT_SECRET: z.string(),
 
     POSTGRES_URL: z.string(),
@@ -44,7 +42,6 @@ const EnvSchema = z
     },
 
     gamesApp: {
-      version: raw.PUBLIC_GAMES_APP_VERSION,
       url: raw.PUBLIC_GAMES_APP_URL,
     },
 
@@ -54,7 +51,6 @@ const EnvSchema = z
     },
 
     controlApp: {
-      version: raw.PUBLIC_CONTROL_APP_VERSION,
       url: raw.PUBLIC_CONTROL_APP_URL,
     },
 

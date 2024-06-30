@@ -5,6 +5,7 @@ const PublicEnvSchema = z
   .object({
     PUBLIC_DOMAIN: z.string(),
     PUBLIC_GAMES_APP_URL: z.string(),
+    PUBLIC_GAMES_APP_VERSION: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     PUBLIC_VK_APP_ID: z.string(),
@@ -12,6 +13,7 @@ const PublicEnvSchema = z
   .transform((raw) => ({
     domain: raw.PUBLIC_DOMAIN,
     gamesApp: {
+      version: raw.PUBLIC_GAMES_APP_VERSION,
       url: raw.PUBLIC_GAMES_APP_URL,
     },
     gamesApi: {

@@ -7,6 +7,7 @@ const PublicEnvSchema = z
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_CONTROL_APP_URL: z.string(),
+    PUBLIC_CONTROL_APP_VERSION: z.string(),
     PUBLIC_CONTROL_API_URL: z.string(),
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     PUBLIC_VK_APP_ID: z.string(),
@@ -17,14 +18,13 @@ const PublicEnvSchema = z
       url: raw.PUBLIC_GAMES_APP_URL,
     },
     gamesApi: {
-      version: 'dev',
       url: raw.PUBLIC_GAMES_API_URL,
     },
     controlApp: {
+      version: raw.PUBLIC_CONTROL_APP_VERSION,
       url: raw.PUBLIC_CONTROL_APP_URL,
     },
     controlApi: {
-      version: 'dev',
       url: raw.PUBLIC_CONTROL_API_URL,
     },
     telegram: {

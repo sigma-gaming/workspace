@@ -18,5 +18,5 @@ container.register(RedisOptionsToken, {
 })
 
 container.register(CacheVersionToken, {
-  useValue: env.controlApi.version,
+  useValue: env.gamesApi.version,
 })
