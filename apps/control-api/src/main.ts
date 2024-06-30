@@ -37,7 +37,7 @@ app.onError(
   }),
 )
 
-migrateGamesDB(env.database.url).then(() => {
+migrateGamesDB(env.postgres.url).then(() => {
   type Options = Parameters<typeof serve>[0]
 
   const options: Options = {

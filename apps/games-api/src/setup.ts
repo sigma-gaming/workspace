@@ -10,7 +10,7 @@ container.register(LoggerOptionsToken, {
 })
 
 container.register(DbOptionsToken, {
-  useValue: { url: env.database.url, logger: env.isDev },
+  useValue: { url: env.postgres.url, logger: env.isDev },
 })
 
 container.register(RedisOptionsToken, {

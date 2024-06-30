@@ -6,7 +6,6 @@ import { z } from 'zod'
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
-    DATABASE_URL: z.string(),
 
     PUBLIC_DOMAIN: z.string(),
     PUBLIC_GAMES_APP_URL: z.string(),
@@ -19,7 +18,7 @@ const EnvSchema = z
     PUBLIC_CONTROL_API_VERSION: z.string(),
     JWT_SECRET: z.string(),
 
-    RABBITMQ_URL: z.string(),
+    POSTGRES_URL: z.string(),
     REDIS_URL: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
@@ -34,16 +33,12 @@ const EnvSchema = z
     isProd: raw.NODE_ENV === 'production',
     domain: raw.PUBLIC_DOMAIN,
 
-    database: {
-      url: raw.DATABASE_URL,
+    postgres: {
+      url: raw.POSTGRES_URL,
     },
 
     redis: {
       url: raw.REDIS_URL,
-    },
-
-    rabbitmq: {
-      url: raw.RABBITMQ_URL,
     },
 
     gamesApp: {
