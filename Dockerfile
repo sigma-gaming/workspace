@@ -19,22 +19,20 @@ WORKDIR /app
 RUN apk update
 RUN apk add nginx
 COPY ./scripts/inject-env.mjs /scripts/inject-env.mjs
+COPY ./config/app-nginx.conf /etc/nginx/nginx.conf
 CMD node /scripts/inject-env.mjs; nginx -g "daemon off;"
 
 FROM app-base AS games-app
 WORKDIR /app
 COPY --from=build /build/apps/games-app/dist ./
-COPY --from=build /build/apps/games-app/nginx.conf /etc/nginx/nginx.conf
 
 FROM app-base AS control-app
 WORKDIR /app
 COPY --from=build /build/apps/control-app/dist ./
-COPY --from=build /build/apps/control-app/nginx.conf /etc/nginx/nginx.conf
 
 FROM app-base AS maintenance-app
 WORKDIR /app
 COPY --from=build /build/apps/maintenance-app/dist ./
-COPY --from=build /build/apps/maintenance-app/nginx.conf /etc/nginx/nginx.conf
 
 # APIs
 

@@ -13,7 +13,8 @@
       "{workspaceRoot}/pnpm-workspace.yaml",
       "{workspaceRoot}/pnpm-lock.yaml",
       "{workspaceRoot}/.npmrc",
-      "{workspaceRoot}/scripts/**/*"
+      "{workspaceRoot}/scripts/**/*",
+      "{workspaceRoot}/config/**/*"
     ],
     "ci": [
       "{workspaceRoot}/stacks/dev.docker-compose.yml",
