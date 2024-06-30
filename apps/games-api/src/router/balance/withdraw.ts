@@ -46,7 +46,7 @@ export const withdrawRoute = new Hono().post('/', async (ctx) => {
       totalRTP: lastTransaction.totalRTP,
     })
 
-    await budgetService.increaseBudget(-amount)
+    await budgetService.decreaseAvailable(amount)
 
     return ctx.json({
       status: 'success',

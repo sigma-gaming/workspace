@@ -19,17 +19,8 @@ export interface GlobalEntity<TValue> {
   get: () => Promise<TValue | null>
   set: (value: TValue, options?: CacheOptions) => Promise<TValue>
   del: () => Promise<boolean>
-  getField: <TField extends keyof TValue>(
-    field: TField,
-  ) => Promise<TValue[TField] | null>
-  setField: <TField extends keyof TValue>(
-    field: TField,
-    value: TValue[TField],
-  ) => Promise<TValue[TField]>
-  incField: <TField extends keyof TValue>(
-    field: TField,
-    value: number,
-  ) => Promise<number>
+  incrBy(diff: number): Promise<number>
+  decrBy(diff: number): Promise<number>
 }
 
 export interface KeyEntity<TKey, TValue> {
@@ -38,20 +29,8 @@ export interface KeyEntity<TKey, TValue> {
   get: (key: TKey) => Promise<TValue | null>
   set: (key: TKey, value: TValue, options?: CacheOptions) => Promise<TValue>
   del: (key: TKey) => Promise<boolean>
-  getField: <TField extends keyof TValue>(
-    key: TKey,
-    field: TField,
-  ) => Promise<TValue[TField] | null>
-  setField: <TField extends keyof TValue>(
-    key: TKey,
-    field: TField,
-    value: TValue[TField],
-  ) => Promise<TValue[TField]>
-  incField: <TField extends keyof TValue>(
-    key: TKey,
-    field: TField,
-    value: number,
-  ) => Promise<number>
+  incrBy(key: TKey, diff: number): Promise<number>
+  decrBy(key: TKey, diff: number): Promise<number>
 }
 
 export interface Cache {
@@ -86,22 +65,16 @@ export class CacheService {
   }
 
   async get<T>(key: string): Promise<T | null> {
-    const response = await this.redis.call('JSON.GET', key)
+    const response = await this.redis.get(key)
     if (!response) return null
-    return JSON.parse(String(response))
-  }
-
-  async getField<T>(key: string, field: string): Promise<T | null> {
-    const response = await this.redis.call('JSON.GET', key, field)
-    if (!response) return null
-    return JSON.parse(String(response))
+    return JSON.parse(response)
   }
 
   async set<T>(key: string, value: T, options: CacheOptions = {}): Promise<T> {
     const { ttl = 60 * 60 } = options
 
     try {
-      await this.redis.call('JSON.SET', key, '$', JSON.stringify(value))
+      await this.redis.set(key, JSON.stringify(value))
       if (ttl !== Infinity) await this.redis.expire(key, ttl)
     } catch (error) {
       this.logger.error('Failed to set cache')
@@ -111,28 +84,20 @@ export class CacheService {
     return value
   }
 
-  async setField<T>(key: string, field: string, value: T): Promise<T> {
+  async incrBy(key: string, diff: number): Promise<number> {
     try {
-      await this.redis.call('JSON.SET', key, field, JSON.stringify(value))
+      return await this.redis.incrby(key, diff)
     } catch (error) {
-      this.logger.error('Failed to set cache field')
+      this.logger.error('Failed to incrBy cache value')
       throw error
     }
-
-    return value
   }
 
-  async incField(key: string, field: string, value: number): Promise<number> {
+  async decrBy(key: string, diff: number): Promise<number> {
     try {
-      const response = await this.redis.call(
-        'JSON.NUMINCRBY',
-        key,
-        field,
-        value,
-      )
-      return JSON.parse(String(response))
+      return await this.redis.decrby(key, diff)
     } catch (error) {
-      this.logger.error('Failed to inc cache field')
+      this.logger.error('Failed to decrBy cache value')
       throw error
     }
   }
@@ -176,20 +141,11 @@ export class CacheService {
           })
         },
         del: () => this.del(typedKeygen()),
-        getField: <TField extends keyof TValue>(field: TField) => {
-          return this.getField(typedKeygen(), String(field))
+        incrBy: (value: number) => {
+          return this.incrBy(typedKeygen(), value)
         },
-        setField: <TField extends keyof TValue>(
-          field: TField,
-          value: TValue[TField],
-        ) => {
-          return this.setField(typedKeygen(), String(field), value)
-        },
-        incField: <TField extends keyof TValue>(
-          field: TField,
-          value: number,
-        ) => {
-          return this.incField(typedKeygen(), String(field), value)
+        decrBy: (value: number) => {
+          return this.decrBy(typedKeygen(), value)
         },
       }
 
@@ -204,22 +160,11 @@ export class CacheService {
         return this.set(keygen(key), value, { ...defaultOptions, ...options })
       },
       del: (key: TKey) => this.del(keygen(key)),
-      getField: <TField extends keyof TValue>(key: TKey, field: TField) => {
-        return this.getField(keygen(key), String(field))
+      incrBy: (key: TKey, diff: number) => {
+        return this.incrBy(keygen(key), diff)
       },
-      setField: <TField extends keyof TValue>(
-        key: TKey,
-        field: TField,
-        value: TValue[TField],
-      ) => {
-        return this.setField(keygen(key), String(field), value)
-      },
-      incField: <TField extends keyof TValue>(
-        key: TKey,
-        field: TField,
-        value: number,
-      ) => {
-        return this.incField(keygen(key), String(field), value)
+      decrBy: (key: TKey, diff: number) => {
+        return this.decrBy(keygen(key), diff)
       },
     }
 

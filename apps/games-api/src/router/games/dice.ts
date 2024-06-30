@@ -20,7 +20,8 @@ import { z } from 'zod'
 const rtpMultiplier = 0.95
 
 export async function runGame(bet: number, sides: number[]) {
-  const { unwantedLoss, maxLoss } = await budgetService.getBudget()
+  const unwantedLoss = await budgetService.getUnwantedLoss()
+  const maxLoss = await budgetService.getMaxLoss()
   const uniqueSides = new Set(sides)
   const multiplier = (6 / uniqueSides.size) * rtpMultiplier
   const winAmount = Math.ceil(bet * multiplier - bet)

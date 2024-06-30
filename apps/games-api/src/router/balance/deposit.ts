@@ -32,7 +32,7 @@ export const depositRoute = new Hono().post('/', async (ctx) => {
       totalRTP: lastTransaction?.totalRTP ?? 0,
     })
 
-    await budgetService.increaseBudget(amount)
+    await budgetService.increaseAvailable(amount)
 
     return ctx.json({
       status: 'success',

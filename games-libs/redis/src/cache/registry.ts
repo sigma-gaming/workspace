@@ -1,6 +1,5 @@
 import { createSingletonProxy } from '@core/di'
 import {
-  BudgetSelect,
   ChatMessageSelect,
   NotificationSelect,
   TransactionSelect,
@@ -13,7 +12,10 @@ export const CacheVersionToken: InjectionToken<string> = Symbol('CacheVersion')
 
 @singleton()
 export class CacheRegistry {
-  budget: GlobalEntity<BudgetSelect>
+  budgetAvailable: GlobalEntity<number>
+  budgetMaxLoss: GlobalEntity<number>
+  budgetUnwantedLoss: GlobalEntity<number>
+  budgetSyncedAt: GlobalEntity<string>
   detailedProfile: KeyEntity<string, ProfileDetailed>
   session: KeyEntity<string, Session>
   lastTransaction: KeyEntity<string, TransactionSelect>
@@ -25,15 +27,36 @@ export class CacheRegistry {
     private cacheService: CacheService,
     @inject(CacheVersionToken) version: string,
   ) {
-    this.budget = this.cacheService.entity<void, BudgetSelect>({
-      keygen: () => `${version}:global:budget`,
+    this.budgetAvailable = this.cacheService.entity<void, number>({
+      keygen: () => `global:budgetAvailable`,
+      options: {
+        ttl: 60 * 60 * 24, // 1 day
+      },
+    })
+
+    this.budgetMaxLoss = this.cacheService.entity<void, number>({
+      keygen: () => `global:budgetMaxLoss`,
+      options: {
+        ttl: 60 * 60 * 24, // 1 day
+      },
+    })
+
+    this.budgetUnwantedLoss = this.cacheService.entity<void, number>({
+      keygen: () => `global:budgetUnwantedLoss`,
+      options: {
+        ttl: 60 * 60 * 24, // 1 day
+      },
+    })
+
+    this.budgetSyncedAt = this.cacheService.entity<void, string>({
+      keygen: () => `global:budgetSyncedAt`,
       options: {
         ttl: 60 * 60 * 24, // 1 day
       },
     })
 
     this.detailedProfile = this.cacheService.entity<string, ProfileDetailed>({
-      keygen: (token: string) => `${version}:detailed-profile:${token}`,
+      keygen: (token: string) => `${version}:detailedProfile:${token}`,
     })
 
     this.session = this.cacheService.entity<string, Session>({
@@ -41,7 +64,7 @@ export class CacheRegistry {
     })
 
     this.lastTransaction = this.cacheService.entity<string, TransactionSelect>({
-      keygen: (userId: string) => `${version}:last-transaction:${userId}`,
+      keygen: (userId: string) => `${version}:lastTransaction:${userId}`,
     })
 
     this.globalNotifications = this.cacheService.entity<
@@ -60,7 +83,7 @@ export class CacheRegistry {
 
     this.lastChatMessages = this.cacheService.entity<void, ChatMessageSelect[]>(
       {
-        keygen: () => `${version}:global:last-chat-messages`,
+        keygen: () => `${version}:global:lastChatMessages`,
         options: {
           ttl: 60 * 60 * 24 * 1, // 1 day
         },

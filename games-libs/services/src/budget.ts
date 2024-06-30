@@ -2,7 +2,6 @@ import { createSingletonProxy } from '@core/di'
 import { logger } from '@core/logger'
 import { gamesDb } from '@dbs/games-db'
 import {
-  BudgetSelect,
   BudgetTable,
   TransactionTable,
   TransactionType,
@@ -13,8 +12,8 @@ import { singleton } from 'tsyringe'
 
 @singleton()
 export class BudgetService {
-  getBudget = async (): Promise<BudgetSelect> => {
-    const cached = await gamesCaches.budget.get()
+  getAvailable = async (): Promise<number> => {
+    const cached = await gamesCaches.budgetAvailable.get()
 
     if (cached) {
       return cached
@@ -29,30 +28,90 @@ export class BudgetService {
       budget = created[0]
     }
 
-    await gamesCaches.budget.set(budget)
+    await gamesCaches.budgetAvailable.set(budget.available)
 
-    return budget
+    return budget.available
   }
 
-  increaseBudget = async (amount: number) => {
+  getUnwantedLoss = async (): Promise<number> => {
+    const cached = await gamesCaches.budgetUnwantedLoss.get()
+
+    if (cached) {
+      return cached - 100
+    }
+
+    const budget = await gamesDb.query.BudgetTable.findFirst()
+
+    if (!budget) {
+      return 0
+    }
+
+    await gamesCaches.budgetUnwantedLoss.set(budget.unwantedLoss)
+
+    return budget.unwantedLoss - 100
+  }
+
+  getMaxLoss = async (): Promise<number> => {
+    const cached = await gamesCaches.budgetMaxLoss.get()
+
+    if (cached) {
+      return cached
+    }
+
+    const budget = await gamesDb.query.BudgetTable.findFirst()
+
+    if (!budget) {
+      return 0
+    }
+
+    await gamesCaches.budgetMaxLoss.set(budget.maxLoss)
+
+    return budget.maxLoss
+  }
+
+  getSyncedAt = async (): Promise<Date> => {
+    const cached = await gamesCaches.budgetSyncedAt.get()
+
+    if (cached) {
+      return new Date(cached)
+    }
+
+    const budget = await gamesDb.query.BudgetTable.findFirst()
+
+    if (!budget) {
+      return new Date()
+    }
+
+    await gamesCaches.budgetSyncedAt.set(budget.lastSyncAt)
+
+    return new Date(budget.lastSyncAt)
+  }
+
+  increaseAvailable = async (amount: number) => {
     try {
-      await gamesCaches.budget.incField('available', amount)
+      await gamesCaches.budgetAvailable.incrBy(amount)
     } catch (error) {
       logger.error('Failed to increase budget')
     }
   }
 
+  decreaseAvailable = async (amount: number) => {
+    try {
+      await gamesCaches.budgetAvailable.decrBy(amount)
+    } catch (error) {
+      logger.error('Failed to decrease budget')
+    }
+  }
+
   syncBudget = async (force = false) => {
-    const lock = await gamesCaches.budget.lock(10000)
+    const lock = await gamesCaches.budgetAvailable.lock(10000)
 
     try {
-      const budget = await this.getBudget()
-
       const currentSyncAt = new Date()
-      const lastSyncAt = new Date(budget.lastSyncAt)
+      const lastSyncAt = await this.getSyncedAt()
 
       const syncedRecently =
-        currentSyncAt.getTime() - lastSyncAt.getTime() <= 1000 * 60 * 25 // 25 minutes
+        currentSyncAt.getTime() - lastSyncAt.getTime() <= 1000 * 60 * 30 // 30 minutes
 
       if (!force && syncedRecently) {
         return
@@ -86,7 +145,8 @@ export class BudgetService {
         .where(eq(BudgetTable.id, 1))
         .returning()
 
-      await gamesCaches.budget.set(updatedBudget)
+      await gamesCaches.budgetAvailable.set(updatedBudget.available)
+      await gamesCaches.budgetSyncedAt.set(updatedBudget.lastSyncAt)
       logger.info('Budget synced successfully')
     } catch (error) {
       logger.error('Failed to sync budget')
