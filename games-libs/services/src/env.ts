@@ -20,6 +20,7 @@ const EnvSchema = z
 
     POSTGRES_URL: z.string(),
     REDIS_URL: z.string(),
+    REDIS_PASSWORD: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
@@ -39,6 +40,7 @@ const EnvSchema = z
 
     redis: {
       url: raw.REDIS_URL,
+      password: raw.REDIS_PASSWORD,
     },
 
     gamesApp: {

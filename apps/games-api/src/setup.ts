@@ -14,7 +14,7 @@ container.register(DbOptionsToken, {
 })
 
 container.register(RedisOptionsToken, {
-  useValue: { url: env.redis.url },
+  useValue: { url: env.redis.url, password: env.redis.password },
 })
 
 container.register(CacheVersionToken, {

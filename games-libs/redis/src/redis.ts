@@ -5,6 +5,7 @@ import { inject, InjectionToken, singleton } from 'tsyringe'
 
 export interface RedisOptions {
   url: string
+  password: string
 }
 
 export const RedisOptionsToken: InjectionToken<RedisOptions> =
@@ -19,7 +20,7 @@ export class RedisService implements OnApplicationShutdown {
     @inject(RedisOptionsToken) options: RedisOptions,
     loggerService: LoggerService,
   ) {
-    this.redis = new Redis(options.url)
+    this.redis = new Redis(options.url, { password: options.password })
     this.logger = loggerService.logger.child('GamesRedis')
   }
 
