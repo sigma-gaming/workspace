@@ -35,6 +35,9 @@
       "@apis/games-api": [
         "apps/games-api/src/client.ts"
       ],
+      "@apis/games-ws": [
+        "apps/games-ws/src/client.ts"
+      ],
       "@apis/control-api": [
         "apps/control-api/src/client.ts"
       ],
@@ -83,8 +86,8 @@
       "@core/hono-client": [
         "core/hono-client/src/index.ts"
       ],
-      "@core/hono-ws": [
-        "core/hono-ws/src/index.ts"
+      "@core/io-client": [
+        "core/io-client/src/index.ts"
       ]
     }
   }

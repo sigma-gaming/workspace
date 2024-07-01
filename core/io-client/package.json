@@ -1,5 +1,5 @@
 {
-  "name": "@core/hono-ws",
+  "name": "@core/io-client",
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,

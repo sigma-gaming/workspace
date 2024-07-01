@@ -1,5 +1,5 @@
 {
-  "name": "@apis/games-api",
+  "name": "@apis/games-ws",
   "main": "./src/client.ts",
   "module": "./src/client.ts",
   "types": "./src/client.ts",

@@ -4,7 +4,8 @@ import { createQuery } from '@farfetched/core'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and } from 'patronum'
-import { gamesApi, gamesApiSocket } from '../../shared/api/games'
+import { gamesApi } from '../../shared/api/games'
+import { gamesWs } from '../../shared/api/games-ws'
 import { env } from '../../shared/env'
 
 const request = createEvent()
@@ -62,7 +63,10 @@ sample({
 
 sample({
   clock: logoutMutation.finished.success,
-  target: createEffect(() => gamesApiSocket.reconnect()),
+  target: createEffect(() => {
+    gamesWs.disconnect()
+    gamesWs.connect()
+  }),
 })
 
 export const $$user = {

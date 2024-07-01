@@ -1,11 +1,13 @@
 import { createApiEffect } from '@core/hono-client'
+import { subscriptionFactory } from '@core/io-client'
 import { NotificationSelect } from '@dbs/games-schema'
 import { createQuery } from '@farfetched/core'
 import { mapColor } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEffect, createEvent, sample } from 'effector'
 import { $$notifications } from '../../entities/notifications'
-import { gamesApi, gamesApiSocket } from '../../shared/api/games'
+import { gamesApi } from '../../shared/api/games'
+import { gamesWs } from '../../shared/api/games-ws'
 
 const initialize = createEvent()
 const reset = createEvent()
@@ -16,7 +18,7 @@ const getActualQuery = createQuery({
 })
 
 const { receivedData: notificationReceived } = invoke(() => {
-  return gamesApiSocket.subscriptionFactory({ topic: 'notification' })
+  return subscriptionFactory({ ws: gamesWs, event: 'notification' })
 })
 
 sample({

@@ -1,4 +1,3 @@
-import { createNodeWebSocket } from '@core/hono-ws'
 import { env } from '@games/services'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -11,9 +10,3 @@ export const baseApp = new Hono().use('*', logger()).use(
     credentials: true,
   }),
 )
-
-export const { upgradeWebSocket, injectWebSocket, closeWebSocketServer } =
-  createNodeWebSocket({
-    app: baseApp,
-    baseUrl: env.gamesApi.url,
-  })

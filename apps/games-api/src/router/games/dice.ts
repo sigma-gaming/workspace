@@ -56,7 +56,7 @@ export const playDiceRoute = new Hono().post(
   async (ctx) => {
     const logger = loggerService.forRequest(ctx.req)
     const payload = ctx.req.valid('json')
-    const session = await sessionService.getSession(ctx.req)
+    const session = await sessionService.getHonoSession(ctx.req)
     const user = sessionService.getUser(session)
 
     if (payload.bet < rub(1)) {

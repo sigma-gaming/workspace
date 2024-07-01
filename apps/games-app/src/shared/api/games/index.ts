@@ -1,5 +1,4 @@
-import { ApiType, SocketEvent, SocketTopic } from '@apis/games-api'
-import { createApiSocket } from '@core/hono-client'
+import { ApiType } from '@apis/games-api'
 import { hc } from 'hono/client'
 import { env } from '../../env'
 
@@ -8,7 +7,3 @@ export const gamesApi = hc<ApiType>(env.gamesApi.url, {
     return fetch(input, { ...requestInit, credentials: 'include' })
   },
 })
-
-export const gamesApiSocket = createApiSocket<SocketTopic, SocketEvent>(
-  gamesApi.websocket.$ws,
-)

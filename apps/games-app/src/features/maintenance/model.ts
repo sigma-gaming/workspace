@@ -1,8 +1,9 @@
+import { subscriptionFactory } from '@core/io-client'
 import { invoke } from '@withease/factories'
 import { createEffect, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { delay } from 'patronum'
-import { gamesApiSocket } from '../../shared/api/games'
+import { gamesWs } from '../../shared/api/games-ws'
 import { env } from '../../shared/env'
 
 /**
@@ -24,7 +25,7 @@ const reloadPageFx = createEffect(() => {
 })
 
 const { receivedData: maintenanceStarted } = invoke(() => {
-  return gamesApiSocket.subscriptionFactory({ topic: 'maintenance/started' })
+  return subscriptionFactory({ ws: gamesWs, event: 'maintenance/started' })
 })
 
 const reloadAt = Cookies.get('maintenanceReloadAt')

@@ -1,5 +1,6 @@
 import { createField, createForm } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
+import { subscriptionFactory } from '@core/io-client'
 import {
   ChatMessageAttachment,
   ChatMessageSelect,
@@ -11,7 +12,8 @@ import { createEvent, createStore, sample } from 'effector'
 import { v4 as uuid } from 'uuid'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
-import { gamesApi, gamesApiSocket } from '../../shared/api/games'
+import { gamesApi } from '../../shared/api/games'
+import { gamesWs } from '../../shared/api/games-ws'
 
 const initialize = createEvent()
 const reset = createEvent()
@@ -20,7 +22,7 @@ const getLastMessagesFx = createApiEffect(gamesApi.chat.getLastMessages.$get)
 const sendMessageFx = createApiEffect(gamesApi.chat.sendMessage.$post)
 
 const { receivedData: messageReceived } = invoke(() => {
-  return gamesApiSocket.subscriptionFactory({ topic: 'chat/message' })
+  return subscriptionFactory({ ws: gamesWs, event: 'chat/message' })
 })
 
 const fields = {

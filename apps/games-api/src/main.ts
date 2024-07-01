@@ -11,7 +11,6 @@ import { readFileSync } from 'node:fs'
 import { createServer } from 'node:https'
 import { join } from 'node:path'
 import { app } from './app'
-import { closeWebSocketServer, injectWebSocket } from './app-base'
 import { maintenanceEvents } from './events/maintenance'
 
 app.get('/health', async (ctx) => {
@@ -56,8 +55,6 @@ migrateGamesDB(env.postgres.url).then(() => {
     logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
   })
 
-  injectWebSocket(server)
-
   let exited = false
 
   async function handleExit() {
@@ -65,9 +62,6 @@ migrateGamesDB(env.postgres.url).then(() => {
     exited = true
 
     logger.info('Exit signal received')
-
-    logger.info('Closing WebSocket server..')
-    closeWebSocketServer()
 
     if (env.isDev) {
       logger.info('Exiting..')

@@ -33,15 +33,7 @@ export class SessionService {
     this.env = envService.env
   }
 
-  getSession = async (req: HonoRequest): Promise<Session> => {
-    const cookie = req.header('cookie')
-
-    if (!cookie) {
-      return { state: SessionState.Empty, user: null }
-    }
-
-    const { session: token } = parse(cookie)
-
+  getSession = async (token?: string): Promise<Session> => {
     if (!token) {
       return { state: SessionState.Empty, user: null }
     }
@@ -88,6 +80,18 @@ export class SessionService {
     })
 
     return created
+  }
+
+  getHonoSession = async (req: HonoRequest): Promise<Session> => {
+    const cookie = req.header('cookie')
+
+    if (!cookie) {
+      return { state: SessionState.Empty, user: null }
+    }
+
+    const { session: token } = parse(cookie)
+
+    return this.getSession(token)
   }
 
   getUser = (session: Session): UserSelect => {

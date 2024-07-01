@@ -26,7 +26,7 @@ export const updateProfileRoute = new Hono().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const session = await sessionService.getSession(ctx.req)
+    const session = await sessionService.getHonoSession(ctx.req)
     const user = sessionService.getUser(session)
 
     if (payload.username) {
