@@ -41,6 +41,11 @@ WORKDIR /workspace
 COPY --from=build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
 
+FROM base AS games-ws
+WORKDIR /workspace
+COPY --from=build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
+
 FROM base AS control-api
 WORKDIR /workspace
 COPY --from=build /build ./
