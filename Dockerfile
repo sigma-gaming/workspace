@@ -55,3 +55,15 @@ FROM ws-base AS games-ws
 WORKDIR /workspace
 COPY --from=build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
+
+# GCR Cleaner
+
+FROM base AS gcloud-sdk-base
+RUN apk add --update curl bash which python3
+RUN curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/root
+ENV PATH $PATH:/root/google-cloud-sdk/bin
+
+FROM gcloud-sdk-base AS gcr-cleaner
+WORKDIR /workspace
+COPY --from=build /build ./
+CMD ["node", "apps/gcr-cleaner/script.mjs"]

@@ -1,0 +1,17 @@
+{
+  "name": "@tools/gcr-cleaner",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint:fix": "pnpm lint --fix"
+  },
+  "dependencies": {
+    "@google-cloud/artifact-registry": "^3.1.0",
+    "google-auth-library": "^9.4.2",
+    "googleapis": "^130.0.0",
+    "semver": "^7.5.4",
+    "zx": "^7.2.3"
+  }
+}
