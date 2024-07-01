@@ -5,21 +5,10 @@ import { logger, loggerService } from '@core/logger'
 import { migrateGamesDB } from '@dbs/games-db'
 import { env } from '@games/services'
 import { serve } from '@hono/node-server'
-import { cors } from 'hono/cors'
-import { logger as honoLogger } from 'hono/logger'
 import { readFileSync } from 'node:fs'
 import { createServer } from 'node:https'
 import { join } from 'node:path'
 import { app } from './app'
-
-app.use(honoLogger())
-
-app.use(
-  cors({
-    origin: env.controlApp.url,
-    credentials: true,
-  }),
-)
 
 app.get('/health', async (ctx) => {
   return ctx.text('Healthy')
