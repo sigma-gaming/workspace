@@ -41,12 +41,17 @@ WORKDIR /workspace
 COPY --from=build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
 
-FROM base AS games-ws
-WORKDIR /workspace
-COPY --from=build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
-
 FROM base AS control-api
 WORKDIR /workspace
 COPY --from=build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]
+
+# WS APIs
+
+FROM base AS ws-base
+RUN apk add --no-cache gcompat
+
+FROM ws-base AS games-ws
+WORKDIR /workspace
+COPY --from=build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
