@@ -3,10 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
-    "lint:fix": "pnpm lint --fix"
-  },
   "dependencies": {
     "@google-cloud/artifact-registry": "^3.1.0",
     "google-auth-library": "^9.4.2",
