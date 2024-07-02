@@ -32,8 +32,6 @@ for (const image of images) {
     const hasVersion = tag.tags.some(tag => Boolean(semver.valid(tag)))
     const isDev = tag.tags.some(tag => tag.startsWith('dev-'))
 
-    if (isLatest) continue
-
     entries.push({
       path,
       name: tag.name,
@@ -47,6 +45,13 @@ for (const image of images) {
   }
 }
 
+if (entries.length === 0) {
+  console.info('No images to delete')
+  process.exit(0)
+}
+
+console.info(`Found ${entries.length} images to delete`)
+
 /*
  * Recently uploaded images first
  */
@@ -58,12 +63,17 @@ const semverCountByPath = {}
 const devCountByPath = {}
 
 for (const entry of entries) {
+  console.info(`Processing ${entry.url}`)
+  console.info(`Path: ${entry.path}`)
+
+  const reasons = []
+
   /*
    * Always keep the latest image
    */
   if (entry.isLatest) {
     exceptions.add(entry)
-    continue
+    reasons.push('latest')
   }
 
   /**
@@ -71,7 +81,7 @@ for (const entry of entries) {
    */
   if (entry.uploadedAt > sixHoursAgo) {
     exceptions.add(entry)
-    continue
+    reasons.push('recently uploaded')
   }
 
   const semverCount = semverCountByPath[entry.path] || 0
@@ -83,7 +93,7 @@ for (const entry of entries) {
   if (semverCount < 2) {
     semverCountByPath[entry.path] = semverCount + 1
     exceptions.add(entry)
-    continue
+    reasons.push('semver')
   }
 
   /*
@@ -92,6 +102,11 @@ for (const entry of entries) {
   if (devCount < 2) {
     devCountByPath[entry.path] = devCount + 1
     exceptions.add(entry)
+    reasons.push('dev')
+  }
+
+  if (reasons.length > 0) {
+    console.info(`Skipping (${reasons.join(', ')})`)
   }
 }
 
