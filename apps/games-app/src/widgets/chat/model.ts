@@ -7,9 +7,11 @@ import {
   ChatMessageType,
 } from '@dbs/games-schema'
 import { ChatValidation } from '@games/model'
+import { NotificationData } from '@mantine/notifications'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { v4 as uuid } from 'uuid'
+import { $$notifications } from '../../entities/notifications'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
@@ -130,6 +132,26 @@ sample({
     })
   },
   target: $messages,
+})
+
+sample({
+  clock: sendMessageFx.fail,
+  source: $messages,
+  fn: (messages, { params }) => {
+    return messages.filter((message) => {
+      return message.trackingId !== params.trackingId
+    })
+  },
+})
+
+sample({
+  clock: sendMessageFx.fail,
+  fn: (): NotificationData => ({
+    title: 'Ошибка отправки сообщения',
+    message: 'Что-то пошло не так, попробуйте через пару минут',
+    color: 'red',
+  }),
+  target: $$notifications.show,
 })
 
 export const $$chatWidget = {
