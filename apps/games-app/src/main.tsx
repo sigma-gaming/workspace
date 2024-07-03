@@ -7,6 +7,7 @@ import { env } from './shared/env/index.ts'
 
 Sentry.init({
   environment: env.stage,
+  release: env.gamesApp.version,
   dsn: 'https://SENTRY_DSN_REMOVED',
   integrations: [
     Sentry.browserTracingIntegration(),
