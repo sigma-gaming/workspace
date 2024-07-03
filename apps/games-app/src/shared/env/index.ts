@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 const PublicEnvSchema = z
   .object({
+    PUBLIC_STAGE: z.string(),
     PUBLIC_DOMAIN: z.string(),
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_APP_VERSION: z.string(),
@@ -12,6 +13,7 @@ const PublicEnvSchema = z
     PUBLIC_VK_APP_ID: z.string(),
   })
   .transform((raw) => ({
+    stage: raw.PUBLIC_STAGE,
     domain: raw.PUBLIC_DOMAIN,
     gamesApp: {
       version: raw.PUBLIC_GAMES_APP_VERSION,

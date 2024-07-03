@@ -6,6 +6,7 @@ import { z } from 'zod'
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
+    PUBLIC_STAGE: z.string(),
 
     PUBLIC_DOMAIN: z.string(),
     PUBLIC_GAMES_APP_URL: z.string(),
@@ -31,6 +32,7 @@ const EnvSchema = z
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
     isProd: raw.NODE_ENV === 'production',
+    stage: raw.PUBLIC_STAGE,
     domain: raw.PUBLIC_DOMAIN,
 
     postgres: {

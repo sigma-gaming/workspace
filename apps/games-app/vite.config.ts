@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -22,8 +23,14 @@ export default defineConfig({
       babel: { babelrc: true },
     }),
     tsconfigPaths(),
+    sentryVitePlugin({
+      org: 'sigma-games',
+      project: 'games-app',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
   ],
   build: {
+    sourcemap: true,
     rollupOptions: {
       external: ['/env.js'],
     },
