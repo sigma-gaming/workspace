@@ -97,8 +97,6 @@ export const playDiceRoute = new Hono().post(
       const won = hasWon ? winAmount : 0
       const lost = hasWon ? 0 : payload.bet
 
-      logger.info('Test message', { amount, side })
-
       const transactionType = hasWon
         ? TransactionType.Win
         : TransactionType.Loss

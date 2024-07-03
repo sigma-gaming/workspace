@@ -5,7 +5,7 @@ import { logger } from 'hono/logger'
 import { sentryMiddleware } from './shared/sentry'
 
 export const baseApp = new Hono()
-  .use('*', sentryMiddleware)
+  .use('*', sentryMiddleware({ enabled: env.isProd }))
   .use('*', logger())
   .use(
     '*',

@@ -115,8 +115,9 @@ sample({
 
 sample({
   clock: betDoubled,
-  source: fields.bet.$value,
-  fn: (bet) => Math.ceil(bet * 2 * 100) / 100,
+  source: { bet: fields.bet.$value, balance: $$balance.$available },
+  fn: ({ bet, balance }) =>
+    Math.min(balance / 100, Math.ceil(bet * 2 * 100) / 100),
   target: fields.bet.update,
 })
 

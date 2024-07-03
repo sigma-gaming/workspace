@@ -43,7 +43,6 @@
     "@fastify/websocket": "^8.2.0",
     "@hono/node-server": "^1.11.4",
     "@hono/node-ws": "^1.0.1",
-    "@hono/sentry": "^1.1.0",
     "@hono/zod-validator": "^0.2.2",
     "@mantine/core": "^7.3.2",
     "@mantine/hooks": "^7.3.2",
