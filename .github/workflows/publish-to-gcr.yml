@@ -84,6 +84,15 @@ jobs:
         id: timestamp
         uses: release-kit/unix-timestamp@v1
 
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: sigma-games
+          SENTRY_PROJECT: ${{ steps.parse.outputs.name }}
+        with:
+          version: dev-${{ steps.timestamp.outputs.timestamp }}
+
       - name: Build image
         run: |-
           docker build . --target ${{ steps.parse.outputs.name }} \
