@@ -19,4 +19,5 @@ export const sentryMiddleware = sentry({
   dsn: SENTRY_DSN,
   environment: env.stage,
   release: env.gamesApi.version,
+  tracesSampleRate: 1,
 })
