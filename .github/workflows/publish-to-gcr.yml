@@ -98,7 +98,8 @@ jobs:
         run: |-
           docker build . --target ${{ steps.parse.outputs.name }} \
             --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }} \
+            --build-arg sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Push image
         run: |-

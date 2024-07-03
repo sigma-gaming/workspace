@@ -1,4 +1,6 @@
 FROM node:20-alpine AS base
+ARG sentry_auth_token
+ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
