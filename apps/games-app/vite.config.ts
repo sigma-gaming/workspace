@@ -27,6 +27,10 @@ export default defineConfig({
       org: 'sigma-games',
       project: 'games-app',
       authToken: process.env.SENTRY_AUTH_TOKEN,
+      bundleSizeOptimizations: {
+        excludeReplayIframe: true,
+        excludeReplayShadowDom: true,
+      },
     }),
   ],
   build: {
