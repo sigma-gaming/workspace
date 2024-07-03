@@ -192,6 +192,9 @@ importers:
       '@sentry/vite-plugin':
         specifier: ^2.20.1
         version: 2.20.1
+      '@sentry/webpack-plugin':
+        specifier: ^2.20.1
+        version: 2.20.1(webpack@5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4))
       '@types/cookie':
         specifier: ^0.5.4
         version: 0.5.4
@@ -2555,6 +2558,12 @@ packages:
   '@sentry/vite-plugin@2.20.1':
     resolution: {integrity: sha512-IOYAJRcV+Uqn0EL8rxcoCvE77PbtGzKjP+B6iIgDZ229AWbpfbpWY8zHCcufwdDzb5PtgOhWWHT74iAsNyij/A==}
     engines: {node: '>= 14'}
+
+  '@sentry/webpack-plugin@2.20.1':
+    resolution: {integrity: sha512-U6LzoE09Ndt0OCWROoRaZqqIHGxyMRdKpBhbqoBqyyfVwXN/zGW3I/cWZ1e8rreiKFj+2+c7+X0kOS+NGMTUrg==}
+    engines: {node: '>= 14'}
+    peerDependencies:
+      webpack: '>=4.40.0'
 
   '@sesamecare-oss/redlock@1.2.1':
     resolution: {integrity: sha512-S73sH4mRLDEmD0j5Nz9AGh9ra7TB1q9NJZsZwgW+aUEJBG0UJGbKYIrhMhtILJvzCcqAf3yffLKHOqfG+CF95w==}
@@ -9254,6 +9263,16 @@ snapshots:
     dependencies:
       '@sentry/bundler-plugin-core': 2.20.1
       unplugin: 1.0.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@sentry/webpack-plugin@2.20.1(webpack@5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4))':
+    dependencies:
+      '@sentry/bundler-plugin-core': 2.20.1
+      unplugin: 1.0.1
+      uuid: 9.0.1
+      webpack: 5.91.0(esbuild@0.20.2)(webpack-cli@5.1.4)
     transitivePeerDependencies:
       - encoding
       - supports-color

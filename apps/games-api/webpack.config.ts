@@ -1,4 +1,5 @@
 import path from 'path'
+import { sentryWebpackPlugin } from '@sentry/webpack-plugin'
 import { loadConfig } from 'tsconfig-paths'
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
 import webpack from 'webpack'
@@ -15,13 +16,20 @@ const internalModules = Object.keys(loadedTsconfig.paths)
 
 const config: webpack.Configuration = {
   mode: 'none',
-  devtool: process.env.NODE_ENV === 'development' ? 'eval' : false,
+  devtool: process.env.NODE_ENV === 'development' ? 'eval' : 'source-map',
   entry: './src/main.ts',
   target: 'node',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
   },
+  plugins: [
+    sentryWebpackPlugin({
+      org: 'sigma-games',
+      project: 'games-api',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
+  ],
   externals: [
     nodeExternals({
       allowlist: (path) => {

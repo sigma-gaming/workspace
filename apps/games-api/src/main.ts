@@ -1,5 +1,5 @@
 import './setup'
-import './sentry'
+import './shared/sentry/init'
 import { shutdownServices } from '@core/di'
 import { createErrorHandler } from '@core/exceptions'
 import { logger, loggerService } from '@core/logger'
@@ -13,6 +13,7 @@ import { createServer } from 'node:https'
 import { join } from 'node:path'
 import { app } from './app'
 import { maintenanceEvents } from './events/maintenance'
+import { sentryClient } from './shared/sentry'
 
 app.get('/health', async (ctx) => {
   return ctx.text('Healthy')
@@ -76,6 +77,8 @@ migrateGamesDB(env.postgres.url).then(() => {
 
     server.close(async () => {
       logger.info('Server closed')
+
+      await sentryClient?.close(3000)
 
       logger.info('Cleaning up..')
       await shutdownServices()

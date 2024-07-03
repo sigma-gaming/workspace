@@ -2,7 +2,7 @@ import { env } from '@games/services'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { sentryMiddleware } from './sentry'
+import { sentryMiddleware } from './shared/sentry'
 
 export const baseApp = new Hono()
   .use('*', sentryMiddleware)

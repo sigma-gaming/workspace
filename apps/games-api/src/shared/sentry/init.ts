@@ -6,11 +6,14 @@ import { nodeProfilingIntegration } from '@sentry/profiling-node'
 const SENTRY_DSN =
   'https://SENTRY_DSN_REMOVED'
 
-Sentry.init({
+export const sentryClient = Sentry.init({
   dsn: SENTRY_DSN,
   environment: env.stage,
   release: env.gamesApi.version,
-  integrations: [nodeProfilingIntegration()],
+  integrations: [
+    nodeProfilingIntegration(),
+    Sentry.anrIntegration({ captureStackTrace: true }),
+  ],
   tracesSampleRate: 1,
   profilesSampleRate: 1,
 })
