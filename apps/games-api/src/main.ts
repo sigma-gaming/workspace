@@ -1,5 +1,5 @@
-import './sentry'
 import './setup'
+import './sentry'
 import { shutdownServices } from '@core/di'
 import { createErrorHandler } from '@core/exceptions'
 import { logger, loggerService } from '@core/logger'
