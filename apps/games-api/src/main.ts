@@ -1,3 +1,4 @@
+import './sentry'
 import './setup'
 import { shutdownServices } from '@core/di'
 import { createErrorHandler } from '@core/exceptions'
