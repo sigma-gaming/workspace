@@ -12,6 +12,6 @@ export const baseApp = new Hono()
     cors({
       origin: [env.gamesApp.url, env.controlApp.url],
       credentials: true,
-      allowHeaders: ['sentry-trace', 'baggage'],
+      allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
     }),
   )
