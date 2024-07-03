@@ -56,6 +56,10 @@ const config: webpack.Configuration = {
         ],
         exclude: /node_modules/,
       },
+      {
+        test: /\.node$/,
+        loader: 'node-loader',
+      },
     ],
   },
 }
