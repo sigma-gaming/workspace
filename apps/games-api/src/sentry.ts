@@ -1,6 +1,6 @@
 import { env } from '@games/services'
 import { sentry } from '@hono/sentry'
-import Sentry from '@sentry/node'
+import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 
 const SENTRY_DSN =
