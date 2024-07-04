@@ -1,14 +1,14 @@
 FROM node:20-alpine AS base
-ARG sentry_auth_token
-ARG sentry_release
-ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
-ENV SENTRY_RELEASE=$sentry_release
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 FROM base AS build
 WORKDIR /build
+ARG sentry_auth_token
+ARG sentry_release
+ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
+ENV SENTRY_RELEASE=$sentry_release
 COPY . /build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ENV NODE_ENV=production
