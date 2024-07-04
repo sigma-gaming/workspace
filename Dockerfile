@@ -27,9 +27,11 @@ ARG sentry_auth_token
 ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-app
-ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
+ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
+RUN pnpm sentry-cli releases new -p games-app ${sentry_release}
+RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist
-RUN pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release $sentry_release
+RUN pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
 
 FROM app-base AS games-app
 WORKDIR /app
@@ -50,9 +52,11 @@ ARG sentry_auth_token
 ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-api
-ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
+ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
+RUN pnpm sentry-cli releases new -p games-api ${sentry_release}
+RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-api/dist
-RUN pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release $sentry_release
+RUN pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release ${sentry_release}
 
 FROM base AS games-api
 WORKDIR /workspace
