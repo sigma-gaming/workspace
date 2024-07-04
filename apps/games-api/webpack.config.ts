@@ -24,12 +24,16 @@ const config: webpack.Configuration = {
     filename: '[name].js',
   },
   plugins: [
-    process.env.NODE_ENV === 'production' &&
-      sentryWebpackPlugin({
-        org: 'sigma-games',
-        project: 'games-api',
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-      }),
+    sentryWebpackPlugin({
+      disable: process.env.NODE_ENV !== 'production',
+      org: 'sigma-games',
+      project: 'games-api',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      release: {
+        name: process.env.SENTRY_RELEASE,
+        setCommits: { auto: true },
+      },
+    }),
   ],
   externals: [
     nodeExternals({
