@@ -14,6 +14,9 @@ if (loadedTsconfig.resultType !== 'success') {
 
 const internalModules = Object.keys(loadedTsconfig.paths)
 
+console.log(process.env.SENTRY_AUTH_TOKEN)
+console.log(process.env.SENTRY_RELEASE)
+
 const config: webpack.Configuration = {
   mode: 'none',
   devtool: process.env.NODE_ENV === 'development' ? 'eval' : 'source-map',
@@ -25,13 +28,16 @@ const config: webpack.Configuration = {
   },
   plugins: [
     sentryWebpackPlugin({
-      disable: process.env.NODE_ENV !== 'production',
+      disable:
+        process.env.NODE_ENV !== 'production' ||
+        process.env.SENTRY_PROJECT !== 'games-api',
       org: 'sigma-games',
       project: 'games-api',
       authToken: process.env.SENTRY_AUTH_TOKEN,
       release: {
         name: process.env.SENTRY_RELEASE,
         setCommits: { auto: true },
+        inject: true,
       },
     }),
   ],

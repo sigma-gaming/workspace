@@ -5,8 +5,10 @@ RUN corepack enable
 
 FROM base AS build
 WORKDIR /build
+ARG sentry_project
 ARG sentry_auth_token
 ARG sentry_release
+ENV SENTRY_PROJECT=$sentry_project
 ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
 ENV SENTRY_RELEASE=$sentry_release
 COPY . /build

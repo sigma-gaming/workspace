@@ -7,6 +7,9 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 const monorepo = (end: string) => path.resolve(__dirname, '../..', end)
 
+console.log(process.env.SENTRY_AUTH_TOKEN)
+console.log(process.env.SENTRY_RELEASE)
+
 // https://vitejs.dev/config/
 // eslint-disable-next-line import/no-default-export
 export default defineConfig({
@@ -24,7 +27,9 @@ export default defineConfig({
     }),
     tsconfigPaths(),
     sentryVitePlugin({
-      disable: process.env.NODE_ENV !== 'production',
+      disable:
+        process.env.NODE_ENV !== 'production' ||
+        process.env.SENTRY_PROJECT !== 'games-app',
       org: 'sigma-games',
       project: 'games-app',
       authToken: process.env.SENTRY_AUTH_TOKEN,
