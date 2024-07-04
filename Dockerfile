@@ -5,12 +5,6 @@ RUN corepack enable
 
 FROM base AS build
 WORKDIR /build
-ARG sentry_project
-ARG sentry_auth_token
-ARG sentry_release
-ENV SENTRY_PROJECT=$sentry_project
-ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
-ENV SENTRY_RELEASE=$sentry_release
 COPY . /build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ENV NODE_ENV=production
@@ -28,9 +22,18 @@ COPY ./scripts/inject-env.mjs /scripts/inject-env.mjs
 COPY ./config/app-nginx.conf /etc/nginx/nginx.conf
 CMD node /scripts/inject-env.mjs; nginx -g "daemon off;"
 
+FROM build AS games-app-build
+ARG sentry_auth_token
+ARG sentry_release
+ENV SENTRY_ORG=sigma-games
+ENV SENTRY_PROJECT=games-app
+ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
+RUN pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist
+RUN pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release $sentry_release
+
 FROM app-base AS games-app
 WORKDIR /app
-COPY --from=build /build/apps/games-app/dist ./
+COPY --from=games-app-build /build/apps/games-app/dist ./
 
 FROM app-base AS control-app
 WORKDIR /app
@@ -42,9 +45,18 @@ COPY --from=build /build/apps/maintenance-app/dist ./
 
 # APIs
 
+FROM build AS games-api-build
+ARG sentry_auth_token
+ARG sentry_release
+ENV SENTRY_ORG=sigma-games
+ENV SENTRY_PROJECT=games-api
+ENV SENTRY_AUTH_TOKEN=$sentry_auth_token
+RUN pnpm sentry-cli sourcemaps inject /build/apps/games-api/dist
+RUN pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release $sentry_release
+
 FROM base AS games-api
 WORKDIR /workspace
-COPY --from=build /build ./
+COPY --from=games-api-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
 
 FROM base AS control-api

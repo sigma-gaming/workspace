@@ -186,6 +186,9 @@ importers:
       '@nx/workspace':
         specifier: 17.0.2
         version: 17.0.2
+      '@sentry/cli':
+        specifier: ^2.32.1
+        version: 2.32.1
       '@sentry/vite-plugin':
         specifier: ^2.20.1
         version: 2.20.1
