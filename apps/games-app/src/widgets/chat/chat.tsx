@@ -80,7 +80,7 @@ const MessageList = () => {
   const messagesCount = useRef(0)
   const stickyBottom = useRef(true)
   const initializedRef = useRef(false)
-  const loadingMessages = useUnit($$chatWidget.$loadingMessages)
+  const loadingMessages = true
 
   const autoscroll = useCallback(() => {
     const container = containerRef.current
@@ -201,7 +201,7 @@ const MessageSkeleton = memo(() => {
 
   return (
     <Skeleton
-      className="flex gap-3 p-3 pr-4 rounded-2xl"
+      className="flex gap-3 p-3 pr-4 rounded-2xl opacity-50"
       style={{ minHeight }}
     />
   )
