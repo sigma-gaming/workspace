@@ -23,6 +23,10 @@ const reset = createEvent()
 const getLastMessagesFx = createApiEffect(gamesApi.chat.getLastMessages.$get)
 const sendMessageFx = createApiEffect(gamesApi.chat.sendMessage.$post)
 
+const $loadingMessages = createStore(true)
+  .on(getLastMessagesFx.done, () => false)
+  .reset(reset)
+
 const { receivedData: messageReceived } = invoke(() => {
   return subscriptionFactory({ ws: gamesWs, event: 'chat/message' })
 })
@@ -41,7 +45,7 @@ export const form = createForm({
   schema: ChatValidation.MessagePayloadSchema.omit({ trackingId: true }),
 })
 
-type ExtendedMessage = ChatMessageSelect & {
+export type ExtendedMessage = ChatMessageSelect & {
   temporary?: boolean
 }
 
@@ -161,4 +165,5 @@ export const $$chatWidget = {
   fields,
   $messages,
   $messageIds,
+  $loadingMessages,
 }
