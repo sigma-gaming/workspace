@@ -1,5 +1,4 @@
 import path from 'path'
-import { sentryWebpackPlugin } from '@sentry/webpack-plugin'
 import { loadConfig } from 'tsconfig-paths'
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
 import webpack from 'webpack'
@@ -23,21 +22,6 @@ const config: webpack.Configuration = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
   },
-  plugins: [
-    sentryWebpackPlugin({
-      disable:
-        process.env.NODE_ENV !== 'production' ||
-        process.env.SENTRY_PROJECT !== 'games-api',
-      org: 'sigma-games',
-      project: 'games-api',
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      release: {
-        name: process.env.SENTRY_RELEASE,
-        setCommits: { auto: true },
-        inject: true,
-      },
-    }),
-  ],
   externals: [
     nodeExternals({
       allowlist: (path) => {

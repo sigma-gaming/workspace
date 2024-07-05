@@ -24,16 +24,7 @@ export default defineConfig({
     }),
     tsconfigPaths(),
     sentryVitePlugin({
-      disable:
-        process.env.NODE_ENV !== 'production' ||
-        process.env.SENTRY_PROJECT !== 'games-app',
-      org: 'sigma-games',
-      project: 'games-app',
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      release: {
-        name: process.env.SENTRY_RELEASE,
-        setCommits: { auto: true },
-      },
+      disable: process.env.NODE_ENV !== 'production',
       bundleSizeOptimizations: {
         excludeReplayIframe: true,
         excludeReplayShadowDom: true,
