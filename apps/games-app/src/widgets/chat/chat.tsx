@@ -80,7 +80,7 @@ const MessageList = () => {
   const messagesCount = useRef(0)
   const stickyBottom = useRef(true)
   const initializedRef = useRef(false)
-  const loadingMessages = true
+  const loadingMessages = useUnit($$chatWidget.$loadingMessages)
 
   const autoscroll = useCallback(() => {
     const container = containerRef.current
