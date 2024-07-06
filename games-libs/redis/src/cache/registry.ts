@@ -30,7 +30,7 @@ export class CacheRegistry {
     @inject(CacheVersionToken) version: string,
   ) {
     this.budget = this.cacheService.entity<void, BudgetSelect>({
-      keygen: () => `global:budget`,
+      keygen: () => `${version}:global:budget`,
       options: {
         ttl: 60 * 15, // 15 minutes
       },
