@@ -135,16 +135,14 @@ const PossibleWinAmount = () => {
   const sides = useUnit($$dicePage.fields.sides.$value)
   const possibleWinAmount = useUnit($$dicePage.$possibleWinAmount)
 
-  if (sides.length === 0 || sides.length === 6) {
-    return null
-  }
-
   return (
     <div className="flex items-center justify-center gap-0.5">
       <IconFlame className="text-[#FF7A00] w-6 h-6" />
       <p className="font-interface text-sm">
         Возможный выигрыш:{' '}
-        <span className="text-green-400 font-[500]">{possibleWinAmount}</span>
+        <span className="text-green-400 font-[500]">
+          {sides.length === 0 || sides.length === 6 ? '?' : possibleWinAmount}
+        </span>
       </p>
     </div>
   )
@@ -154,6 +152,7 @@ const SidesSelect = () => {
   const sides = useUnit($$dicePage.fields.sides.$value)
   const update = useUnit($$dicePage.fields.sides.update)
   const autoplaying = useUnit($$dicePage.$autoplaying)
+  const errors = useUnit($$dicePage.form.$errors)
 
   const options = [
     { label: '1', value: '1' },
@@ -183,6 +182,7 @@ const SidesSelect = () => {
             <Dice
               className={sides.includes(value) ? 'opacity-100' : 'opacity-25'}
               side={Number(value)}
+              error={Boolean(errors.sides[0])}
             />
           </button>
         </li>
@@ -194,14 +194,16 @@ const SidesSelect = () => {
 interface DiceProps {
   className?: string
   side: number
+  error?: boolean
 }
 
-const Dice = ({ className, side }: DiceProps) => {
+const Dice = ({ className, side, error }: DiceProps) => {
   return (
     <div
       className={clsx(
         className,
-        'relative flex justify-center items-center w-full aspect-square bg-white rounded-[16%] select-none',
+        'relative flex justify-center items-center w-full aspect-square rounded-[16%] select-none',
+        error ? 'bg-red-200' : 'bg-white',
       )}
     >
       {side === 1 && (
