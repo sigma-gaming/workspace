@@ -1,9 +1,7 @@
-const formatter = new Intl.NumberFormat('ru-RU', {
-  style: 'currency',
-  currency: 'RUB',
+const formatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 })
 
-export function formatRUB(number: number | bigint) {
+export function formatGem(number: number | bigint) {
   return formatter.format(number)
 }

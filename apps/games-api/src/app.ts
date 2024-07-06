@@ -1,11 +1,11 @@
 import { baseApp } from './app-base'
-import { authRouter } from './router/auth'
-import { balanceRouter } from './router/balance'
-import { chatRouter } from './router/chat'
-import { gamesRouter } from './router/games'
-import { meRouter } from './router/me'
-import { notificationsRouter } from './router/notifications'
-import { settingsRouter } from './router/settings'
+import { authRouter } from './routes/auth'
+import { balanceRouter } from './routes/balance'
+import { chatRouter } from './routes/chat'
+import { gamesRouter } from './routes/games'
+import { meRouter } from './routes/me'
+import { notificationsRouter } from './routes/notifications'
+import { settingsRouter } from './routes/settings'
 
 export const app = baseApp
   .route('/notifications', notificationsRouter)

@@ -5,7 +5,7 @@ import {
 } from '@core/exceptions'
 import { loggerService } from '@core/logger'
 import { Game, TransactionType } from '@dbs/games-schema'
-import { rub } from '@games/model'
+import { calculateDiceWinAmount, gem } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import {
   budgetService,
@@ -17,14 +17,11 @@ import { Hono } from 'hono'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 
-const rtpMultiplier = 0.95
-
 export async function runGame(bet: number, sides: number[]) {
   const unwantedLoss = await budgetService.getUnwantedLoss()
   const maxLoss = await budgetService.getMaxLoss()
   const uniqueSides = new Set(sides)
-  const multiplier = (6 / uniqueSides.size) * rtpMultiplier
-  const winAmount = Math.ceil(bet * multiplier - bet)
+  const winAmount = calculateDiceWinAmount(bet, sides)
 
   let tries = 1
   if (winAmount > unwantedLoss) tries = 2
@@ -59,7 +56,7 @@ export const playDiceRoute = new Hono().post(
     const session = await sessionService.getHonoSession(ctx.req)
     const user = sessionService.getUser(session)
 
-    if (payload.bet < rub(1)) {
+    if (payload.bet < gem(1)) {
       throw new BadRequestException({
         path: ['bet'],
         message: 'Минимальная ставка - 1 рубль',

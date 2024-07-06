@@ -1,6 +1,7 @@
 export * from './account'
 export * from './balance'
 export * from './chat'
+export * from './games'
 export * from './notifications'
 export * from './profile'
 export * from './session'

@@ -1,5 +1,6 @@
 import { createSingletonProxy } from '@core/di'
 import {
+  BudgetSelect,
   ChatMessageSelect,
   NotificationSelect,
   TransactionSelect,
@@ -12,6 +13,7 @@ export const CacheVersionToken: InjectionToken<string> = Symbol('CacheVersion')
 
 @singleton()
 export class CacheRegistry {
+  budget: GlobalEntity<BudgetSelect>
   budgetAvailable: GlobalEntity<number>
   budgetMaxLoss: GlobalEntity<number>
   budgetUnwantedLoss: GlobalEntity<number>
@@ -27,6 +29,13 @@ export class CacheRegistry {
     private cacheService: CacheService,
     @inject(CacheVersionToken) version: string,
   ) {
+    this.budget = this.cacheService.entity<void, BudgetSelect>({
+      keygen: () => `global:budget`,
+      options: {
+        ttl: 60 * 15, // 15 minutes
+      },
+    })
+
     this.budgetAvailable = this.cacheService.entity<void, number>({
       keygen: () => `global:budgetAvailable`,
       options: {

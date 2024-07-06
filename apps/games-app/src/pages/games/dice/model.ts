@@ -2,8 +2,9 @@ import { BadRequestException } from '@core/exceptions'
 import { createField, createForm } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
 import { createMutation } from '@farfetched/core'
+import { calculateDiceWinAmount } from '@games/model'
 import { Rive } from '@rive-app/react-canvas'
-import { attach, createEvent, createStore, sample } from 'effector'
+import { attach, combine, createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$balance } from '../../../entities/balance'
@@ -71,15 +72,21 @@ export const form = createForm({
   schema: z.object({
     bet: z
       .number()
-      .min(1, 'Минимальная ставка - 1 рубль')
+      .min(1, 'Минимальная ставка - 1 гем')
       .step(0.01, 'Ставка должна быть кратна 0.01')
-      .transform((rubles) => Math.floor(rubles * 100)),
+      .transform((gems) => Math.floor(gems * 100)),
     sides: z
       .array(z.string().transform(Number))
       .min(1, 'Выберите как минимум одну грань')
       .max(6),
   }),
 })
+
+const $possibleWinAmount = combine(
+  fields.bet.$value,
+  fields.sides.$value.map((sides) => sides.map(Number)),
+  (bet, sides) => calculateDiceWinAmount(bet * 100, sides) / 100,
+)
 
 const showActionNotAllowed = $$notifications.show.prepend(() => ({
   title: 'Действие недоступно',
@@ -195,6 +202,7 @@ sample({
 export const $$dicePage = {
   fields,
   form,
+  $possibleWinAmount,
   $playing,
   $autoplaying,
   $animationPlaying,

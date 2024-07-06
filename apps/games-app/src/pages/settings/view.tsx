@@ -94,7 +94,7 @@ const Profile = () => {
 
       <Skeleton className="sm:w-fit" visible={!loaded}>
         <TextInput
-          label="Имя в профиле"
+          label="Имя в профиле и в чате"
           description="Переопределить имя из социальной сети"
           placeholder="Введите имя"
           value={name}

@@ -9,6 +9,7 @@ import {
   Title,
 } from '@mantine/core'
 import { useRive } from '@rive-app/react-canvas'
+import { IconFlame } from '@tabler/icons-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { memo, useEffect } from 'react'
@@ -46,6 +47,7 @@ export const DiceGamePageView = () => {
   const playing = useUnit($$dicePage.$playing)
   const autoplaying = useUnit($$dicePage.$autoplaying)
   const animationPlaying = useUnit($$dicePage.$animationPlaying)
+  const possibleWinAmount = useUnit($$dicePage.$possibleWinAmount)
 
   return (
     <Card
@@ -105,6 +107,18 @@ export const DiceGamePageView = () => {
           <InputLabel>Грани</InputLabel>
           <SidesSelect />
           {errors.sides[0] && <InputError>{errors.sides[0]}</InputError>}
+
+          {possibleWinAmount > 0 && (
+            <div className="flex items-center justify-center gap-0.5">
+              <IconFlame className="text-[#FF7A00] w-6 h-6" />
+              <p className="font-interface text-sm">
+                Возможный выигрыш:{' '}
+                <span className="text-green-400 font-[500]">
+                  {possibleWinAmount}
+                </span>
+              </p>
+            </div>
+          )}
 
           <div className="flex flex-col gap-3 mt-2">
             <Button

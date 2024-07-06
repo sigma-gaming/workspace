@@ -4,6 +4,7 @@ import { Button, Menu, Modal, rem, Skeleton, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconCoins,
+  IconDiamondFilled,
   IconLoader2,
   IconLogout,
   IconSettings,
@@ -19,7 +20,7 @@ import { $$profile } from '../../entities/profile/index.ts'
 import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
-import { formatRUB } from '../../shared/lib/format/currency.ts'
+import { formatGem } from '../../shared/lib/format/currency.ts'
 
 function useAvatarSize() {
   const fromLg = useMedia({ from: 'lg' })
@@ -62,13 +63,16 @@ export const MiniProfile = () => {
               </Text>
             </Skeleton>
             <Skeleton visible={balanceLoading} width="fit-content">
-              <Text
-                className="font-interface !leading-none text-lg lg:text-xl"
-                fw={500}
-                c="green.6"
-              >
-                <AnimatedBalance />
-              </Text>
+              <div className="flex items-center justify-end gap-1.5">
+                <Text
+                  className="font-interface !leading-none text-lg lg:text-xl"
+                  fw={500}
+                  c="green.6"
+                >
+                  <AnimatedBalance />
+                </Text>
+                <IconDiamondFilled className="w-6 h-6 text-primary-4 -translate-y-[1px]" />
+              </div>
             </Skeleton>
           </div>
 
@@ -213,14 +217,16 @@ const AnimatedBalance = () => {
     }
 
     if (previousRef.current === current) {
-      node.textContent = formatRUB(current / 100)
+      const text = formatGem(current / 100)
+      node.textContent = text
       return
     }
 
     const controls = animate(previousRef.current, current, {
-      duration: 0.25,
+      duration: 0.5,
       onUpdate(value) {
-        node.textContent = formatRUB(value / 100)
+        const text = formatGem(value / 100)
+        node.textContent = text
       },
     })
 
@@ -228,5 +234,5 @@ const AnimatedBalance = () => {
     return () => controls.stop()
   }, [loaded, current])
 
-  return <span ref={nodeRef} />
+  return <span style={{ display: 'inline-block' }} ref={nodeRef} />
 }

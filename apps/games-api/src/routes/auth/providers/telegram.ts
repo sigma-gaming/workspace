@@ -96,7 +96,14 @@ export const signInViaTelegramRoute = new Hono().post(
       providerUsername: tgAuthResult.username,
       providerUserFirstName: tgAuthResult.first_name,
       providerUserLastName: tgAuthResult.last_name,
-      providerUserImage: tgAuthResult.photo_url,
+    }
+
+    if (tgAuthResult.photo_url) {
+      const response = await fetch(tgAuthResult.photo_url)
+
+      if (response.ok) {
+        accountSharedInput.providerUserImage = tgAuthResult.photo_url
+      }
     }
 
     /**
