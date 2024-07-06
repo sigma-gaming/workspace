@@ -11,11 +11,11 @@ const authenticateFx = createApiEffect(
 invoke($$socialAuthentication.factory, {
   clock: routes.vkCallback.opened,
   authenticate: async () => {
-    const [hash, payloadEncoded] = window.location.hash.split('&payload=')
-    const returnPath = decodeURIComponent(hash.replace('#path=', ''))
+    const query = new URLSearchParams(location.search)
+    const payloadEncoded = query.get('payload')
+    if (!payloadEncoded) throw new Error('No VK payload found')
     const payload = decodeURIComponent(payloadEncoded)
     const { status } = await authenticateFx({ payload })
-    if (status !== 'success') throw new Error('Authentication failed')
-    return { returnPath }
+    if (status !== 'success') throw new Error('VK authentication failed')
   },
 })

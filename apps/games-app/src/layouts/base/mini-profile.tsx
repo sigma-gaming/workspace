@@ -184,10 +184,10 @@ export const ExpiredProfile = () => {
         centered
       >
         <div className="flex flex-col gap-2">
-          <VkButton size="md" fullWidth>
+          <VkButton flow="sign-in" size="md" fullWidth>
             Войти через VK ID
           </VkButton>
-          <TelegramButton size="md" fullWidth>
+          <TelegramButton flow="sign-in" size="md" fullWidth>
             Войти через Telegram
           </TelegramButton>
         </div>

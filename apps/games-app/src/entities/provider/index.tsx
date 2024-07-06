@@ -20,45 +20,64 @@ export const ProviderInfoMap: Record<AccountProvider, ProviderInfo> = {
   },
 }
 
-function defaultReturnTo() {
-  if (typeof window === 'undefined') return '/'
-  return window.location.pathname + window.location.search
+export type AuthFlow = 'sign-in' | 'connect'
+
+interface Meta {
+  flow: AuthFlow
+  returnUrl: string
 }
 
-export function createTelegramUrl(returnTo = defaultReturnTo()) {
+const META_KEY = 'auth/meta'
+
+function saveMeta({ flow }: Pick<Meta, 'flow'>) {
+  if (typeof window === 'undefined') return '/'
+  const returnUrl = window.location.pathname + window.location.search
+  const meta: Meta = { flow, returnUrl }
+  window.localStorage.setItem(META_KEY, JSON.stringify(meta))
+}
+
+export function getMeta() {
+  if (typeof window === 'undefined') return null
+  const json = window.localStorage.getItem(META_KEY)
+  if (!json) return null
+  return JSON.parse(json) as Meta
+}
+
+export function clearMeta() {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(META_KEY)
+}
+
+export function createTelegramUrl() {
   const params = new URLSearchParams()
   params.set('bot_id', env.telegram.botId)
   params.set('origin', env.gamesApp.url)
   params.set('embed', '0')
   params.set('request_access', 'write')
-  params.set(
-    'return_to',
-    `${env.gamesApp.url}/callbacks/telegram?path=${returnTo}`,
-  )
-
+  params.set('return_to', `${env.gamesApp.url}/callbacks/telegram`)
   return `https://oauth.telegram.org/auth?${params.toString()}`
 }
 
-export function createVkUrl(returnTo = defaultReturnTo()) {
+export function createVkUrl() {
   const params = new URLSearchParams()
   params.set('uuid', v4())
   params.set('app_id', env.vk.appId)
   params.set('response_type', 'silent_token')
-  params.set(
-    'redirect_uri',
-    `${env.gamesApp.url}/callbacks/vk/#path=${returnTo}`,
-  )
-
+  params.set('redirect_uri', `${env.gamesApp.url}/callbacks/vk`)
   return `https://id.vk.com/auth?${params.toString()}`
 }
 
+type AuthButtonProps = Partial<LinkButtonProps> & Pick<Meta, 'flow'>
+
 export const VkButton = ({
+  flow,
   children = 'Войти через VK ID',
   ...rest
-}: Partial<LinkButtonProps>) => {
+}: AuthButtonProps) => {
   return (
     <LinkButton
       to={createVkUrl()}
+      onClick={() => saveMeta({ flow })}
       color="#3375F6"
       className="!outline-[#3375F6]"
       leftSection={<Icons.Vk />}
@@ -72,12 +91,14 @@ export const VkButton = ({
 }
 
 export const TelegramButton = ({
+  flow,
   children = 'Войти через Telegram',
   ...rest
-}: Partial<LinkButtonProps>) => {
+}: AuthButtonProps) => {
   return (
     <LinkButton
       to={createTelegramUrl()}
+      onClick={() => saveMeta({ flow })}
       color="#51A2DD"
       className="!outline-[#51A2DD]"
       leftSection={<Icons.Telegram />}
