@@ -204,6 +204,12 @@ export const ExpiredProfile = () => {
   )
 }
 
+function getFractionDigits(number: number) {
+  if (number % 10 !== 0) return 2
+  if (number % 100 !== 0) return 1
+  return 0
+}
+
 const AnimatedBalance = () => {
   const current = useUnit($$balance.$available)
   const loaded = useUnit($$balance.$loaded)
@@ -226,10 +232,15 @@ const AnimatedBalance = () => {
       return
     }
 
+    const fractionDigits = Math.max(
+      getFractionDigits(current),
+      getFractionDigits(previousRef.current),
+    )
+
     const controls = animate(previousRef.current, current, {
       duration: 0.5,
       onUpdate(value) {
-        const text = formatGem(value / 100)
+        const text = formatGem(value / 100, fractionDigits)
         node.textContent = text
       },
     })
