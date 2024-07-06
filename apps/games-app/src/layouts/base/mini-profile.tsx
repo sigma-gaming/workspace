@@ -62,7 +62,11 @@ export const MiniProfile = () => {
                 Баланс
               </Text>
             </Skeleton>
-            <Skeleton visible={balanceLoading} width="fit-content">
+            <Skeleton
+              visible={balanceLoading}
+              width="fit-content"
+              className="min-w-[100px]"
+            >
               <div className="flex items-center justify-end gap-1.5">
                 <Text
                   className="font-interface !leading-none text-lg lg:text-xl"
