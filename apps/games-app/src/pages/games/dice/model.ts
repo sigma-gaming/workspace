@@ -78,7 +78,7 @@ export const form = createForm({
     sides: z
       .array(z.string().transform(Number))
       .min(1, 'Выберите как минимум одну грань')
-      .max(6),
+      .max(5, 'Выберите не более пяти граней'),
   }),
 })
 

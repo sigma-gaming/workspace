@@ -47,7 +47,7 @@ export const playDiceRoute = new Hono().post(
     'json',
     z.object({
       bet: z.number().int(),
-      sides: z.array(z.number().int().min(1).max(6)).min(1).max(6),
+      sides: z.array(z.number().int().min(1).max(6)).min(1).max(5),
     }),
   ),
   async (ctx) => {
@@ -59,7 +59,7 @@ export const playDiceRoute = new Hono().post(
     if (payload.bet < gem(1)) {
       throw new BadRequestException({
         path: ['bet'],
-        message: 'Минимальная ставка - 1 рубль',
+        message: 'Минимальная ставка - 1 гем',
       })
     }
 
@@ -89,6 +89,7 @@ export const playDiceRoute = new Hono().post(
         payload.bet,
         payload.sides,
       )
+
       const amount = hasWon ? winAmount : -payload.bet
       const rtp = amount + payload.bet
       const won = hasWon ? winAmount : 0

@@ -47,7 +47,6 @@ export const DiceGamePageView = () => {
   const playing = useUnit($$dicePage.$playing)
   const autoplaying = useUnit($$dicePage.$autoplaying)
   const animationPlaying = useUnit($$dicePage.$animationPlaying)
-  const possibleWinAmount = useUnit($$dicePage.$possibleWinAmount)
 
   return (
     <Card
@@ -108,17 +107,7 @@ export const DiceGamePageView = () => {
           <SidesSelect />
           {errors.sides[0] && <InputError>{errors.sides[0]}</InputError>}
 
-          {possibleWinAmount > 0 && (
-            <div className="flex items-center justify-center gap-0.5">
-              <IconFlame className="text-[#FF7A00] w-6 h-6" />
-              <p className="font-interface text-sm">
-                Возможный выигрыш:{' '}
-                <span className="text-green-400 font-[500]">
-                  {possibleWinAmount}
-                </span>
-              </p>
-            </div>
-          )}
+          <PossibleWinAmount />
 
           <div className="flex flex-col gap-3 mt-2">
             <Button
@@ -139,6 +128,25 @@ export const DiceGamePageView = () => {
         </div>
       </div>
     </Card>
+  )
+}
+
+const PossibleWinAmount = () => {
+  const sides = useUnit($$dicePage.fields.sides.$value)
+  const possibleWinAmount = useUnit($$dicePage.$possibleWinAmount)
+
+  if (sides.length === 0 || sides.length === 6) {
+    return null
+  }
+
+  return (
+    <div className="flex items-center justify-center gap-0.5">
+      <IconFlame className="text-[#FF7A00] w-6 h-6" />
+      <p className="font-interface text-sm">
+        Возможный выигрыш:{' '}
+        <span className="text-green-400 font-[500]">{possibleWinAmount}</span>
+      </p>
+    </div>
   )
 }
 
