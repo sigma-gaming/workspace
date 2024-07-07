@@ -1,8 +1,9 @@
 {
   "name": "@apis/control-api",
+  "private": true,
+  "type": "module",
   "version": "0.0.0",
   "license": "UNLICENSED",
-  "private": true,
   "main": "./src/client.ts",
   "module": "./src/client.ts",
   "types": "./src/client.ts",

@@ -1,10 +1,12 @@
-import path from 'path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { loadConfig } from 'tsconfig-paths'
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
-import webpack from 'webpack'
 import nodeExternals from 'webpack-node-externals'
 
-const tsconfigPath = path.resolve(__dirname, './tsconfig.json')
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+const tsconfigPath = resolve(__dirname, './tsconfig.json')
 const loadedTsconfig = loadConfig(tsconfigPath)
 
 if (loadedTsconfig.resultType !== 'success') {
@@ -13,14 +15,19 @@ if (loadedTsconfig.resultType !== 'success') {
 
 const internalModules = Object.keys(loadedTsconfig.paths)
 
-const config: webpack.Configuration = {
-  mode: 'none',
+/** @type {import('webpack').Configuration} */
+const config = {
+  mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
   devtool: process.env.NODE_ENV === 'development' ? 'eval' : 'source-map',
   entry: './src/main.ts',
-  target: 'node',
+  target: 'es2023',
+  experiments: {
+    outputModule: true,
+  },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: resolve(__dirname, 'dist'),
     filename: '[name].js',
+    module: true,
   },
   externals: [
     nodeExternals({
@@ -36,9 +43,10 @@ const config: webpack.Configuration = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
+    conditionNames: ['import', 'node'],
     plugins: [
       new TsconfigPathsPlugin({
-        configFile: path.resolve(__dirname, './tsconfig.json'),
+        configFile: tsconfigPath,
       }),
     ],
   },
@@ -50,15 +58,11 @@ const config: webpack.Configuration = {
           {
             loader: 'ts-loader',
             options: {
-              configFile: path.resolve(__dirname, './tsconfig.json'),
+              configFile: tsconfigPath,
             },
           },
         ],
         exclude: /node_modules/,
-      },
-      {
-        test: /\.node$/,
-        loader: 'node-loader',
       },
     ],
   },

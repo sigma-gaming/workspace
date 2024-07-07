@@ -1,5 +1,7 @@
 {
   "name": "@apis/games-api",
+  "private": true,
+  "type": "module",
   "main": "./src/client.ts",
   "module": "./src/client.ts",
   "types": "./src/client.ts",
@@ -17,16 +19,16 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
+    "@core/di": "workspace:*",
+    "@core/events": "workspace:*",
+    "@core/exceptions": "workspace:*",
+    "@core/io-client": "workspace:*",
+    "@core/logger": "workspace:*",
     "@dbs/games-db": "workspace:*",
     "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",
     "@games/redis": "workspace:*",
     "@games/services": "workspace:*",
-    "@core/di": "workspace:*",
-    "@core/exceptions": "workspace:*",
-    "@core/logger": "workspace:*",
-    "@tooling/env": "workspace:*",
-    "@core/events": "workspace:*",
-    "@core/io-client": "workspace:*"
+    "@tooling/env": "workspace:*"
   }
 }

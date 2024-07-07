@@ -1,10 +1,10 @@
-import path from 'path'
+import { resolve } from 'node:path'
 import { loadConfig } from 'tsconfig-paths'
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
-import webpack from 'webpack'
+import { Configuration } from 'webpack'
 import nodeExternals from 'webpack-node-externals'
 
-const tsconfigPath = path.resolve(__dirname, './tsconfig.json')
+const tsconfigPath = resolve(__dirname, './tsconfig.json')
 const loadedTsconfig = loadConfig(tsconfigPath)
 
 if (loadedTsconfig.resultType !== 'success') {
@@ -13,13 +13,13 @@ if (loadedTsconfig.resultType !== 'success') {
 
 const internalModules = Object.keys(loadedTsconfig.paths)
 
-const config: webpack.Configuration = {
-  mode: 'none',
-  devtool: process.env.NODE_ENV === 'development' ? 'eval' : false,
+const config: Configuration = {
+  mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+  devtool: process.env.NODE_ENV === 'development' ? 'eval' : 'source-map',
   entry: './src/main.ts',
-  target: 'node',
+  target: 'node20',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: resolve(__dirname, 'dist'),
     filename: '[name].js',
   },
   externals: [
@@ -31,34 +31,32 @@ const config: webpack.Configuration = {
   ],
   externalsPresets: { node: true },
   ignoreWarnings: [/^(?!CriticalDependenciesWarning$)/],
-  optimization: {
-    nodeEnv: false,
-  },
+  optimization: { nodeEnv: false },
   resolve: {
     extensions: ['.ts', '.js'],
     plugins: [
       new TsconfigPathsPlugin({
-        configFile: path.resolve(__dirname, './tsconfig.json'),
+        configFile: tsconfigPath,
       }),
     ],
   },
   module: {
     rules: [
       {
+        test: /\.node$/,
+        loader: 'node-loader',
+      },
+      {
         test: /.ts$/,
         use: [
           {
             loader: 'ts-loader',
             options: {
-              configFile: path.resolve(__dirname, './tsconfig.json'),
+              configFile: tsconfigPath,
             },
           },
         ],
         exclude: /node_modules/,
-      },
-      {
-        test: /\.node$/,
-        loader: 'node-loader',
       },
     ],
   },

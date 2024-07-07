@@ -1,8 +1,8 @@
 {
   "name": "@apps/maintenance-app",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "version": "0.0.0",
   "scripts": {
     "copy-env": "copy-env",
     "create-env": "node ./scripts/create-env.js",
