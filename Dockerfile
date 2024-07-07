@@ -19,7 +19,6 @@ WORKDIR /app
 RUN apk update
 RUN apk add nginx
 COPY ./scripts/inject-env.mjs /scripts/inject-env.mjs
-COPY ./config/app-nginx.conf /etc/nginx/nginx.conf
 CMD node /scripts/inject-env.mjs; nginx -g "daemon off;"
 
 FROM build AS games-app-build
@@ -35,14 +34,17 @@ RUN pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sen
 
 FROM app-base AS games-app
 WORKDIR /app
+COPY ./apps/games-app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=games-app-build /build/apps/games-app/dist ./
 
 FROM app-base AS control-app
 WORKDIR /app
+COPY ./apps/control-app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /build/apps/control-app/dist ./
 
 FROM app-base AS maintenance-app
 WORKDIR /app
+COPY ./apps/maintenance-app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /build/apps/maintenance-app/dist ./
 
 # APIs
