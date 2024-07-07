@@ -1,5 +1,8 @@
 import './setup'
 import './shared/sentry/init'
+import { readFileSync } from 'fs'
+import { createServer } from 'https'
+import { join } from 'path'
 import { shutdownServices } from '@core/di'
 import { createErrorHandler } from '@core/exceptions'
 import { logger, loggerService } from '@core/logger'
@@ -8,16 +11,9 @@ import { maintenanceCache } from '@games/redis'
 import { env } from '@games/services'
 import { serve } from '@hono/node-server'
 import { HTTPException } from 'hono/http-exception'
-import { readFileSync } from 'node:fs'
-import { createServer } from 'node:https'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'url'
 import { app } from './app'
 import { maintenanceEvents } from './events/maintenance'
 import { sentry } from './shared/sentry'
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 app.get('/health', async (ctx) => {
   return ctx.text('Healthy')
