@@ -78,7 +78,7 @@ jobs:
         uses: release-kit/regex@v1
         with:
           string: ${{ matrix.packageName }}
-          pattern: '^@?(?<folder>.*)\/(?<name>.*)$'
+          pattern: '^@?(?<scope>.*)\/(?<name>.*)$'
 
       - name: Get current unix timestamp
         id: timestamp
@@ -89,10 +89,10 @@ jobs:
           docker build . --target ${{ steps.parse.outputs.name }} \
             --build-arg sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }} \
             --build-arg sentry_release=dev-${{ steps.timestamp.outputs.timestamp }} \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest \
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
 
       - name: Push image
         run: |-
-          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:latest
-          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.folder }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}

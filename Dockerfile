@@ -78,6 +78,13 @@ WORKDIR /workspace
 COPY --from=build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
 
+# Migrations
+
+FROM base AS games-db-migration
+WORKDIR /workspace
+COPY --from=build /build ./
+CMD [ "node", "apps/games-db-migration/dist/main.js" ]
+
 # GCR Cleaner
 
 FROM base AS gcloud-sdk-base

@@ -1,4 +1,3 @@
-import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -23,13 +22,6 @@ export default defineConfig({
       babel: { babelrc: true },
     }),
     tsconfigPaths(),
-    sentryVitePlugin({
-      disable: process.env.NODE_ENV !== 'production',
-      bundleSizeOptimizations: {
-        excludeReplayIframe: true,
-        excludeReplayShadowDom: true,
-      },
-    }),
   ],
   build: {
     sourcemap: true,
