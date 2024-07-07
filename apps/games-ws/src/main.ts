@@ -69,6 +69,10 @@ gamesPubsubs.notifications.subscribe((payload) => {
   }
 })
 
+gamesPubsubs.maintenanceStarted.subscribe(() => {
+  sendToAll('maintenance/started')
+})
+
 /**
  * Setup
  */

@@ -13,7 +13,6 @@ import { serve } from '@hono/node-server'
 import { sql } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 import { app } from './app'
-import { maintenanceEvents } from './events/maintenance'
 import { sentry } from './shared/sentry'
 
 app.get('/healthy', async (ctx) => {
@@ -31,7 +30,6 @@ app.get('/ready', async (ctx) => {
   }
 
   if (await maintenanceCache.isMaintenanceMode()) {
-    maintenanceEvents.emit('started')
     throw new HTTPException(503)
   }
 

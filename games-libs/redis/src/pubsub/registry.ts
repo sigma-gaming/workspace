@@ -7,6 +7,7 @@ import { PubSub, PubSubService } from './service'
 export class PubSubRegistry {
   notifications: PubSub<NotificationSelect>
   chatMessages: PubSub<ChatMessageSelect>
+  maintenanceStarted: PubSub<void>
 
   constructor(pubsubService: PubSubService) {
     this.notifications = pubsubService.create<NotificationSelect>({
@@ -15,6 +16,10 @@ export class PubSubRegistry {
 
     this.chatMessages = pubsubService.create<ChatMessageSelect>({
       channelName: 'chat-messages',
+    })
+
+    this.maintenanceStarted = pubsubService.create<void>({
+      channelName: 'maintenance-started',
     })
   }
 }
