@@ -84,9 +84,22 @@ app.get('/healthy', (res) => {
 })
 
 app.get('/ready', async (res) => {
+  let aborted = false
+
   res.onAborted(() => {
+    aborted = true
     res.writeStatus('503 Service Unavailable').end()
   })
+
+  const wrapReply = (callback: () => void) => {
+    if (aborted) {
+      return
+    }
+
+    res.cork(() => {
+      callback()
+    })
+  }
 
   const redisReady = await gamesRedis
     .ping()
@@ -94,7 +107,7 @@ app.get('/ready', async (res) => {
     .catch(() => false)
 
   if (!redisReady) {
-    res.cork(() => {
+    wrapReply(() => {
       res.writeStatus('503 Service Unavailable').end()
     })
 
@@ -102,14 +115,14 @@ app.get('/ready', async (res) => {
   }
 
   if (await maintenanceCache.isMaintenanceMode()) {
-    res.cork(() => {
+    wrapReply(() => {
       res.writeStatus('503 Service Unavailable').end()
     })
 
     return
   }
 
-  res.cork(() => {
+  wrapReply(() => {
     res.writeStatus('200 OK').end('Yes')
   })
 })
