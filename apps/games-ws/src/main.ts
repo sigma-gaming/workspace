@@ -97,12 +97,16 @@ app.get('/ready', async (res) => {
     res.cork(() => {
       res.writeStatus('503 Service Unavailable').end()
     })
+
+    return
   }
 
   if (await maintenanceCache.isMaintenanceMode()) {
     res.cork(() => {
       res.writeStatus('503 Service Unavailable').end()
     })
+
+    return
   }
 
   res.cork(() => {
