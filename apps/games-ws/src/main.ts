@@ -1,7 +1,7 @@
 import './setup'
 import { shutdownServices } from '@core/di'
 import { logger } from '@core/logger'
-import { gamesPubsubs, gamesRedis } from '@games/redis'
+import { gamesPubsubs, gamesRedis, maintenanceCache } from '@games/redis'
 import { env, sessionService } from '@games/services'
 import { parse } from 'cookie'
 import { Server } from 'socket.io'
@@ -93,12 +93,19 @@ app.get('/ready', async (res) => {
     .then(() => true)
     .catch(() => false)
 
-  res.cork(() => {
-    if (!redisReady) {
+  if (!redisReady) {
+    res.cork(() => {
       res.writeStatus('503 Service Unavailable').end()
-      return
-    }
+    })
+  }
 
+  if (await maintenanceCache.isMaintenanceMode()) {
+    res.cork(() => {
+      res.writeStatus('503 Service Unavailable').end()
+    })
+  }
+
+  res.cork(() => {
     res.writeStatus('200 OK').end('Yes')
   })
 })
