@@ -6,7 +6,6 @@ import { join } from 'path'
 import { shutdownServices } from '@core/di'
 import { createErrorHandler } from '@core/exceptions'
 import { logger, loggerService } from '@core/logger'
-import { migrateGamesDB } from '@dbs/games-db'
 import { maintenanceCache } from '@games/redis'
 import { env } from '@games/services'
 import { serve } from '@hono/node-server'
@@ -36,58 +35,56 @@ app.onError(
   }),
 )
 
-migrateGamesDB(env.postgres.url).then(() => {
-  type Options = Parameters<typeof serve>[0]
+type Options = Parameters<typeof serve>[0]
 
-  const options: Options = {
-    fetch: app.fetch,
-    port: 5050,
+const options: Options = {
+  fetch: app.fetch,
+  port: 5050,
+}
+
+if (env.isDev) {
+  options.createServer = createServer
+
+  options.serverOptions = {
+    key: readFileSync(join(__dirname, '../../../ssl/local.key')),
+    cert: readFileSync(join(__dirname, '../../../ssl/local.crt')),
   }
+}
+
+const server = serve(options, () => {
+  logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
+})
+
+let exited = false
+
+async function handleExit() {
+  if (exited) return
+  exited = true
+
+  logger.info('Exit signal received')
 
   if (env.isDev) {
-    options.createServer = createServer
-
-    options.serverOptions = {
-      key: readFileSync(join(__dirname, '../../../ssl/local.key')),
-      cert: readFileSync(join(__dirname, '../../../ssl/local.crt')),
-    }
+    logger.info('Exiting..')
+    process.exit(0)
   }
 
-  const server = serve(options, () => {
-    logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
+  setTimeout(() => {
+    logger.info('Timeout, exiting..')
+    process.exit(0)
+  }, 5000)
+
+  server.close(async () => {
+    logger.info('Server closed')
+
+    await sentry?.close(3000)
+
+    logger.info('Cleaning up..')
+    await shutdownServices()
+
+    console.info('Exiting..')
+    process.exit(0)
   })
+}
 
-  let exited = false
-
-  async function handleExit() {
-    if (exited) return
-    exited = true
-
-    logger.info('Exit signal received')
-
-    if (env.isDev) {
-      logger.info('Exiting..')
-      process.exit(0)
-    }
-
-    setTimeout(() => {
-      logger.info('Timeout, exiting..')
-      process.exit(0)
-    }, 5000)
-
-    server.close(async () => {
-      logger.info('Server closed')
-
-      await sentry?.close(3000)
-
-      logger.info('Cleaning up..')
-      await shutdownServices()
-
-      console.info('Exiting..')
-      process.exit(0)
-    })
-  }
-
-  process.on('SIGTERM', handleExit)
-  process.on('SIGINT', handleExit)
-})
+process.on('SIGTERM', handleExit)
+process.on('SIGINT', handleExit)

@@ -6,3 +6,5 @@ if (!process.env.POSTGRES_URL) {
 }
 
 await migrateGamesDB(process.env.POSTGRES_URL)
+
+console.info('Migration finished')
