@@ -5,16 +5,38 @@ import { join } from 'path'
 import { shutdownServices } from '@core/di'
 import { createErrorHandler } from '@core/exceptions'
 import { logger, loggerService } from '@core/logger'
+import { gamesDb } from '@dbs/games-db'
+import { gamesRedis } from '@games/redis'
 import { env } from '@games/services'
 import { serve } from '@hono/node-server'
+import { sql } from 'drizzle-orm'
+import { HTTPException } from 'hono/http-exception'
 import { app } from './app'
 
-app.get('/health', async (ctx) => {
-  return ctx.text('Healthy')
+app.get('/healthy', async (ctx) => {
+  return ctx.text('Yes')
 })
 
 app.get('/ready', async (ctx) => {
-  return ctx.text('Ready')
+  const redisReady = await gamesRedis
+    .ping()
+    .then(() => true)
+    .catch(() => false)
+
+  if (!redisReady) {
+    throw new HTTPException(503)
+  }
+
+  const postgresReady = await gamesDb
+    .execute(sql`SELECT 1`)
+    .then(() => true)
+    .catch(() => false)
+
+  if (!postgresReady) {
+    throw new HTTPException(503)
+  }
+
+  return ctx.text('Yes')
 })
 
 app.onError(

@@ -1,7 +1,7 @@
 import './setup'
 import { shutdownServices } from '@core/di'
 import { logger } from '@core/logger'
-import { gamesPubsubs } from '@games/redis'
+import { gamesPubsubs, gamesRedis } from '@games/redis'
 import { env, sessionService } from '@games/services'
 import { parse } from 'cookie'
 import { Server } from 'socket.io'
@@ -73,12 +73,30 @@ gamesPubsubs.notifications.subscribe((payload) => {
  * Setup
  */
 
-app.get('/health', (res) => {
-  res.writeStatus('200 OK').end('Healthy')
+app.get('/healthy', (res) => {
+  res.cork(() => {
+    res.writeStatus('200 OK').end('Yes')
+  })
 })
 
-app.get('/ready', (res) => {
-  res.writeStatus('200 OK').end('Healthy')
+app.get('/ready', async (res) => {
+  res.onAborted(() => {
+    res.writeStatus('503 Service Unavailable').end()
+  })
+
+  const redisReady = await gamesRedis
+    .ping()
+    .then(() => true)
+    .catch(() => false)
+
+  res.cork(() => {
+    if (!redisReady) {
+      res.writeStatus('503 Service Unavailable').end()
+      return
+    }
+
+    res.writeStatus('200 OK').end('Yes')
+  })
 })
 
 app.listen(5052, (token) => {
