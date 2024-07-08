@@ -16,7 +16,8 @@ export const BetField = () => {
             className="grow"
             classNames={{ wrapper: 'mt-0' }}
             value={bet}
-            onChange={(value) => $$dicePage.fields.bet.update(Number(value))}
+            onChange={(value) => $$dicePage.fields.bet.update(String(value))}
+            allowedDecimalSeparators={[',', '.']}
             error={errors.bet[0]}
             disabled={autoplaying}
             min={1}

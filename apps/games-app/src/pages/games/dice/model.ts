@@ -60,7 +60,7 @@ const playAnimationFx = attach({
 
 const fields = {
   bet: createField({
-    emptyValue: 1,
+    emptyValue: '1',
   }),
   sides: createField<string[]>({
     emptyValue: ['1'],
@@ -70,7 +70,7 @@ const fields = {
 export const form = createForm({
   fields,
   schema: z.object({
-    bet: z
+    bet: z.coerce
       .number()
       .min(1, 'Минимальная ставка - 1 гем')
       .step(0.01, 'Ставка должна быть кратна 0.01')
@@ -85,7 +85,7 @@ export const form = createForm({
 const $possibleWinAmount = combine(
   fields.bet.$value,
   fields.sides.$value.map((sides) => sides.map(Number)),
-  (bet, sides) => calculateDiceWinAmount(bet * 100, sides) / 100,
+  (bet, sides) => calculateDiceWinAmount(Number(bet) * 100, sides) / 100,
 )
 
 const showActionNotAllowed = $$notifications.show.prepend(() => ({
@@ -123,8 +123,14 @@ sample({
 sample({
   clock: betDoubled,
   source: { bet: fields.bet.$value, balance: $$balance.$available },
-  fn: ({ bet, balance }) =>
-    Math.min(balance / 100, Math.ceil(bet * 2 * 100) / 100),
+  fn: ({ bet, balance }) => {
+    const doubled = Math.min(
+      balance / 100,
+      Math.ceil(Number(bet) * 2 * 100) / 100,
+    )
+
+    return String(doubled)
+  },
   target: fields.bet.update,
 })
 
@@ -132,8 +138,8 @@ sample({
   clock: betHalved,
   source: fields.bet.$value,
   fn: (bet) => {
-    const next = Math.ceil((bet / 2) * 100) / 100
-    return Math.max(next, 1)
+    const halved = Math.max(1, Math.ceil((Number(bet) / 2) * 100) / 100)
+    return String(halved)
   },
   target: fields.bet.update,
 })
