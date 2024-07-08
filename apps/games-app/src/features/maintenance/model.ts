@@ -17,7 +17,7 @@ const saveToCookieFx = createEffect(() => {
   const preparedAt = new Date()
   preparedAt.setSeconds(preparedAt.getSeconds() + MAX_SECONDS_PREPARING)
 
-  Cookies.set('maintenance/preparing', '1', {
+  Cookies.set('maintenancePreparing', '1', {
     domain: env.domain,
     expires: preparedAt,
   })
@@ -31,7 +31,7 @@ const { receivedData: maintenanceStarted } = invoke(() => {
   return subscriptionFactory({ ws: gamesWs, event: 'maintenance/started' })
 })
 
-const maintenancePreparing = Cookies.get('maintenance/preparing')
+const maintenancePreparing = Cookies.get('maintenancePreparing')
 
 const $active = createStore(Boolean(maintenancePreparing)).on(
   maintenanceStarted,
@@ -44,7 +44,7 @@ sample({
 })
 
 const requestedReload = sample({
-  source: delay($active, SECONDS_BEFORE_RELOAD),
+  source: delay($active, SECONDS_BEFORE_RELOAD * 1000),
   filter: Boolean,
 })
 
