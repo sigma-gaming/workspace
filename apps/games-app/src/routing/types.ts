@@ -7,6 +7,7 @@ export interface RouteRecord<
   Props = object,
   Params extends RouteParams = object,
 > {
+  title?: string
   route: RouteInstance<Params> | RouteInstance<Params>[]
   layout?: RouteLayout
   view: ComponentType<Props>
