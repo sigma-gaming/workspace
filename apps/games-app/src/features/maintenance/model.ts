@@ -6,7 +6,7 @@ import { interval } from 'patronum'
 import { gamesWs } from '../../shared/api/games-ws'
 import { env } from '../../shared/env'
 
-const MAX_SECONDS_PREPARING = 30
+const MAX_SECONDS_PREPARING = 60
 const SECONDS_BEFORE_RELOAD = 5
 
 /**
