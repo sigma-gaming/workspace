@@ -5,11 +5,11 @@ import { CenteredLayout } from '../../layouts/centered'
 
 export const HomePageView = () => {
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    const timeoutId = setTimeout(() => {
       window.location.reload()
     }, 5000)
 
-    return () => clearInterval(intervalId)
+    return () => clearTimeout(timeoutId)
   }, [])
 
   return (
