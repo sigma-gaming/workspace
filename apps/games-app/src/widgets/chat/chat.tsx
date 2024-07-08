@@ -50,7 +50,7 @@ export const Chat = () => {
         <textarea
           ref={textareaRef}
           className={clsx(
-            'w-full bg-transparent resize-none outline-none scrollbar-hide',
+            'w-full font-interface bg-transparent resize-none outline-none scrollbar-hide',
             'text-[color:var(--mantine-color-text)] placeholder-[color:var(--mantine-color-placeholder)]',
           )}
           value={text}

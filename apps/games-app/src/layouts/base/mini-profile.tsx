@@ -4,7 +4,7 @@ import { Button, Menu, Modal, rem, Skeleton, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconCoins,
-  IconDiamondFilled,
+  IconDiamondsFilled,
   IconLoader2,
   IconLogout,
   IconSettings,
@@ -75,7 +75,7 @@ export const MiniProfile = () => {
                 >
                   <AnimatedBalance />
                 </Text>
-                <IconDiamondFilled className="w-6 h-6 text-primary-4 -translate-y-[1px]" />
+                <IconDiamondsFilled className="w-6 h-6 text-primary-4 -translate-y-[1px]" />
               </div>
             </Skeleton>
           </div>
