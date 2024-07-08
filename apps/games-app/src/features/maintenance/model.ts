@@ -6,19 +6,20 @@ import { delay } from 'patronum'
 import { gamesWs } from '../../shared/api/games-ws'
 import { env } from '../../shared/env'
 
-const SECONDS_BEFORE_RELOAD = 20
+const MAX_SECONDS_PREPARING = 30
+const SECONDS_BEFORE_RELOAD = 5
 
 /**
  * Saves maintenance between page reloads
  * (in case when API healthcheck was executed before APP healthcheck)
  */
 const saveToCookieFx = createEffect(() => {
-  const reloadAt = new Date()
-  reloadAt.setSeconds(reloadAt.getSeconds() + SECONDS_BEFORE_RELOAD)
+  const preparedAt = new Date()
+  preparedAt.setSeconds(preparedAt.getSeconds() + MAX_SECONDS_PREPARING)
 
-  Cookies.set('maintenanceReloadAt', reloadAt.toISOString(), {
+  Cookies.set('maintenance/preparing', '1', {
     domain: env.domain,
-    expires: reloadAt,
+    expires: preparedAt,
   })
 })
 
@@ -30,8 +31,9 @@ const { receivedData: maintenanceStarted } = invoke(() => {
   return subscriptionFactory({ ws: gamesWs, event: 'maintenance/started' })
 })
 
-const reloadAt = Cookies.get('maintenanceReloadAt')
-const $active = createStore(Boolean(reloadAt)).on(
+const maintenancePreparing = Cookies.get('maintenance/preparing')
+
+const $active = createStore(Boolean(maintenancePreparing)).on(
   maintenanceStarted,
   () => true,
 )
@@ -41,12 +43,8 @@ sample({
   target: saveToCookieFx,
 })
 
-const msBeforeReload = reloadAt
-  ? new Date(reloadAt).getTime() - new Date().getTime()
-  : SECONDS_BEFORE_RELOAD * 1000
-
 const requestedReload = sample({
-  source: delay($active, msBeforeReload),
+  source: delay($active, SECONDS_BEFORE_RELOAD),
   filter: Boolean,
 })
 
