@@ -6,13 +6,15 @@ import { delay } from 'patronum'
 import { gamesWs } from '../../shared/api/games-ws'
 import { env } from '../../shared/env'
 
+const SECONDS_BEFORE_RELOAD = 20
+
 /**
  * Saves maintenance between page reloads
  * (in case when API healthcheck was executed before APP healthcheck)
  */
 const saveToCookieFx = createEffect(() => {
   const reloadAt = new Date()
-  reloadAt.setSeconds(reloadAt.getSeconds() + 5)
+  reloadAt.setSeconds(reloadAt.getSeconds() + SECONDS_BEFORE_RELOAD)
 
   Cookies.set('maintenanceReloadAt', reloadAt.toISOString(), {
     domain: env.domain,
@@ -41,7 +43,7 @@ sample({
 
 const msBeforeReload = reloadAt
   ? new Date(reloadAt).getTime() - new Date().getTime()
-  : 5000
+  : SECONDS_BEFORE_RELOAD * 1000
 
 const requestedReload = sample({
   source: delay($active, msBeforeReload),
