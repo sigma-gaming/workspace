@@ -52,7 +52,8 @@
       "{projectRoot}/next.config.*",
       "{projectRoot}/rollup.config.*",
       "{projectRoot}/webpack.config.*",
-      "{projectRoot}/drizzle.config.*"
+      "{projectRoot}/drizzle.config.*",
+      "{projectRoot}/nginx.conf"
     ],
     "migrations": [
       "{projectRoot}/migrate.*",
