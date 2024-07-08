@@ -1,8 +1,17 @@
 import { Anchor, rem, Text, Title } from '@mantine/core'
 import { IconBarrierBlock } from '@tabler/icons-react'
+import { useEffect } from 'react'
 import { CenteredLayout } from '../../layouts/centered'
 
 export const HomePageView = () => {
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      window.location.reload()
+    }, 5000)
+
+    return () => clearInterval(intervalId)
+  }, [])
+
   return (
     <CenteredLayout>
       <div className="flex flex-col items-center gap-8 max-w-[320px]">
