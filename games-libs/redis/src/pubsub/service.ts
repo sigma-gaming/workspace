@@ -78,8 +78,8 @@ export class PubSubService implements OnApplicationShutdown {
             return
           }
 
-          const payload = JSON.parse(message) as TPayload
-          handler(payload)
+          const payload = message.length > 0 ? JSON.parse(message) : null
+          handler(payload as TPayload)
         }
 
         this.subRedis.on('message', listener)
