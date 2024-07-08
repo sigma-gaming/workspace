@@ -4,6 +4,7 @@ import { not } from 'patronum'
 import { $$balance } from '../entities/balance'
 import { $$profile } from '../entities/profile'
 import { $$user } from '../entities/user'
+import { $$maintenance } from '../features/maintenance'
 import { $$notificationEvents } from '../features/notification-events'
 import { router } from '../routing'
 import { $$chatWidget } from '../widgets/chat'
@@ -24,7 +25,11 @@ sample({
 
 sample({
   clock: started,
-  target: [$$notificationEvents.initialize, $$chatWidget.initialize],
+  target: [
+    $$notificationEvents.initialize,
+    $$chatWidget.initialize,
+    $$maintenance.startChecking,
+  ],
 })
 
 export const $$app = {

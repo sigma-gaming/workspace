@@ -1,8 +1,8 @@
 import { subscriptionFactory } from '@core/io-client'
 import { invoke } from '@withease/factories'
-import { createEffect, createStore, sample } from 'effector'
+import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
-import { delay } from 'patronum'
+import { interval } from 'patronum'
 import { gamesWs } from '../../shared/api/games-ws'
 import { env } from '../../shared/env'
 
@@ -43,16 +43,20 @@ sample({
   target: saveToCookieFx,
 })
 
-const requestedReload = sample({
-  source: delay($active, SECONDS_BEFORE_RELOAD * 1000),
-  filter: Boolean,
+const startChecking = createEvent()
+
+const { tick } = interval({
+  start: startChecking,
+  timeout: SECONDS_BEFORE_RELOAD * 1000,
 })
 
 sample({
-  clock: requestedReload,
+  clock: tick,
+  filter: $active,
   target: reloadPageFx,
 })
 
 export const $$maintenance = {
+  startChecking,
   $active,
 }
