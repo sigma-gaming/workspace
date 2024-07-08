@@ -17,7 +17,7 @@ const images = await client.listDockerImages({
 })
 
 const entries = []
-const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000)
+const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
 
 for (const image of images) {
   if (!image) continue
@@ -79,7 +79,7 @@ for (const entry of entries) {
   /**
    * Keep recently uploaded images
    */
-  if (entry.uploadedAt > sixHoursAgo) {
+  if (entry.uploadedAt > oneHourAgo) {
     exceptions.add(entry)
     reasons.push('recently uploaded')
   }
