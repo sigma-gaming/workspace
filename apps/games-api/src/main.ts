@@ -73,6 +73,16 @@ const server = serve(options, () => {
   logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
 })
 
+process.on('uncaughtException', (error) => {
+  logger.info('Uncaught exception')
+  logger.error(error)
+})
+
+process.on('unhandledRejection', (error) => {
+  logger.info('Unhandled rejection')
+  logger.error(error)
+})
+
 let exited = false
 
 async function handleExit() {

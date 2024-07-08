@@ -67,6 +67,16 @@ const server = serve(options, () => {
   console.info(`🚀 Server ready at ${env.controlApi.url}`)
 })
 
+process.on('uncaughtException', (error) => {
+  logger.info('Uncaught exception')
+  logger.error(error)
+})
+
+process.on('unhandledRejection', (error) => {
+  logger.info('Unhandled rejection')
+  logger.error(error)
+})
+
 let exited = false
 
 async function handleExit() {

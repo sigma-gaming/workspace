@@ -32,10 +32,6 @@ io.on('connection', async (socket) => {
   }
 
   socket.join(userRoom(user.id))
-
-  socket.on('disconnect', () => {
-    socket.leave(userRoom(user.id))
-  })
 })
 
 /**
@@ -84,20 +80,21 @@ app.get('/healthy', (res) => {
 })
 
 app.get('/ready', async (res) => {
-  let aborted = false
+  let replied = false
 
   res.onAborted(() => {
-    aborted = true
     res.writeStatus('503 Service Unavailable').end()
+    replied = true
   })
 
   const wrapReply = (callback: () => void) => {
-    if (aborted) {
+    if (replied) {
       return
     }
 
     res.cork(() => {
       callback()
+      replied = true
     })
   }
 
@@ -114,7 +111,9 @@ app.get('/ready', async (res) => {
     return
   }
 
-  if (await maintenanceCache.isMaintenanceMode()) {
+  const maintenanceMode = await maintenanceCache.isMaintenanceMode()
+
+  if (maintenanceMode) {
     wrapReply(() => {
       res.writeStatus('503 Service Unavailable').end()
     })
@@ -136,6 +135,16 @@ app.listen(5052, (token) => {
   logger.info(`🚀 WebSocket server ready at ${env.gamesWs.url}`)
 })
 
+process.on('uncaughtException', (error) => {
+  logger.info('Uncaught exception')
+  logger.error(error)
+})
+
+process.on('unhandledRejection', (error) => {
+  logger.info('Unhandled rejection')
+  logger.error(error)
+})
+
 let exited = false
 
 async function handleExit() {
@@ -145,7 +154,7 @@ async function handleExit() {
   logger.info('Exit signal received')
 
   logger.info('Closing WebSocket server server..')
-  app.close()
+  io.close(() => app.close())
 
   logger.info('Cleaning up..')
   await shutdownServices()
