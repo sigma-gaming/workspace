@@ -10,6 +10,7 @@ import { z } from 'zod'
 import { $$balance } from '../../../entities/balance'
 import { $$notifications } from '../../../entities/notifications'
 import { $$user } from '../../../entities/user'
+import { $$gameHistory } from '../../../features/game-history'
 import { routes } from '../../../routing'
 import { gamesApi } from '../../../shared/api/games'
 
@@ -18,7 +19,7 @@ const playGameMutation = createMutation({
   effect: createApiEffect(gamesApi.games.playDice.$post),
 })
 
-$$balance.receiveUpdates(playGameMutation, (data) => data.closingBalance)
+$$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
 
 const betDoubled = createEvent()
 const betHalved = createEvent()
@@ -161,11 +162,15 @@ sample({
 })
 
 sample({
-  clock: playGameMutation.finished.success,
-  source: $rive,
-  filter: Boolean,
-  fn: (_, { result }) => `Shake_${result.side}`,
+  source: playGameMutation.finished.success,
+  fn: ({ result }) => `Shake_${result.record.snapshot.outputSide}`,
   target: playAnimationFx,
+})
+
+sample({
+  source: playGameMutation.finished.success,
+  fn: ({ result }) => result.record,
+  target: $$gameHistory.appendMyGame,
 })
 
 sample({

@@ -1,0 +1,15 @@
+.list:before {
+  @apply border-[#25273E];
+}
+
+.tabLabel {
+  @apply font-interface font-medium;
+}
+
+.tab:hover {
+  @apply bg-[#25273E];
+
+  &:not([data-active]) {
+    @apply border-[#333655];
+  }
+}

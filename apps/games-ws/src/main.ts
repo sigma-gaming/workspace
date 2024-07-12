@@ -1,7 +1,12 @@
 import './setup'
 import { shutdownServices } from '@core/di'
 import { logger } from '@core/logger'
-import { gamesPubsubs, gamesRedis, maintenanceCache } from '@games/redis'
+import {
+  gamesCaches,
+  gamesPubsubs,
+  gamesRedis,
+  maintenanceCache,
+} from '@games/redis'
 import { env, sessionService } from '@games/services'
 import { parse } from 'cookie'
 import { Server } from 'socket.io'
@@ -68,6 +73,47 @@ gamesPubsubs.notifications.subscribe((payload) => {
 gamesPubsubs.maintenanceStarted.subscribe(() => {
   sendToAll('maintenance/started')
 })
+
+let lastWinSent: string | null = null
+
+async function sendLastWins() {
+  // Add 100ms compensation for network delays
+  const next = (ms = 900) => {
+    setTimeout(sendLastWins, ms)
+  }
+
+  try {
+    const lastWins = await gamesCaches.lastWinHistory.get()
+
+    const lastSentIndex = lastWins.findIndex(
+      (gameRecord) => gameRecord.id === lastWinSent,
+    )
+
+    // Send only new records
+    const newWins = lastWins.slice(0, lastSentIndex)
+
+    if (newWins.length === 0) {
+      return next()
+    }
+
+    lastWinSent = newWins[0].id
+    sendToAll('gameHistory/lastWins', newWins)
+
+    /*
+     * ~1 win per second is enough for history table
+     * So, send new records later if we got more than one new win
+     * Max delay is 4000ms, so new visitors will not wait too long for the first portions
+     * Add 100ms compensation for network delays
+     */
+    const delay = Math.min(4000, 1000 * newWins.length - 100)
+    next(delay)
+  } catch {
+    logger.error('Failed to send last wins')
+    return next()
+  }
+}
+
+setTimeout(sendLastWins, 3000)
 
 /**
  * Setup

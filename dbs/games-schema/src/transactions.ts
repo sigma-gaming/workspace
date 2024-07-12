@@ -25,6 +25,7 @@ export const TransactionTable = pgTable('Transaction', {
   userId: uuid('userId')
     .references(() => UserTable.id)
     .notNull(),
+  gameRecordId: uuid('gameRecordId'),
 })
 
 export type TransactionSelect = typeof TransactionTable.$inferSelect

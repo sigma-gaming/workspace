@@ -1,7 +1,6 @@
 {
   "name": "@migrations/games-db-migration",
   "private": true,
-  "type": "module",
   "version": "0.0.0",
   "scripts": {
     "copy-env": "copy-env",

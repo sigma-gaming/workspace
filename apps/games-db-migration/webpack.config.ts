@@ -1,10 +1,8 @@
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
 import { loadConfig } from 'tsconfig-paths'
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
+import { Configuration } from 'webpack'
 import nodeExternals from 'webpack-node-externals'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const tsconfigPath = resolve(__dirname, './tsconfig.json')
 const loadedTsconfig = loadConfig(tsconfigPath)
@@ -15,19 +13,14 @@ if (loadedTsconfig.resultType !== 'success') {
 
 const internalModules = Object.keys(loadedTsconfig.paths)
 
-/** @type {import('webpack').Configuration} */
-const config = {
+const config: Configuration = {
   mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
-  devtool: process.env.NODE_ENV === 'development' ? 'eval' : false,
+  devtool: process.env.NODE_ENV === 'development' ? 'eval' : 'source-map',
   entry: './src/main.ts',
-  target: 'es2023',
-  experiments: {
-    outputModule: true,
-  },
+  target: 'node20',
   output: {
     path: resolve(__dirname, 'dist'),
     filename: '[name].js',
-    module: true,
   },
   externals: [
     nodeExternals({
@@ -38,12 +31,13 @@ const config = {
   ],
   externalsPresets: { node: true },
   ignoreWarnings: [/^(?!CriticalDependenciesWarning$)/],
-  optimization: {
-    nodeEnv: false,
-  },
+  optimization: { nodeEnv: false },
   resolve: {
     extensions: ['.ts', '.js'],
-    conditionNames: ['import', 'node'],
+    alias: {
+      // Fix wrong webpack resolution of tsyringe
+      tsyringe: require.resolve('tsyringe/dist/esm2015/index.js'),
+    },
     plugins: [
       new TsconfigPathsPlugin({
         configFile: tsconfigPath,
@@ -52,6 +46,10 @@ const config = {
   },
   module: {
     rules: [
+      {
+        test: /\.node$/,
+        loader: 'node-loader',
+      },
       {
         test: /.ts$/,
         use: [

@@ -21,6 +21,11 @@ export enum Game {
   Dice = 'Dice',
 }
 
+export enum GameOutcome {
+  Win = 'Win',
+  Loss = 'Loss',
+}
+
 export enum NotificationKind {
   Success = 'Success',
   Info = 'Info',

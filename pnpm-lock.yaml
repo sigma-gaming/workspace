@@ -360,6 +360,9 @@ importers:
 
   apps/games-api:
     dependencies:
+      '@core/cron-jobs':
+        specifier: workspace:*
+        version: link:../../core/cron-jobs
       '@core/di':
         specifier: workspace:*
         version: link:../../core/di
@@ -369,6 +372,9 @@ importers:
       '@core/exceptions':
         specifier: workspace:*
         version: link:../../core/exceptions
+      '@core/flow':
+        specifier: workspace:*
+        version: link:../../core/flow
       '@core/io-client':
         specifier: workspace:*
         version: link:../../core/io-client
@@ -501,6 +507,8 @@ importers:
   core/events: {}
 
   core/exceptions: {}
+
+  core/flow: {}
 
   core/forms: {}
 

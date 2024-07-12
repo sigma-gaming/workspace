@@ -41,28 +41,26 @@ export class ChatService {
     }
   }
 
-  private async getLastMessagesUnlocked(): Promise<ChatMessageSelect[]> {
-    const lastMessages = await gamesCaches.lastChatMessages.get()
-    if (lastMessages) return lastMessages
-
-    const messages = await gamesDb.query.ChatMessageTable.findMany({
-      orderBy: desc(ChatMessageTable.createdAt),
-      limit: 100,
-    })
-
-    await gamesCaches.lastChatMessages.set(messages)
-
-    return messages
-  }
-
-  async getLastMessages(): Promise<ChatMessageSelect[]> {
+  async initializeMessages() {
     const lock = await gamesCaches.lastChatMessages.lock(10000)
 
     try {
-      return await this.getLastMessagesUnlocked()
+      const exists = await gamesCaches.lastChatMessages.exists()
+      if (exists) return
+
+      const messages = await gamesDb.query.ChatMessageTable.findMany({
+        orderBy: desc(ChatMessageTable.createdAt),
+        limit: 100,
+      })
+
+      await gamesCaches.lastChatMessages.pushMany(messages)
     } finally {
       await lock.release()
     }
+  }
+
+  async getLastMessages(): Promise<ChatMessageSelect[]> {
+    return gamesCaches.lastChatMessages.get()
   }
 
   async sendMessage(options: {
@@ -73,77 +71,64 @@ export class ChatService {
       trackingId?: string
     }
   }): Promise<ChatMessageSelect> {
-    const lock = await gamesCaches.lastChatMessages.lock(10000)
+    const { userId, payload } = options
+    const { text, attachments = [] } = payload
 
-    try {
-      const { userId, payload } = options
-      const { text, attachments = [] } = payload
+    if (!text && attachments.length === 0) {
+      throw new BadRequestException({
+        path: ['text'],
+        message: 'Нельзя отправить пустое сообщение',
+      })
+    }
 
-      if (!text && attachments.length === 0) {
+    if (userId && attachments.length > 0) {
+      if (attachments.length > 1) {
         throw new BadRequestException({
-          path: ['text'],
-          message: 'Нельзя отправить пустое сообщение',
+          path: ['attachments'],
+          message: 'Доступно только одно вложение',
         })
       }
 
-      if (userId && attachments.length > 0) {
-        if (attachments.length > 1) {
-          throw new BadRequestException({
-            path: ['attachments'],
-            message: 'Доступно только одно вложение',
-          })
-        }
+      const [attachment] = attachments
 
-        const [attachment] = attachments
-
-        if (attachment.type === ChatMessageAttachmentType.Game) {
-          await this.validateUserGameAttachment(userId, attachment)
-        }
+      if (attachment.type === ChatMessageAttachmentType.Game) {
+        await this.validateUserGameAttachment(userId, attachment)
       }
-
-      let chatMessageInsert: ChatMessageInsert
-
-      if (userId) {
-        const detailedProfile = await profileService.getDetailedProfile(userId)
-
-        chatMessageInsert = {
-          type: ChatMessageType.UserMessage,
-          text,
-          attachments,
-          senderName: detailedProfile.name,
-          senderUsername: detailedProfile.username,
-          senderImage: detailedProfile.image,
-          senderRoles: detailedProfile.roles,
-          trackingId: payload.trackingId,
-        }
-      } else {
-        chatMessageInsert = {
-          type: ChatMessageType.SystemMessage,
-          text,
-          attachments,
-          senderRoles: [UserRole.Admin],
-        }
-      }
-
-      const [message] = await gamesDb
-        .insert(ChatMessageTable)
-        .values(chatMessageInsert)
-        .returning()
-
-      const lastChatMessages = await this.getLastMessagesUnlocked()
-      lastChatMessages.push(message)
-
-      while (lastChatMessages.length > 100) {
-        lastChatMessages.shift()
-      }
-
-      await gamesCaches.lastChatMessages.set(lastChatMessages)
-      await gamesPubsubs.chatMessages.publish(message)
-
-      return message
-    } finally {
-      await lock.release()
     }
+
+    let chatMessageInsert: ChatMessageInsert
+
+    if (userId) {
+      const detailedProfile = await profileService.getDetailedProfile(userId)
+
+      chatMessageInsert = {
+        type: ChatMessageType.UserMessage,
+        text,
+        attachments,
+        senderName: detailedProfile.name,
+        senderUsername: detailedProfile.username,
+        senderImage: detailedProfile.image,
+        senderRoles: detailedProfile.roles,
+        trackingId: payload.trackingId,
+      }
+    } else {
+      chatMessageInsert = {
+        type: ChatMessageType.SystemMessage,
+        text,
+        attachments,
+        senderRoles: [UserRole.Admin],
+      }
+    }
+
+    const [message] = await gamesDb
+      .insert(ChatMessageTable)
+      .values(chatMessageInsert)
+      .returning()
+
+    await gamesCaches.lastChatMessages.push(message)
+    await gamesPubsubs.chatMessages.publish(message)
+
+    return message
   }
 }
 

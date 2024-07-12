@@ -3,20 +3,22 @@ import { Logger, LoggerService } from '@core/logger'
 import { Redis } from 'ioredis'
 import { singleton } from 'tsyringe'
 import { RedisService } from '../redis'
-import { CacheService } from './service'
+import { GlobalBooleanEntityService } from './entity-boolean'
 
 @singleton()
 export class MaintenanceCacheService {
   private readonly redis: Redis
   private readonly logger: Logger
+  private readonly entity: GlobalBooleanEntityService
 
-  constructor(
-    private readonly cacheService: CacheService,
-    redisService: RedisService,
-    loggerService: LoggerService,
-  ) {
+  constructor(redisService: RedisService, loggerService: LoggerService) {
     this.redis = redisService.redis
     this.logger = loggerService.logger.child('MaintenanceCache')
+
+    this.entity = new GlobalBooleanEntityService({
+      key: 'global:maintenance',
+      ttl: Infinity,
+    })
   }
 
   async isMaintenanceMode() {
@@ -26,8 +28,8 @@ export class MaintenanceCacheService {
 
     for (let i = 0; i < 3; i++) {
       try {
-        const value = await this.cacheService.get('global:maintenance')
-        return Boolean(value)
+        const value = await this.entity.get()
+        return value ?? false
       } catch (error) {
         this.logger.info('Failed to get maintenance mode:')
         this.logger.error(error)
@@ -41,7 +43,7 @@ export class MaintenanceCacheService {
 
   async setMaintenanceMode(value: boolean) {
     if (this.redis.status !== 'ready') return null
-    await this.cacheService.set('global:maintenance', value)
+    await this.entity.set(value)
     return value
   }
 }

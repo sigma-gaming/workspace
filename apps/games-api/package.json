@@ -18,11 +18,13 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
+    "@core/flow": "workspace:*",
     "@core/di": "workspace:*",
     "@core/events": "workspace:*",
     "@core/exceptions": "workspace:*",
     "@core/io-client": "workspace:*",
     "@core/logger": "workspace:*",
+    "@core/cron-jobs": "workspace:*",
     "@dbs/games-db": "workspace:*",
     "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",

@@ -1,7 +1,7 @@
 import { RouteInstance, RouteParams } from 'atomic-router'
-import { ComponentType, PropsWithChildren, ReactNode } from 'react'
+import { ComponentType, ReactNode } from 'react'
 
-export type RouteLayout = (props: PropsWithChildren) => ReactNode
+export type RouteLayout = (props: { children: ReactNode }) => ReactNode
 
 export interface RouteRecord<
   Props = object,

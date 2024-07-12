@@ -5,6 +5,6 @@ if (!process.env.POSTGRES_URL) {
   throw new Error('POSTGRES_URL is not set')
 }
 
-await migrateGamesDB(process.env.POSTGRES_URL)
-
-console.info('Migration finished')
+migrateGamesDB(process.env.POSTGRES_URL).then(() => {
+  console.info('Migration finished')
+})

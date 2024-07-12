@@ -1,8 +1,13 @@
-import { ChatMessageSelect, NotificationSelect } from '@dbs/games-schema'
+import {
+  ChatMessageSelect,
+  GameRecordSelect,
+  NotificationSelect,
+} from '@dbs/games-schema'
 
 export interface ServerToClientEvents {
   'chat/message': (message: ChatMessageSelect) => void
   'notification': (notification: NotificationSelect) => void
+  'gameHistory/lastWins': (lastWins: GameRecordSelect[]) => void
   'maintenance/started': () => void
 }
 

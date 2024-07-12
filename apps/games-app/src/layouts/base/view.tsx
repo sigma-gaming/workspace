@@ -2,7 +2,7 @@ import { useMedia } from '@core/ui'
 import { Title } from '@mantine/core'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
-import { CSSProperties, PropsWithChildren } from 'react'
+import { CSSProperties, ReactNode } from 'react'
 import { routes } from '../../routing/index.ts'
 import { Chat } from '../../widgets/chat'
 import { Logo } from './logo.tsx'
@@ -22,7 +22,12 @@ function useTabsHeight() {
   return '48px'
 }
 
-export const BaseLayout = ({ children }: PropsWithChildren) => {
+interface Props {
+  className?: string
+  children: ReactNode
+}
+
+export const BaseLayout = ({ className, children }: Props) => {
   const headerHeight = useHeaderHeight()
   const tabsHeight = useTabsHeight()
   const isMobile = useMedia({ to: 'md' })
@@ -39,6 +44,7 @@ export const BaseLayout = ({ children }: PropsWithChildren) => {
       <Header />
       <main
         className={clsx(
+          className,
           'pb-4 lg:pb-6',
           leftVisible ? 'pl-[280px]' : 'pl-4 lg:pl-6',
           rightVisible ? 'pr-[320px]' : 'pr-4 lg:pr-6',
@@ -56,8 +62,8 @@ export const BaseLayout = ({ children }: PropsWithChildren) => {
 
 const Header = () => {
   return (
-    <div className="sticky top-0 z-50 h-[--header-height] py-2 bg-[#25273A] lg:bg-transparent flex items-center justify-between shadow-border lg:shadow-none">
-      <div className="w-[280px] pl-2 lg:pl-4 flex justify-start lg:justify-center">
+    <div className="pointer-events-none sticky top-0 z-50 h-[--header-height] py-2 bg-[#25273A] lg:bg-transparent flex items-center justify-between shadow-border lg:shadow-none">
+      <div className="pointer-events-auto w-[280px] pl-2 lg:pl-4 flex justify-start lg:justify-center">
         <Link
           to={routes.home}
           className="flex items-center gap-2 p-2 focus-visible:outline-primary rounded-xl"
@@ -68,7 +74,7 @@ const Header = () => {
           </Title>
         </Link>
       </div>
-      <div className="pr-4 py-2 lg:pr-6">
+      <div className="pointer-events-auto pr-4 py-2 lg:pr-6">
         <MiniProfile />
       </div>
     </div>

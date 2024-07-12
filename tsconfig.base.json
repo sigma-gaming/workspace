@@ -88,6 +88,9 @@
       ],
       "@core/io-client": [
         "core/io-client/src/index.ts"
+      ],
+      "@core/flow": [
+        "core/flow/src/index.ts"
       ]
     }
   }

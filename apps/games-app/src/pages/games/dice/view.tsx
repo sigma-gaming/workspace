@@ -1,4 +1,4 @@
-import { Card, Title } from '@mantine/core'
+import { Title } from '@mantine/core'
 import { memo } from 'react'
 import { $$dicePage } from './model.ts'
 import { AnimatedDice } from './ui/animated-dice.tsx'
@@ -9,9 +9,7 @@ import { PossibleWinAmount } from './ui/possible-win-amount.tsx'
 
 export const DiceGamePageView = memo(() => {
   return (
-    <Card
-      component="form"
-      className="p-4 rounded-xl md:p-6 md:rounded-2xl"
+    <form
       onSubmit={(event) => {
         event.preventDefault()
         $$dicePage.playPressed()
@@ -33,6 +31,6 @@ export const DiceGamePageView = memo(() => {
           <FormActions />
         </div>
       </div>
-    </Card>
+    </form>
   )
 })

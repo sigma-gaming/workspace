@@ -32,6 +32,8 @@
     "dev:games": "nx run-many -t dev --projects @apps/games-app,@apis/games-api,@apis/games-ws",
     "check": "pnpm nx run-many -t build test lint typecheck --parallel 3",
     "check:affected": "pnpm nx affected -t build test lint typecheck --parallel 3",
+    "lint": "pnpm nx run-many -t lint",
+    "lint:fix": "pnpm nx run-many -t lint:fix",
     "changeset:publish": "changeset tag && git push --follow-tags",
     "cert:generate": "mkcert -key-file ssl/local.key -cert-file ssl/local.crt localhost sigma.local '*.sigma.local'",
     "cert:install": "mkcert -install"

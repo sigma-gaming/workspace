@@ -18,6 +18,7 @@ import {
   Select,
   Skeleton,
   Switch,
+  Tabs,
   Title,
 } from '@mantine/core'
 import { PropsWithChildren } from 'react'
@@ -37,6 +38,7 @@ import popoverClassNames from './popover.module.css'
 import selectClassNames from './select.module.css'
 import skeletonClassNames from './skeleton.module.css'
 import switchClassNames from './switch.module.css'
+import tabsClassNames from './tabs.module.css'
 import titleClassNames from './title.module.css'
 
 export const theme = createTheme({
@@ -106,6 +108,9 @@ export const theme = createTheme({
     }),
     Switch: Switch.extend({
       classNames: switchClassNames,
+    }),
+    Tabs: Tabs.extend({
+      classNames: tabsClassNames,
     }),
   },
 })

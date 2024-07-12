@@ -2,102 +2,102 @@ import { createSingletonProxy } from '@core/di'
 import {
   BudgetSelect,
   ChatMessageSelect,
+  GameRecordSelect,
   NotificationSelect,
   TransactionSelect,
 } from '@dbs/games-schema'
 import { ProfileDetailed, Session } from '@games/model'
-import { inject, InjectionToken, singleton } from 'tsyringe'
-import { CacheService, GlobalEntity, KeyEntity } from './service'
+import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe'
+import { GlobalJsonEntityService, KeyJsonEntityService } from './entity-json'
+import { GlobalEntityListService, KeyEntityListService } from './entity-list'
+import { GlobalNumberEntityService } from './entity-number'
+import { GlobalStringEntityService } from './entity-string'
 
 export const CacheVersionToken: InjectionToken<string> = Symbol('CacheVersion')
 
 @singleton()
+@autoInjectable()
 export class CacheRegistry {
-  budget: GlobalEntity<BudgetSelect>
-  budgetAvailable: GlobalEntity<number>
-  budgetMaxLoss: GlobalEntity<number>
-  budgetUnwantedLoss: GlobalEntity<number>
-  budgetSyncedAt: GlobalEntity<string>
-  detailedProfile: KeyEntity<string, ProfileDetailed>
-  session: KeyEntity<string, Session>
-  lastTransaction: KeyEntity<string, TransactionSelect>
-  globalNotifications: GlobalEntity<NotificationSelect[]>
-  personalNotifications: KeyEntity<string, NotificationSelect[]>
-  lastChatMessages: GlobalEntity<ChatMessageSelect[]>
+  budget: GlobalJsonEntityService<BudgetSelect>
+  budgetAvailable: GlobalNumberEntityService
+  budgetMaxLoss: GlobalNumberEntityService
+  budgetUnwantedLoss: GlobalNumberEntityService
+  budgetSyncedAt: GlobalStringEntityService
+  detailedProfile: KeyJsonEntityService<ProfileDetailed>
+  session: KeyJsonEntityService<Session>
+  lastTransaction: KeyJsonEntityService<TransactionSelect>
+  globalNotifications: GlobalJsonEntityService<NotificationSelect[]>
+  personalNotifications: KeyJsonEntityService<NotificationSelect[]>
+  lastChatMessages: GlobalEntityListService<ChatMessageSelect>
+  lastWinHistory: GlobalEntityListService<GameRecordSelect>
+  userGameHistory: KeyEntityListService<GameRecordSelect>
 
-  constructor(
-    private cacheService: CacheService,
-    @inject(CacheVersionToken) version: string,
-  ) {
-    this.budget = this.cacheService.entity<void, BudgetSelect>({
-      keygen: () => `${version}:global:budget`,
-      options: {
-        ttl: 60 * 15, // 15 minutes
-      },
+  constructor(@inject(CacheVersionToken) version: string) {
+    this.budget = new GlobalJsonEntityService<BudgetSelect>({
+      key: `${version}:global:budget`,
+      ttl: 60 * 15, // 15 minutes
     })
 
-    this.budgetAvailable = this.cacheService.entity<void, number>({
-      keygen: () => `global:budgetAvailable`,
-      options: {
-        ttl: 60 * 60 * 24, // 1 day
-      },
+    this.budgetAvailable = new GlobalNumberEntityService({
+      key: `global:budgetAvailable`,
+      ttl: 60 * 60 * 24, // 1 day
     })
 
-    this.budgetMaxLoss = this.cacheService.entity<void, number>({
-      keygen: () => `global:budgetMaxLoss`,
-      options: {
-        ttl: 60 * 60 * 24, // 1 day
-      },
+    this.budgetMaxLoss = new GlobalNumberEntityService({
+      key: `global:budgetMaxLoss`,
+      ttl: 60 * 60 * 24, // 1 day
     })
 
-    this.budgetUnwantedLoss = this.cacheService.entity<void, number>({
-      keygen: () => `global:budgetUnwantedLoss`,
-      options: {
-        ttl: 60 * 60 * 24, // 1 day
-      },
+    this.budgetUnwantedLoss = new GlobalNumberEntityService({
+      key: `global:budgetUnwantedLoss`,
+      ttl: 60 * 60 * 24, // 1 day
     })
 
-    this.budgetSyncedAt = this.cacheService.entity<void, string>({
-      keygen: () => `global:budgetSyncedAt`,
-      options: {
-        ttl: 60 * 60 * 24, // 1 day
-      },
+    this.budgetSyncedAt = new GlobalStringEntityService({
+      key: `global:budgetSyncedAt`,
+      ttl: 60 * 60 * 24, // 1 day
     })
 
-    this.detailedProfile = this.cacheService.entity<string, ProfileDetailed>({
+    this.detailedProfile = new KeyJsonEntityService<ProfileDetailed>({
       keygen: (token: string) => `${version}:detailedProfile:${token}`,
     })
 
-    this.session = this.cacheService.entity<string, Session>({
+    this.session = new KeyJsonEntityService<Session>({
       keygen: (token: string) => `${version}:session:${token}`,
     })
 
-    this.lastTransaction = this.cacheService.entity<string, TransactionSelect>({
+    this.lastTransaction = new KeyJsonEntityService<TransactionSelect>({
       keygen: (userId: string) => `${version}:lastTransaction:${userId}`,
     })
 
-    this.globalNotifications = this.cacheService.entity<
-      void,
+    this.globalNotifications = new GlobalJsonEntityService<
       NotificationSelect[]
     >({
-      keygen: () => `${version}:global:notifications`,
+      key: `${version}:global:notifications`,
     })
 
-    this.personalNotifications = this.cacheService.entity<
-      string,
-      NotificationSelect[]
-    >({
-      keygen: (userId: string) => `${version}:notifications:${userId}`,
-    })
-
-    this.lastChatMessages = this.cacheService.entity<void, ChatMessageSelect[]>(
+    this.personalNotifications = new KeyJsonEntityService<NotificationSelect[]>(
       {
-        keygen: () => `${version}:global:lastChatMessages`,
-        options: {
-          ttl: 60 * 60 * 24 * 1, // 1 day
-        },
+        keygen: (userId: string) => `${version}:notifications:${userId}`,
       },
     )
+
+    this.lastChatMessages = new GlobalEntityListService<ChatMessageSelect>({
+      key: `${version}:global:lastChatMessages`,
+      ttl: 60 * 60 * 24 * 1, // 1 day
+    })
+
+    this.lastWinHistory = new GlobalEntityListService<GameRecordSelect>({
+      key: `${version}:global:lastWinHistory`,
+      max: 10,
+      ttl: 60 * 60 * 1, // 1 hour
+    })
+
+    this.userGameHistory = new KeyEntityListService<GameRecordSelect>({
+      keygen: (userId: string) => `${version}:userGameHistory:${userId}`,
+      max: 10,
+      ttl: 60 * 15, // 15 minutes
+    })
   }
 }
 

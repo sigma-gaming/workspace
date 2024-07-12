@@ -2,6 +2,7 @@ import { baseApp } from './app-base'
 import { authRouter } from './routes/auth'
 import { balanceRouter } from './routes/balance'
 import { chatRouter } from './routes/chat'
+import { gameHistoryRouter } from './routes/game-history'
 import { gamesRouter } from './routes/games'
 import { meRouter } from './routes/me'
 import { notificationsRouter } from './routes/notifications'
@@ -15,3 +16,4 @@ export const app = baseApp
   .route('/settings', settingsRouter)
   .route('/balance', balanceRouter)
   .route('/games', gamesRouter)
+  .route('/gameHistory', gameHistoryRouter)

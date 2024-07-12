@@ -3,6 +3,7 @@ import {
   AccountProvider,
   ChatMessageType,
   Game,
+  GameOutcome,
   NotificationKind,
   TransactionType,
   UserRole,
@@ -27,6 +28,8 @@ export const transactionTypeEnum = pgEnum(
 )
 
 export const gameEnum = pgEnum('Game', enumValues(Game))
+
+export const gameOutcomeEnum = pgEnum('GameOutcome', enumValues(GameOutcome))
 
 export const notificationKindEnum = pgEnum(
   'NotificationKind',

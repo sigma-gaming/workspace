@@ -13,6 +13,7 @@ import { serve } from '@hono/node-server'
 import { sql } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 import { app } from './app'
+import { initializeCronJobs } from './jobs'
 import { sentry } from './shared/sentry'
 
 app.get('/healthy', async (ctx) => {
@@ -68,6 +69,8 @@ if (env.isDev) {
     cert: readFileSync(join(__dirname, '../../../ssl/local.crt')),
   }
 }
+
+initializeCronJobs()
 
 const server = serve(options, () => {
   logger.info(`🚀 Server ready at ${env.gamesApi.url}`)

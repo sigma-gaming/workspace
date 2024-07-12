@@ -4,11 +4,12 @@ import {
   RouteException,
 } from '@core/exceptions'
 import { loggerService } from '@core/logger'
-import { Game, TransactionType } from '@dbs/games-schema'
+import { Game, GameOutcome } from '@dbs/games-schema'
 import { calculateDiceWinAmount, gem } from '@games/model'
-import { gamesCaches } from '@games/redis'
 import {
   budgetService,
+  gameService,
+  profileService,
   sessionService,
   transactionService,
 } from '@games/services'
@@ -55,6 +56,7 @@ export const playDiceRoute = new Hono().post(
     const payload = ctx.req.valid('json')
     const session = await sessionService.getHonoSession(ctx.req)
     const user = sessionService.getUser(session)
+    const profile = await profileService.getDetailedProfile(user.id)
 
     if (payload.bet < gem(1)) {
       throw new BadRequestException({
@@ -63,20 +65,14 @@ export const playDiceRoute = new Hono().post(
       })
     }
 
-    const lock = await gamesCaches.lastTransaction.lock(user.id, 10000)
+    const lock = await transactionService.lock(user.id)
 
     try {
       const lastTransaction = await transactionService.getLastTransaction(
         user.id,
       )
 
-      const {
-        closingBalance: lastBalance = 0,
-        totalBet = 0,
-        totalWon = 0,
-        totalLost = 0,
-        totalRTP = 0,
-      } = lastTransaction ?? {}
+      const { closingBalance: lastBalance = 0 } = lastTransaction ?? {}
 
       if (lastBalance < payload.bet) {
         throw new BadRequestException({
@@ -91,37 +87,26 @@ export const playDiceRoute = new Hono().post(
       )
 
       const amount = hasWon ? winAmount : -payload.bet
-      const rtp = amount + payload.bet
-      const won = hasWon ? winAmount : 0
-      const lost = hasWon ? 0 : payload.bet
 
-      const transactionType = hasWon
-        ? TransactionType.Win
-        : TransactionType.Loss
-
-      const newTransaction = await transactionService.createTransaction(
-        user.id,
-        {
-          type: transactionType,
+      const { gameRecord, transaction } = await gameService.saveGame({
+        userId: user.id,
+        game: Game.Dice,
+        bet: payload.bet,
+        payout: amount,
+        snapshot: {
           game: Game.Dice,
-          amount,
-          openingBalance: lastBalance,
-          closingBalance: lastBalance + amount,
-          totalBet: totalBet + payload.bet,
-          totalWon: totalWon + won,
-          totalLost: totalLost + lost,
-          totalRTP: totalRTP + rtp,
+          inputSides: payload.sides,
+          outputSide: side,
         },
-      )
+        outcome: hasWon ? GameOutcome.Win : GameOutcome.Loss,
+        previewUserName: profile.name,
+        previousTransaction: lastTransaction,
+      })
 
       return ctx.json({
         status: 'success',
-        transactionId: newTransaction.id,
-        transactionType,
-        side,
-        amount,
-        openingBalance: newTransaction.openingBalance,
-        closingBalance: newTransaction.closingBalance,
+        record: gameRecord,
+        updatedBalance: transaction.closingBalance,
       })
     } catch (error) {
       if (error instanceof RouteException) {

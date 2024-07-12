@@ -11,6 +11,10 @@ import { singleton } from 'tsyringe'
 
 @singleton()
 export class TransactionService {
+  lock = async (userId: string, ms = 3000) => {
+    return gamesCaches.lastTransaction.lock(userId, ms)
+  }
+
   getLastTransaction = async (
     userId: string,
   ): Promise<TransactionSelect | null> => {
@@ -41,7 +45,9 @@ export class TransactionService {
 
   createTransaction = async (
     userId: string,
-    payload: Required<Omit<TransactionInsert, 'id' | 'createdAt' | 'userId'>>,
+    payload: Required<
+      Omit<TransactionInsert, 'id' | 'createdAt' | 'userId' | 'gameRecordId'>
+    >,
   ): Promise<TransactionSelect> => {
     const [newTransaction] = await this.createTransactionQuery.execute({
       userId,
@@ -71,6 +77,7 @@ export class TransactionService {
       totalWon: sql.placeholder('totalWon'),
       totalLost: sql.placeholder('totalLost'),
       totalRTP: sql.placeholder('totalRTP'),
+      gameRecordId: null,
     })
     .returning()
     .prepare('createTransactionQuery')
