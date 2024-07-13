@@ -3,7 +3,7 @@ import { createApiEffect } from '@core/hono-client'
 import { createQuery } from '@farfetched/core'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
-import { and } from 'patronum'
+import { and, not } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
 import { env } from '../../shared/env'
@@ -37,6 +37,7 @@ const $loggingOut = logoutMutation.$pending
 const expiresAt = Cookies.get('sessionExpiresAt') ?? null
 const initialExpired = expiresAt === null || new Date() >= new Date(expiresAt)
 const $expired = createStore(initialExpired)
+const $loggedIn = not($expired)
 
 sample({
   clock: request,
@@ -79,5 +80,6 @@ export const $$user = {
   $loading,
   $loaded,
   $expired,
+  $loggedIn,
   $loggingOut,
 }

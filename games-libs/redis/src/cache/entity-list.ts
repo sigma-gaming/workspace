@@ -84,6 +84,11 @@ export class GlobalEntityListService<TValue> {
   }
 
   async set(values: TValue[]) {
+    if (values.length === 0) {
+      await this.empty()
+      return 0
+    }
+
     try {
       // Use rpush to avoid reversing the values
       const length = await this.redis.rpush(
@@ -211,6 +216,11 @@ export class KeyEntityListService<TValue> {
   }
 
   async set(key: string, values: TValue[]) {
+    if (values.length === 0) {
+      await this.empty(this.keygen(key))
+      return 0
+    }
+
     try {
       // Use rpush to avoid reversing the values
       const length = await this.redis.rpush(

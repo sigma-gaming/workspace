@@ -1,102 +1,146 @@
 import { createApiEffect } from '@core/hono-client'
 import { subscriptionFactory } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
-import { invoke } from '@withease/factories'
-import { combine, createEvent, createStore, sample } from 'effector'
+import { createFactory, invoke } from '@withease/factories'
+import {
+  combine,
+  createEvent,
+  createStore,
+  Effect,
+  Event,
+  sample,
+} from 'effector'
 import { and, interval, not } from 'patronum'
+import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
+
+export type Tab = 'last-wins' | 'big-wins' | 'my-games'
 
 const initialize = createEvent()
 const reset = createEvent()
 const appendMyGame = createEvent<GameRecordSelect>()
+const resetMyGames = createEvent()
+const setTab = createEvent<Tab | null>()
+const resetTab = createEvent()
 
 const getLastWinsFx = createApiEffect(gamesApi.gameHistory.getLastWins.$get)
+const getBigWinsFx = createApiEffect(gamesApi.gameHistory.getBigWins.$get)
 const getMyGamesFx = createApiEffect(gamesApi.gameHistory.getMyGames.$get)
 
 const { receivedData: lastWinsReceived } = invoke(() => {
   return subscriptionFactory({ ws: gamesWs, event: 'gameHistory/lastWins' })
 })
 
-const $lastWinsLoaded = createStore(false)
-  .on(getLastWinsFx.done, () => true)
-  .reset(reset)
+const { receivedData: bigWinsReceived } = invoke(() => {
+  return subscriptionFactory({ ws: gamesWs, event: 'gameHistory/bigWins' })
+})
+
+const feedFactory = createFactory(
+  (options: {
+    getInitialFx: Effect<unknown, GameRecordSelect[]>
+    recordsReceived: Event<GameRecordSelect[]>
+  }) => {
+    const { getInitialFx, recordsReceived } = options
+
+    const $initialLoaded = createStore(false)
+      .on(getInitialFx.done, () => true)
+      .reset(reset)
+
+    const $queue = createStore<GameRecordSelect[]>([])
+
+    const $feed = createStore<GameRecordSelect[]>([]).on(
+      getInitialFx.doneData,
+      (_, records) => records,
+    )
+
+    const $queueOnlyNew = combine($queue, $feed, (queue, feed) => {
+      const lastDate = new Date(feed[0]?.createdAt ?? 0)
+      return queue.filter((record) => new Date(record.createdAt) > lastDate)
+    })
+
+    const $hasNewRecords = $queueOnlyNew.map((queue) => queue.length > 0)
+
+    sample({
+      clock: recordsReceived,
+      source: $queue,
+      fn: (queue, incoming) => {
+        const incomingIds = new Set(incoming.map(({ id }) => id))
+
+        return queue
+          .filter((queued) => !incomingIds.has(queued.id))
+          .concat(incoming)
+          .slice(-20)
+      },
+      target: $queue,
+    })
+
+    const { tick: updateFeed } = interval({
+      start: initialize,
+      stop: reset,
+      timeout: 1000,
+    })
+
+    const nextRecordTaken = sample({
+      clock: updateFeed,
+      source: $queueOnlyNew,
+      filter: and($initialLoaded, $hasNewRecords),
+      fn: (queue) => queue[0],
+    })
+
+    sample({
+      clock: nextRecordTaken,
+      source: $queue,
+      fn: (queue, nextRecord) =>
+        queue.filter((record) => {
+          // Remove outdated wins from queue
+          return new Date(record.createdAt) > new Date(nextRecord.createdAt)
+        }),
+      target: $queue,
+    })
+
+    sample({
+      clock: nextRecordTaken,
+      source: $feed,
+      fn: (feed, nextRecord) => [nextRecord].concat(feed).slice(0, 10),
+      target: $feed,
+    })
+
+    return $feed
+  },
+)
+
+const $tab = createStore<Tab | null>('last-wins')
+  .on(setTab, (_, tab) => tab)
+  .reset(reset, resetTab)
 
 const $myGamesLoaded = createStore(false)
   .on(getMyGamesFx.done, () => true)
-  .reset(reset)
+  .reset(reset, resetMyGames)
 
-const $lastWinsQueue = createStore<GameRecordSelect[]>([])
+const $myGames = createStore<GameRecordSelect[]>([])
+  .on(getMyGamesFx.doneData, (_, myGames) => myGames)
+  .reset(reset, resetMyGames)
 
-const $lastWins = createStore<GameRecordSelect[]>([]).on(
-  getLastWinsFx.doneData,
-  (_, lastWins) => lastWins,
-)
+const $lastWins = invoke(feedFactory, {
+  getInitialFx: getLastWinsFx,
+  recordsReceived: lastWinsReceived,
+})
 
-const $myGames = createStore<GameRecordSelect[]>([]).on(
-  getMyGamesFx.doneData,
-  (_, myGames) => myGames,
-)
-
-const $lastWinsQueueOnlyNew = combine(
-  $lastWinsQueue,
-  $lastWins,
-  (queue, lastWins) => {
-    const lastWinDate = new Date(lastWins[0]?.createdAt ?? 0)
-    return queue.filter((record) => new Date(record.createdAt) > lastWinDate)
-  },
-)
-
-const $hasNewLastWins = $lastWinsQueueOnlyNew.map((queue) => queue.length > 0)
+const $bigWins = invoke(feedFactory, {
+  getInitialFx: getBigWinsFx,
+  recordsReceived: bigWinsReceived,
+})
 
 sample({
   clock: initialize,
-  target: [getLastWinsFx, getMyGamesFx],
+  target: [getLastWinsFx, getBigWinsFx],
 })
 
 sample({
-  clock: lastWinsReceived,
-  source: $lastWinsQueue,
-  fn: (lastWinsQueue, incomingWins) => {
-    const incomingIds = new Set(incomingWins.map(({ id }) => id))
-
-    return lastWinsQueue
-      .filter((queued) => !incomingIds.has(queued.id))
-      .concat(incomingWins)
-      .slice(-20)
-  },
-  target: $lastWinsQueue,
-})
-
-const { tick: updateLastWins } = interval({
-  start: initialize,
-  stop: reset,
-  timeout: 1000,
-})
-
-const nextWinFound = sample({
-  clock: updateLastWins,
-  source: $lastWinsQueueOnlyNew,
-  filter: and($lastWinsLoaded, $hasNewLastWins),
-  fn: (queue) => queue[0],
-})
-
-sample({
-  clock: nextWinFound,
-  source: $lastWinsQueue,
-  fn: (queue, nextWin) =>
-    queue.filter((win) => {
-      // Remove outdated wins from queue
-      return new Date(win.createdAt) > new Date(nextWin.createdAt)
-    }),
-  target: $lastWinsQueue,
-})
-
-sample({
-  clock: nextWinFound,
-  source: $lastWins,
-  fn: (lastWins, nextWin) => [nextWin].concat(lastWins).slice(0, 10),
-  target: $lastWins,
+  clock: initialize,
+  filter: not($$user.$expired),
+  target: getMyGamesFx,
 })
 
 sample({
@@ -107,10 +151,18 @@ sample({
   target: $myGames,
 })
 
+sample({
+  clock: $$user.logout,
+  target: [resetMyGames, resetTab],
+})
+
 export const $$gameHistory = {
   initialize,
   reset,
   appendMyGame,
+  setTab,
+  $tab,
   $lastWins,
+  $bigWins,
   $myGames,
 }

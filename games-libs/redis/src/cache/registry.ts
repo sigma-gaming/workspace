@@ -30,6 +30,7 @@ export class CacheRegistry {
   personalNotifications: KeyJsonEntityService<NotificationSelect[]>
   lastChatMessages: GlobalEntityListService<ChatMessageSelect>
   lastWinHistory: GlobalEntityListService<GameRecordSelect>
+  bigWinHistory: GlobalEntityListService<GameRecordSelect>
   userGameHistory: KeyEntityListService<GameRecordSelect>
 
   constructor(@inject(CacheVersionToken) version: string) {
@@ -90,7 +91,13 @@ export class CacheRegistry {
     this.lastWinHistory = new GlobalEntityListService<GameRecordSelect>({
       key: `${version}:global:lastWinHistory`,
       max: 10,
-      ttl: 60 * 60 * 1, // 1 hour
+      ttl: 60 * 60 * 1, // 6 hours
+    })
+
+    this.bigWinHistory = new GlobalEntityListService<GameRecordSelect>({
+      key: `${version}:global:bigWinHistory`,
+      max: 10,
+      ttl: 60 * 60 * 6, // 6 hours
     })
 
     this.userGameHistory = new KeyEntityListService<GameRecordSelect>({

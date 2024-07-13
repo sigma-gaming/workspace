@@ -1,9 +1,26 @@
+.list {
+  @apply overflow-auto flex-nowrap;
+  scrollbar-width: none;
+}
+
 .list:before {
   @apply border-[#25273E];
 }
 
 .tabLabel {
   @apply font-interface font-medium;
+}
+
+.tabSection[data-position="left"] {
+  @apply mr-2;
+}
+
+.tabSection[data-position="right"] {
+  @apply ml-2;
+}
+
+.tab {
+  @apply font-interface;
 }
 
 .tab:hover {

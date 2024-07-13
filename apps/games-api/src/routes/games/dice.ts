@@ -5,7 +5,7 @@ import {
 } from '@core/exceptions'
 import { loggerService } from '@core/logger'
 import { Game, GameOutcome } from '@dbs/games-schema'
-import { calculateDiceWinAmount, gem } from '@games/model'
+import { calculateDiceWinAmount, gemInt } from '@games/model'
 import {
   budgetService,
   gameService,
@@ -58,7 +58,7 @@ export const playDiceRoute = new Hono().post(
     const user = sessionService.getUser(session)
     const profile = await profileService.getDetailedProfile(user.id)
 
-    if (payload.bet < gem(1)) {
+    if (payload.bet < gemInt(1)) {
       throw new BadRequestException({
         path: ['bet'],
         message: 'Минимальная ставка - 1 гем',

@@ -5,10 +5,11 @@ import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { createElement, ReactNode, useEffect } from 'react'
+import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { formatGem } from '../../shared/lib/format/currency'
 import { Icons } from '../../shared/ui/icons'
-import { $$gameHistory } from './model'
+import { $$gameHistory, Tab } from './model'
 
 const gameToLabelMap: Record<Game, string> = {
   [Game.Dice]: 'Dice',
@@ -23,6 +24,9 @@ const gameToRouteMap: Record<Game, RouteInstance<RouteParams>> = {
 }
 
 export const GameHistoryTable = () => {
+  const tab = useUnit($$gameHistory.$tab)
+  const loggedIn = useUnit($$user.$loggedIn)
+
   useEffect(() => {
     $$gameHistory.initialize()
     return () => $$gameHistory.reset()
@@ -30,18 +34,42 @@ export const GameHistoryTable = () => {
 
   return (
     <Card className="grow p-0 rounded-xl md:rounded-2xl">
-      <Tabs defaultValue="last-wins">
+      <Tabs
+        value={tab}
+        onChange={(tab) => $$gameHistory.setTab(tab as Tab | null)}
+      >
         <Tabs.List>
-          <Tabs.Tab value="last-wins" className="px-6 py-4 font-interface">
+          <Tabs.Tab
+            value="last-wins"
+            className="px-4 md:px-6 py-4"
+            leftSection={<Icons.Transfer width={20} height={20} />}
+          >
             Все игры
           </Tabs.Tab>
-          <Tabs.Tab value="my-games" className="px-6 py-4 font-interface">
-            Мои игры
+          <Tabs.Tab
+            value="big-wins"
+            className="px-4 md:px-6 py-4"
+            leftSection={<Icons.TrendingUp width={20} height={20} />}
+          >
+            Крупные выигрыши
           </Tabs.Tab>
+          {loggedIn && (
+            <Tabs.Tab
+              value="my-games"
+              className="px-4 md:px-6 py-4"
+              leftSection={<Icons.History width={20} height={20} />}
+            >
+              Мои игры
+            </Tabs.Tab>
+          )}
         </Tabs.List>
 
         <Tabs.Panel value="last-wins">
           <LastWinsTable />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="big-wins">
+          <BigWinsTable />
         </Tabs.Panel>
 
         <Tabs.Panel value="my-games">
@@ -57,6 +85,11 @@ const LastWinsTable = () => {
   return <HistoryTable records={lastWins} />
 }
 
+const BigWinsTable = () => {
+  const bigWins = useUnit($$gameHistory.$bigWins)
+  return <HistoryTable records={bigWins} />
+}
+
 const MyGamesTable = () => {
   const myGames = useUnit($$gameHistory.$myGames)
   return <HistoryTable records={myGames} />
@@ -70,13 +103,24 @@ const HistoryTable = ({ records }: { records: GameRecordSelect[] }) => {
           <Cell type="head" className="font-medium">
             Игра
           </Cell>
-          <Cell type="head" className="font-medium">
+          <Cell
+            type="head"
+            className="font-medium hidden sm:table-cell lg:hidden xl:table-cell"
+          >
             Игрок
           </Cell>
-          <Cell type="head" className="font-medium" align="center">
+          <Cell
+            type="head"
+            className="font-medium hidden sm:table-cell lg:hidden xl:table-cell"
+            align="center"
+          >
             Ставка
           </Cell>
-          <Cell type="head" className="font-medium" align="center">
+          <Cell
+            type="head"
+            className="font-medium hidden sm:table-cell lg:hidden xl:table-cell"
+            align="center"
+          >
             Множитель
           </Cell>
           <Cell type="head" className="font-medium" align="right">
@@ -104,9 +148,23 @@ const HistoryTable = ({ records }: { records: GameRecordSelect[] }) => {
                 {gameToIconMap[record.game]}
                 <Link to={route}>{gameToLabelMap[record.game]}</Link>
               </Cell>
-              <Cell textColor="primary">{record.previewUserName}</Cell>
-              <Cell align="center">{formatGem(record.bet / 100)}g</Cell>
-              <Cell align="center" textColor={highlight}>
+              <Cell
+                className="hidden sm:table-cell lg:hidden xl:table-cell"
+                textColor="primary"
+              >
+                {record.previewUserName}
+              </Cell>
+              <Cell
+                className="hidden sm:table-cell lg:hidden xl:table-cell"
+                align="center"
+              >
+                {formatGem(record.bet / 100)}g
+              </Cell>
+              <Cell
+                className="hidden sm:table-cell lg:hidden xl:table-cell"
+                align="center"
+                textColor={highlight}
+              >
                 {multiplier}x
               </Cell>
               <Cell align="right" textColor={highlight}>
@@ -127,6 +185,7 @@ interface CellProps {
   textSize?: 'sm' | 'xs'
   textColor?: 'default' | 'primary' | 'success' | 'failure'
   align?: 'left' | 'center' | 'right'
+  hidden?: boolean
 }
 
 const Cell = ({
@@ -136,7 +195,12 @@ const Cell = ({
   textSize = type === 'head' ? 'xs' : 'sm',
   textColor = 'default',
   align = 'left',
+  hidden = false,
 }: CellProps) => {
+  if (hidden) {
+    return null
+  }
+
   return createElement(
     type === 'head' ? 'th' : 'td',
     {

@@ -5,8 +5,9 @@ import {
   GameRecordSelect,
   GameRecordTable,
 } from '@dbs/games-schema'
+import { gemFloat, gemInt } from '@games/model'
 import { gamesCaches } from '@games/redis'
-import { desc, eq } from 'drizzle-orm'
+import { and, desc, eq, gte, sql } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 
 @singleton()
@@ -26,6 +27,27 @@ export class GameHistoryService {
     return records
   }
 
+  getBigWinHistory = async () => {
+    if (await gamesCaches.bigWinHistory.exists()) {
+      return gamesCaches.bigWinHistory.get()
+    }
+
+    const records = await gamesDb.query.GameRecordTable.findMany({
+      where: and(
+        gte(GameRecordTable.multiplier, 150),
+        gte(
+          sql`${GameRecordTable.bet} + ${GameRecordTable.payout}`,
+          gemInt(3000),
+        ),
+      ),
+      orderBy: desc(GameRecordTable.createdAt),
+      limit: 10,
+    })
+
+    await gamesCaches.bigWinHistory.set(records)
+    return records
+  }
+
   getUserGameHistory = async (userId: string) => {
     if (await gamesCaches.userGameHistory.exists(userId)) {
       return gamesCaches.userGameHistory.get(userId)
@@ -41,13 +63,22 @@ export class GameHistoryService {
     return records
   }
 
-  addGameRecord = async (gameRecord: GameRecordSelect) => {
-    const promises = [
-      gamesCaches.userGameHistory.unshift(gameRecord.userId, gameRecord),
+  addGameRecord = async (record: GameRecordSelect) => {
+    const promises: Promise<unknown>[] = []
 
-      gameRecord.outcome === GameOutcome.Win &&
-        gamesCaches.lastWinHistory.unshift(gameRecord),
-    ].filter(Boolean)
+    promises.push(gamesCaches.userGameHistory.unshift(record.userId, record))
+
+    console.log(record)
+    if (
+      gemFloat(record.bet + record.payout) >= 3000 &&
+      record.multiplier >= 150
+    ) {
+      promises.push(gamesCaches.bigWinHistory.unshift(record))
+    }
+
+    if (record.outcome === GameOutcome.Win) {
+      promises.push(gamesCaches.lastWinHistory.unshift(record))
+    }
 
     await Promise.all(promises)
   }

@@ -8,6 +8,7 @@ export interface ServerToClientEvents {
   'chat/message': (message: ChatMessageSelect) => void
   'notification': (notification: NotificationSelect) => void
   'gameHistory/lastWins': (lastWins: GameRecordSelect[]) => void
+  'gameHistory/bigWins': (bigWins: GameRecordSelect[]) => void
   'maintenance/started': () => void
 }
 
