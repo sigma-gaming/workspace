@@ -4,7 +4,6 @@ import { Button, Menu, Modal, rem, Skeleton, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconCoins,
-  IconDiamondsFilled,
   IconLoader2,
   IconLogout,
   IconSettings,
@@ -21,6 +20,7 @@ import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { formatGem } from '../../shared/lib/format/currency.ts'
+import { Icons } from '../../shared/ui/icons/index.tsx'
 
 function useAvatarSize() {
   const fromLg = useMedia({ from: 'lg' })
@@ -75,7 +75,7 @@ export const MiniProfile = () => {
                 >
                   <AnimatedBalance />
                 </Text>
-                <IconDiamondsFilled className="w-6 h-6 text-primary-4 -translate-y-[1px]" />
+                <Icons.Gem className="w-6 h-6 text-primary-4 -translate-y-[1px]" />
               </div>
             </Skeleton>
           </div>

@@ -1,4 +1,5 @@
 import { Dice } from './dice.tsx'
+import { Gem } from './gem.tsx'
 import { History } from './history.tsx'
 import { Play } from './play.tsx'
 import { Telegram } from './telegram.tsx'
@@ -9,6 +10,7 @@ import { Vk } from './vk.tsx'
 export const Icons = {
   Vk,
   Telegram,
+  Gem,
   Dice,
   Play,
   History,

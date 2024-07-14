@@ -1,5 +1,5 @@
 import { Game, GameOutcome, GameRecordSelect } from '@dbs/games-schema'
-import { Card, LoadingOverlay, Tabs } from '@mantine/core'
+import { Card, LoadingOverlay, Tabs, Text } from '@mantine/core'
 import { useIsFirstRender } from '@mantine/hooks'
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
@@ -88,7 +88,7 @@ const LastWinsTable = () => {
   const lastWinsLoaded = useUnit($$gameHistory.$lastWinsLoaded)
   if (tab !== 'last-wins') return null
   if (!lastWinsLoaded) return <TableLoader />
-  if (lastWins.length === 0) return null
+  if (lastWins.length === 0) return <TableEmpty />
   return <HistoryTable records={lastWins} />
 }
 
@@ -98,7 +98,7 @@ const BigWinsTable = () => {
   const bigWinsLoaded = useUnit($$gameHistory.$bigWinsLoaded)
   if (tab !== 'big-wins') return null
   if (!bigWinsLoaded) return <TableLoader />
-  if (bigWins.length === 0) return null
+  if (bigWins.length === 0) return <TableEmpty />
   return <HistoryTable records={bigWins} />
 }
 
@@ -108,7 +108,7 @@ const MyGamesTable = () => {
   const myGamesLoaded = useUnit($$gameHistory.$myGamesLoaded)
   if (tab !== 'my-games') return null
   if (!myGamesLoaded) return <TableLoader />
-  if (myGames.length === 0) return null
+  if (myGames.length === 0) return <TableEmpty />
   return <HistoryTable records={myGames} />
 }
 
@@ -162,6 +162,14 @@ const TableLoader = () => {
   return (
     <div className="relative w-full h-[484px]">
       <LoadingOverlay visible={true} overlayProps={{ bg: '#1B1C2F' }} />
+    </div>
+  )
+}
+
+const TableEmpty = () => {
+  return (
+    <div className="px-4 md:px-6 py-4">
+      <Text>Здесь пока что нет игр</Text>
     </div>
   )
 }
