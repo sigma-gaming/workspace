@@ -1,10 +1,10 @@
 .list {
-  @apply overflow-auto flex-nowrap;
+  @apply overflow-x-auto overflow-y-visible flex-nowrap;
   scrollbar-width: none;
 }
 
 .list:before {
-  @apply border-[#25273E];
+  content: none;
 }
 
 .tabLabel {
@@ -21,6 +21,11 @@
 
 .tab {
   @apply font-interface;
+  @apply border-b-2 border-[#25273e];
+}
+
+.tab:where([data-active]) {
+  @apply border-[var(--tabs-color)];
 }
 
 .tab:hover {
