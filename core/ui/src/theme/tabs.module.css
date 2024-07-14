@@ -1,5 +1,6 @@
 .list {
   @apply overflow-x-auto overflow-y-visible flex-nowrap;
+  box-shadow: inset 0 -2px #25273e;
   scrollbar-width: none;
 }
 
