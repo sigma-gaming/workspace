@@ -3,6 +3,10 @@
   background-color: #25273C;
 }
 
+.root + .root {
+  @apply mt-[var(--mantine-spacing-xs)] md:mt-[var(--mantine-spacing-md)];
+}
+
 .description {
   color: var(--mantine-color-text);
 }

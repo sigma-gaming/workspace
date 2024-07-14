@@ -1,0 +1,3 @@
+.root {
+  @apply !bottom-[72px] lg:!bottom-[var(--mantine-spacing-md)];
+}

@@ -161,7 +161,11 @@ const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
 const TableLoader = () => {
   return (
     <div className="relative w-full h-[484px]">
-      <LoadingOverlay visible={true} overlayProps={{ bg: '#1B1C2F' }} />
+      <LoadingOverlay
+        visible={true}
+        overlayProps={{ bg: '#1B1C2F' }}
+        zIndex={0}
+      />
     </div>
   )
 }

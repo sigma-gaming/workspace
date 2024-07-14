@@ -37,7 +37,7 @@ export const MobileTabs = () => {
 
   return (
     <>
-      <div className="fixed z-50 left-0 right-0 bottom-0 bg-[#1B1C2F] flex justify-around h-[--tabs-height] px-4 bg-opacity-80 backdrop-blur-md shadow-border">
+      <div className="fixed z-[200] left-0 right-0 bottom-0 bg-[#1B1C2F] flex justify-around h-[--tabs-height] px-4 bg-opacity-80 backdrop-blur-md shadow-border">
         <button
           className={clsx(
             'relative flex flex-col gap-0.5 w-12 items-center justify-center',

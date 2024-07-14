@@ -22,6 +22,7 @@ import {
   Tabs,
   Title,
 } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
 import { PropsWithChildren } from 'react'
 import { colors } from '../colors'
 import actionIconClassNames from './action-icon.module.css'
@@ -34,6 +35,7 @@ import menuClassNames from './menu.module.css'
 import modalClassNames from './modal.module.css'
 import multiSelectClassNames from './multi-select.module.css'
 import notificationClassNames from './notification.module.css'
+import notificationsClassNames from './notifications.module.css'
 import numberInputClassNames from './number-input.module.css'
 import pillClassNames from './pill.module.css'
 import popoverClassNames from './popover.module.css'
@@ -57,6 +59,10 @@ export const theme = createTheme({
     }),
     Notification: Notification.extend({
       classNames: notificationClassNames,
+    }),
+    Notifications: Notifications.extend({
+      classNames: notificationsClassNames,
+      defaultProps: { zIndex: 290 },
     }),
     Title: Title.extend({
       classNames: titleClassNames,
@@ -95,6 +101,7 @@ export const theme = createTheme({
     }),
     LoadingOverlay: LoadingOverlay.extend({
       classNames: loadingOverlayClassNames,
+      defaultProps: { zIndex: 150 },
     }),
     Pill: Pill.extend({
       classNames: pillClassNames,
