@@ -2,14 +2,15 @@ import { IconCategory2, IconMenu2, IconMessage } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
+import { disablePageScroll, enablePageScroll } from 'scroll-lock'
 import { router, routes } from '../../routing'
 import { Chat } from '../../widgets/chat'
 import { BaseLayoutMenu } from './menu'
 
 enum Tab {
-  Menu,
-  Chat,
+  Menu = 'menu',
+  Chat = 'chat',
 }
 
 export const MobileTabs = () => {
@@ -19,6 +20,20 @@ export const MobileTabs = () => {
   const toggle = (tab: Tab) => {
     setTab((previous) => (previous === tab ? null : tab))
   }
+
+  useLayoutEffect(() => {
+    let disabled = false
+
+    if (tab) {
+      disablePageScroll()
+      disabled = true
+    }
+
+    return () => {
+      if (!disabled) return
+      enablePageScroll()
+    }
+  }, [tab])
 
   return (
     <>
@@ -66,7 +81,10 @@ export const MobileTabs = () => {
       </div>
 
       {tab === Tab.Menu && (
-        <div className="fixed z-40 inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]">
+        <div
+          className="fixed z-40 inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]"
+          data-scroll-lock-scrollable
+        >
           <div className="px-4 py-6 h-full">
             <BaseLayoutMenu onNavigate={() => setTab(null)} />
           </div>
@@ -74,7 +92,10 @@ export const MobileTabs = () => {
       )}
 
       {tab === Tab.Chat && (
-        <div className="fixed z-40 inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]">
+        <div
+          className="fixed z-40 inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]"
+          data-scroll-lock-scrollable
+        >
           <div className="px-4 py-6 h-full">
             <Chat />
           </div>
