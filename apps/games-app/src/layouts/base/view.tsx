@@ -62,7 +62,7 @@ export const BaseLayout = ({ className, children }: Props) => {
 
 const Header = () => {
   return (
-    <div className="pointer-events-none sticky top-0 z-50 h-[--header-height] py-2 bg-[#1B1C2F] bg-opacity-80 lg:bg-transparent flex items-center justify-between lg:backdrop-blur-md shadow-border lg:shadow-none">
+    <div className="pointer-events-none sticky top-0 z-50 h-[--header-height] py-2 bg-[#1B1C2F] bg-opacity-80 lg:bg-transparent flex items-center justify-between backdrop-blur-md lg:backdrop-blur-none shadow-border lg:shadow-none">
       <div className="pointer-events-auto w-[280px] pl-2 lg:pl-4 flex justify-start lg:justify-center">
         <Link
           to={routes.home}
