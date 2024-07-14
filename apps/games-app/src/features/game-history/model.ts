@@ -49,10 +49,9 @@ const feedFactory = createFactory(
 
     const $queue = createStore<GameRecordSelect[]>([])
 
-    const $feed = createStore<GameRecordSelect[]>([]).on(
-      getInitialFx.doneData,
-      (_, records) => records,
-    )
+    const $feed = createStore<GameRecordSelect[]>([])
+      .on(getInitialFx.doneData, (_, records) => records)
+      .reset(reset)
 
     const $queueOnlyNew = combine($queue, $feed, (queue, feed) => {
       const lastDate = new Date(feed[0]?.createdAt ?? 0)
