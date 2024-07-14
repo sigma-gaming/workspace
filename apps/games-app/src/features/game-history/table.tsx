@@ -1,15 +1,17 @@
 import { Game, GameOutcome, GameRecordSelect } from '@dbs/games-schema'
 import { Card, Tabs } from '@mantine/core'
+import { useIsFirstRender } from '@mantine/hooks'
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
-import { createElement, ReactNode, useEffect } from 'react'
+import { memo, ReactNode, useEffect } from 'react'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { formatGem } from '../../shared/lib/format/currency'
 import { Icons } from '../../shared/ui/icons'
 import { $$gameHistory, Tab } from './model'
+import styles from './table.module.css'
 
 const gameToLabelMap: Record<Game, string> = {
   [Game.Dice]: 'Dice',
@@ -81,25 +83,36 @@ export const GameHistoryTable = () => {
 }
 
 const LastWinsTable = () => {
+  const tab = useUnit($$gameHistory.$tab)
   const lastWins = useUnit($$gameHistory.$lastWins)
+  if (tab !== 'last-wins') return null
+  if (lastWins.length === 0) return null
   return <HistoryTable records={lastWins} />
 }
 
 const BigWinsTable = () => {
+  const tab = useUnit($$gameHistory.$tab)
   const bigWins = useUnit($$gameHistory.$bigWins)
+  if (tab !== 'big-wins') return null
+  if (bigWins.length === 0) return null
   return <HistoryTable records={bigWins} />
 }
 
 const MyGamesTable = () => {
+  const tab = useUnit($$gameHistory.$tab)
   const myGames = useUnit($$gameHistory.$myGames)
+  if (tab !== 'my-games') return null
+  if (myGames.length === 0) return null
   return <HistoryTable records={myGames} />
 }
 
-const HistoryTable = ({ records }: { records: GameRecordSelect[] }) => {
+const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
+  const isFirstRender = useIsFirstRender()
+
   return (
-    <table className="w-full text-left">
+    <table className={styles.table}>
       <thead>
-        <tr>
+        <tr className={styles.row}>
           <Cell type="head" className="font-medium">
             Игра
           </Cell>
@@ -130,55 +143,70 @@ const HistoryTable = ({ records }: { records: GameRecordSelect[] }) => {
       </thead>
       <tbody>
         {records.map((record) => {
-          const route = gameToRouteMap[record.game]
-          const hasWon = record.outcome === GameOutcome.Win
-          const highlight = hasWon ? 'success' : 'failure'
-
-          const multiplier = hasWon
-            ? Math.floor(100 + record.multiplier) / 100
-            : 0
-
-          const payout = hasWon
-            ? formatGem((record.bet + record.payout) / 100)
-            : formatGem(record.payout / 100)
-
           return (
-            <tr key={record.id} className="border-t-[1px] border-[#25273E]">
-              <Cell className="flex gap-2 items-center">
-                {gameToIconMap[record.game]}
-                <Link to={route}>{gameToLabelMap[record.game]}</Link>
-              </Cell>
-              <Cell
-                className="hidden sm:table-cell lg:hidden xl:table-cell"
-                textColor="primary"
-              >
-                {record.previewUserName}
-              </Cell>
-              <Cell
-                className="hidden sm:table-cell lg:hidden xl:table-cell"
-                align="center"
-              >
-                {formatGem(record.bet / 100)}g
-              </Cell>
-              <Cell
-                className="hidden sm:table-cell lg:hidden xl:table-cell"
-                align="center"
-                textColor={highlight}
-              >
-                {multiplier}x
-              </Cell>
-              <Cell align="right" textColor={highlight}>
-                {payout}g
-              </Cell>
-            </tr>
+            <Row key={record.id} record={record} animated={!isFirstRender} />
           )
         })}
       </tbody>
     </table>
   )
-}
+})
 
-interface CellProps {
+const Row = memo(
+  ({ record, animated }: { record: GameRecordSelect; animated: boolean }) => {
+    console.log('render')
+    const route = gameToRouteMap[record.game]
+    const hasWon = record.outcome === GameOutcome.Win
+    const highlight = hasWon ? 'success' : 'failure'
+
+    const multiplier = hasWon ? Math.floor(100 + record.multiplier) / 100 : 0
+
+    const payout = hasWon
+      ? formatGem((record.bet + record.payout) / 100)
+      : formatGem(record.payout / 100)
+
+    return (
+      <tr className={styles.row} data-animated={animated}>
+        <Cell className="flex gap-2 items-center">
+          {gameToIconMap[record.game]}
+          <Link to={route}>{gameToLabelMap[record.game]}</Link>
+        </Cell>
+        <Cell
+          className="hidden sm:table-cell lg:hidden xl:table-cell"
+          textColor="primary"
+        >
+          {record.previewUserName}
+        </Cell>
+        <Cell
+          className="hidden sm:table-cell lg:hidden xl:table-cell"
+          align="center"
+        >
+          {formatGem(record.bet / 100)}g
+        </Cell>
+        <Cell
+          className="hidden sm:table-cell lg:hidden xl:table-cell"
+          align="center"
+          textColor={highlight}
+        >
+          {multiplier}x
+        </Cell>
+        <Cell align="right" textColor={highlight}>
+          {payout}g
+        </Cell>
+      </tr>
+    )
+  },
+)
+
+const Cell = ({
+  className: classNameExtra,
+  type = 'row',
+  children,
+  textSize = type === 'head' ? 'xs' : 'sm',
+  textColor = 'default',
+  align = 'left',
+  hidden = false,
+}: {
   type?: 'head' | 'row'
   className?: string
   children: ReactNode
@@ -186,39 +214,29 @@ interface CellProps {
   textColor?: 'default' | 'primary' | 'success' | 'failure'
   align?: 'left' | 'center' | 'right'
   hidden?: boolean
-}
-
-const Cell = ({
-  className,
-  type = 'row',
-  children,
-  textSize = type === 'head' ? 'xs' : 'sm',
-  textColor = 'default',
-  align = 'left',
-  hidden = false,
-}: CellProps) => {
+}) => {
   if (hidden) {
     return null
   }
 
-  return createElement(
-    type === 'head' ? 'th' : 'td',
-    {
-      className: clsx(
-        className,
-        'px-4 md:px-6 py-2 h-11 font-interface',
-        type === 'head' && 'uppercase font-medium',
-        textSize === 'xs' && 'text-xs',
-        textSize === 'sm' && 'text-sm',
-        textColor === 'default' && 'text-[#9494a5]',
-        textColor === 'primary' && 'text-[#fcf8f9]',
-        textColor === 'success' && 'text-green-400',
-        textColor === 'failure' && 'text-red-400',
-        align === 'left' && 'text-left',
-        align === 'center' && 'text-center',
-        align === 'right' && 'text-right',
-      ),
-    },
-    children,
+  const className = clsx(
+    classNameExtra,
+    'px-4 md:px-6 py-2 h-11 font-interface',
+    type === 'head' && 'uppercase font-medium',
+    textSize === 'xs' && 'text-xs',
+    textSize === 'sm' && 'text-sm',
+    textColor === 'default' && 'text-[#9494a5]',
+    textColor === 'primary' && 'text-[#fcf8f9]',
+    textColor === 'success' && 'text-green-400',
+    textColor === 'failure' && 'text-red-400',
+    align === 'left' && 'text-left',
+    align === 'center' && 'text-center',
+    align === 'right' && 'text-right',
   )
+
+  if (type === 'head') {
+    return <th className={className}>{children}</th>
+  }
+
+  return <td className={className}>{children}</td>
 }

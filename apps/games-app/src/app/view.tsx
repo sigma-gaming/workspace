@@ -3,6 +3,7 @@ import { ThemeProvider, useMedia } from '@core/ui'
 import { Notifications } from '@mantine/notifications'
 import { createRoutesView, RouterProvider } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
+import { domMax, LazyMotion } from 'framer-motion'
 import { MaintenanceOverlay } from '../features/maintenance/overlay.tsx'
 import { PAGES } from '../pages'
 import { NotFoundPageView } from '../pages/not-found'
@@ -55,17 +56,19 @@ export const AppView = () => {
   const isMobile = useMedia({ to: 'md' })
 
   return (
-    <RouterProvider router={router}>
-      <ThemeProvider>
-        <Notifications
-          limit={3}
-          position="bottom-left"
-          containerWidth={320}
-          bottom={isMobile ? 64 : 'var(--mantine-spacing-md)'}
-        />
-        <OptimizedPages />
-        <MaintenanceOverlay />
-      </ThemeProvider>
-    </RouterProvider>
+    <LazyMotion features={domMax}>
+      <RouterProvider router={router}>
+        <ThemeProvider>
+          <Notifications
+            limit={3}
+            position="bottom-left"
+            containerWidth={320}
+            bottom={isMobile ? 64 : 'var(--mantine-spacing-md)'}
+          />
+          <OptimizedPages />
+          <MaintenanceOverlay />
+        </ThemeProvider>
+      </RouterProvider>
+    </LazyMotion>
   )
 }

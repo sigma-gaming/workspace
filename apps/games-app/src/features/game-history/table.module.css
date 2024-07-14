@@ -1,0 +1,39 @@
+.table {
+  @apply w-full text-left border-spacing-0;
+  border-collapse: initial;
+}
+
+.row {
+  @apply bg-[#1B1C2F];
+
+  & > th,
+  & > td {
+    @apply overflow-hidden border-b-[1px] border-[#25273E];
+  }
+
+  &:last-child > td {
+    @apply border-b-0;
+  }
+}
+
+thead .row {
+  @apply relative z-10;
+}
+
+.row[data-animated="true"]:nth-of-type(odd) {
+  animation: row-slide-odd 0.5s ease-out forwards;
+}
+
+.row[data-animated="true"]:nth-of-type(even) {
+  animation: row-slide-even 0.5s ease-out forwards;
+}
+
+@keyframes row-slide-odd {
+  from { transform: translate3d(0, -100%, 0) }
+  to { transform: translate3d(0, 0, 0) }
+}
+
+@keyframes row-slide-even {
+  from { transform: translate3d(0, -100%, 0) }
+  to { transform: translate3d(0, 0, 0) }
+}
