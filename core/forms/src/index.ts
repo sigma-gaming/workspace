@@ -8,6 +8,7 @@ import {
   sample,
   Store,
 } from 'effector'
+import { persist } from 'effector-storage/local'
 import { ZodError, ZodObjectDef, ZodSchema } from 'zod'
 
 type FormValues = Record<string, unknown>
@@ -25,6 +26,7 @@ export function normalizeFieldErrors<TValues extends FormValues>(
 
 interface FieldOptions<TValue> {
   emptyValue: TValue
+  persistKey?: string
 }
 
 interface Field<TValue> {
@@ -104,6 +106,10 @@ export function createField<TValue>(
     .on(initialize, (_, value) => value)
     .on(update, (_, value) => value)
     .reset(empty)
+
+  if (options.persistKey) {
+    persist({ store: $value, key: options.persistKey })
+  }
 
   const $empty = $value.map((value) => value === emptyValue)
 

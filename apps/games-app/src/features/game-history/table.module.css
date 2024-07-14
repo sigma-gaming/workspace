@@ -4,7 +4,7 @@
 }
 
 .row {
-  @apply h-11 bg-[#1B1C2F];
+  @apply bg-[#1B1C2F];
 
   & > th,
   & > td {

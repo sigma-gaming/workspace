@@ -62,6 +62,7 @@ const playAnimationFx = attach({
 const fields = {
   bet: createField({
     emptyValue: '1',
+    persistKey: 'games/dice/bet',
   }),
   sides: createField<string[]>({
     emptyValue: ['1'],

@@ -227,7 +227,7 @@ const Cell = ({
 
   const className = clsx(
     classNameExtra,
-    'px-4 md:px-6 py-2 font-interface text-ellipsis',
+    'h-11 px-4 md:px-6 py-2 font-interface text-ellipsis',
     type === 'head' && 'uppercase font-medium',
     textSize === 'xs' && 'text-xs',
     textSize === 'sm' && 'text-sm',

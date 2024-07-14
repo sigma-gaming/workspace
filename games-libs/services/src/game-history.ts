@@ -68,7 +68,6 @@ export class GameHistoryService {
 
     promises.push(gamesCaches.userGameHistory.unshift(record.userId, record))
 
-    console.log(record)
     if (
       gemFloat(record.bet + record.payout) >= 3000 &&
       record.multiplier >= 150
