@@ -10,7 +10,7 @@ import {
   Event,
   sample,
 } from 'effector'
-import { and, interval, not } from 'patronum'
+import { and, interval, not, status } from 'patronum'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
@@ -27,6 +27,9 @@ const resetTab = createEvent()
 const getLastWinsFx = createApiEffect(gamesApi.gameHistory.getLastWins.$get)
 const getBigWinsFx = createApiEffect(gamesApi.gameHistory.getBigWins.$get)
 const getMyGamesFx = createApiEffect(gamesApi.gameHistory.getMyGames.$get)
+
+const $lastWinsLoaded = status(getLastWinsFx).map((status) => status === 'done')
+const $bigWinsLoaded = status(getBigWinsFx).map((status) => status === 'done')
 
 const { receivedData: lastWinsReceived } = invoke(() => {
   return subscriptionFactory({ ws: gamesWs, event: 'gameHistory/lastWins' })
@@ -164,4 +167,7 @@ export const $$gameHistory = {
   $lastWins,
   $bigWins,
   $myGames,
+  $lastWinsLoaded,
+  $bigWinsLoaded,
+  $myGamesLoaded,
 }

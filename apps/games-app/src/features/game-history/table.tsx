@@ -1,5 +1,5 @@
 import { Game, GameOutcome, GameRecordSelect } from '@dbs/games-schema'
-import { Card, Tabs } from '@mantine/core'
+import { Card, LoadingOverlay, Tabs } from '@mantine/core'
 import { useIsFirstRender } from '@mantine/hooks'
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
@@ -85,7 +85,9 @@ export const GameHistoryTable = () => {
 const LastWinsTable = () => {
   const tab = useUnit($$gameHistory.$tab)
   const lastWins = useUnit($$gameHistory.$lastWins)
+  const lastWinsLoaded = useUnit($$gameHistory.$lastWinsLoaded)
   if (tab !== 'last-wins') return null
+  if (!lastWinsLoaded) return <TableLoader />
   if (lastWins.length === 0) return null
   return <HistoryTable records={lastWins} />
 }
@@ -93,7 +95,9 @@ const LastWinsTable = () => {
 const BigWinsTable = () => {
   const tab = useUnit($$gameHistory.$tab)
   const bigWins = useUnit($$gameHistory.$bigWins)
+  const bigWinsLoaded = useUnit($$gameHistory.$bigWinsLoaded)
   if (tab !== 'big-wins') return null
+  if (!bigWinsLoaded) return <TableLoader />
   if (bigWins.length === 0) return null
   return <HistoryTable records={bigWins} />
 }
@@ -101,10 +105,14 @@ const BigWinsTable = () => {
 const MyGamesTable = () => {
   const tab = useUnit($$gameHistory.$tab)
   const myGames = useUnit($$gameHistory.$myGames)
+  const myGamesLoaded = useUnit($$gameHistory.$myGamesLoaded)
   if (tab !== 'my-games') return null
+  if (!myGamesLoaded) return <TableLoader />
   if (myGames.length === 0) return null
   return <HistoryTable records={myGames} />
 }
+
+const cellDesktop = 'hidden sm:table-cell lg:hidden xl:table-cell'
 
 const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
   // Used to skip animation of first render
@@ -117,22 +125,19 @@ const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
           <Cell type="head" className="font-medium">
             Игра
           </Cell>
-          <Cell
-            type="head"
-            className="font-medium hidden sm:table-cell lg:hidden xl:table-cell"
-          >
+          <Cell type="head" className={clsx('font-medium', cellDesktop)}>
             Игрок
           </Cell>
           <Cell
             type="head"
-            className="font-medium hidden sm:table-cell lg:hidden xl:table-cell"
+            className={clsx('font-medium', cellDesktop)}
             align="center"
           >
             Ставка
           </Cell>
           <Cell
             type="head"
-            className="font-medium hidden sm:table-cell lg:hidden xl:table-cell"
+            className={clsx('font-medium', cellDesktop)}
             align="center"
           >
             Множитель
@@ -153,6 +158,14 @@ const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
   )
 })
 
+const TableLoader = () => {
+  return (
+    <div className="relative w-full h-[484px]">
+      <LoadingOverlay visible={true} overlayProps={{ bg: '#1B1C2F' }} />
+    </div>
+  )
+}
+
 const Row = memo(
   ({ record, animated }: { record: GameRecordSelect; animated: boolean }) => {
     const route = gameToRouteMap[record.game]
@@ -172,22 +185,15 @@ const Row = memo(
           <Link to={route}>{gameToLabelMap[record.game]}</Link>
         </Cell>
         <Cell
-          className="max-w-[120px] hidden sm:table-cell lg:hidden xl:table-cell"
+          className={clsx('max-w-[120px]', cellDesktop)}
           textColor="primary"
         >
           {record.previewUserName}
         </Cell>
-        <Cell
-          className="hidden sm:table-cell lg:hidden xl:table-cell"
-          align="center"
-        >
+        <Cell className={cellDesktop} align="center">
           {formatGem(record.bet / 100)}g
         </Cell>
-        <Cell
-          className="hidden sm:table-cell lg:hidden xl:table-cell"
-          align="center"
-          textColor={highlight}
-        >
+        <Cell className={cellDesktop} align="center" textColor={highlight}>
           {multiplier}x
         </Cell>
         <Cell align="right" textColor={highlight}>
@@ -209,7 +215,7 @@ const Cell = ({
 }: {
   type?: 'head' | 'row'
   className?: string
-  children: ReactNode
+  children?: ReactNode
   textSize?: 'sm' | 'xs'
   textColor?: 'default' | 'primary' | 'success' | 'failure'
   align?: 'left' | 'center' | 'right'
@@ -221,7 +227,7 @@ const Cell = ({
 
   const className = clsx(
     classNameExtra,
-    'px-4 md:px-6 py-2 h-11 font-interface text-ellipsis',
+    'px-4 md:px-6 py-2 font-interface text-ellipsis',
     type === 'head' && 'uppercase font-medium',
     textSize === 'xs' && 'text-xs',
     textSize === 'sm' && 'text-sm',

@@ -4,7 +4,7 @@
 }
 
 .row {
-  @apply bg-[#1B1C2F];
+  @apply h-11 bg-[#1B1C2F];
 
   & > th,
   & > td {
@@ -28,6 +28,11 @@ thead .row {
   animation: row-slide-even 0.5s ease-out forwards;
 }
 
+.row[data-skeleton="true"] {
+  animation: row-skeleton 2s ease-in-out;
+  animation-iteration-count: infinite;
+}
+
 @keyframes row-slide-odd {
   from { transform: translate3d(0, -100%, 0) }
   to { transform: translate3d(0, 0, 0) }
@@ -36,4 +41,10 @@ thead .row {
 @keyframes row-slide-even {
   from { transform: translate3d(0, -100%, 0) }
   to { transform: translate3d(0, 0, 0) }
+}
+
+@keyframes row-skeleton {
+  0% { background-color: #1B1C2F }
+  50% { background-color: #25273E }
+  100% { background-color: #1B1C2F }
 }
