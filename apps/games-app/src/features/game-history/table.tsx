@@ -107,6 +107,7 @@ const MyGamesTable = () => {
 }
 
 const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
+  // Used to skip animation of first render
   const isFirstRender = useIsFirstRender()
 
   return (
@@ -154,7 +155,6 @@ const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
 
 const Row = memo(
   ({ record, animated }: { record: GameRecordSelect; animated: boolean }) => {
-    console.log('render')
     const route = gameToRouteMap[record.game]
     const hasWon = record.outcome === GameOutcome.Win
     const highlight = hasWon ? 'success' : 'failure'
