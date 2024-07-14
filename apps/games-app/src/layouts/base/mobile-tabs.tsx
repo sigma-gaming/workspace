@@ -1,7 +1,9 @@
 import { IconCategory2, IconMenu2, IconMessage } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
+import clsx from 'clsx'
+import { useUnit } from 'effector-react'
 import { useState } from 'react'
-import { routes } from '../../routing'
+import { router, routes } from '../../routing'
 import { Chat } from '../../widgets/chat'
 import { BaseLayoutMenu } from './menu'
 
@@ -12,6 +14,7 @@ enum Tab {
 
 export const MobileTabs = () => {
   const [tab, setTab] = useState<Tab | null>(null)
+  const isAtHome = useUnit(router.$activeRoutes).includes(routes.home)
 
   const toggle = (tab: Tab) => {
     setTab((previous) => (previous === tab ? null : tab))
@@ -19,25 +22,46 @@ export const MobileTabs = () => {
 
   return (
     <>
-      <div className="fixed z-50 left-0 right-0 bottom-0 flex h-[--tabs-height] bg-[#25273C] shadow-border">
+      <div className="fixed z-50 left-0 right-0 bottom-0 bg-[#1B1C2F] flex justify-around h-[--tabs-height] px-4 bg-opacity-80 backdrop-blur-md shadow-border">
         <button
-          className="flex-1 flex items-center justify-center"
+          className={clsx(
+            'relative flex flex-col gap-0.5 w-12 items-center justify-center',
+            tab === Tab.Menu && 'text-purple-500',
+          )}
           onClick={() => toggle(Tab.Menu)}
         >
-          <IconMenu2 className="w-6 h-6" />
+          {tab === Tab.Menu && (
+            <span className="absolute left-0 -top-px w-full h-px bg-purple-500" />
+          )}
+          <IconMenu2 className="w-4 h-4" />
+          <span className="text-xs">Меню</span>
         </button>
         <Link
           to={routes.home}
-          className="flex-1 flex items-center justify-center"
+          className={clsx(
+            'relative flex flex-col gap-0.5 w-12 items-center justify-center',
+            isAtHome && tab === null && 'text-purple-500',
+          )}
           onClick={() => setTab(null)}
         >
-          <IconCategory2 className="w-6 h-6" />
+          {isAtHome && tab === null && (
+            <span className="absolute left-0 -top-px w-full h-px bg-purple-500" />
+          )}
+          <IconCategory2 className="w-4 h-4" />
+          <span className="text-xs">Игры</span>
         </Link>
         <button
-          className="flex-1 flex items-center justify-center"
+          className={clsx(
+            'relative flex flex-col gap-0.5 w-12 items-center justify-center',
+            tab === Tab.Chat && 'text-purple-500',
+          )}
           onClick={() => toggle(Tab.Chat)}
         >
-          <IconMessage className="w-6 h-6" />
+          {tab === Tab.Chat && (
+            <span className="absolute left-0 -top-px w-full h-px bg-purple-500" />
+          )}
+          <IconMessage className="w-4 h-4" />
+          <span className="text-xs">Чат</span>
         </button>
       </div>
 

@@ -1,11 +1,11 @@
 .dropdown {
   @apply font-interface shadow-border;
+  @apply bg-[#25273E] bg-opacity-90 backdrop-blur-md;
   border: none;
-  background-color: #25273E;
 }
 
 .divider {
-  @apply mx-3 my-[10px];
+  @apply mx-3 my-[10px] border-[#515268];
 }
 
 .item {

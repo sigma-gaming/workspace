@@ -2,6 +2,7 @@ import { Dice } from './dice.tsx'
 import { Gem } from './gem.tsx'
 import { History } from './history.tsx'
 import { Play } from './play.tsx'
+import { Send } from './send.tsx'
 import { Telegram } from './telegram.tsx'
 import { Transfer } from './transfer.tsx'
 import { TrendingUp } from './trending-up.tsx'
@@ -16,4 +17,5 @@ export const Icons = {
   History,
   Transfer,
   TrendingUp,
+  Send,
 }

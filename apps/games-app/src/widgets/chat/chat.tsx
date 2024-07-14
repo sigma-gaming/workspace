@@ -1,11 +1,12 @@
 import { Avatar, useMedia } from '@core/ui'
 import { ChatMessageType } from '@dbs/games-schema'
 import { getUserInitials } from '@games/model'
-import { Button, Skeleton, Text, Title } from '@mantine/core'
+import { ActionIcon, Button, Skeleton, Text, Title } from '@mantine/core'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useUnit } from 'effector-react'
 import { memo, UIEventHandler, useCallback, useEffect, useRef } from 'react'
+import { Icons } from '../../shared/ui/icons'
 import { $$chatWidget, ExtendedMessage } from './model'
 
 export const Chat = () => {
@@ -27,9 +28,11 @@ export const Chat = () => {
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <form
         className={clsx(
-          'relative h-[142px] px-4 py-3 bg-[#1B1C2F] cursor-text transition-colors',
+          'relative px-4 py-3 bg-[#1B1C2F] cursor-text transition-colors',
           'border rounded-2xl border-[#1B1C2E]',
           'focus-within:outline outline-2 outline-[color:var(--mantine-color-input-border-focus)] outline-offset-2',
+          !isMobile && 'h-[142px]',
+          isMobile && 'flex gap-4 items-center',
         )}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
@@ -56,18 +59,25 @@ export const Chat = () => {
           value={text}
           onChange={(event) => updateText(event.target.value)}
           spellCheck={false}
-          rows={3}
+          rows={isMobile ? 1 : 3}
+          wrap={isMobile ? 'off' : 'soft'}
           placeholder="Введите сообщение..."
         />
-        <Button
-          className="absolute bottom-3 right-4"
-          radius={12}
-          size="sm"
-          type="submit"
-          disabled={text.length === 0}
-        >
-          Отправить
-        </Button>
+        {isMobile ? (
+          <ActionIcon size={36} type="submit" disabled={text.length === 0}>
+            <Icons.Send className="w-6 h-6" />
+          </ActionIcon>
+        ) : (
+          <Button
+            className="absolute bottom-3 right-4"
+            radius={12}
+            size="sm"
+            type="submit"
+            disabled={text.length === 0}
+          >
+            Отправить
+          </Button>
+        )}
       </form>
     </div>
   )

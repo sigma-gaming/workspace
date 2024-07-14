@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Anchor,
   Button,
   Card,
@@ -23,6 +24,7 @@ import {
 } from '@mantine/core'
 import { PropsWithChildren } from 'react'
 import { colors } from '../colors'
+import actionIconClassNames from './action-icon.module.css'
 import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
 import inputClassNames from './input.module.css'
@@ -111,6 +113,9 @@ export const theme = createTheme({
     }),
     Tabs: Tabs.extend({
       classNames: tabsClassNames,
+    }),
+    ActionIcon: ActionIcon.extend({
+      classNames: actionIconClassNames,
     }),
   },
 })
