@@ -13,6 +13,7 @@ import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe'
 import { GameHistoryService } from './game-history'
+import { ProfileService } from './profile'
 
 interface SaveGamePayload {
   userId: string
@@ -21,13 +22,15 @@ interface SaveGamePayload {
   payout: number
   snapshot: GameSnapshot
   outcome: GameOutcome
-  previewUserName: string
   previousTransaction?: TransactionSelect | null
 }
 
 @singleton()
 export class GameService {
-  constructor(private readonly gameHistoryService: GameHistoryService) {}
+  constructor(
+    private readonly gameHistoryService: GameHistoryService,
+    private readonly profileService: ProfileService,
+  ) {}
 
   lock = async (userId: string, ms = 3000) => {
     return gamesCaches.lastTransaction.lock(userId, ms)
@@ -40,9 +43,10 @@ export class GameService {
     payout,
     snapshot,
     outcome,
-    previewUserName,
     previousTransaction,
   }: SaveGamePayload) => {
+    const profile = await this.profileService.getDetailedProfile(userId)
+
     const {
       closingBalance: lastBalance = 0,
       totalBet = 0,
@@ -83,7 +87,7 @@ export class GameService {
             bet,
             payout,
             userId,
-            previewUserName,
+            previewUserName: profile.username ?? profile.name,
             transactionId,
           })
           .returning()

@@ -9,7 +9,6 @@ import { calculateDiceWinAmount, gemInt } from '@games/model'
 import {
   budgetService,
   gameService,
-  profileService,
   sessionService,
   transactionService,
 } from '@games/services'
@@ -56,7 +55,6 @@ export const playDiceRoute = new Hono().post(
     const payload = ctx.req.valid('json')
     const session = await sessionService.getHonoSession(ctx.req)
     const user = sessionService.getUser(session)
-    const profile = await profileService.getDetailedProfile(user.id)
 
     if (payload.bet < gemInt(1)) {
       throw new BadRequestException({
@@ -99,7 +97,6 @@ export const playDiceRoute = new Hono().post(
           outputSide: side,
         },
         outcome: hasWon ? GameOutcome.Win : GameOutcome.Loss,
-        previewUserName: profile.name,
         previousTransaction: lastTransaction,
       })
 

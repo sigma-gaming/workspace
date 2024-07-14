@@ -103,9 +103,15 @@ export const MiniProfile = () => {
       <Menu.Dropdown p="xs">
         {profile && (
           <div className="px-3 py-2">
-            <Text fw={500}>{profile.name}</Text>
+            <Text className="text-ellipsis overflow-hidden" fw={500}>
+              {profile.name}
+            </Text>
             {profile.username && (
-              <Text size="sm" c="dark.2">
+              <Text
+                className="text-ellipsis overflow-hidden"
+                size="sm"
+                c="dark.2"
+              >
                 @{profile.username}
               </Text>
             )}

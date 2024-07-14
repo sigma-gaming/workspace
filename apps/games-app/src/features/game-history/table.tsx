@@ -172,7 +172,7 @@ const Row = memo(
           <Link to={route}>{gameToLabelMap[record.game]}</Link>
         </Cell>
         <Cell
-          className="hidden sm:table-cell lg:hidden xl:table-cell"
+          className="max-w-[120px] hidden sm:table-cell lg:hidden xl:table-cell"
           textColor="primary"
         >
           {record.previewUserName}
@@ -221,7 +221,7 @@ const Cell = ({
 
   const className = clsx(
     classNameExtra,
-    'px-4 md:px-6 py-2 h-11 font-interface',
+    'px-4 md:px-6 py-2 h-11 font-interface text-ellipsis',
     type === 'head' && 'uppercase font-medium',
     textSize === 'xs' && 'text-xs',
     textSize === 'sm' && 'text-sm',
