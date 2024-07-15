@@ -18,7 +18,7 @@ export const NotFoundPageView = () => {
           </Title>
         </div>
         <Text className="text-center" size="lg" lh="md">
-          <LinkAnchor to={routes.home}>Вернуться на главную</LinkAnchor>
+          <LinkAnchor to={routes.games}>Вернуться на главную</LinkAnchor>
         </Text>
       </div>
     </CenteredLayout>

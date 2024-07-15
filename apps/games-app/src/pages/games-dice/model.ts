@@ -7,12 +7,12 @@ import { Rive } from '@rive-app/react-canvas'
 import { attach, combine, createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
-import { $$balance } from '../../../entities/balance'
-import { $$notifications } from '../../../entities/notifications'
-import { $$user } from '../../../entities/user'
-import { $$gameHistory } from '../../../features/game-history'
-import { routes } from '../../../routing'
-import { gamesApi } from '../../../shared/api/games'
+import { $$balance } from '../../entities/balance'
+import { $$notifications } from '../../entities/notifications'
+import { $$user } from '../../entities/user'
+import { $$gameHistory } from '../../features/game-history'
+import { routes } from '../../routing'
+import { gamesApi } from '../../shared/api/games'
 
 const playGameMutation = createMutation({
   name: 'games/dice/play',

@@ -1,14 +1,14 @@
 import { createHistoryRouter } from 'atomic-router'
 import {
   diceGame,
-  home,
+  games,
   settings,
   telegramCallback,
   vkCallback,
 } from './routes'
 
 const routes = [
-  { path: '/', route: home },
+  { path: '/', route: games },
   { path: '/games/dice', route: diceGame },
   { path: '/settings', route: settings },
   { path: '/callbacks/vk', route: vkCallback },

@@ -1,7 +1,7 @@
 import { useUnit } from 'effector-react/effector-react.mjs'
 import { useLayoutEffect } from 'react'
 import { $$user } from '../entities/user'
-import { home } from './routes.ts'
+import { games } from './routes.ts'
 import { RouteRecord } from './types.ts'
 
 export function createAuthenticatedPage({
@@ -13,7 +13,7 @@ export function createAuthenticatedPage({
 
     useLayoutEffect(() => {
       if (!expired) return
-      void home.open()
+      void games.open()
     })
 
     if (expired) {

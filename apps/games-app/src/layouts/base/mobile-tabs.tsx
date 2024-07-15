@@ -15,7 +15,7 @@ enum Tab {
 
 export const MobileTabs = () => {
   const [tab, setTab] = useState<Tab | null>(null)
-  const isAtHome = useUnit(router.$activeRoutes).includes(routes.home)
+  const isAtHome = useUnit(router.$activeRoutes).includes(routes.games)
 
   const toggle = (tab: Tab) => {
     setTab((previous) => (previous === tab ? null : tab))
@@ -52,7 +52,7 @@ export const MobileTabs = () => {
           <span className="text-xs">Меню</span>
         </button>
         <Link
-          to={routes.home}
+          to={routes.games}
           className={clsx(
             'relative flex flex-col gap-0.5 w-12 items-center justify-center',
             isAtHome && tab === null && 'text-purple-500',

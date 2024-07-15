@@ -5,8 +5,8 @@ import { Icons } from '../../shared/ui/icons'
 export const BaseLayoutMenu = ({ onNavigate }: { onNavigate?: () => void }) => {
   return (
     <Menu onNavigate={onNavigate}>
-      <MenuLink to={routes.home} icon={<Icons.Play />}>
-        Главная
+      <MenuLink to={routes.games} icon={<Icons.Play />}>
+        Игры
       </MenuLink>
       <MenuSection label="Игры">
         <MenuLink to={routes.diceGame} icon={<Icons.Dice />}>

@@ -4,7 +4,7 @@ import { routes } from '../../routing'
 import diceSrc from './assets/dice.webp'
 import pincode from './assets/pincode.webp'
 
-export const HomePageView = () => {
+export const GamesPageView = () => {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       <GameCard route={routes.diceGame} label="Dice" imageSrc={diceSrc} />

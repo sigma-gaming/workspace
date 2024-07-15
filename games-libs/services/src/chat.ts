@@ -60,7 +60,18 @@ export class ChatService {
   }
 
   async getLastMessages(): Promise<ChatMessageSelect[]> {
-    return gamesCaches.lastChatMessages.get()
+    const cached = await gamesCaches.lastChatMessages.get()
+
+    if (cached.length > 0) {
+      return cached
+    }
+
+    const messages = await gamesDb.query.ChatMessageTable.findMany({
+      orderBy: desc(ChatMessageTable.createdAt),
+      limit: 100,
+    })
+
+    return messages
   }
 
   async sendMessage(options: {
