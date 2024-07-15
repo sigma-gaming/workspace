@@ -92,10 +92,7 @@ export const MobileTabs = () => {
       )}
 
       {tab === Tab.Chat && (
-        <div
-          className="fixed z-40 inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]"
-          data-scroll-lock-scrollable
-        >
+        <div className="fixed z-40 inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]">
           <div className="px-4 py-6 h-full">
             <Chat />
           </div>

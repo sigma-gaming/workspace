@@ -146,6 +146,7 @@ const MessageList = () => {
           : 'overflow-auto flex-col',
       )}
       onScroll={handleScroll}
+      data-scroll-lock-scrollable
     >
       {loadingMessages
         ? Array.from({ length: 10 }).map((_, index) => {
