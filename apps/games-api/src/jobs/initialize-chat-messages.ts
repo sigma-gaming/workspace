@@ -8,7 +8,7 @@ cronJobRegistry.register(
   'initializeChatMessages',
   // every 6 hours
   CronJob.from({
-    cronTime: '0 */6 * * *',
+    cronTime: '0 */1 * * *',
     runOnInit: true,
     onTick: async () => {
       const result = await retry({

@@ -42,7 +42,7 @@ export class ChatService {
   }
 
   async initializeMessages() {
-    const lock = await gamesCaches.lastChatMessages.lock(10000)
+    const lock = await gamesCaches.lastChatMessages.lock(3000)
 
     try {
       const exists = await gamesCaches.lastChatMessages.exists()
@@ -53,25 +53,14 @@ export class ChatService {
         limit: 100,
       })
 
-      await gamesCaches.lastChatMessages.pushMany(messages)
+      await gamesCaches.lastChatMessages.set(messages.reverse())
     } finally {
       await lock.release()
     }
   }
 
   async getLastMessages(): Promise<ChatMessageSelect[]> {
-    const cached = await gamesCaches.lastChatMessages.get()
-
-    if (cached.length > 0) {
-      return cached
-    }
-
-    const messages = await gamesDb.query.ChatMessageTable.findMany({
-      orderBy: desc(ChatMessageTable.createdAt),
-      limit: 100,
-    })
-
-    return messages
+    return gamesCaches.lastChatMessages.get()
   }
 
   async sendMessage(options: {
