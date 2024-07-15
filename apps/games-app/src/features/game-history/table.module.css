@@ -17,7 +17,7 @@
 }
 
 thead .row {
-  @apply relative z-10;
+  @apply sticky z-10;
 }
 
 .row[data-animated="true"]:nth-of-type(odd) {
