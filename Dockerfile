@@ -73,7 +73,10 @@ CMD [ "bun", "run", "apps/control-api/dist/main.js" ]
 
 # WS APIs
 
-FROM base AS games-ws
+FROM node:20-alpine AS ws-base
+RUN apk add --no-cache gcompat
+
+FROM ws-base AS games-ws
 WORKDIR /workspace
 COPY --from=build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]

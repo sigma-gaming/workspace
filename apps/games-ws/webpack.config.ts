@@ -31,7 +31,7 @@ const config: Configuration = {
   ],
   externalsPresets: { node: true },
   ignoreWarnings: [/^(?!CriticalDependenciesWarning$)/],
-  optimization: { nodeEnv: false },
+  optimization: { nodeEnv: false, minimize: false },
   resolve: {
     extensions: ['.ts', '.js'],
     plugins: [
