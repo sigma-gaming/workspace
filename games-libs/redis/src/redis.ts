@@ -1,7 +1,7 @@
 import { createSingletonProxy, OnApplicationShutdown } from '@core/di'
 import { Logger, LoggerService } from '@core/logger'
 import { Redis } from 'ioredis'
-import { inject, InjectionToken, singleton } from 'tsyringe'
+import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 
 export interface RedisOptions {
   host: string

@@ -1,7 +1,7 @@
 import { Logger, LoggerService } from '@core/logger'
 import { Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
-import { autoInjectable } from 'tsyringe'
+import { autoInjectable } from 'tsyringe-neo'
 import { RedisService } from '../redis'
 import { RedlockService } from '../redlock'
 

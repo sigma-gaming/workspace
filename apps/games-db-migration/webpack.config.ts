@@ -34,10 +34,6 @@ const config: Configuration = {
   optimization: { nodeEnv: false },
   resolve: {
     extensions: ['.ts', '.js'],
-    alias: {
-      // Fix wrong webpack resolution of tsyringe
-      tsyringe: require.resolve('tsyringe/dist/esm2015/index.js'),
-    },
     plugins: [
       new TsconfigPathsPlugin({
         configFile: tsconfigPath,

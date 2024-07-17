@@ -1,7 +1,7 @@
 import { createSingletonProxy } from '@core/di'
 import { Logger, LoggerService } from '@core/logger'
 import { Redis } from 'ioredis'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { RedisService } from '../redis'
 import { GlobalBooleanEntityService } from './entity-boolean'
 

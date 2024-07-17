@@ -182,13 +182,11 @@ const Row = memo(
   ({ record, animated }: { record: GameRecordSelect; animated: boolean }) => {
     const route = gameToRouteMap[record.game]
     const hasWon = record.outcome === GameOutcome.Win
-    const highlight = hasWon ? 'success' : 'failure'
+    const highlight = hasWon ? 'success' : 'default'
 
     const multiplier = hasWon ? Math.floor(100 + record.multiplier) / 100 : 0
 
-    const payout = hasWon
-      ? formatGem((record.bet + record.payout) / 100)
-      : formatGem(record.payout / 100)
+    const payout = formatGem((record.bet + record.payout) / 100)
 
     return (
       <tr className={styles.row} data-animated={animated}>

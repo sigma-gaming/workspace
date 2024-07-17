@@ -12,7 +12,7 @@ import {
 import { getUserFullName, ProfileDetailed } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 
 interface Reused {
   user?: UserSelect

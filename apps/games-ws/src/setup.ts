@@ -3,7 +3,7 @@ import { LoggerOptionsToken } from '@core/logger'
 import { DbOptionsToken } from '@dbs/games-db'
 import { CacheVersionToken, RedisOptionsToken } from '@games/redis'
 import { env } from '@games/services'
-import { container } from 'tsyringe'
+import { container } from 'tsyringe-neo'
 
 container.register(LoggerOptionsToken, {
   useValue: { pretty: env.isDev },

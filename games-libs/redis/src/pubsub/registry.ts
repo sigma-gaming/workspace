@@ -1,6 +1,6 @@
 import { createSingletonProxy } from '@core/di'
 import { ChatMessageSelect, NotificationSelect } from '@dbs/games-schema'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { PubSub, PubSubService } from './service'
 
 @singleton()

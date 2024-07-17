@@ -8,7 +8,7 @@ import {
 import { gemFloat, gemInt } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { and, desc, eq, gte, sql } from 'drizzle-orm'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 
 @singleton()
 export class GameHistoryService {

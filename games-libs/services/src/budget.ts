@@ -3,7 +3,7 @@ import { logger } from '@core/logger'
 import { gamesDb } from '@dbs/games-db'
 import { BudgetTable } from '@dbs/games-schema'
 import { gamesCaches } from '@games/redis'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 
 @singleton()
 export class BudgetService {

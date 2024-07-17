@@ -1,4 +1,4 @@
-import { InjectionToken } from 'tsyringe'
+import { InjectionToken } from 'tsyringe-neo'
 
 export interface OnApplicationShutdown {
   shutdownBefore?: InjectionToken<unknown>[]

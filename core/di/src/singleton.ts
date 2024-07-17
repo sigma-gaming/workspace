@@ -1,4 +1,4 @@
-import { container } from 'tsyringe'
+import { container } from 'tsyringe-neo'
 
 interface RecordLike {
   [key: string | number | symbol]: any

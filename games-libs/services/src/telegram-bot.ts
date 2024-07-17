@@ -1,6 +1,6 @@
 import { createSingletonProxy } from '@core/di'
 import { Bot } from 'grammy'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { EnvService } from './env'
 
 @singleton()

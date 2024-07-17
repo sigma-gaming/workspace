@@ -7,7 +7,7 @@ import {
   TransactionSelect,
 } from '@dbs/games-schema'
 import { ProfileDetailed, Session } from '@games/model'
-import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe'
+import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe-neo'
 import { GlobalJsonEntityService, KeyJsonEntityService } from './entity-json'
 import { GlobalEntityListService, KeyEntityListService } from './entity-list'
 import { GlobalNumberEntityService } from './entity-number'

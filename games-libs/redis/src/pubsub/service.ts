@@ -1,7 +1,7 @@
 import { OnApplicationShutdown } from '@core/di'
 import { Logger, LoggerService } from '@core/logger'
 import { Callback, Redis } from 'ioredis'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { RedisService, SubRedisService } from '../redis'
 
 type RedisMessageHandler = (channel: string, message: string) => void

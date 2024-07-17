@@ -3,6 +3,9 @@
     "**/node_modules",
     "**/dist"
   ],
+  "include": [
+    "node_modules/tsyringe/dist/typings/index.d.ts"
+  ],
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "node",

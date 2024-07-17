@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM imbios/bun-node:1.1.20-20-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -49,6 +49,9 @@ COPY --from=build /build/apps/maintenance-app/dist ./
 
 # APIs
 
+FROM oven/bun:1.1.20-alpine AS api-base
+WORKDIR /workspace
+
 FROM build AS games-api-build
 ARG sentry_auth_token
 ARG sentry_release
@@ -60,15 +63,13 @@ RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-api/dist
 RUN pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release ${sentry_release}
 
-FROM base AS games-api
-WORKDIR /workspace
+FROM api-base AS games-api
 COPY --from=games-api-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
+CMD [ "bun", "run", "apps/games-api/dist/main.js" ]
 
-FROM base AS control-api
-WORKDIR /workspace
+FROM api-base AS control-api
 COPY --from=build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]
+CMD [ "bun", "run", "apps/control-api/dist/main.js" ]
 
 # WS APIs
 

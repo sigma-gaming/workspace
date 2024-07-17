@@ -1,4 +1,4 @@
-import { container, InjectionToken } from 'tsyringe'
+import { container, InjectionToken } from 'tsyringe-neo'
 import { implementsApplicationShutdown, OnApplicationShutdown } from './hooks'
 
 interface Registry {

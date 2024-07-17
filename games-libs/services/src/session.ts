@@ -17,7 +17,7 @@ import { desc, eq, inArray } from 'drizzle-orm'
 import { Context as HonoContext, HonoRequest } from 'hono'
 import { deleteCookie, setCookie } from 'hono/cookie'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { Env, EnvService } from './env'
 
 interface AddSessionOptions {

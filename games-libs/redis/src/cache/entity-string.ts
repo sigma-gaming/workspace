@@ -1,4 +1,4 @@
-import { autoInjectable } from 'tsyringe'
+import { autoInjectable } from 'tsyringe-neo'
 import { GlobalEntityBaseService, KeyEntityBaseService } from './entity-base'
 
 @autoInjectable()

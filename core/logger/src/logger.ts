@@ -16,7 +16,7 @@ import {
 } from 'fastify'
 import { HonoRequest } from 'hono'
 import { IncomingMessage } from 'node:http'
-import { inject, InjectionToken, singleton } from 'tsyringe'
+import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 import { v4 as uuid } from 'uuid'
 
 export type Logger = NeodxLogger<DefaultLoggerLevel>

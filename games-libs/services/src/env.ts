@@ -1,6 +1,6 @@
 import { createSingletonProxy } from '@core/di'
 import { loadEnv, parseEnv } from '@tooling/env'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { z } from 'zod'
 
 const EnvSchema = z

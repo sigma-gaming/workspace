@@ -7,7 +7,7 @@ import {
 } from '@dbs/games-schema'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { and, asc, eq, gte, isNull } from 'drizzle-orm'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 
 @singleton()
 export class NotificationService {

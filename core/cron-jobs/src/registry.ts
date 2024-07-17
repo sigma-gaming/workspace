@@ -1,7 +1,7 @@
 import { createSingletonProxy } from '@core/di'
 import { logger } from '@core/logger'
 import { CronJob } from 'cron'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 
 interface Job {
   name: string

@@ -7,7 +7,7 @@ import {
 } from '@dbs/games-schema'
 import { gamesCaches } from '@games/redis'
 import { desc, eq, sql } from 'drizzle-orm'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 
 @singleton()
 export class TransactionService {

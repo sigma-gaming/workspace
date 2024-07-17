@@ -13,7 +13,7 @@ import {
 } from '@dbs/games-schema'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { desc } from 'drizzle-orm'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { profileService } from './profile'
 import { TransactionService } from './transaction'
 

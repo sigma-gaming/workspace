@@ -11,7 +11,7 @@ import {
 } from '@dbs/games-schema'
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { GameHistoryService } from './game-history'
 import { ProfileService } from './profile'
 

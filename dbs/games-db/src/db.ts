@@ -2,7 +2,7 @@ import { createSingletonProxy } from '@core/di'
 import * as schema from '@dbs/games-schema'
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
-import { inject, InjectionToken, singleton } from 'tsyringe'
+import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 
 interface DbOptions {
   url: string

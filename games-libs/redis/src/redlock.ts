@@ -1,6 +1,6 @@
 import { createSingletonProxy } from '@core/di'
 import { Redlock } from '@sesamecare-oss/redlock'
-import { singleton } from 'tsyringe'
+import { singleton } from 'tsyringe-neo'
 import { RedisService } from './redis'
 
 @singleton()

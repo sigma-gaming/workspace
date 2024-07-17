@@ -8,5 +8,6 @@ export const baseApp = new Hono().use('*', logger()).use(
   cors({
     origin: env.controlApp.url,
     credentials: true,
+    allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
   }),
 )
