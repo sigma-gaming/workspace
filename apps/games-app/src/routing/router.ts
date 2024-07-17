@@ -2,6 +2,7 @@ import { createHistoryRouter } from 'atomic-router'
 import {
   diceGame,
   games,
+  pincodeGame,
   settings,
   telegramCallback,
   vkCallback,
@@ -10,6 +11,7 @@ import {
 const routes = [
   { path: '/', route: games },
   { path: '/games/dice', route: diceGame },
+  { path: '/games/pincode', route: pincodeGame },
   { path: '/settings', route: settings },
   { path: '/callbacks/vk', route: vkCallback },
   { path: '/callbacks/telegram', route: telegramCallback },

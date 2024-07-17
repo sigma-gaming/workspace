@@ -85,6 +85,7 @@ export class CacheRegistry {
 
     this.lastChatMessages = new GlobalEntityListService<ChatMessageSelect>({
       key: `${version}:global:lastChatMessages`,
+      max: 50,
       ttl: 60 * 60 * 24 * 1, // 1 day
     })
 

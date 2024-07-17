@@ -22,7 +22,7 @@ export const Menu = ({
 }: PropsWithChildren<MenuProps>) => {
   return (
     <MenuContext.Provider value={{ onNavigate }}>
-      <div className={clsx(className, 'flex flex-col gap-1')}>{children}</div>
+      <div className={clsx(className, 'flex flex-col gap-2')}>{children}</div>
     </MenuContext.Provider>
   )
 }
@@ -32,7 +32,7 @@ export const MenuSection = ({
   children,
 }: PropsWithChildren<{ label: string }>) => {
   return (
-    <div className="flex flex-col gap-1 mt-4">
+    <div className="flex flex-col gap-2 mt-4">
       <Title
         className="px-4 uppercase text-sm mb-1 font-interface text-[color:var(--mantine-color-dimmed)]"
         order={3}

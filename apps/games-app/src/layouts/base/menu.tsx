@@ -9,8 +9,17 @@ export const BaseLayoutMenu = ({ onNavigate }: { onNavigate?: () => void }) => {
         Игры
       </MenuLink>
       <MenuSection label="Игры">
-        <MenuLink to={routes.diceGame} icon={<Icons.Dice />}>
+        <MenuLink
+          to={routes.diceGame}
+          icon={<Icons.Dice width={24} height={24} />}
+        >
           Dice
+        </MenuLink>
+        <MenuLink
+          to={routes.pincodeGame}
+          icon={<Icons.Card width={24} height={24} />}
+        >
+          Pincode
         </MenuLink>
       </MenuSection>
     </Menu>

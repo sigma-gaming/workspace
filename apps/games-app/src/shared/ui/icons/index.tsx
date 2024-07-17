@@ -1,3 +1,4 @@
+import { Card } from './card.tsx'
 import { Dice } from './dice.tsx'
 import { Gem } from './gem.tsx'
 import { History } from './history.tsx'
@@ -18,4 +19,5 @@ export const Icons = {
   Transfer,
   TrendingUp,
   Send,
+  Card,
 }
