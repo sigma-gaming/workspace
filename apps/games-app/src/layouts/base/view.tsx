@@ -65,6 +65,7 @@ const Header = () => {
     <div className="pointer-events-none sticky top-0 z-[200] h-[--header-height] py-2 bg-[#1B1C2F] bg-opacity-80 lg:bg-transparent flex items-center justify-between backdrop-blur-md lg:backdrop-blur-none shadow-border lg:shadow-none">
       <div className="pointer-events-auto w-[280px] pl-2 lg:pl-4 flex justify-start lg:justify-center">
         <Link
+          aria-label="Перейти на главную страницу"
           to={routes.games}
           className="flex items-center gap-2 p-2 focus-visible:outline-primary rounded-xl"
         >

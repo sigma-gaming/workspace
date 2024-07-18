@@ -9,10 +9,11 @@ export const BetField = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <InputLabel>Ставка</InputLabel>
+      <InputLabel htmlFor="bet-field">Ставка</InputLabel>
       <div className="flex flex-col">
         <div className="flex flex-row gap-2 items-start">
           <NumberInput
+            id="bet-field"
             className="grow"
             classNames={{ wrapper: 'mt-0' }}
             value={bet}

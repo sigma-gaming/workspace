@@ -20,11 +20,15 @@ export const SidesField = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <InputLabel>Грани</InputLabel>
-      <ul className="grid grid-cols-3 min-[396px]:grid-cols-4 min-[396px]:max-w-[360px] min-[576px]:grid-cols-6 min-[576px]:max-w-[540px] lg:grid-cols-4 lg:max-w-[360px] xl:grid-cols-3 xl:max-w-none grid-flow-row gap-4">
-        {options.map(({ value }) => (
+      <InputLabel htmlFor="sides-field">Грани</InputLabel>
+      <ul
+        id="sides-field"
+        className="grid grid-cols-3 min-[396px]:grid-cols-4 min-[396px]:max-w-[360px] min-[576px]:grid-cols-6 min-[576px]:max-w-[540px] lg:grid-cols-4 lg:max-w-[360px] xl:grid-cols-3 xl:max-w-none grid-flow-row gap-4"
+      >
+        {options.map(({ label, value }) => (
           <li key={value} className="block">
             <button
+              name={`Грань ${label}`}
               type="button"
               className="block w-full outline-none"
               onClick={() =>

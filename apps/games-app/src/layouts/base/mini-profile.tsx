@@ -55,7 +55,10 @@ export const MiniProfile = () => {
       disabled={userLoading}
     >
       <Menu.Target>
-        <div className="flex gap-3 md:gap-4 items-center justify-end pl-4 cursor-pointer rounded-xl !outline-offset-4">
+        <div
+          role="menu"
+          className="flex gap-3 md:gap-4 items-center justify-end pl-4 cursor-pointer rounded-xl !outline-offset-4"
+        >
           <div className="flex flex-col gap-1 items-end">
             <Skeleton visible={balanceLoading} width="fit-content">
               <Text className="!leading-tight text-xs lg:text-sm">Баланс</Text>
