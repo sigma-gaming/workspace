@@ -10,14 +10,9 @@ if (process.env.NODE_ENV === 'production') {
     environment: env.stage,
     release: env.gamesApp.version,
     dsn: 'https://SENTRY_DSN_REMOVED',
-    integrations: [
-      Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration(),
-    ],
+    integrations: [Sentry.browserTracingIntegration()],
     tracesSampleRate: 1,
     tracePropagationTargets: [env.gamesApi.url, env.gamesWs.url],
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1,
   })
 }
 
