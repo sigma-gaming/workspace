@@ -3,13 +3,16 @@ import { ThemeProvider, useMedia } from '@core/ui'
 import { Notifications } from '@mantine/notifications'
 import { createRoutesView, RouterProvider } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
-import { domMax, LazyMotion } from 'framer-motion'
+import { LazyMotion } from 'framer-motion'
 import { MaintenanceOverlay } from '../features/maintenance/overlay.tsx'
 import { PAGES } from '../pages'
 import { NotFoundPageView } from '../pages/not-found'
 import { router } from '../routing'
 import { RouteLayout } from '../routing/types.ts'
 import { usePageTitle } from '../shared/meta/title.ts'
+
+const loadFramerFeatures = () =>
+  import('./framer-features.ts').then(({ features }) => features)
 
 export const PageViews = createRoutesView({
   routes: PAGES.map(({ layout, ...record }) => record),
@@ -56,7 +59,7 @@ export const AppView = () => {
   const isMobile = useMedia({ to: 'md' })
 
   return (
-    <LazyMotion features={domMax}>
+    <LazyMotion strict features={loadFramerFeatures}>
       <RouterProvider router={router}>
         <ThemeProvider>
           <Notifications

@@ -1,6 +1,6 @@
 import { Avatar, useMedia } from '@core/ui'
 import { getUserInitials } from '@games/model'
-import { Button, Menu, Modal, rem, Skeleton, Text } from '@mantine/core'
+import { Button, Menu, Modal, rem, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconCoins,
@@ -12,15 +12,12 @@ import {
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
-import { animate } from 'framer-motion/dom'
-import { useLayoutEffect, useRef } from 'react'
 import { $$balance } from '../../entities/balance'
 import { $$profile } from '../../entities/profile/index.ts'
 import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
-import { formatGem } from '../../shared/lib/format/currency.ts'
-import { Icons } from '../../shared/ui/icons/index.tsx'
+import { Balance } from './balance.tsx'
 
 function useAvatarSize() {
   const fromLg = useMedia({ from: 'lg' })
@@ -38,7 +35,6 @@ export const MiniProfile = () => {
   const balanceWithdrawing = useUnit($$balance.$withdrawing)
   const userLoading = useUnit($$user.$loading)
   const profile = useUnit($$profile.$profile)
-  const balanceLoading = useUnit($$balance.$loading)
   const avatarSize = useAvatarSize()
 
   if (userExpired) {
@@ -59,27 +55,7 @@ export const MiniProfile = () => {
           role="menu"
           className="flex gap-3 md:gap-4 items-center justify-end pl-4 cursor-pointer rounded-xl !outline-offset-4"
         >
-          <div className="flex flex-col gap-1 items-end">
-            <Skeleton visible={balanceLoading} width="fit-content">
-              <Text className="!leading-tight text-xs lg:text-sm">Баланс</Text>
-            </Skeleton>
-            <Skeleton
-              visible={balanceLoading}
-              width="fit-content"
-              className="min-w-[100px]"
-            >
-              <div className="flex items-center justify-end gap-1.5">
-                <Text
-                  className="font-interface !leading-none text-lg lg:text-xl"
-                  fw={500}
-                  c="green.6"
-                >
-                  <AnimatedBalance />
-                </Text>
-                <Icons.Gem className="w-6 h-6 text-primary-4 -translate-y-[1px]" />
-              </div>
-            </Skeleton>
-          </div>
+          <Balance />
 
           <Avatar
             src={profile?.image}
@@ -209,52 +185,4 @@ export const ExpiredProfile = () => {
       </Modal>
     </>
   )
-}
-
-function getFractionDigits(number: number) {
-  if (number % 10 !== 0) return 2
-  if (number % 100 !== 0) return 1
-  return 0
-}
-
-const AnimatedBalance = () => {
-  const current = useUnit($$balance.$available)
-  const loaded = useUnit($$balance.$loaded)
-  const previousLoadedRef = useRef(loaded)
-  const previousRef = useRef(current)
-  const nodeRef = useRef<HTMLSpanElement>(null)
-
-  useLayoutEffect(() => {
-    const node = nodeRef.current
-    if (!node) return
-
-    if (!previousLoadedRef.current && loaded) {
-      previousLoadedRef.current = loaded
-      previousRef.current = current
-    }
-
-    if (previousRef.current === current) {
-      const text = formatGem(current / 100)
-      node.textContent = text
-      return
-    }
-
-    const fractionDigits = Math.max(
-      getFractionDigits(current),
-      getFractionDigits(previousRef.current),
-    )
-
-    const controls = animate(previousRef.current, current, {
-      duration: 0.5,
-      onUpdate(value) {
-        const text = formatGem(value / 100, fractionDigits)
-        node.textContent = text
-      },
-    })
-
-    previousRef.current = current
-    return () => controls.stop()
-  }, [loaded, current])
-
-  return <span style={{ display: 'inline-block' }} ref={nodeRef} />
 }
