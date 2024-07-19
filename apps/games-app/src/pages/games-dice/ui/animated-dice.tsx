@@ -1,31 +1,26 @@
 import { LoadingOverlay } from '@mantine/core'
-import { useRive } from '@rive-app/react-canvas'
 import { useUnit } from 'effector-react'
-import { memo, useEffect } from 'react'
+import { lazy, memo, Suspense } from 'react'
 import { $$dicePage } from '../model'
+
+export const AnimatedDiceRive = lazy(async () => {
+  const { AnimatedDiceRive } = await import('./animated-dice-rive.tsx')
+  return { default: AnimatedDiceRive }
+})
 
 export const AnimatedDice = memo(() => {
   const loaded = useUnit($$dicePage.$animationLoaded)
 
-  const { rive, RiveComponent } = useRive({
-    src: '/games/dice.riv',
-    onLoad: () => $$dicePage.animationLoaded(),
-    onPlay: () => $$dicePage.animationStarted(),
-    onStop: () => $$dicePage.animationFinished(),
-  })
-
-  useEffect(() => {
-    $$dicePage.riveChanged(rive)
-  }, [rive])
-
   return (
-    <div className="w-full">
+    <div className="w-full h-64">
       <LoadingOverlay
         className="h-full"
         visible={!loaded}
         loaderProps={{ size: 'xl' }}
       />
-      <RiveComponent className="h-64" />
+      <Suspense fallback={null}>
+        <AnimatedDiceRive />
+      </Suspense>
     </div>
   )
 })
