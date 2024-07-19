@@ -20,7 +20,7 @@ import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
 import { singleton } from 'tsyringe-neo'
 import { Env, EnvService } from './env'
 
-interface AddSessionOptions {
+type AddSessionOptions = {
   userId: string
   provider: AccountProvider
 }

@@ -14,7 +14,7 @@ import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
 
-interface Reused {
+type Reused = {
   user?: UserSelect
   profile?: ProfileSelect
   accounts?: AccountSelect[]

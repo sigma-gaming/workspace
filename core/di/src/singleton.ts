@@ -1,6 +1,6 @@
 import { container } from 'tsyringe-neo'
 
-interface RecordLike {
+type RecordLike = {
   [key: string | number | symbol]: any
 }
 

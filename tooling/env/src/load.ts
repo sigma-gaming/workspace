@@ -1,4 +1,4 @@
-interface EnvFile {
+type EnvFile = {
   path: string
   condition?: () => boolean
 }
@@ -23,7 +23,7 @@ const createDefaultFiles = (root: string): EnvFile[] => {
   ]
 }
 
-interface Options {
+type Options = {
   root: string
   files?: EnvFile[]
 }

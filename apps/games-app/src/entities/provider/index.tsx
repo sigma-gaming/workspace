@@ -4,7 +4,7 @@ import { v4 } from 'uuid'
 import { env } from '../../shared/env'
 import { Icons } from '../../shared/ui/icons'
 
-interface ProviderInfo {
+type ProviderInfo = {
   label: string
   profileUrl: string
 }
@@ -22,7 +22,7 @@ export const ProviderInfoMap: Record<AccountProvider, ProviderInfo> = {
 
 export type AuthFlow = 'sign-in' | 'connect'
 
-interface Meta {
+type Meta = {
   flow: AuthFlow
   returnUrl: string
 }

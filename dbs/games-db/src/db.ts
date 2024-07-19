@@ -4,7 +4,7 @@ import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 
-interface DbOptions {
+type DbOptions = {
   url: string
   logger?: boolean
 }

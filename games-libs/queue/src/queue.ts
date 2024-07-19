@@ -1,11 +1,11 @@
 import { Consumer, ConsumerProps, ConsumerStatus } from 'rabbitmq-client'
 import { RMQ } from './rmq'
 
-interface Options {
+type Options = {
   name: string
 }
 
-export interface Queue<TPayload, TOutput> {
+export type Queue<TPayload, TOutput> = {
   send(payload: TPayload): Promise<TOutput>
   createConsumer(
     options: Omit<ConsumerProps, 'queue'> & {

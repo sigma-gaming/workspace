@@ -24,12 +24,12 @@ export function normalizeFieldErrors<TValues extends FormValues>(
   return normalized
 }
 
-interface FieldOptions<TValue> {
+type FieldOptions<TValue> = {
   emptyValue: TValue
   persistKey?: string
 }
 
-interface Field<TValue> {
+type Field<TValue> = {
   emptyValue: TValue
   initialize: EventCallable<TValue>
   update: EventCallable<TValue>
@@ -54,11 +54,11 @@ type CleanValues<
     : TValues[K]
 }
 
-interface Form<
+type Form<
   TValues extends FormValues,
   TCleanEmpty extends { [K in keyof TValues]?: boolean },
   TValidated,
-> {
+> = {
   initialize: EventCallable<Partial<TValues>>
   update: EventCallable<Partial<TValues>>
   submit: EventCallable<void>
@@ -161,12 +161,12 @@ export function createForm<
 }): Form<TValues, TCleanEmpty, TValidated> {
   const { fields, cleanEmpty, schema } = options
 
-  interface ValidResult {
+  type ValidResult = {
     valid: true
     values: TValidated
   }
 
-  interface InvalidResult {
+  type InvalidResult = {
     valid: false
     errors: Partial<Record<keyof TValues, string[]>>
   }

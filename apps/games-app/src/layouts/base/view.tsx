@@ -22,7 +22,7 @@ function useTabsHeight() {
   return '56px'
 }
 
-interface Props {
+type Props = {
   className?: string
   children: ReactNode
 }

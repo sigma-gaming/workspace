@@ -13,7 +13,7 @@ export const GamesPageView = () => {
   )
 }
 
-interface GameCardProps {
+type GameCardProps = {
   route: RouteInstance<RouteParams>
   label: string
   imageSrc: string

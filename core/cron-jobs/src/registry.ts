@@ -3,7 +3,7 @@ import { logger } from '@core/logger'
 import { CronJob } from 'cron'
 import { singleton } from 'tsyringe-neo'
 
-interface Job {
+type Job = {
   name: string
   instance: CronJob
 }

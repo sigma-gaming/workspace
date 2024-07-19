@@ -3,7 +3,7 @@ import { execa } from 'execa'
 import fs from 'node:fs'
 import path from 'node:path'
 
-interface Options {
+type Options = {
   outputDir: string
   packageJsonPath: string
   updateBin?: boolean

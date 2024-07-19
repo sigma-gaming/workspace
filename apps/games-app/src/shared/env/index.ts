@@ -34,7 +34,7 @@ const PublicEnvSchema = z
   }))
 
 if (process.env.NODE_ENV === 'development') {
-  // eslint-disable-next-line import/no-unresolved
+  // eslint-disable-next-line import-x/no-unresolved
   await import('/env.js?url')
 }
 

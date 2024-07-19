@@ -4,7 +4,7 @@ import {
   NotificationSelect,
 } from '@dbs/games-schema'
 
-export interface ServerToClientEvents {
+export type ServerToClientEvents = {
   'chat/message': (message: ChatMessageSelect) => void
   'notification': (notification: NotificationSelect) => void
   'gameHistory/lastWins': (lastWins: GameRecordSelect[]) => void
@@ -13,4 +13,4 @@ export interface ServerToClientEvents {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ClientToServerEvents {}
+export type ClientToServerEvents = Record<string, never>

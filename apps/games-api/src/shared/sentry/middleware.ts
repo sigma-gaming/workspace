@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/bun'
 import { MiddlewareHandler } from 'hono'
 import { sentry } from './init'
 
-interface Options {
+type Options = {
   enabled?: boolean
 }
 

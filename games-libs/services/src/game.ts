@@ -15,7 +15,7 @@ import { singleton } from 'tsyringe-neo'
 import { GameHistoryService } from './game-history'
 import { ProfileService } from './profile'
 
-interface SaveGamePayload {
+type SaveGamePayload = {
   userId: string
   game: Game
   bet: number

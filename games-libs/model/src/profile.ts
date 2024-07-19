@@ -2,12 +2,12 @@ import { ProfileSelect, UserRole } from '@dbs/games-schema'
 import { z } from 'zod'
 import { AccountPublic } from './account'
 
-export interface ProfileDetailed extends ProfileSelect {
+export type ProfileDetailed = {
   name: string
   image: string | null
   roles: UserRole[]
   accounts: AccountPublic[]
-}
+} & ProfileSelect
 
 export function getUserFullName(
   firstName?: string | null,

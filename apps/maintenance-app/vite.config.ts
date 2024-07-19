@@ -7,7 +7,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 const monorepo = (end: string) => path.resolve(__dirname, '../..', end)
 
 // https://vitejs.dev/config/
-// eslint-disable-next-line import/no-default-export
+// eslint-disable-next-line import-x/no-default-export
 export default defineConfig({
   server: {
     host: 'maintenance.sigma.local',

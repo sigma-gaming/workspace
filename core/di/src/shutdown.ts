@@ -1,7 +1,7 @@
 import { container, InjectionToken } from 'tsyringe-neo'
 import { implementsApplicationShutdown, OnApplicationShutdown } from './hooks'
 
-interface Registry {
+type Registry = {
   entries(): IterableIterator<[InjectionToken<any>, { instance: unknown }]>
 }
 

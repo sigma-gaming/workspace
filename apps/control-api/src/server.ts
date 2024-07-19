@@ -44,7 +44,7 @@ app.onError(
   }),
 )
 
-// eslint-disable-next-line import/no-anonymous-default-export, import/no-default-export
+// eslint-disable-next-line import-x/no-anonymous-default-export, import-x/no-default-export
 const config: TLSServeOptions = {
   port: 5051,
   fetch: app.fetch,

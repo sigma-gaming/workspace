@@ -5,7 +5,7 @@ import esbuild from 'rollup-plugin-esbuild'
 
 const DEFAULT_EXTERNAL = (id: string) => !/^[./]/.test(id)
 
-interface SingleOptions {
+type SingleOptions = {
   type: 'single'
   input: string
   outputDir: string
@@ -14,7 +14,7 @@ interface SingleOptions {
   extraPlugins?: InputPluginOption[]
 }
 
-interface MultiOptions {
+type MultiOptions = {
   type: 'multi'
   input: Record<string, string>
   outputDir: string

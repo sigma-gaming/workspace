@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-interface DiceDotProps {
+type DiceDotProps = {
   className?: string
 }
 
@@ -15,7 +15,7 @@ export const DiceDot = ({ className }: DiceDotProps) => {
   )
 }
 
-export interface DiceProps {
+export type DiceProps = {
   className?: string
   side: number
   error?: boolean

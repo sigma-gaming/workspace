@@ -1,23 +1,23 @@
 import EventEmitter from 'node:events'
 
-interface EventConfig<T> {
+type EventConfig<T> = {
   type: 'public' | 'internal'
   __type__: T
 }
 
-interface PublicEventConfig<T> extends EventConfig<T> {
+type PublicEventConfig<T> = {
   type: 'public'
   __type__: T
-}
+} & EventConfig<T>
 
-interface InternalEventConfig<T> extends EventConfig<T> {
+type InternalEventConfig<T> = {
   type: 'internal'
   __type__: T
-}
+} & EventConfig<T>
 
 type InferPayload<T> = T extends EventConfig<infer P> ? P : never
 
-interface Events {
+type Events = {
   [key: string]: EventConfig<unknown>
 }
 

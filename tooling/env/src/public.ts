@@ -10,7 +10,7 @@ class InvalidEnvSourceError extends Error {
 
 const EnvRecordSchema = z.record(z.string())
 
-interface Options {
+type Options = {
   source: unknown
   exitProcessOnFail?: boolean
 }

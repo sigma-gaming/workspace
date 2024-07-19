@@ -1,6 +1,6 @@
 import { Connection, RPCClient } from 'rabbitmq-client'
 
-export interface RMQ {
+export type RMQ = {
   connection: Connection
   rpc: RPCClient
 }

@@ -1,4 +1,4 @@
-export interface BalanceDetailed {
+export type BalanceDetailed = {
   available: number
 }
 

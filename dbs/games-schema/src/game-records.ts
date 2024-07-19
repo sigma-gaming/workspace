@@ -12,7 +12,7 @@ import { Game } from './enums-raw'
 import { TransactionTable } from './transactions'
 import { UserTable } from './users'
 
-export interface GameSnapshot {
+export type GameSnapshot = {
   game: Game.Dice
   inputSides: number[]
   outputSide: number

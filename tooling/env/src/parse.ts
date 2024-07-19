@@ -9,7 +9,7 @@ class InvalidEnvError extends Error {
   }
 }
 
-interface Options<TOutput, TDef extends ZodTypeDef, TInput> {
+type Options<TOutput, TDef extends ZodTypeDef, TInput> = {
   source: unknown
   schema: ZodType<TOutput, TDef, TInput>
   exitProcessOnFail?: boolean

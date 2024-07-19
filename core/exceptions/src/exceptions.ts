@@ -79,7 +79,7 @@ export class SessionExpiredException extends RouteException {
   message = 'Session expired'
 }
 
-interface BadRequestExceptionPayload {
+type BadRequestExceptionPayload = {
   path?: string[]
   message: string
 }
@@ -90,7 +90,7 @@ export class BadRequestException extends RouteException<BadRequestExceptionPaylo
   message = 'Bad request'
 }
 
-interface ValidationExceptionPayload {
+type ValidationExceptionPayload = {
   issues: ZodIssue[]
   fieldErrors: Record<string, string[] | undefined>
 }

@@ -1,6 +1,6 @@
 import { InjectionToken } from 'tsyringe-neo'
 
-export interface OnApplicationShutdown {
+export type OnApplicationShutdown = {
   shutdownBefore?: InjectionToken<unknown>[]
   onApplicationShutdown(signal?: string): void | Promise<void>
 }

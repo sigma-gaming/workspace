@@ -1,7 +1,7 @@
 import { ExternalOption, InputPluginOption, rollup } from 'rollup'
 import esbuild from 'rollup-plugin-esbuild'
 
-interface Options {
+type Options = {
   input: string
   output: string
   external?: ExternalOption

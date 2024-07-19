@@ -2,11 +2,11 @@ import { createFactory } from '@withease/factories'
 import { createEvent, createStore, Event, sample } from 'effector'
 import { Socket } from 'socket.io-client'
 
-interface EventsMap {
+type EventsMap = {
   [key: string]: (...args: any[]) => void
 }
 
-interface Subscription<T> {
+type Subscription<T> = {
   pause: Event<void>
   unpause: Event<void>
   reset: Event<void>

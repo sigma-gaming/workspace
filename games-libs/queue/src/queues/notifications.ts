@@ -20,12 +20,12 @@ export const NotificationContentSchema = z.object({
   withCloseButton: z.boolean().optional(),
 })
 
-export interface NotificationsQueuePayload {
+export type NotificationsQueuePayload = {
   target: z.infer<typeof NotificationTargetSchema>
   content: z.infer<typeof NotificationContentSchema>
 }
 
-export interface NotificationsQueueOutput {
+export type NotificationsQueueOutput = {
   sent: boolean
 }
 

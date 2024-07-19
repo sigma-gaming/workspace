@@ -6,11 +6,11 @@ import { RedisService, SubRedisService } from '../redis'
 
 type RedisMessageHandler = (channel: string, message: string) => void
 
-export interface PubSubSubscription {
+export type PubSubSubscription = {
   unsubscribe: () => void
 }
 
-export interface PubSub<TPayload> {
+export type PubSub<TPayload> = {
   publish: (payload: TPayload) => Promise<number>
   subscribe: (handler: (payload: TPayload) => void) => PubSubSubscription
   unsubscribeAll: () => void

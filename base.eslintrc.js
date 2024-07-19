@@ -8,15 +8,13 @@ module.exports = configure({
     presets.imports(),
     presets.node(),
     presets.prettier(),
-    presets.typescript(),
+    presets.typescript({ enforceUsingType: true }),
   ],
 
   extend: {
     ignorePatterns: ['!**/*', 'node_modules', 'dist', 'public', '.eslintrc.cjs'],
     rules: {
-      'import/extensions': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unnecessary-condition': 'off',
       'sonarjs/no-identical-functions': 'off',
     },
   },

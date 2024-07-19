@@ -3,7 +3,7 @@ import { chatMessageTypeEnum, userRoleEnum } from './enums'
 import { ChatMessageAttachmentType } from './enums-raw'
 import { UserTable } from './users'
 
-export interface ChatMessageAttachmentGame {
+export type ChatMessageAttachmentGame = {
   type: ChatMessageAttachmentType.Game
   transactionId: string
 }

@@ -10,7 +10,7 @@ import { $$user } from '../../entities/user'
 import { router } from '../../routing'
 import { gamesWs } from '../../shared/api/games-ws'
 
-interface FactoryParams {
+type FactoryParams = {
   clock: Event<unknown>
   authenticate: () => Promise<void>
 }
