@@ -84,13 +84,13 @@ export const playDiceRoute = new Hono().post(
         payload.sides,
       )
 
-      const amount = hasWon ? winAmount : -payload.bet
+      const payout = hasWon ? winAmount : -payload.bet
 
       const { gameRecord, transaction } = await gameService.saveGame({
         userId: user.id,
         game: Game.Dice,
         bet: payload.bet,
-        payout: amount,
+        payout,
         snapshot: {
           game: Game.Dice,
           inputSides: payload.sides,

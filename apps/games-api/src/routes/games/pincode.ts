@@ -16,9 +16,45 @@ import { Hono } from 'hono'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 
-export async function runGame() {
+const multiplierMap: Partial<Record<number, number>> = {
+  0: 250,
+  1111: 250,
+  1337: 111,
+  1488: 111,
+  2222: 250,
+  3333: 250,
+  4444: 250,
+  5555: 250,
+  6666: 250,
+  7777: 250,
+  8888: 250,
+  9999: 250,
+}
+
+for (let code = 0; code < 10000; code++) {
+  let sevenCount = 0
+
+  for (const element of code.toString()) {
+    if (element === '7') {
+      sevenCount += 1
+    }
+  }
+
+  if (sevenCount === 4) {
+    continue
+  } else if (sevenCount === 3) {
+    multiplierMap[code] = 100
+  } else if (sevenCount === 2) {
+    multiplierMap[code] = 5
+  }
+}
+
+export async function runGame(bet: number) {
   const number = crypto.randomInt(1, 10000)
-  return { number }
+  const multiplier = multiplierMap[number] ?? 0
+  const hasWon = multiplier > 0
+  const winAmount = Math.ceil(bet * multiplier - bet)
+  return { number, multiplier, hasWon, winAmount }
 }
 
 export const playPincodeRoute = new Hono().post(
@@ -58,18 +94,20 @@ export const playPincodeRoute = new Hono().post(
         })
       }
 
-      const { number } = await runGame()
+      const { number, hasWon, winAmount } = await runGame(payload.bet)
+
+      const payout = hasWon ? winAmount : -payload.bet
 
       const { gameRecord, transaction } = await gameService.saveGame({
         userId: user.id,
         game: Game.Pincode,
         bet: payload.bet,
-        payout: 0,
+        payout,
         snapshot: {
           game: Game.Pincode,
           outputNumber: number,
         },
-        outcome: GameOutcome.Win,
+        outcome: hasWon ? GameOutcome.Win : GameOutcome.Loss,
         previousTransaction: lastTransaction,
       })
 
