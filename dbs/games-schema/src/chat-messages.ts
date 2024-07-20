@@ -1,14 +1,7 @@
 import { json, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { chatMessageTypeEnum, userRoleEnum } from './enums'
-import { ChatMessageAttachmentType } from './enums-raw'
+import { ChatMessageAttachment } from './types'
 import { UserTable } from './users'
-
-export type ChatMessageAttachmentGame = {
-  type: ChatMessageAttachmentType.Game
-  transactionId: string
-}
-
-export type ChatMessageAttachment = ChatMessageAttachmentGame
 
 export const ChatMessageTable = pgTable('ChatMessage', {
   id: uuid('id').defaultRandom().primaryKey(),

@@ -8,15 +8,9 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { gameEnum, gameOutcomeEnum } from './enums'
-import { Game } from './enums-raw'
 import { TransactionTable } from './transactions'
+import { GameSnapshot } from './types'
 import { UserTable } from './users'
-
-export type GameSnapshot = {
-  game: Game.Dice
-  inputSides: number[]
-  outputSide: number
-}
 
 export const GameRecordTable = pgTable('GameRecord', {
   id: uuid('id').defaultRandom().primaryKey(),

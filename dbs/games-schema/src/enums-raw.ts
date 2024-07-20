@@ -19,6 +19,7 @@ export enum TransactionType {
 
 export enum Game {
   Dice = 'Dice',
+  Pincode = 'Pincode',
 }
 
 export enum GameOutcome {

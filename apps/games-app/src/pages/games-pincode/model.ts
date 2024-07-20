@@ -3,9 +3,7 @@ import { createField, createForm } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
 import { Game } from '@dbs/games-schema'
 import { createMutation } from '@farfetched/core'
-import { calculateDiceWinAmount } from '@games/model'
-import type { Rive } from '@rive-app/react-canvas'
-import { attach, combine, createEvent, createStore, sample } from 'effector'
+import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$balance } from '../../entities/balance'
@@ -16,8 +14,8 @@ import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
 
 const playGameMutation = createMutation({
-  name: 'games/dice/play',
-  effect: createApiEffect(gamesApi.games.playDice.$post),
+  name: 'games/pincode/play',
+  effect: createApiEffect(gamesApi.games.playPincode.$post),
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
@@ -29,10 +27,7 @@ const autoplayPressed = createEvent()
 const startPlay = createEvent()
 const autoplayToggled = createEvent()
 const autoplayChanged = createEvent<boolean>()
-const riveChanged = createEvent<Rive | null>()
-const animationLoaded = createEvent()
-const animationStarted = createEvent()
-const animationFinished = createEvent()
+const pincodeChanged = createEvent<number>()
 const reset = createEvent()
 
 const $playing = playGameMutation.$pending
@@ -41,24 +36,14 @@ const $autoplaying = createStore(false)
   .on(autoplayChanged, (_, autoplay) => autoplay)
   .reset(reset)
 
-const $rive = createStore<Rive | null>(null).on(riveChanged, (_, rive) => rive)
-
-const $animationLoaded = createStore(false)
-  .on(animationLoaded, () => true)
-  .reset(reset)
-
 const $animationPlaying = createStore(false)
-  .on(animationStarted, () => true)
-  .reset(animationFinished)
+  .on(pincodeChanged, () => true)
+  .on(delay(pincodeChanged, 500), () => false)
   .reset(reset)
 
-const playAnimationFx = attach({
-  source: $rive,
-  effect(rive, animation?: string) {
-    if (!rive) return
-    rive.play(animation)
-  },
-})
+const $activePincode = createStore<number>(0)
+  .on(pincodeChanged, (_, pincode) => pincode)
+  .reset(reset)
 
 const fields = {
   bet: createField({
@@ -84,12 +69,6 @@ export const form = createForm({
       .max(5, 'Выберите не более пяти граней'),
   }),
 })
-
-const $possibleWinAmount = combine(
-  fields.bet.$value,
-  fields.sides.$value.map((sides) => sides.map(Number)),
-  (bet, sides) => calculateDiceWinAmount(Number(bet) * 100, sides) / 100,
-)
 
 const showActionNotAllowed = $$notifications.show.prepend(() => ({
   title: 'Действие недоступно',
@@ -169,14 +148,14 @@ const receivedGameRecord = sample({
 })
 
 const receivedGameSnapshot = receivedGameRecord.filterMap((record) => {
-  if (record.snapshot.game !== Game.Dice) return
+  if (record.snapshot.game !== Game.Pincode) return
   return record.snapshot
 })
 
 sample({
   source: receivedGameSnapshot,
-  fn: ({ outputSide }) => `Shake_${outputSide}`,
-  target: playAnimationFx,
+  fn: ({ outputNumber }) => outputNumber,
+  target: pincodeChanged,
 })
 
 sample({
@@ -187,10 +166,10 @@ sample({
 sample({
   clock: delay(
     sample({
-      clock: animationFinished,
+      clock: pincodeChanged,
       filter: $autoplaying,
     }),
-    250,
+    750, // 500ms animation + 250ms delay
   ),
   target: startPlay,
 })
@@ -217,24 +196,19 @@ sample({
 })
 
 sample({
-  clock: routes.diceGame.closed,
+  clock: routes.pincodeGame.closed,
   target: reset,
 })
 
-export const $$dicePage = {
+export const $$pincodePage = {
+  playPressed,
+  autoplayPressed,
+  betDoubled,
+  betHalved,
   fields,
   form,
-  $possibleWinAmount,
   $playing,
   $autoplaying,
   $animationPlaying,
-  $animationLoaded,
-  playPressed,
-  autoplayPressed,
-  riveChanged,
-  animationLoaded,
-  animationStarted,
-  animationFinished,
-  betDoubled,
-  betHalved,
+  $activePincode,
 }

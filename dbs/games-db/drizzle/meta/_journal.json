@@ -15,6 +15,13 @@
       "when": 1720597436045,
       "tag": "0001_lush_obadiah_stane",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1721486691658,
+      "tag": "0002_marvelous_chimera",
+      "breakpoints": true
     }
   ]
 }

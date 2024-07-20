@@ -15,14 +15,17 @@ import styles from './table.module.css'
 
 const gameToLabelMap: Record<Game, string> = {
   [Game.Dice]: 'Dice',
+  [Game.Pincode]: 'Pincode',
 }
 
 const gameToIconMap: Record<Game, ReactNode> = {
   [Game.Dice]: <Icons.Dice width={16} height={16} />,
+  [Game.Pincode]: <Icons.Card width={16} height={16} />,
 }
 
 const gameToRouteMap: Record<Game, RouteInstance<RouteParams>> = {
   [Game.Dice]: routes.diceGame,
+  [Game.Pincode]: routes.pincodeGame,
 }
 
 export const GameHistoryTable = () => {
