@@ -24,6 +24,7 @@ export default defineConfig({
     }),
     tsconfigPaths(),
     sentryVitePlugin({
+      disable: process.env.NODE_ENV === 'development',
       bundleSizeOptimizations: {
         excludeDebugStatements: true,
         excludeReplayIframe: true,

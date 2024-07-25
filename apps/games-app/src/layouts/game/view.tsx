@@ -1,6 +1,6 @@
 import { Card } from '@mantine/core'
 import { PropsWithChildren } from 'react'
-import { GameHistoryTable } from '../../features/game-history'
+import { GameHistoryTable } from '../../widgets/game-history-table'
 import { BaseLayout } from '../base'
 
 export const GameLayout = ({ children }: PropsWithChildren) => {

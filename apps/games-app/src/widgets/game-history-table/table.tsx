@@ -1,4 +1,9 @@
-import { Game, GameOutcome, GameRecordSelect } from '@dbs/games-schema'
+import {
+  Game,
+  GameOutcome,
+  GameRecordSelect,
+  GameSnapshot,
+} from '@dbs/games-schema'
 import { Card, LoadingOverlay, Tabs, Text } from '@mantine/core'
 import { useIsFirstRender } from '@mantine/hooks'
 import { RouteInstance, RouteParams } from 'atomic-router'
@@ -7,10 +12,10 @@ import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { memo, ReactNode, useEffect } from 'react'
 import { $$user } from '../../entities/user'
+import { $$gameHistory, Tab } from '../../features/game-history'
 import { routes } from '../../routing'
 import { formatGem } from '../../shared/lib/format/currency'
 import { Icons } from '../../shared/ui/icons'
-import { $$gameHistory, Tab } from './model'
 import styles from './table.module.css'
 
 const gameToLabelMap: Record<Game, string> = {
@@ -26,6 +31,13 @@ const gameToIconMap: Record<Game, ReactNode> = {
 const gameToRouteMap: Record<Game, RouteInstance<RouteParams>> = {
   [Game.Dice]: routes.diceGame,
   [Game.Pincode]: routes.pincodeGame,
+}
+
+function getGameResult(snapshot: GameSnapshot): string {
+  if (snapshot.game === Game.Dice) return snapshot.outputSide.toString()
+  if (snapshot.game === Game.Pincode)
+    return snapshot.outputNumber.toString().padStart(4, '0')
+  return '?'
 }
 
 export const GameHistoryTable = () => {
@@ -116,6 +128,7 @@ const MyGamesTable = () => {
 }
 
 const cellDesktop = 'hidden sm:table-cell lg:hidden xl:table-cell'
+const cellLargeDesktop = 'hidden sm:table-cell lg:hidden 2xl:table-cell'
 
 const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
   // Used to skip animation of first render
@@ -125,27 +138,20 @@ const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
     <table className={styles.table}>
       <thead>
         <tr className={styles.row}>
-          <Cell type="head" className="font-medium">
-            Игра
-          </Cell>
-          <Cell type="head" className={clsx('font-medium', cellDesktop)}>
+          <Cell type="head">Игра</Cell>
+          <Cell type="head" className={cellDesktop}>
             Игрок
           </Cell>
-          <Cell
-            type="head"
-            className={clsx('font-medium', cellDesktop)}
-            align="center"
-          >
+          <Cell type="head" className={cellDesktop} align="center">
             Ставка
           </Cell>
-          <Cell
-            type="head"
-            className={clsx('font-medium', cellDesktop)}
-            align="center"
-          >
+          <Cell type="head" className={cellDesktop} align="center">
+            Результат
+          </Cell>
+          <Cell type="head" className={cellLargeDesktop} align="center">
             Множитель
           </Cell>
-          <Cell type="head" className="font-medium" align="right">
+          <Cell type="head" align="right">
             Выплата
           </Cell>
         </tr>
@@ -206,7 +212,10 @@ const Row = memo(
         <Cell className={cellDesktop} align="center">
           {formatGem(record.bet / 100)}g
         </Cell>
-        <Cell className={cellDesktop} align="center" textColor={highlight}>
+        <Cell className={cellDesktop} align="center">
+          {getGameResult(record.snapshot)}
+        </Cell>
+        <Cell className={cellLargeDesktop} align="center" textColor={highlight}>
           {multiplier}x
         </Cell>
         <Cell align="right" textColor={highlight}>

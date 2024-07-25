@@ -1,0 +1,1 @@
+export { GameHistoryTable } from './table'
