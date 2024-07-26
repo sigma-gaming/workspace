@@ -1,6 +1,6 @@
 .body input:checked + .track {
-  background-color: var(--mantine-primary-color-filled);
-  border-color: var(--mantine-primary-color-filled);
+  background-color: var(--switch-color);
+  border-color: var(--switch-color);
 
   & .thumb {
     background-color: #ffffff;

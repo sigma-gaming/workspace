@@ -13,6 +13,8 @@ import { $$gameHistory } from '../../features/game-history'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
 
+export type PincodeMode = 'easy' | 'hardcore'
+
 const playGameMutation = createMutation({
   name: 'games/pincode/play',
   effect: createApiEffect(gamesApi.games.playPincode.$post),
@@ -48,10 +50,13 @@ const $activePincode = createStore<number>(0)
 const fields = {
   bet: createField({
     emptyValue: '1',
-    persistKey: 'games/dice/bet',
+    persistKey: 'games/pincode/bet',
+    persistInitialValue: true,
   }),
-  sides: createField<string[]>({
-    emptyValue: ['1'],
+  mode: createField<PincodeMode>({
+    emptyValue: 'easy',
+    persistKey: 'games/pincode/mode',
+    persistInitialValue: true,
   }),
 }
 
@@ -63,10 +68,7 @@ export const form = createForm({
       .min(1, 'Минимальная ставка - 1 гем')
       .step(0.01, 'Ставка должна быть кратна 0.01')
       .transform((gems) => Math.floor(gems * 100)),
-    sides: z
-      .array(z.string().transform(Number))
-      .min(1, 'Выберите как минимум одну грань')
-      .max(5, 'Выберите не более пяти граней'),
+    mode: z.enum(['easy', 'hardcore']),
   }),
 })
 

@@ -27,6 +27,7 @@ export function normalizeFieldErrors<TValues extends FormValues>(
 type FieldOptions<TValue> = {
   emptyValue: TValue
   persistKey?: string
+  persistInitialValue?: boolean
 }
 
 type Field<TValue> = {
@@ -97,7 +98,14 @@ export function createField<TValue>(
   const setErrors = createEvent<string[]>()
   const resetErrors = createEvent()
 
-  const $initialValue = createStore<TValue>(emptyValue).on(
+  let initialValue: TValue = emptyValue
+
+  if (options.persistKey) {
+    const savedValue = localStorage.getItem(options.persistKey)
+    if (savedValue !== null) initialValue = JSON.parse(savedValue)
+  }
+
+  const $initialValue = createStore<TValue>(initialValue).on(
     initialize,
     (_, value) => value,
   )
@@ -109,6 +117,13 @@ export function createField<TValue>(
 
   if (options.persistKey) {
     persist({ store: $value, key: options.persistKey })
+
+    if (options.persistInitialValue) {
+      sample({
+        source: $value,
+        target: $initialValue,
+      })
+    }
   }
 
   const $empty = $value.map((value) => value === emptyValue)

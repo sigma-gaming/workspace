@@ -64,9 +64,12 @@ const fields = {
   bet: createField({
     emptyValue: '1',
     persistKey: 'games/dice/bet',
+    persistInitialValue: true,
   }),
   sides: createField<string[]>({
     emptyValue: ['1'],
+    persistKey: 'games/dice/sides',
+    persistInitialValue: true,
   }),
 }
 

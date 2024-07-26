@@ -16,6 +16,7 @@ import {
   NumberInput,
   Pill,
   Popover,
+  SegmentedControl,
   Select,
   Skeleton,
   Switch,
@@ -39,6 +40,7 @@ import notificationsClassNames from './notifications.module.css'
 import numberInputClassNames from './number-input.module.css'
 import pillClassNames from './pill.module.css'
 import popoverClassNames from './popover.module.css'
+import segmentedControlClassNames from './segmented-control.module.css'
 import selectClassNames from './select.module.css'
 import skeletonClassNames from './skeleton.module.css'
 import switchClassNames from './switch.module.css'
@@ -123,6 +125,9 @@ export const theme = createTheme({
     }),
     ActionIcon: ActionIcon.extend({
       classNames: actionIconClassNames,
+    }),
+    SegmentedControl: SegmentedControl.extend({
+      classNames: segmentedControlClassNames,
     }),
   },
 })

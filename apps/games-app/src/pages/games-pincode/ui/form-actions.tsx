@@ -8,7 +8,7 @@ export const FormActions = () => {
   const animationPlaying = useUnit($$pincodePage.$animationPlaying)
 
   return (
-    <div className="flex flex-col gap-3 mt-2">
+    <div className="flex flex-col gap-3 mt-auto">
       <Button
         type="submit"
         disabled={autoplaying || animationPlaying}

@@ -14,5 +14,9 @@ export const AnimatedDiceRive = () => {
     $$dicePage.riveChanged(rive)
   }, [rive])
 
-  return <RiveComponent />
+  return (
+    <div className="w-full h-full max-h-64">
+      <RiveComponent />
+    </div>
+  )
 }

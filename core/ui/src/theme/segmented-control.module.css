@@ -1,0 +1,7 @@
+.root {
+  @apply bg-[#25273E];
+}
+
+.indicator {
+  background-color: var(--sc-color, var(--mantine-primary-color-filled));
+}

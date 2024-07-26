@@ -1,5 +1,6 @@
-import { Title } from '@mantine/core'
+import { useUnit } from 'effector-react'
 import { memo } from 'react'
+import { GamePlaygroundLayout } from '../../layouts/game-playground/view.tsx'
 import { $$dicePage } from './model.ts'
 import { AnimatedDice } from './ui/animated-dice.tsx'
 import { BetField } from './ui/field-bet.tsx'
@@ -8,29 +9,22 @@ import { FormActions } from './ui/form-actions.tsx'
 import { PossibleWinAmount } from './ui/possible-win-amount.tsx'
 
 export const DiceGamePageView = memo(() => {
+  const loaded = useUnit($$dicePage.$animationLoaded)
+
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        $$dicePage.playPressed()
-      }}
-    >
-      <Title className="mb-4" order={3}>
-        Dice
-      </Title>
-
-      <div className="flex flex-col xl:flex-row-reverse gap-4">
-        <div className="relative grow flex flex-col justify-between xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
-          <AnimatedDice />
-        </div>
-
-        <div className="flex flex-col gap-4 xl:w-[240px] xl:shrink-0">
+    <GamePlaygroundLayout
+      title="Dice"
+      onSubmit={() => $$dicePage.playPressed()}
+      animation={<AnimatedDice />}
+      loading={!loaded}
+      fields={
+        <>
           <BetField />
           <SidesField />
           <PossibleWinAmount />
           <FormActions />
-        </div>
-      </div>
-    </form>
+        </>
+      }
+    />
   )
 })

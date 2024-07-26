@@ -13,7 +13,7 @@ function formatPincode(number: number) {
   return number.toFixed(0).padStart(4, '0')
 }
 
-export const AnimatedPincode = memo(() => {
+const PincodeNumber = memo(() => {
   const current = useUnit($$pincodePage.$activePincode)
   const previousRef = useRef(current)
   const nodeRef = useRef<HTMLSpanElement>(null)
@@ -49,3 +49,11 @@ export const AnimatedPincode = memo(() => {
 
   return <span style={{ display: 'inline-block' }} ref={nodeRef} />
 })
+
+export const AnimatedPincode = () => {
+  return (
+    <div>
+      <PincodeNumber />
+    </div>
+  )
+}
