@@ -1,3 +1,4 @@
+import { GameSnapshot } from '@dbs/games-types'
 import {
   bigint,
   integer,
@@ -9,7 +10,6 @@ import {
 } from 'drizzle-orm/pg-core'
 import { gameEnum, gameOutcomeEnum } from './enums'
 import { TransactionTable } from './transactions'
-import { GameSnapshot } from './types'
 import { UserTable } from './users'
 
 export const GameRecordTable = pgTable('GameRecord', {

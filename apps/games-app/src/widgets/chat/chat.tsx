@@ -1,5 +1,5 @@
 import { Avatar, useMedia } from '@core/ui'
-import { ChatMessageType } from '@dbs/games-schema'
+import { ChatMessageType } from '@dbs/games-types'
 import { getUserInitials } from '@games/model'
 import { ActionIcon, Button, Skeleton, Text, Title } from '@mantine/core'
 import clsx from 'clsx'

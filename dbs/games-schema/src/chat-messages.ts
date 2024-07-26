@@ -1,6 +1,6 @@
+import { ChatMessageAttachment } from '@dbs/games-types'
 import { json, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { chatMessageTypeEnum, userRoleEnum } from './enums'
-import { ChatMessageAttachment } from './types'
 import { UserTable } from './users'
 
 export const ChatMessageTable = pgTable('ChatMessage', {

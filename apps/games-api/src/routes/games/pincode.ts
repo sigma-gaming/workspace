@@ -4,7 +4,7 @@ import {
   RouteException,
 } from '@core/exceptions'
 import { loggerService } from '@core/logger'
-import { Game, GameOutcome } from '@dbs/games-schema'
+import { Game, GameOutcome } from '@dbs/games-types'
 import { gemInt } from '@games/model'
 import {
   gameService,

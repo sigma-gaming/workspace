@@ -2,15 +2,17 @@ import { createSingletonProxy } from '@core/di'
 import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { gamesDb } from '@dbs/games-db'
 import {
-  ChatMessageAttachment,
-  ChatMessageAttachmentGame,
-  ChatMessageAttachmentType,
   ChatMessageInsert,
   ChatMessageSelect,
   ChatMessageTable,
+} from '@dbs/games-schema'
+import {
+  ChatMessageAttachment,
+  ChatMessageAttachmentGame,
+  ChatMessageAttachmentType,
   ChatMessageType,
   UserRole,
-} from '@dbs/games-schema'
+} from '@dbs/games-types'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { desc } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'

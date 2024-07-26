@@ -1,6 +1,7 @@
 import { createField, createForm } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
-import { NotificationInsert, NotificationKind } from '@dbs/games-schema'
+import { NotificationInsert } from '@dbs/games-schema'
+import { NotificationKind } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'

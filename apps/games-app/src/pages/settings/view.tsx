@@ -1,5 +1,5 @@
 import { Avatar } from '@core/ui'
-import { AccountProvider } from '@dbs/games-schema'
+import { AccountProvider } from '@dbs/games-types'
 import { getUserFullName, getUserInitials } from '@games/model'
 import {
   Anchor,

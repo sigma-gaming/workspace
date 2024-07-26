@@ -1,4 +1,3 @@
-import { pgEnum } from 'drizzle-orm/pg-core'
 import {
   AccountProvider,
   ChatMessageType,
@@ -7,7 +6,8 @@ import {
   NotificationKind,
   TransactionType,
   UserRole,
-} from './enums-raw'
+} from '@dbs/games-types'
+import { pgEnum } from 'drizzle-orm/pg-core'
 import { enumValues } from './lib/enums'
 
 /**

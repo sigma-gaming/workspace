@@ -1,11 +1,7 @@
 import { BadRequestException } from '@core/exceptions'
 import { gamesDb } from '@dbs/games-db'
-import {
-  AccountProvider,
-  AccountTable,
-  ProfileTable,
-  ProfileUpdate,
-} from '@dbs/games-schema'
+import { AccountTable, ProfileTable, ProfileUpdate } from '@dbs/games-schema'
+import { AccountProvider } from '@dbs/games-types'
 import { getUserFullName, ProfileValidation } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { profileService, sessionService } from '@games/services'

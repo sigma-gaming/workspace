@@ -1,10 +1,7 @@
 import { createSingletonProxy } from '@core/di'
 import { gamesDb } from '@dbs/games-db'
-import {
-  GameOutcome,
-  GameRecordSelect,
-  GameRecordTable,
-} from '@dbs/games-schema'
+import { GameRecordSelect, GameRecordTable } from '@dbs/games-schema'
+import { GameOutcome } from '@dbs/games-types'
 import { gemFloat, gemInt } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { and, desc, eq, gte, sql } from 'drizzle-orm'

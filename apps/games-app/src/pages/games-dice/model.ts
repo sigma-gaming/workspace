@@ -1,7 +1,7 @@
 import { BadRequestException } from '@core/exceptions'
 import { createField, createForm } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
-import { Game } from '@dbs/games-schema'
+import { Game } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { calculateDiceWinAmount } from '@games/model'
 import type { Rive } from '@rive-app/react-canvas'

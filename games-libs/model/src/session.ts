@@ -1,4 +1,5 @@
-import { AccountProvider, UserSelect } from '@dbs/games-schema'
+import { UserSelect } from '@dbs/games-schema'
+import { AccountProvider } from '@dbs/games-types'
 
 export enum SessionState {
   Empty,

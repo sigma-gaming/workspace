@@ -1,9 +1,5 @@
-import {
-  Game,
-  GameOutcome,
-  GameRecordSelect,
-  GameSnapshot,
-} from '@dbs/games-schema'
+import { GameRecordSelect } from '@dbs/games-schema'
+import { Game, GameOutcome, GameSnapshot } from '@dbs/games-types'
 import { Card, LoadingOverlay, Tabs, Text } from '@mantine/core'
 import { useIsFirstRender } from '@mantine/hooks'
 import { RouteInstance, RouteParams } from 'atomic-router'

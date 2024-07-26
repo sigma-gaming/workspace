@@ -1,7 +1,7 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
-import path, { resolve } from 'node:path'
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
@@ -37,15 +37,6 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       external: ['/env.js'],
-    },
-  },
-  resolve: {
-    alias: {
-      // Remove drizzle schemas from bundle
-      '@dbs/games-schema': resolve(
-        __dirname,
-        '../../dbs/games-schema/src/index.client.ts',
-      ),
     },
   },
 })

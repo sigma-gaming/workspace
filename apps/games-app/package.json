@@ -15,12 +15,14 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
-    "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",
     "@core/hono-client": "workspace:*",
     "@core/exceptions": "workspace:*",
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",
     "@tooling/env": "workspace:*"
+  },
+  "devDependencies": {
+    "@dbs/games-schema": "workspace:*"
   }
 }

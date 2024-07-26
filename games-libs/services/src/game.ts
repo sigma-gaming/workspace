@@ -1,14 +1,16 @@
 import { createSingletonProxy } from '@core/di'
 import { gamesDb } from '@dbs/games-db'
 import {
-  Game,
-  GameOutcome,
   GameRecordTable,
-  GameSnapshot,
   TransactionSelect,
   TransactionTable,
-  TransactionType,
 } from '@dbs/games-schema'
+import {
+  Game,
+  GameOutcome,
+  GameSnapshot,
+  TransactionType,
+} from '@dbs/games-types'
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'

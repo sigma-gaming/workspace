@@ -7,7 +7,7 @@ import {
   normalizeFieldErrors,
 } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
-import { AccountProvider } from '@dbs/games-schema'
+import { AccountProvider } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { getUserFullName, ProfileValidation } from '@games/model'
 import { sample } from 'effector'

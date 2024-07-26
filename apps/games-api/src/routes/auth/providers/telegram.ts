@@ -2,11 +2,11 @@ import { BadRequestException } from '@core/exceptions'
 import { gamesDb } from '@dbs/games-db'
 import {
   AccountInsert,
-  AccountProvider,
   AccountTable,
   ProfileTable,
   UserTable,
 } from '@dbs/games-schema'
+import { AccountProvider } from '@dbs/games-types'
 import { gamesCaches } from '@games/redis'
 import { env, sessionService, telegramBotService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'

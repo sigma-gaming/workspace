@@ -1,4 +1,5 @@
-import { ProfileSelect, UserRole } from '@dbs/games-schema'
+import { ProfileSelect } from '@dbs/games-schema'
+import { UserRole } from '@dbs/games-types'
 import { z } from 'zod'
 import { AccountPublic } from './account'
 

@@ -3,7 +3,7 @@ import {
   InternalServerException,
   RouteException,
 } from '@core/exceptions'
-import { TransactionType } from '@dbs/games-schema'
+import { TransactionType } from '@dbs/games-types'
 import { gamesCaches } from '@games/redis'
 import {
   budgetService,

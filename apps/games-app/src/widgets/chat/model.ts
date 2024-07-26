@@ -1,11 +1,8 @@
 import { createField, createForm } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
 import { subscriptionFactory } from '@core/io-client'
-import {
-  ChatMessageAttachment,
-  ChatMessageSelect,
-  ChatMessageType,
-} from '@dbs/games-schema'
+import { ChatMessageSelect } from '@dbs/games-schema'
+import { ChatMessageAttachment, ChatMessageType } from '@dbs/games-types'
 import { ChatValidation } from '@games/model'
 import { NotificationData } from '@mantine/notifications'
 import { invoke } from '@withease/factories'

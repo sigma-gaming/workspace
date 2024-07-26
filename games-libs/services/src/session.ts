@@ -4,12 +4,8 @@ import {
   SessionExpiredException,
 } from '@core/exceptions'
 import { gamesDb } from '@dbs/games-db'
-import {
-  AccountProvider,
-  SessionTable,
-  UserSelect,
-  UserTable,
-} from '@dbs/games-schema'
+import { SessionTable, UserSelect, UserTable } from '@dbs/games-schema'
+import { AccountProvider } from '@dbs/games-types'
 import { Session, SessionState } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { parse } from 'cookie'

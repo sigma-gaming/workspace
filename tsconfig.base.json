@@ -50,6 +50,9 @@
       "@dbs/games-schema": [
         "dbs/games-schema/src/index.ts"
       ],
+      "@dbs/games-types": [
+        "dbs/games-types/src/index.ts"
+      ],
       "@games/model": [
         "games-libs/model/src/index.ts"
       ],
