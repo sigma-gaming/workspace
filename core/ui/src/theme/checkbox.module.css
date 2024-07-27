@@ -1,0 +1,7 @@
+.input {
+  @apply bg-[#25273E] border-[#303250];
+}
+
+.label {
+  @apply select-none;
+}

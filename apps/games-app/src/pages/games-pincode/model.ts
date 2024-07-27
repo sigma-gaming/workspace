@@ -4,7 +4,7 @@ import { createApiEffect } from '@core/hono-client'
 import { Game } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
-import { and, condition, delay, not } from 'patronum'
+import { and, condition, debug, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$balance } from '../../entities/balance'
 import { $$notifications } from '../../entities/notifications'
@@ -56,6 +56,11 @@ const fields = {
   mode: createField<PincodeMode>({
     emptyValue: 'easy',
     persistKey: 'games/pincode/mode',
+    persistInitialValue: true,
+  }),
+  stopOnBigWin: createField({
+    emptyValue: false,
+    persistKey: 'games/pincode/stopOnBigWin',
     persistInitialValue: true,
   }),
 }
@@ -149,6 +154,19 @@ const receivedGameRecord = sample({
   fn: ({ result }) => result.record,
 })
 
+const receivedBigWin = sample({
+  source: receivedGameRecord,
+  filter: ({ multiplier }) => multiplier >= 10000 * 0.95,
+})
+
+debug(receivedBigWin)
+
+sample({
+  clock: receivedBigWin,
+  filter: and($autoplaying, fields.stopOnBigWin.$value),
+  target: autoplayChanged.prepend(() => false),
+})
+
 const receivedGameSnapshot = receivedGameRecord.filterMap((record) => {
   if (record.snapshot.game !== Game.Pincode) return
   return record.snapshot
@@ -171,7 +189,7 @@ sample({
       clock: pincodeChanged,
       filter: $autoplaying,
     }),
-    750, // 500ms animation + 250ms delay
+    1000, // 500ms animation + 500ms delay
   ),
   target: startPlay,
 })

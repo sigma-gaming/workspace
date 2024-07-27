@@ -3,6 +3,7 @@ import {
   Anchor,
   Button,
   Card,
+  Checkbox,
   createTheme,
   CSSVariablesResolver,
   Input,
@@ -29,6 +30,7 @@ import { colors } from '../colors'
 import actionIconClassNames from './action-icon.module.css'
 import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
+import checkboxClassNames from './checkbox.module.css'
 import inputClassNames from './input.module.css'
 import inputWrapperClassNames from './input-wrapper.module.css'
 import loadingOverlayClassNames from './loading-overlay.module.css'
@@ -128,6 +130,10 @@ export const theme = createTheme({
     }),
     SegmentedControl: SegmentedControl.extend({
       classNames: segmentedControlClassNames,
+    }),
+    Checkbox: Checkbox.extend({
+      classNames: checkboxClassNames,
+      defaultProps: { radius: 'sm' },
     }),
   },
 })

@@ -1,7 +1,9 @@
+import { calculatePincode } from '@games/model'
 import { useUnit } from 'effector-react'
 import { AnimationPlaybackControls } from 'framer-motion'
-import { memo, useLayoutEffect, useRef } from 'react'
+import { memo, useLayoutEffect, useMemo, useRef } from 'react'
 import { $$pincodePage } from '../model'
+import styles from './styles.module.css'
 
 let animate: typeof import('framer-motion/dom').animate | null = null
 
@@ -16,38 +18,85 @@ function formatPincode(number: number) {
 const PincodeNumber = memo(() => {
   const current = useUnit($$pincodePage.$activePincode)
   const previousRef = useRef(current)
-  const nodeRef = useRef<HTMLSpanElement>(null)
+  const number1Ref = useRef<HTMLSpanElement>(null)
+  const number2Ref = useRef<HTMLSpanElement>(null)
+  const number3Ref = useRef<HTMLSpanElement>(null)
+  const number4Ref = useRef<HTMLSpanElement>(null)
+
+  const numbers = useMemo(
+    () => [number1Ref, number2Ref, number3Ref, number4Ref],
+    [number1Ref, number2Ref, number3Ref, number4Ref],
+  )
 
   useLayoutEffect(() => {
-    const node = nodeRef.current
-    if (!node) return
+    const updateNumbers = (value: number) => {
+      const pincode = formatPincode(value)
+
+      for (const [i, node] of numbers.entries()) {
+        if (!node.current) return
+        node.current.textContent = pincode[i]
+      }
+    }
+
+    const highlight = (value: number) => {
+      const { highlight } = calculatePincode(value)
+
+      for (const [i, node] of numbers.entries()) {
+        const element = node.current
+        if (!element) return
+        const highlighted = highlight[i]
+        const currentHighlight = element.dataset.highlight
+
+        if (!highlighted) element.dataset.highlight = 'none'
+        else if (currentHighlight === '1') element.dataset.highlight = '2'
+        else element.dataset.highlight = '1'
+      }
+    }
+
+    const clearHighlight = () => {
+      for (const node of numbers) {
+        const element = node.current
+        if (!element) return
+        element.dataset.highlight = 'none'
+      }
+    }
 
     if (previousRef.current === current) {
-      node.textContent = formatPincode(current)
+      updateNumbers(current)
       return
     }
 
     let controls: AnimationPlaybackControls | null = null
 
+    clearHighlight()
+
     if (animate) {
       controls = animate(previousRef.current, current, {
         duration: 0.5,
         onUpdate(value) {
-          const text = formatPincode(value)
-          if (!node) return
-          node.textContent = text
+          updateNumbers(value)
+        },
+        onComplete() {
+          highlight(current)
         },
       })
     } else {
-      const text = formatPincode(current)
-      node.textContent = text
+      updateNumbers(current)
+      highlight(current)
     }
 
     previousRef.current = current
     return () => controls?.stop()
-  }, [current])
+  }, [current, numbers])
 
-  return <span style={{ display: 'inline-block' }} ref={nodeRef} />
+  return (
+    <div className="flex gap-2 items-center justify-center font-interface font-[500] text-3xl">
+      <span className={styles.pincodeNumber} ref={number1Ref} />
+      <span className={styles.pincodeNumber} ref={number2Ref} />
+      <span className={styles.pincodeNumber} ref={number3Ref} />
+      <span className={styles.pincodeNumber} ref={number4Ref} />
+    </div>
+  )
 })
 
 export const AnimatedPincode = () => {

@@ -5,7 +5,7 @@ import {
 } from '@core/exceptions'
 import { loggerService } from '@core/logger'
 import { Game, GameOutcome } from '@dbs/games-types'
-import { gemInt } from '@games/model'
+import { calculatePincode, gemInt } from '@games/model'
 import {
   gameService,
   sessionService,
@@ -16,42 +16,9 @@ import { Hono } from 'hono'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 
-const multiplierMap: Partial<Record<number, number>> = {
-  0: 250,
-  1111: 250,
-  1337: 111,
-  1488: 111,
-  2222: 250,
-  3333: 250,
-  4444: 250,
-  5555: 250,
-  6666: 250,
-  7777: 250,
-  8888: 250,
-  9999: 250,
-}
-
-for (let code = 0; code < 10000; code++) {
-  let sevenCount = 0
-
-  for (const element of code.toString()) {
-    if (element === '7') {
-      sevenCount += 1
-    }
-  }
-
-  if (sevenCount === 4) {
-    continue
-  } else if (sevenCount === 3) {
-    multiplierMap[code] = 100
-  } else if (sevenCount === 2) {
-    multiplierMap[code] = 5
-  }
-}
-
 export async function runGame(bet: number) {
   const number = crypto.randomInt(1, 10000)
-  const multiplier = multiplierMap[number] ?? 0
+  const { multiplier } = calculatePincode(number)
   const hasWon = multiplier > 0
   const winAmount = Math.ceil(bet * multiplier - bet)
   return { number, multiplier, hasWon, winAmount }

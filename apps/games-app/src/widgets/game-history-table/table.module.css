@@ -20,6 +20,11 @@ thead .row {
   @apply sticky z-10;
 }
 
+.liveDot {
+  @apply opacity-75;
+  animation: live-pulse 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
 .row[data-animated="true"]:nth-of-type(odd) {
   animation: row-slide-odd 0.5s ease-out forwards;
 }
@@ -47,4 +52,10 @@ thead .row {
   0% { background-color: #1B1C2F }
   50% { background-color: #25273E }
   100% { background-color: #1B1C2F }
+}
+
+@keyframes live-pulse {
+  0% { transform: scale(1) }
+  75% { transform: scale(2); opacity: 0 }
+  100% { transform: scale(2); opacity: 0 }
 }

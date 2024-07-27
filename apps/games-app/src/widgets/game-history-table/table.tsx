@@ -54,14 +54,14 @@ export const GameHistoryTable = () => {
         <Tabs.List>
           <Tabs.Tab
             value="last-wins"
-            className="px-4 md:px-6 py-4"
+            className="px-4 md:px-6 py-3"
             leftSection={<Icons.Transfer width={20} height={20} />}
           >
             Все игры
           </Tabs.Tab>
           <Tabs.Tab
             value="big-wins"
-            className="px-4 md:px-6 py-4"
+            className="px-4 md:px-6 py-3"
             leftSection={<Icons.TrendingUp width={20} height={20} />}
           >
             Крупные выигрыши
@@ -69,12 +69,24 @@ export const GameHistoryTable = () => {
           {loggedIn && (
             <Tabs.Tab
               value="my-games"
-              className="px-4 md:px-6 py-4"
+              className="px-4 md:px-6 py-3"
               leftSection={<Icons.History width={20} height={20} />}
             >
               Мои игры
             </Tabs.Tab>
           )}
+          <div className="ml-auto h-[46px] px-6 flex gap-2 items-center justify-center select-none">
+            <span className="inline-block relative w-3 h-3">
+              <div
+                className={clsx(
+                  'absolute inset-0 inline-flex rounded-full bg-primary-3 -translate-y-px',
+                  styles.liveDot,
+                )}
+              />
+              <span className="absolute inset-0 z-10 inline-flex rounded-full bg-primary-6" />
+            </span>
+            <span className="text-sm font-interface font-[500]">Live</span>
+          </div>
         </Tabs.List>
 
         <Tabs.Panel value="last-wins">
