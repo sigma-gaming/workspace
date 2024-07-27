@@ -1,1 +1,1 @@
-export { GameLayout } from './view.tsx'
+export { GamePlaygroundLayout } from './view.tsx'
