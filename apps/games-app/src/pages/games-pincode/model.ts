@@ -54,7 +54,7 @@ const fields = {
     persistInitialValue: true,
   }),
   mode: createField<PincodeMode>({
-    emptyValue: 'easy',
+    emptyValue: 'hardcore',
     persistKey: 'games/pincode/mode',
     persistInitialValue: true,
   }),
