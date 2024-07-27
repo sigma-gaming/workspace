@@ -52,7 +52,7 @@ const PincodeNumber = memo(() => {
 
 export const AnimatedPincode = () => {
   return (
-    <div>
+    <div className="flex items-center justify-center min-h-32">
       <PincodeNumber />
     </div>
   )

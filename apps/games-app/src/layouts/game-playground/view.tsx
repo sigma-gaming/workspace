@@ -47,7 +47,7 @@ export const GamePlaygroundLayout = memo(
           </Title>
 
           <div className="flex flex-col xl:flex-row-reverse gap-4">
-            <div className="relative grow flex flex-col items-center justify-center xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
+            <div className="relative grow w-full flex flex-col items-center justify-center shrink-0 xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
               <Loader />
               {animation}
             </div>

@@ -7,8 +7,10 @@ export const AnimatedDiceRive = lazy(async () => {
 
 export const AnimatedDice = memo(() => {
   return (
-    <Suspense fallback={null}>
-      <AnimatedDiceRive />
-    </Suspense>
+    <div className="w-full h-64">
+      <Suspense fallback={null}>
+        <AnimatedDiceRive />
+      </Suspense>
+    </div>
   )
 })
