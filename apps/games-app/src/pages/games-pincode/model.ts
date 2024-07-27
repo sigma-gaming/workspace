@@ -4,7 +4,7 @@ import { createApiEffect } from '@core/hono-client'
 import { Game } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
-import { and, condition, debug, delay, not } from 'patronum'
+import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$balance } from '../../entities/balance'
 import { $$notifications } from '../../entities/notifications'
@@ -158,8 +158,6 @@ const receivedBigWin = sample({
   source: receivedGameRecord,
   filter: ({ multiplier }) => multiplier >= 10000 * 0.95,
 })
-
-debug(receivedBigWin)
 
 sample({
   clock: receivedBigWin,
