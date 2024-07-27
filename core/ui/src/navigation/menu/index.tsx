@@ -34,7 +34,7 @@ export const MenuSection = ({
   return (
     <div className="flex flex-col gap-2 mt-4">
       <Title
-        className="px-4 uppercase text-sm mb-1 font-interface text-[color:var(--mantine-color-dimmed)]"
+        className="px-4 uppercase text-sm mb-1 text-[color:var(--mantine-color-dimmed)]"
         order={3}
       >
         {label}
@@ -62,7 +62,7 @@ export const MenuLink = ({
       onClick={onNavigate}
     >
       <div className="opacity-75">{icon}</div>
-      <Text className="text-md md:text-lg font-interface" fw={500}>
+      <Text className="text-md md:text-lg" fw={500}>
         {children}
       </Text>
     </Link>

@@ -33,9 +33,7 @@ const GameCard = ({ route, label, imageSrc }: GameCardProps) => {
             'linear-gradient(to top, rgba(23, 24, 36, 0.75) 7%, rgba(23, 24, 36, 0.25) 50%, transparent 100%)',
         }}
       >
-        <span className="text-white font-interface font-[500] text-xl">
-          {label}
-        </span>
+        <span className="text-white font-medium text-xl">{label}</span>
       </div>
     </Link>
   )

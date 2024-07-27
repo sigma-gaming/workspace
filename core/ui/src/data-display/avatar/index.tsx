@@ -60,7 +60,7 @@ export const Avatar = ({
       <div
         className={clsx(
           'flex w-full h-full items-center justify-center rounded-full bg-[#363753] pointer-events-none',
-          'font-interface font-medium text-[#b6b7ce] select-none',
+          'font-medium text-[#b6b7ce] select-none',
         )}
       >
         {content}

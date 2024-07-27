@@ -1,7 +1,7 @@
 import { Avatar, useMedia } from '@core/ui'
 import { ChatMessageType } from '@dbs/games-types'
 import { getUserInitials } from '@games/model'
-import { ActionIcon, Button, Skeleton, Text, Title } from '@mantine/core'
+import { ActionIcon, Button, Skeleton } from '@mantine/core'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useUnit } from 'effector-react'
@@ -23,7 +23,7 @@ export const Chat = () => {
 
   return (
     <div className="flex flex-col gap-2 h-full">
-      <Title order={3}>Чат</Title>
+      <h2 className="font-text text-2xl font-bold m-0">Чат</h2>
       <MessageList />
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <form
@@ -53,7 +53,7 @@ export const Chat = () => {
         <textarea
           ref={textareaRef}
           className={clsx(
-            'w-full font-interface bg-transparent resize-none outline-none scrollbar-hide',
+            'w-full bg-transparent resize-none outline-none scrollbar-hide',
             'text-[color:var(--mantine-color-text)] placeholder-[color:var(--mantine-color-placeholder)]',
           )}
           value={text}
@@ -182,26 +182,18 @@ const Message = memo(({ message }: { message: ExtendedMessage }) => {
       ) : (
         <Avatar src={null} alt="Аватар системы" fallback="S" size={32} />
       )}
-      <div className="flex flex-col gap-1 mt-1 font-interface">
+      <div className="flex flex-col gap-1 mt-1">
         <div className="flex gap-2">
-          <Text
-            className="cursor-default font-interface truncate max-w-[150px]"
-            c="#7D7E9C"
-            fw={500}
-            lh={1}
-            size="sm"
-          >
+          <p className="cursor-default truncate max-w-[150px] text-[#7D7E9C] font-medium text-sm leading-none">
             {message.type === ChatMessageType.UserMessage
               ? message.senderName
               : 'Система'}
-          </Text>
-          <Text lh={1} size="sm" c="#4F506F">
+          </p>
+          <p className="text-sm leading-none text-[#4F506F]">
             {dayjs(message.createdAt).format('HH:mm')}
-          </Text>
+          </p>
         </div>
-        <Text className="break-words" lh="xs" size="sm">
-          {message.text}
-        </Text>
+        <p className="break-words text-sm">{message.text}</p>
       </div>
     </div>
   )

@@ -8,7 +8,7 @@
 }
 
 .tabLabel {
-  @apply font-interface font-medium;
+  @apply font-medium;
 }
 
 .tabSection[data-position="left"] {
@@ -20,7 +20,6 @@
 }
 
 .tab {
-  @apply font-interface;
   @apply border-b-2 border-[#25273e];
 }
 

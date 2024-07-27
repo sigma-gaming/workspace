@@ -15,6 +15,26 @@ function formatPincode(number: number) {
   return number.toFixed(0).padStart(4, '0')
 }
 
+const placeholders = [
+  'CODE',
+  'PLAY',
+  'LUCK',
+  'GAME',
+  'SPIN',
+  'CASH',
+  'ROLL',
+  'GEMS',
+  'RISK',
+  'SLOT',
+  'TAKE',
+  'WISH',
+]
+
+function getRandomPlaceholder() {
+  const index = Math.floor(Math.random() * placeholders.length)
+  return placeholders[index]
+}
+
 const PincodeNumber = memo(() => {
   const current = useUnit($$pincodePage.$activePincode)
   const previousRef = useRef(current)
@@ -30,7 +50,8 @@ const PincodeNumber = memo(() => {
 
   useLayoutEffect(() => {
     const updateNumbers = (value: number) => {
-      const pincode = formatPincode(value)
+      const pincode =
+        value === -1 ? getRandomPlaceholder() : formatPincode(value)
 
       for (const [i, node] of numbers.entries()) {
         if (!node.current) return
@@ -90,7 +111,7 @@ const PincodeNumber = memo(() => {
   }, [current, numbers])
 
   return (
-    <div className="flex gap-2 items-center justify-center font-interface font-[500] text-3xl">
+    <div className="flex gap-2 items-center justify-center font-medium text-3xl">
       <span className={styles.pincodeNumber} ref={number1Ref} />
       <span className={styles.pincodeNumber} ref={number2Ref} />
       <span className={styles.pincodeNumber} ref={number3Ref} />

@@ -28,9 +28,9 @@ const Left = () => {
         className="w-full flex items-center justify-center gap-2 p-2 mb-4"
       >
         <Logo />
-        <Title className="hidden md:block" order={1}>
+        <h1 className="hidden md:block font-text text-2xl font-medium">
           Sigma
-        </Title>
+        </h1>
       </Link>
       <Menu>
         <MenuLink

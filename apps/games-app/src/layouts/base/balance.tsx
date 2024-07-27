@@ -21,7 +21,7 @@ export const Balance = memo(() => {
       >
         <div className="flex items-center justify-end gap-1.5">
           <Text
-            className="font-interface !leading-none text-lg lg:text-xl"
+            className="!leading-none text-lg lg:text-xl"
             fw={500}
             c="green.6"
           >

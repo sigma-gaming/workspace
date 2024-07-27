@@ -1,5 +1,5 @@
 .dropdown {
-  @apply font-interface shadow-border;
+  @apply shadow-border;
   background-color: #25273E;
   border: none;
 }

@@ -1,6 +1,7 @@
 import { Config } from 'tailwindcss'
 import plugin from 'tailwindcss/plugin'
 import { tailwindColors } from './colors'
+import { fontSizes } from './font-sizes'
 import { screens } from './screens'
 
 const basePlugin = plugin(({ addBase }) => {
@@ -73,6 +74,17 @@ export function createConfig(config: { content: string[] }): Config {
     theme: {
       screens: Object.fromEntries(
         screens.map(({ name, width }) => [name, `${width}px`]),
+      ),
+      fontSize: fontSizes.reduce(
+        (acc, fontSize) => {
+          acc[fontSize.name] = [
+            `${fontSize.size}px`,
+            `${fontSize.lineHeight}px`,
+          ]
+
+          return acc
+        },
+        {} as Record<string, [string, string]>,
       ),
       extend: {
         fontFamily: {

@@ -1,5 +1,4 @@
 import { useMedia } from '@core/ui'
-import { Title } from '@mantine/core'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { CSSProperties, ReactNode } from 'react'
@@ -70,9 +69,9 @@ const Header = () => {
           className="flex items-center gap-2 p-2 focus-visible:outline-primary rounded-xl"
         >
           <Logo />
-          <Title className="hidden lg:block" order={1}>
+          <h1 className="hidden lg:block text-4xl leading-none font-text font-bold">
             Sigma
-          </Title>
+          </h1>
         </Link>
       </div>
       <div className="pointer-events-auto pr-4 py-2 lg:pr-6">

@@ -52,6 +52,19 @@ export const GameHistoryTable = () => {
         onChange={(tab) => $$gameHistory.setTab(tab as Tab | null)}
       >
         <Tabs.List>
+          <div className="mr-auto h-[46px] px-6 flex gap-2 items-center justify-center select-none">
+            <span className="inline-block relative w-3 h-3">
+              <div
+                className={clsx(
+                  'absolute inset-0 inline-flex rounded-full bg-green-500 -translate-y-px',
+                  styles.liveDot,
+                )}
+              />
+              <span className="absolute inset-0 z-10 inline-flex rounded-full bg-green-600" />
+            </span>
+            <span className="text-sm font-medium">Live</span>
+          </div>
+
           <Tabs.Tab
             value="last-wins"
             className="px-4 md:px-6 py-3"
@@ -75,18 +88,6 @@ export const GameHistoryTable = () => {
               Мои игры
             </Tabs.Tab>
           )}
-          <div className="ml-auto h-[46px] px-6 flex gap-2 items-center justify-center select-none">
-            <span className="inline-block relative w-3 h-3">
-              <div
-                className={clsx(
-                  'absolute inset-0 inline-flex rounded-full bg-primary-3 -translate-y-px',
-                  styles.liveDot,
-                )}
-              />
-              <span className="absolute inset-0 z-10 inline-flex rounded-full bg-primary-6" />
-            </span>
-            <span className="text-sm font-interface font-[500]">Live</span>
-          </div>
         </Tabs.List>
 
         <Tabs.Panel value="last-wins">
@@ -257,7 +258,7 @@ const Cell = ({
 
   const className = clsx(
     classNameExtra,
-    'h-11 px-4 md:px-6 py-2 font-interface text-ellipsis',
+    'h-11 px-4 md:px-6 py-2 text-ellipsis',
     type === 'head' && 'uppercase font-medium',
     textSize === 'xs' && 'text-xs',
     textSize === 'sm' && 'text-sm',

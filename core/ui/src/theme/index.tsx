@@ -7,7 +7,6 @@ import {
   createTheme,
   CSSVariablesResolver,
   Input,
-  InputWrapper,
   LoadingOverlay,
   MantineProvider,
   Menu,
@@ -27,12 +26,12 @@ import {
 import { Notifications } from '@mantine/notifications'
 import { PropsWithChildren } from 'react'
 import { colors } from '../colors'
+import { fontSizes } from '../font-sizes'
 import actionIconClassNames from './action-icon.module.css'
 import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
 import checkboxClassNames from './checkbox.module.css'
 import inputClassNames from './input.module.css'
-import inputWrapperClassNames from './input-wrapper.module.css'
 import loadingOverlayClassNames from './loading-overlay.module.css'
 import menuClassNames from './menu.module.css'
 import modalClassNames from './modal.module.css'
@@ -52,9 +51,16 @@ import titleClassNames from './title.module.css'
 export const theme = createTheme({
   primaryColor: 'primary',
   primaryShade: 7,
-  fontFamily: 'DM Sans, sans-serif',
   defaultRadius: 'md',
   colors,
+  fontFamily: 'Rubik, sans-serif',
+  fontSizes: fontSizes.reduce(
+    (acc, fontSize) => {
+      acc[fontSize.name] = `${fontSize.size}px`
+      return acc
+    },
+    {} as Record<string, string>,
+  ),
   components: {
     Anchor: Anchor.extend({
       defaultProps: {
@@ -76,9 +82,6 @@ export const theme = createTheme({
     }),
     Input: Input.extend({
       classNames: inputClassNames,
-    }),
-    InputWrapper: InputWrapper.extend({
-      classNames: inputWrapperClassNames,
     }),
     Card: Card.extend({
       classNames: cardClassNames,

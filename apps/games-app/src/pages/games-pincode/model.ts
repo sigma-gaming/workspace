@@ -43,7 +43,7 @@ const $animationPlaying = createStore(false)
   .on(delay(pincodeChanged, 500), () => false)
   .reset(reset)
 
-const $activePincode = createStore<number>(0)
+const $activePincode = createStore<number>(-1)
   .on(pincodeChanged, (_, pincode) => pincode)
   .reset(reset)
 

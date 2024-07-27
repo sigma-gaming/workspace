@@ -9,9 +9,9 @@ export const PossibleWinAmount = () => {
   return (
     <div className="flex items-center justify-center gap-0.5">
       <IconFlame className="text-[#FF7A00] w-6 h-6" />
-      <p className="font-interface text-sm">
+      <p className="text-sm">
         Возможный выигрыш:{' '}
-        <span className="text-green-400 font-[500]">
+        <span className="text-green-400 font-medium">
           {sides.length === 0 || sides.length === 6 ? '?' : possibleWinAmount}
         </span>
       </p>

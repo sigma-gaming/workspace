@@ -42,9 +42,7 @@ export const GamePlaygroundLayout = memo(
             onSubmit()
           }}
         >
-          <Title className="mb-4" order={3}>
-            {title}
-          </Title>
+          <h2 className="mb-4 font-text text-2xl font-bold">{title}</h2>
 
           <div className="flex flex-col xl:flex-row-reverse gap-4">
             <div className="relative grow w-full flex flex-col items-center justify-center shrink-0 xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
