@@ -6,6 +6,7 @@ import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
+import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { $$notifications } from '../../entities/notifications'
 import { $$user } from '../../entities/user'
@@ -179,6 +180,11 @@ sample({
 sample({
   source: receivedGameRecord,
   target: $$gameHistory.appendMyGame,
+})
+
+sample({
+  source: pincodeChanged,
+  target: $$audio.play.prepend(() => Sound.Pincode),
 })
 
 sample({
