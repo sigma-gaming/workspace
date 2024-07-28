@@ -123,6 +123,7 @@ condition({
 
 sample({
   clock: startPlay,
+  filter: and(not($playing), not($animationPlaying)),
   target: form.submit,
 })
 

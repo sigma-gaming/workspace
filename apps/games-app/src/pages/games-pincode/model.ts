@@ -104,13 +104,14 @@ condition({
 
 condition({
   source: autoplayToggled,
-  if: and(not($playing), not($autoplaying)),
+  if: and(not($playing), not($autoplaying), not($animationPlaying)),
   then: autoplayChanged.prepend(() => true),
   else: autoplayChanged.prepend(() => false),
 })
 
 sample({
   clock: startPlay,
+  filter: and(not($playing), not($animationPlaying)),
   target: form.submit,
 })
 
@@ -211,11 +212,8 @@ sample({
 })
 
 sample({
-  clock: delay(
-    pincodeChanged,
-    1000, // 500ms animation + 500ms delay
-  ),
-  filter: $autoplaying,
+  clock: delay(animationFinished, 500),
+  filter: and($autoplaying, not($playing)),
   target: startPlay,
 })
 
