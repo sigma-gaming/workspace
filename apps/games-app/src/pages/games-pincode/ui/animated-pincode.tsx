@@ -1,4 +1,4 @@
-import { calculatePincode } from '@games/model'
+import { getPincodeHighlight } from '@games/model'
 import { useUnit } from 'effector-react'
 import { AnimationPlaybackControls } from 'framer-motion'
 import { memo, useLayoutEffect, useMemo, useRef } from 'react'
@@ -60,7 +60,7 @@ const PincodeNumber = memo(() => {
     }
 
     const highlight = (value: number) => {
-      const { highlight } = calculatePincode(value)
+      const highlight = getPincodeHighlight(value)
 
       for (const [i, node] of numbers.entries()) {
         const element = node.current
@@ -98,6 +98,7 @@ const PincodeNumber = memo(() => {
           updateNumbers(value)
         },
         onComplete() {
+          $$pincodePage.animationFinished()
           highlight(current)
         },
       })

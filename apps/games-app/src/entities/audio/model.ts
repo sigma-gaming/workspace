@@ -5,6 +5,8 @@ export enum Sound {
   TopUp = 'top_up',
   Withdraw = 'withdraw',
   Pincode = 'pincode',
+  PincodeWin = 'pincode_win',
+  PincodeBigWin = 'pincode_big_win',
 }
 
 const defaultVolumeMap: Partial<Record<Sound, number>> = {

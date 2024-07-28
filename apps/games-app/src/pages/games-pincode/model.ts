@@ -1,7 +1,8 @@
 import { BadRequestException } from '@core/exceptions'
 import { createField, createForm } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
-import { Game } from '@dbs/games-types'
+import { GameRecordSelect } from '@dbs/games-schema'
+import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
@@ -31,6 +32,7 @@ const startPlay = createEvent()
 const autoplayToggled = createEvent()
 const autoplayChanged = createEvent<boolean>()
 const pincodeChanged = createEvent<number>()
+const animationFinished = createEvent()
 const reset = createEvent()
 
 const $playing = playGameMutation.$pending
@@ -47,6 +49,8 @@ const $animationPlaying = createStore(false)
 const $activePincode = createStore<number>(-1)
   .on(pincodeChanged, (_, pincode) => pincode)
   .reset(reset)
+
+const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
 
 const fields = {
   bet: createField({
@@ -155,6 +159,25 @@ const receivedGameRecord = sample({
   fn: ({ result }) => result.record,
 })
 
+sample({
+  source: receivedGameRecord,
+  target: $lastGame,
+})
+
+sample({
+  clock: animationFinished,
+  source: $lastGame,
+  filter: (record) => record?.outcome === GameOutcome.Win,
+  fn: (record) => {
+    if (record!.multiplier >= 10000 * 0.95) {
+      return Sound.PincodeBigWin
+    }
+
+    return Sound.PincodeWin
+  },
+  target: $$audio.play,
+})
+
 const receivedBigWin = sample({
   source: receivedGameRecord,
   filter: ({ multiplier }) => multiplier >= 10000 * 0.95,
@@ -225,6 +248,7 @@ sample({
 export const $$pincodePage = {
   playPressed,
   autoplayPressed,
+  animationFinished,
   betDoubled,
   betHalved,
   fields,

@@ -5,7 +5,7 @@ import {
 } from '@core/exceptions'
 import { loggerService } from '@core/logger'
 import { Game, GameOutcome } from '@dbs/games-types'
-import { calculatePincode, gemInt } from '@games/model'
+import { gemInt, getPincodeMultiplier } from '@games/model'
 import {
   gameService,
   sessionService,
@@ -16,9 +16,9 @@ import { Hono } from 'hono'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 
-export async function runGame(bet: number) {
-  const number = crypto.randomInt(1, 10000)
-  const { multiplier } = calculatePincode(number)
+export function runGame(bet: number) {
+  const number = crypto.randomInt(10000)
+  const multiplier = getPincodeMultiplier(number)
   const hasWon = multiplier > 0
   const winAmount = Math.ceil(bet * multiplier - bet)
   return { number, multiplier, hasWon, winAmount }
