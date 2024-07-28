@@ -188,13 +188,8 @@ sample({
 })
 
 sample({
-  clock: delay(
-    sample({
-      clock: animationFinished,
-      filter: $autoplaying,
-    }),
-    250,
-  ),
+  clock: delay(animationFinished, 250),
+  filter: $autoplaying,
   target: startPlay,
 })
 

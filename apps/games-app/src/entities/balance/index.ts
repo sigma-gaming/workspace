@@ -5,10 +5,10 @@ import {
 } from '@core/exceptions'
 import { createApiEffect } from '@core/hono-client'
 import { createMutation, createQuery, Mutation, update } from '@farfetched/core'
-import { notifications } from '@mantine/notifications'
-import { createEffect, createEvent, sample } from 'effector'
+import { createEvent, sample } from 'effector'
 import { and, previous } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
+import { $$audio, Sound } from '../audio'
 import { $$notifications } from '../notifications'
 
 const balanceQuery = createQuery({
@@ -85,24 +85,26 @@ sample({
 
 sample({
   clock: depositMutation.finished.success,
-  target: createEffect(() => {
-    notifications.show({
+  target: [
+    $$notifications.show.prepend(() => ({
       color: 'green',
       title: 'Баланс обновлен',
       message: `Деньги зачислены на ваш счёт`,
-    })
-  }),
+    })),
+    $$audio.play.prepend(() => Sound.TopUp),
+  ],
 })
 
 sample({
   clock: withdrawMutation.finished.success,
-  target: createEffect(() => {
-    notifications.show({
+  target: [
+    $$notifications.show.prepend(() => ({
       color: 'green',
       title: 'Баланс обновлен',
       message: `Деньги успешно выведены`,
-    })
-  }),
+    })),
+    $$audio.play.prepend(() => Sound.Withdraw),
+  ],
 })
 
 const receivedException = sample({

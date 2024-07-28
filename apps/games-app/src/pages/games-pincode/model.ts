@@ -183,12 +183,10 @@ sample({
 
 sample({
   clock: delay(
-    sample({
-      clock: pincodeChanged,
-      filter: $autoplaying,
-    }),
+    pincodeChanged,
     1000, // 500ms animation + 500ms delay
   ),
+  filter: $autoplaying,
   target: startPlay,
 })
 
