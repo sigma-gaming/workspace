@@ -4,6 +4,7 @@ import { createApiEffect } from '@core/hono-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
+import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
@@ -14,6 +15,7 @@ import { $$user } from '../../entities/user'
 import { $$gameHistory } from '../../features/game-history'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
+import { averageRequestTimeFactory } from '../../shared/lib/transport'
 
 export type PincodeMode = 'easy' | 'hardcore'
 
@@ -21,6 +23,8 @@ const playGameMutation = createMutation({
   name: 'games/pincode/play',
   effect: createApiEffect(gamesApi.games.playPincode.$post),
 })
+
+const $averageRequestTime = invoke(averageRequestTimeFactory, playGameMutation)
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
 
@@ -179,6 +183,16 @@ sample({
   target: $$audio.play,
 })
 
+const receivedWin = sample({
+  source: receivedGameRecord,
+  filter: ({ outcome }) => outcome === GameOutcome.Win,
+})
+
+const receivedLoss = sample({
+  source: receivedGameRecord,
+  filter: ({ outcome }) => outcome === GameOutcome.Loss,
+})
+
 const receivedBigWin = sample({
   source: receivedGameRecord,
   filter: ({ multiplier }) => multiplier >= 10000 * 0.95,
@@ -211,8 +225,27 @@ sample({
   target: $$audio.play.prepend(() => Sound.Pincode),
 })
 
+const autoplayWin = sample({
+  clock: receivedWin,
+  filter: and($autoplaying, not($playing)),
+})
+
+const autoplayLoss = sample({
+  clock: receivedLoss,
+  filter: and($autoplaying, not($playing)),
+})
+
+const $autoplayWinDelay = $averageRequestTime.map((time) => 1500 - time)
+const $autoplayLossDelay = $averageRequestTime.map((time) => 1000 - time)
+
 sample({
-  clock: delay(animationFinished, 500),
+  source: delay(autoplayWin, $autoplayWinDelay),
+  filter: and($autoplaying, not($playing)),
+  target: startPlay,
+})
+
+sample({
+  source: delay(autoplayLoss, $autoplayLossDelay),
   filter: and($autoplaying, not($playing)),
   target: startPlay,
 })

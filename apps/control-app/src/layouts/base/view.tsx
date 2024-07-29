@@ -1,5 +1,5 @@
 import { Menu, MenuLink, MenuSection } from '@core/ui'
-import { rem, Title } from '@mantine/core'
+import { rem } from '@mantine/core'
 import {
   IconBarrierBlock,
   IconCoins,
