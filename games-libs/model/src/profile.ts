@@ -21,6 +21,7 @@ export function getUserInitials(name: string | null | undefined) {
   if (!name) return null
 
   return name
+    .trim()
     .split(' ')
     .slice(0, 2)
     .map((word) => word[0].toUpperCase())
@@ -30,6 +31,7 @@ export function getUserInitials(name: string | null | undefined) {
 export const ProfileValidation = {
   UsernameSchema: z
     .string()
+    .trim()
     .min(3, 'Минимальная длина - 3 символа')
     .max(20, 'Максимальная длина - 20 символов')
     .regex(
@@ -38,6 +40,7 @@ export const ProfileValidation = {
     ),
   NameSchema: z
     .string()
+    .trim()
     .min(1, 'Минимальная длина - 1 символ')
     .max(32, 'Максимальная длина - 32 символа')
     .regex(
