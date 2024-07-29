@@ -2,12 +2,17 @@ import { Mutation, Query } from '@farfetched/core'
 import { createFactory } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 
+type Options = {
+  operation: Query<any, any, any> | Mutation<any, any, any>
+  last?: number
+}
+
 export const averageRequestTimeFactory = createFactory(
-  (operation: Mutation<any, any, any> | Query<any, any, any>) => {
-    const updated = createEvent<{ requestCount: number; totalTime: number }>()
+  ({ operation, last = 3 }: Options) => {
+    const updated = createEvent<{ requestCount: number; lastTimes: number[] }>()
 
     const $requestCount = createStore(0)
-    const $totalTime = createStore(0)
+    const $lastTimes = createStore<number[]>([])
     const $averageTime = createStore(0)
 
     const $startMap = createStore({ map: new WeakMap<object, number>() })
@@ -27,17 +32,17 @@ export const averageRequestTimeFactory = createFactory(
       source: {
         startMap: $startMap,
         averageTime: $averageTime,
-        totalTime: $totalTime,
+        lastTimes: $lastTimes,
         requestCount: $requestCount,
       },
-      fn: ({ startMap, averageTime, totalTime, requestCount }, payload) => {
+      fn: ({ startMap, averageTime, lastTimes, requestCount }, payload) => {
         const startedAt = startMap.map.get(payload.params)
         const finishedAt = performance.now()
         const requestTime = startedAt ? finishedAt - startedAt : averageTime
 
         return {
-          totalTime: totalTime + requestTime,
-          requestCount: requestCount + 1,
+          lastTimes: lastTimes.slice(1 - last).concat(requestTime),
+          requestCount: Math.min(requestCount + 1, last),
         }
       },
       target: updated,
@@ -45,8 +50,8 @@ export const averageRequestTimeFactory = createFactory(
 
     sample({
       source: updated,
-      fn: ({ totalTime }) => totalTime,
-      target: $totalTime,
+      fn: ({ lastTimes }) => lastTimes,
+      target: $lastTimes,
     })
 
     sample({
@@ -57,10 +62,10 @@ export const averageRequestTimeFactory = createFactory(
 
     sample({
       source: updated,
-      fn: ({ totalTime, requestCount }) => {
+      fn: ({ lastTimes, requestCount }) => {
         if (requestCount === 0) return 0
-        const averageTime = totalTime / requestCount
-        return averageTime
+        const totalTime = lastTimes.reduce((acc, time) => acc + time, 0)
+        return totalTime / requestCount
       },
       target: $averageTime,
     })
