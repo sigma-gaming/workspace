@@ -1,4 +1,4 @@
-import { LoadingOverlay, Title } from '@mantine/core'
+import { LoadingOverlay } from '@mantine/core'
 import { createContext, memo, ReactNode, useContext } from 'react'
 
 type Props = {
@@ -6,6 +6,7 @@ type Props = {
   onSubmit: () => void
   animation: ReactNode
   fields: ReactNode
+  cornerControls?: ReactNode
   loading?: boolean
 }
 
@@ -33,7 +34,14 @@ const Loader = () => {
  * Used inside GameLayout to create Form + Animation layout
  */
 export const GamePlaygroundLayout = memo(
-  ({ title, loading = false, animation, fields, onSubmit }: Props) => {
+  ({
+    title,
+    loading = false,
+    animation,
+    fields,
+    cornerControls,
+    onSubmit,
+  }: Props) => {
     return (
       <GamePlaygroundContext.Provider value={{ loading }}>
         <form
@@ -42,7 +50,12 @@ export const GamePlaygroundLayout = memo(
             onSubmit()
           }}
         >
-          <h2 className="mb-4 font-text text-2xl font-bold">{title}</h2>
+          <div className="mb-4 flex gap-4 items-center justify-between">
+            <h2 className="font-text text-2xl font-bold">{title}</h2>
+            {cornerControls && (
+              <div className="flex gap-4">{cornerControls}</div>
+            )}
+          </div>
 
           <div className="flex flex-col xl:flex-row-reverse gap-4">
             <div className="relative grow w-full flex flex-col items-center justify-center shrink-0 xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">

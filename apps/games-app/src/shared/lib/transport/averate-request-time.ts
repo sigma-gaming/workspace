@@ -41,7 +41,10 @@ export const averageRequestTimeFactory = createFactory(
         const requestTime = startedAt ? finishedAt - startedAt : averageTime
 
         return {
-          lastTimes: lastTimes.slice(1 - last).concat(requestTime),
+          lastTimes:
+            last === 1
+              ? [requestTime]
+              : lastTimes.slice(1 - last).concat(requestTime),
           requestCount: Math.min(requestCount + 1, last),
         }
       },

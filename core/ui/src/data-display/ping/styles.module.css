@@ -1,0 +1,24 @@
+.root {
+  @apply flex gap-1 items-center;
+  @apply px-2 py-1 rounded-md;
+  @apply backdrop-blur-sm;
+  @apply text-xs font-medium leading-none;
+  @apply select-none;
+  @apply transition-colors;
+
+  &[data-level="1"] {
+    @apply text-red-400 bg-red-400 bg-opacity-25;
+  }
+
+  &[data-level="2"] {
+    @apply text-orange-400 bg-orange-400 bg-opacity-25;
+  }
+
+  &[data-level="3"] {
+    @apply text-yellow-400 bg-yellow-400 bg-opacity-25;
+  }
+
+  &[data-level="4"] {
+    @apply text-green-400 bg-green-400 bg-opacity-25;
+  }
+}

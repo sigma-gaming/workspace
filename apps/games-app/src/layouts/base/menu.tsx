@@ -1,6 +1,5 @@
-import { Menu, MenuLink, MenuSection } from '@core/ui'
+import { Icons, Menu, MenuLink, MenuSection } from '@core/ui'
 import { routes } from '../../routing'
-import { Icons } from '../../shared/ui/icons'
 
 export const BaseLayoutMenu = ({ onNavigate }: { onNavigate?: () => void }) => {
   return (

@@ -1,10 +1,9 @@
+import { Icons, useLazyAnimate } from '@core/ui'
 import { Skeleton, Text } from '@mantine/core'
 import { useUnit } from 'effector-react'
-import { AnimationPlaybackControls } from 'framer-motion'
-import { memo, useLayoutEffect, useRef } from 'react'
+import { memo, useRef } from 'react'
 import { $$balance } from '../../entities/balance'
 import { formatGem } from '../../shared/lib/format/currency.ts'
-import { Icons } from '../../shared/ui/icons/index.tsx'
 
 export const Balance = memo(() => {
   const balanceLoading = useUnit($$balance.$loading)
@@ -40,58 +39,31 @@ function getFractionDigits(number: number) {
   return 0
 }
 
-let animate: typeof import('framer-motion/dom').animate | null = null
-
-import('framer-motion/dom').then((module) => {
-  animate = module.animate
-})
-
 const AnimatedBalance = () => {
-  const current = useUnit($$balance.$available)
   const loaded = useUnit($$balance.$loaded)
-  const previousLoadedRef = useRef(loaded)
-  const previousRef = useRef(current)
+  if (!loaded) return null
+  return <AnimatedBalanceInternal />
+}
+
+const AnimatedBalanceInternal = () => {
+  const balance = useUnit($$balance.$available)
   const nodeRef = useRef<HTMLSpanElement>(null)
 
-  useLayoutEffect(() => {
-    const node = nodeRef.current
-    if (!node) return
+  useLazyAnimate(balance, {
+    onUpdate: (current, previous) => {
+      const fractionDigits = Math.max(
+        getFractionDigits(current),
+        getFractionDigits(previous),
+      )
 
-    if (!previousLoadedRef.current && loaded) {
-      previousLoadedRef.current = loaded
-      previousRef.current = current
-    }
-
-    if (previousRef.current === current) {
-      const text = formatGem(current / 100)
-      node.textContent = text
-      return
-    }
-
-    const fractionDigits = Math.max(
-      getFractionDigits(current),
-      getFractionDigits(previousRef.current),
-    )
-
-    let controls: AnimationPlaybackControls | null = null
-
-    if (animate) {
-      controls = animate(previousRef.current, current, {
-        duration: 0.5,
-        onUpdate(value) {
-          const text = formatGem(value / 100, fractionDigits)
-          if (!node) return
-          node.textContent = text
-        },
-      })
-    } else {
-      const text = formatGem(current / 100)
-      node.textContent = text
-    }
-
-    previousRef.current = current
-    return () => controls?.stop()
-  }, [loaded, current])
+      return (value) => {
+        const node = nodeRef.current
+        if (!node) return
+        const text = formatGem(value / 100, fractionDigits)
+        node.textContent = text
+      }
+    },
+  })
 
   return <span style={{ display: 'inline-block' }} ref={nodeRef} />
 }

@@ -26,6 +26,7 @@ const playGameMutation = createMutation({
 
 const $ping = invoke(averageRequestTimeFactory, {
   operation: playGameMutation,
+  last: 1,
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
@@ -117,7 +118,6 @@ condition({
 
 sample({
   clock: startPlay,
-  filter: and(not($playing), not($animationPlaying)),
   target: form.submit,
 })
 
@@ -229,26 +229,23 @@ sample({
 
 const autoplayWin = sample({
   clock: receivedWin,
-  filter: and($autoplaying, not($playing)),
+  filter: $autoplaying,
 })
 
 const autoplayLoss = sample({
   clock: receivedLoss,
-  filter: and($autoplaying, not($playing)),
+  filter: $autoplaying,
 })
 
 const $autoplayWinDelay = $ping.map((time) => Math.max(1500 - time, 0))
 const $autoplayLossDelay = $ping.map((time) => Math.max(1000 - time, 0))
 
 sample({
-  source: delay(autoplayWin, $autoplayWinDelay),
-  filter: and($autoplaying, not($playing)),
-  target: startPlay,
-})
-
-sample({
-  source: delay(autoplayLoss, $autoplayLossDelay),
-  filter: and($autoplaying, not($playing)),
+  clock: [
+    delay(autoplayWin, $autoplayWinDelay),
+    delay(autoplayLoss, $autoplayLossDelay),
+  ],
+  filter: $autoplaying,
   target: startPlay,
 })
 

@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   Anchor,
+  Badge,
   Button,
   Card,
   Checkbox,
@@ -28,6 +29,7 @@ import { PropsWithChildren } from 'react'
 import { colors } from '../colors'
 import { fontSizes } from '../font-sizes'
 import actionIconClassNames from './action-icon.module.css'
+import badgeClassNames from './badge.module.css'
 import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
 import checkboxClassNames from './checkbox.module.css'
@@ -137,6 +139,9 @@ export const theme = createTheme({
     Checkbox: Checkbox.extend({
       classNames: checkboxClassNames,
       defaultProps: { radius: 'sm' },
+    }),
+    Badge: Badge.extend({
+      classNames: badgeClassNames,
     }),
   },
 })

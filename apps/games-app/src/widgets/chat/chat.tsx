@@ -1,4 +1,4 @@
-import { Avatar, useMedia } from '@core/ui'
+import { Avatar, Icons, useMedia } from '@core/ui'
 import { ChatMessageType } from '@dbs/games-types'
 import { getUserInitials } from '@games/model'
 import { ActionIcon, Button, Skeleton } from '@mantine/core'
@@ -6,7 +6,6 @@ import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useUnit } from 'effector-react'
 import { memo, UIEventHandler, useCallback, useEffect, useRef } from 'react'
-import { Icons } from '../../shared/ui/icons'
 import { $$chatWidget, ExtendedMessage } from './model'
 
 export const Chat = () => {

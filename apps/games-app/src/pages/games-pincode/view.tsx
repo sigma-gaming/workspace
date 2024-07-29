@@ -5,6 +5,7 @@ import { AnimatedPincode } from './ui/animated-pincode.tsx'
 import { BetField } from './ui/field-bet.tsx'
 import { HardcoreModeField } from './ui/field-hardcore-mode.tsx'
 import { FormActions } from './ui/form-actions.tsx'
+import { Ping } from './ui/ping.tsx'
 
 export const PincodeGamePageView = memo(() => {
   return (
@@ -12,6 +13,7 @@ export const PincodeGamePageView = memo(() => {
       title="Pincode"
       onSubmit={() => $$pincodePage.playPressed()}
       animation={<AnimatedPincode />}
+      cornerControls={<Ping />}
       fields={
         <>
           <BetField />

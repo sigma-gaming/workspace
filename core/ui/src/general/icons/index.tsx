@@ -8,6 +8,7 @@ import { Telegram } from './telegram.tsx'
 import { Transfer } from './transfer.tsx'
 import { TrendingUp } from './trending-up.tsx'
 import { Vk } from './vk.tsx'
+import { Wifi } from './wifi.tsx'
 
 export const Icons = {
   Vk,
@@ -20,4 +21,5 @@ export const Icons = {
   TrendingUp,
   Send,
   Card,
+  Wifi,
 }

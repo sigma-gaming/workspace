@@ -1,7 +1,10 @@
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
 
+export * from './animations'
 export * from './data-display/avatar'
+export * from './data-display/ping'
+export * from './general/icons'
 export * from './general/link-anchor'
 export * from './general/link-button'
 export * from './lib/responsive'
