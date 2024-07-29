@@ -6,7 +6,7 @@ import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
-import { and, condition, debug, delay, not } from 'patronum'
+import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
@@ -27,8 +27,6 @@ const playGameMutation = createMutation({
 const $ping = invoke(averageRequestTimeFactory, {
   operation: playGameMutation,
 })
-
-debug($ping)
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
 
@@ -239,8 +237,8 @@ const autoplayLoss = sample({
   filter: and($autoplaying, not($playing)),
 })
 
-const $autoplayWinDelay = $ping.map((time) => 1500 - time)
-const $autoplayLossDelay = $ping.map((time) => 1000 - time)
+const $autoplayWinDelay = $ping.map((time) => Math.max(1500 - time, 0))
+const $autoplayLossDelay = $ping.map((time) => Math.max(1000 - time, 0))
 
 sample({
   source: delay(autoplayWin, $autoplayWinDelay),
