@@ -46,6 +46,8 @@ COPY ./apps/maintenance-app/dist ./
 FROM base AS build
 WORKDIR /build
 COPY . /build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm nx run-many -t build
 
 FROM oven/bun:1.1.20-alpine AS api-base
 WORKDIR /workspace

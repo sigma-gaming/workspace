@@ -1,3 +1,7 @@
 # compiled output
 **/.env.development
 .nx
+
+node_modules
+**/node_modules
+**/dist

@@ -53,6 +53,9 @@ jobs:
       - name: Run checks and build
         run: pnpm check:affected
 
+      - name: Prebuild docker stage
+        run: docker build . --target build --platform linux/amd64
+
       - name: Output affected apps
         id: affected
         run: echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
