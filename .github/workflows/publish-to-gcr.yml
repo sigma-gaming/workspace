@@ -103,7 +103,8 @@ jobs:
             --build-arg sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }} \
             --build-arg sentry_release=dev-${{ steps.timestamp.outputs.timestamp }} \
             --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }} \
+            --platform linux/amd64
 
       - name: Push image
         run: |-
