@@ -21,16 +21,15 @@ ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-app
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-COPY ./apps/games-app/dist ./
 RUN pnpm sentry-cli releases new -p games-app ${sentry_release}
 RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
-RUN pnpm sentry-cli sourcemaps inject /build
-RUN pnpm sentry-cli sourcemaps upload /build --release ${sentry_release}
+RUN pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist
+RUN pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
 
 FROM app-base AS games-app
 WORKDIR /app
 COPY ./apps/games-app/nginx.conf /etc/nginx/nginx.conf
-COPY --from=games-app-build /build ./
+COPY --from=games-app-build /build/apps/games-app/dist ./
 
 FROM app-base AS control-app
 WORKDIR /app
