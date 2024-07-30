@@ -11,6 +11,10 @@ env:
 concurrency:
   group: ${{ github.workflow }}
 
+defaults:
+  run:
+    shell: bash -leo pipefail {0}
+
 jobs:
   copy-repository:
     name: Copy repository
