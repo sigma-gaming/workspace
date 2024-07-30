@@ -9,8 +9,6 @@ COPY . /build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 ENV NODE_ENV=production
 RUN pnpm nx run-many -t build
-# ensure that nginx has access to all files
-RUN chmod -R 755 /build
 
 # Apps
 
