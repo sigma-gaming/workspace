@@ -34,6 +34,9 @@ jobs:
           NODE_ENV: production
         run: pnpm check:affected
 
+      - name: Test
+        run: echo 'TEST' > /tmp/test.txt
+
       - name: Output affected apps
         id: affected
         run: |-
@@ -54,6 +57,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Test
+        run: cat /tmp/test.txt
 
       - name: Set gcloud project
         run: gcloud config set project ${{ secrets.GCLOUD_PROJECT_ID }}

@@ -21,7 +21,7 @@ cronJobRegistry.register(
       if (result.succeeded) {
         logger.info('Chat messages initialized successfully')
       } else {
-        console.log(result.error)
+        console.error(result.error)
         logger.error('Failed to initialize chat messages', result.error)
       }
     },

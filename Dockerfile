@@ -1,6 +1,9 @@
 FROM imbios/bun-node:1.1.20-20-alpine AS base
 WORKDIR /workspace
 ENV NODE_ENV=production
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 # Apps
 

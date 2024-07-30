@@ -2,7 +2,7 @@ const { configure, presets } = require("eslint-kit")
 
 module.exports = configure({
   root: __dirname,
-  allowDebug: process.env.NODE_ENV !== 'production',
+  allowDebug: process.env.NODE_ENV !== 'production' && !process.env.CI,
 
   presets: [
     presets.imports(),
