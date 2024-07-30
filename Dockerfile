@@ -14,7 +14,7 @@ RUN apk add nginx
 COPY ./scripts/inject-env.mjs /scripts/inject-env.mjs
 CMD node /scripts/inject-env.mjs; nginx -g "daemon off;"
 
-FROM base AS games-app-build
+FROM build AS games-app-build
 WORKDIR /build
 ARG sentry_auth_token
 ARG sentry_release
