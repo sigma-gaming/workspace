@@ -22,7 +22,9 @@ jobs:
           fetch-depth: 0
 
       - name: Copy repository
-        run: cp -r . ${{ env.WORKING_DIRECTORY }}
+        run: |-
+          mkdir -p ${{ env.WORKING_DIRECTORY }}
+          cp -r . ${{ env.WORKING_DIRECTORY }}
 
   affected:
     name: Get affected apps
