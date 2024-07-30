@@ -1,7 +1,3 @@
 # compiled output
 **/.env.development
-**/dist
-generated
-tmp
-/out-tsc
 .nx
