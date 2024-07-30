@@ -9,11 +9,11 @@ export function createRmq(url: string): RMQ {
   const connection = new Connection(url)
 
   connection.on('error', (err) => {
-    console.log('[RabbitMQ] Connection error', err)
+    console.error('[RabbitMQ] Connection error', err)
   })
 
   connection.on('connection', () => {
-    console.log('[RabbitMQ] Connection successfully (re)established')
+    console.info('[RabbitMQ] Connection successfully (re)established')
   })
 
   return {
