@@ -1,6 +1,5 @@
 FROM imbios/bun-node:1.1.20-20-alpine AS base
 WORKDIR /workspace
-ENV NODE_ENV=production
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -9,6 +8,7 @@ RUN corepack enable
 
 FROM base AS app-base
 WORKDIR /app
+ENV NODE_ENV=production
 RUN apk update
 RUN apk add nginx
 COPY ./scripts/inject-env.mjs /scripts/inject-env.mjs
@@ -47,10 +47,12 @@ FROM base AS build
 WORKDIR /build
 COPY . /build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+ENV NODE_ENV=production
 RUN pnpm nx run-many -t build
 
 FROM oven/bun:1.1.20-alpine AS api-base
 WORKDIR /workspace
+ENV NODE_ENV=production
 
 FROM build AS games-api-build
 ARG sentry_auth_token
@@ -74,6 +76,7 @@ CMD [ "bun", "run", "apps/control-api/dist/main.js" ]
 # WS APIs
 
 FROM node:20-alpine AS ws-base
+ENV NODE_ENV=production
 RUN apk add --no-cache gcompat
 
 FROM ws-base AS games-ws
