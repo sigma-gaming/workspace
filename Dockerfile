@@ -4,6 +4,13 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
+FROM base AS build
+WORKDIR /build
+COPY . /build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+ENV NODE_ENV=production
+RUN pnpm nx run-many -t build
+
 # Apps
 
 FROM base AS app-base
@@ -42,13 +49,6 @@ COPY --from=build /build/apps/maintenance-app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /build/apps/maintenance-app/dist ./
 
 # APIs
-
-FROM base AS build
-WORKDIR /build
-COPY . /build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-ENV NODE_ENV=production
-RUN pnpm nx run-many -t build
 
 FROM oven/bun:1.1.20-alpine AS api-base
 WORKDIR /workspace
