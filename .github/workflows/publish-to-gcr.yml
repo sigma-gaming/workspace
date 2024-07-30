@@ -11,14 +11,13 @@ env:
 concurrency:
   group: ${{ github.workflow }}
 
-defaults:
-  run:
-    shell: bash -leo pipefail {0}
-
 jobs:
   copy-repository:
     name: Copy repository
     runs-on: [self-hosted, build, ARM64]
+    defaults:
+      run:
+        shell: bash -leo pipefail {0}
 
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +36,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash -leo pipefail {0}
 
     outputs:
       apps: ${{ steps.affected.outputs.apps }}
@@ -64,6 +64,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash -leo pipefail {0}
 
     if: needs.affected.outputs.apps != '[]'
 
