@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Breakpoint, Screen, screens } from '../../screens'
 
-interface Options {
+type Options = {
   from?: Breakpoint
   to?: Breakpoint
 }

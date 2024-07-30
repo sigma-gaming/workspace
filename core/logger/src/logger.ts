@@ -57,7 +57,7 @@ export const logger = createSingletonProxy(
   (service) => service.logger,
 )
 
-function generateReqId(req: IncomingMessage) {
+function _generateReqId(req: IncomingMessage) {
   const existingID = req.headers['x-trace-id']
   if (existingID) return existingID.toString()
   const id = uuid()

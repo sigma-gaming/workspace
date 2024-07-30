@@ -7,7 +7,7 @@ type RootRenderProps = PropsWithChildren<{
   style: React.CSSProperties
 }>
 
-interface Props {
+type Props = {
   src?: string | null
   alt: string
   size: number

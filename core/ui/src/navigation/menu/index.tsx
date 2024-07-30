@@ -4,11 +4,11 @@ import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { createContext, PropsWithChildren, ReactNode, useContext } from 'react'
 
-interface MenuContext {
+type MenuContext = {
   onNavigate?: () => void
 }
 
-interface MenuProps {
+type MenuProps = {
   className?: string
   onNavigate?: () => void
 }

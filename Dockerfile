@@ -1,14 +1,6 @@
 FROM imbios/bun-node:1.1.20-20-alpine AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-
-FROM base AS build
-WORKDIR /build
-COPY . /build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+WORKDIR /workspace
 ENV NODE_ENV=production
-RUN pnpm nx run-many -t build
 
 # Apps
 
@@ -19,33 +11,39 @@ RUN apk add nginx
 COPY ./scripts/inject-env.mjs /scripts/inject-env.mjs
 CMD node /scripts/inject-env.mjs; nginx -g "daemon off;"
 
-FROM build AS games-app-build
+FROM base AS games-app-build
+WORKDIR /build
 ARG sentry_auth_token
 ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-app
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
+COPY ./apps/games-app/dist ./
 RUN pnpm sentry-cli releases new -p games-app ${sentry_release}
 RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
-RUN pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist
-RUN pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
+RUN pnpm sentry-cli sourcemaps inject /build
+RUN pnpm sentry-cli sourcemaps upload /build --release ${sentry_release}
 
 FROM app-base AS games-app
 WORKDIR /app
 COPY ./apps/games-app/nginx.conf /etc/nginx/nginx.conf
-COPY --from=games-app-build /build/apps/games-app/dist ./
+COPY --from=games-app-build /build ./
 
 FROM app-base AS control-app
 WORKDIR /app
 COPY ./apps/control-app/nginx.conf /etc/nginx/nginx.conf
-COPY --from=build /build/apps/control-app/dist ./
+COPY ./apps/control-app/dist ./
 
 FROM app-base AS maintenance-app
 WORKDIR /app
 COPY ./apps/maintenance-app/nginx.conf /etc/nginx/nginx.conf
-COPY --from=build /build/apps/maintenance-app/dist ./
+COPY ./apps/maintenance-app/dist ./
 
 # APIs
+
+FROM base AS build
+WORKDIR /build
+COPY . /build
 
 FROM oven/bun:1.1.20-alpine AS api-base
 WORKDIR /workspace

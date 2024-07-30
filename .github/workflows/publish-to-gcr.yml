@@ -29,7 +29,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run checks
+      - name: Run checks and build
+        env:
+          NODE_ENV: production
         run: pnpm check:affected
 
       - name: Output affected apps
@@ -45,7 +47,6 @@ jobs:
     if: needs.affected.outputs.apps != '[]'
 
     strategy:
-      max-parallel: 1
       matrix:
         packageName: ${{ fromJson(needs.affected.outputs.apps) }}
 
