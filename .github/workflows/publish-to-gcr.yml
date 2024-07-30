@@ -61,7 +61,7 @@ jobs:
         run: echo '${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}' > /tmp/gcloud-service-key.json
 
       - name: Auth gcloud service account
-        run: gcloud auth activate-service-account ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }} --key-file=/tmp/gcloud-service-key.json
+        run: gcloud auth activate-service-account --key-file=/tmp/gcloud-service-key.json
 
       - name: Authenticate Docker registry
         run: |-
