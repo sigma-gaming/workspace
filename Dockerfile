@@ -47,6 +47,7 @@ COPY ./apps/maintenance-app/dist ./
 FROM base AS build
 WORKDIR /build
 COPY . /build
+RUN ls /build/apps/games-api
 
 FROM oven/bun:1.1.20-alpine AS api-base
 WORKDIR /workspace
