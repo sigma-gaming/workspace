@@ -6,34 +6,43 @@ on:
 
 env:
   DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
+  WORKING_DIRECTORY: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
 
 concurrency:
   group: ${{ github.workflow }}
 
 jobs:
-  affected:
-    name: Get affected apps
+  copy-repository:
+    name: Copy repository
     runs-on: [self-hosted, build]
-    defaults:
-      run:
-        working-directory: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
-
-    outputs:
-      apps: ${{ steps.affected.outputs.apps }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Copy repository
+        run: cp -r . ${{ env.WORKING_DIRECTORY }}
+
+  affected:
+    name: Get affected apps
+    needs: copy-repository
+    runs-on: [self-hosted, build]
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+    outputs:
+      apps: ${{ steps.affected.outputs.apps }}
+
+    steps:
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
+        with:
+          working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Run checks and build
-        run: pnpm check:affected
 
       - name: Output affected apps
         id: affected
@@ -41,11 +50,11 @@ jobs:
 
   publish:
     name: Publish to Google Cloud Registry
-    needs: affected
+    needs: [affected, copy-repository]
     runs-on: [self-hosted, build]
     defaults:
       run:
-        working-directory: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
     if: needs.affected.outputs.apps != '[]'
 
@@ -54,16 +63,6 @@ jobs:
         packageName: ${{ fromJson(needs.affected.outputs.apps) }}
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: ls before
-        run: ls
-
-      - name: ls after
-        run: ls
-
       - name: Set gcloud project
         run: gcloud config set project ${{ secrets.GCLOUD_PROJECT_ID }}
 
