@@ -26,7 +26,7 @@ const playGameMutation = createMutation({
 
 const $ping = invoke(averageRequestTimeFactory, {
   operation: playGameMutation,
-  last: 2,
+  last: 1,
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
@@ -237,8 +237,8 @@ const autoplayLoss = sample({
   filter: $autoplaying,
 })
 
-const $autoplayWinDelay = $ping.map((time) => Math.max(1500 - time, 750))
-const $autoplayLossDelay = $ping.map((time) => Math.max(1000 - time, 250))
+const $autoplayWinDelay = $ping.map((time) => Math.max(1500 - time, 1250))
+const $autoplayLossDelay = $ping.map((time) => Math.max(1000 - time, 750))
 
 sample({
   clock: [
