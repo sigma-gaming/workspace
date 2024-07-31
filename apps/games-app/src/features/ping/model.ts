@@ -1,15 +1,20 @@
 import { createWsEffect } from '@core/io-client'
-import { createEvent, createStore, sample } from 'effector'
+import { createEffect, createEvent, restore, sample } from 'effector'
 import { interval } from 'patronum'
 import { gamesWs } from '../../shared/api/games-ws'
 
 const pingFx = createWsEffect(gamesWs, 'ping')
 
+const measurePingFx = createEffect(async () => {
+  const startTime = performance.now()
+  await pingFx()
+  return performance.now() - startTime
+})
+
 const initialize = createEvent()
 const reset = createEvent()
 
-const $startTime = createStore<number>(-1)
-const $ping = createStore<number>(-1)
+const $ping = restore(measurePingFx, -1)
 
 const { tick } = interval({
   start: initialize,
@@ -20,20 +25,7 @@ const { tick } = interval({
 
 sample({
   clock: tick,
-  target: pingFx,
-})
-
-sample({
-  clock: pingFx,
-  fn: () => performance.now(),
-  target: $startTime,
-})
-
-sample({
-  clock: pingFx.done,
-  source: $startTime,
-  fn: (startTime) => performance.now() - startTime,
-  target: $ping,
+  target: measurePingFx,
 })
 
 gamesWs.on('connect', () => initialize())
