@@ -37,6 +37,14 @@ io.on('connection', async (socket) => {
   }
 
   socket.join(userRoom(user.id))
+
+  socket.on('ping', (ack) => {
+    ack('pong')
+  })
+})
+
+io.on('ping', (ack) => {
+  ack('pong')
 })
 
 /**

@@ -1,1 +1,1 @@
-export type { ServerToClientEvents } from './types'
+export type { ClientToServerEvents, ServerToClientEvents } from './types'

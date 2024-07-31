@@ -15,7 +15,7 @@ type Props = {
 }
 
 export const Ping = ({ ping }: Props) => {
-  if (ping === 0) return null
+  if (ping === -1) return null
   return <LoadedPing ping={ping} />
 }
 

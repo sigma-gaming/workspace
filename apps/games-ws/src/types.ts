@@ -13,4 +13,6 @@ export type ServerToClientEvents = {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export type ClientToServerEvents = Record<string, never>
+export type ClientToServerEvents = {
+  ping: (ack: (pong: 'pong') => void) => void
+}

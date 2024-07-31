@@ -4,7 +4,6 @@ import { createApiEffect } from '@core/hono-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
@@ -13,20 +12,15 @@ import { $$balance } from '../../entities/balance'
 import { $$notifications } from '../../entities/notifications'
 import { $$user } from '../../entities/user'
 import { $$gameHistory } from '../../features/game-history'
+import { $$ping } from '../../features/ping'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
-import { averageRequestTimeFactory } from '../../shared/lib/transport'
 
 export type PincodeMode = 'easy' | 'hardcore'
 
 const playGameMutation = createMutation({
   name: 'games/pincode/play',
   effect: createApiEffect(gamesApi.games.playPincode.$post),
-})
-
-const $ping = invoke(averageRequestTimeFactory, {
-  operation: playGameMutation,
-  last: 1,
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
@@ -237,8 +231,13 @@ const autoplayLoss = sample({
   filter: $autoplaying,
 })
 
-const $autoplayWinDelay = $ping.map((time) => Math.max(1500 - time, 1250))
-const $autoplayLossDelay = $ping.map((time) => Math.max(1000 - time, 750))
+const $autoplayWinDelay = $$ping.$ping.map((time) =>
+  Math.max(1500 - time, 1250),
+)
+
+const $autoplayLossDelay = $$ping.$ping.map((time) =>
+  Math.max(1000 - time, 750),
+)
 
 sample({
   clock: [
@@ -287,5 +286,4 @@ export const $$pincodePage = {
   $autoplaying,
   $animationPlaying,
   $activePincode,
-  $ping,
 }
