@@ -6,7 +6,8 @@ on:
 
 env:
   DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
-  WORKING_DIRECTORY: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
+  WORKSPACE_DIRECTORY: /tmp/workspace/${{ github.run_id }}
+  WORKSPACE_RUN_DIRECTORY: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
 
 concurrency:
   group: ${{ github.workflow }}
@@ -26,8 +27,8 @@ jobs:
 
       - name: Copy repository
         run: |-
-          mkdir -p ${{ env.WORKING_DIRECTORY }}
-          cp -r . ${{ env.WORKING_DIRECTORY }}
+          mkdir -p ${{ env.WORKSPACE_RUN_DIRECTORY }}
+          cp -r . ${{ env.WORKSPACE_RUN_DIRECTORY }}
 
   affected:
     name: Get affected apps
@@ -35,7 +36,7 @@ jobs:
     runs-on: [self-hosted, build, ARM64]
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ${{ env.WORKSPACE_RUN_DIRECTORY }}
         shell: zsh {0}
 
     outputs:
@@ -45,7 +46,7 @@ jobs:
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
         with:
-          working-directory: ${{ env.WORKING_DIRECTORY }}
+          working-directory: ${{ env.WORKSPACE_RUN_DIRECTORY }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -66,7 +67,7 @@ jobs:
     runs-on: [self-hosted, build, ARM64]
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ${{ env.WORKSPACE_RUN_DIRECTORY }}
         shell: zsh {0}
 
     if: needs.affected.outputs.apps != '[]'
@@ -114,3 +115,18 @@ jobs:
         run: |-
           docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest
           docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
+  
+  cleanup:
+    name: Cleanup
+    needs: [copy-repository, publish]
+    runs-on: [self-hosted, build, ARM64]
+    defaults:
+      run:
+        shell: zsh {0}
+
+    steps:
+      - name: Clean docker images
+        run: docker image prune -a --force --filter "until=6h"
+      
+      - name: Clean temporary files
+        run: rm -rf ${{ env.WORKSPACE_DIRECTORY }}
