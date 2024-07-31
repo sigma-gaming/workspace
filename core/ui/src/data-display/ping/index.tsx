@@ -38,7 +38,12 @@ const LoadedPing = ({ ping }: Props) => {
   return (
     <div className={styles.root} data-level={level}>
       <span ref={nodeRef} />
-      <Icons.Wifi level={level} width={12} height={12} />
+      <Icons.Connection
+        className="shrink-0"
+        level={level}
+        width={14}
+        height={14}
+      />
     </div>
   )
 }

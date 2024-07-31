@@ -1,4 +1,5 @@
 import { Card } from './card.tsx'
+import { Connection } from './connection.tsx'
 import { Dice } from './dice.tsx'
 import { Gem } from './gem.tsx'
 import { History } from './history.tsx'
@@ -8,7 +9,6 @@ import { Telegram } from './telegram.tsx'
 import { Transfer } from './transfer.tsx'
 import { TrendingUp } from './trending-up.tsx'
 import { Vk } from './vk.tsx'
-import { Wifi } from './wifi.tsx'
 
 export const Icons = {
   Vk,
@@ -21,5 +21,5 @@ export const Icons = {
   TrendingUp,
   Send,
   Card,
-  Wifi,
+  Connection,
 }

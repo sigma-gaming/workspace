@@ -3,7 +3,7 @@ import { createField, createForm } from '@core/forms'
 import { createApiEffect } from '@core/hono-client'
 import { Game } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { calculateDiceWinAmount } from '@games/model'
+import { calculateDiceFullWinAmount } from '@games/model'
 import type { Rive } from '@rive-app/react-canvas'
 import { attach, combine, createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
@@ -91,7 +91,7 @@ export const form = createForm({
 const $possibleWinAmount = combine(
   fields.bet.$value,
   fields.sides.$value.map((sides) => sides.map(Number)),
-  (bet, sides) => calculateDiceWinAmount(Number(bet) * 100, sides) / 100,
+  (bet, sides) => calculateDiceFullWinAmount(Number(bet) * 100, sides) / 100,
 )
 
 const showActionNotAllowed = $$notifications.show.prepend(() => ({

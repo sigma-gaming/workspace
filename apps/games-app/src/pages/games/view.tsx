@@ -23,9 +23,13 @@ const GameCard = ({ route, label, imageSrc }: GameCardProps) => {
   return (
     <Link
       to={route}
-      className="relative block w-full h-full aspect-square rounded-2xl overflow-hidden transition-all ease-in-out hover:opacity-90 hover:-translate-y-0.5"
+      className="relative block w-full h-full aspect-square rounded-2xl overflow-hidden transition-all ease-in-out hover:opacity-90 hover:-translate-y-0.5 bg-[#232337]"
     >
-      <img src={imageSrc} alt={label} />
+      <img
+        src={imageSrc}
+        alt={label}
+        onError={(event) => (event.currentTarget.style.display = 'none')}
+      />
       <div
         className="absolute top-0 left-0 w-full h-full flex items-end px-4 py-3"
         style={{
