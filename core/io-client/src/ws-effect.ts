@@ -48,7 +48,7 @@ type Ack<Events extends EventsMap, K extends keyof Events> = Parameters<
     ? Parameters<Events[K]>[1]
     : never
 
-type AckPayload<Ack extends AnyFunction> = Parameters<Ack>[0] extends undefined
+type AckOutput<Ack extends AnyFunction> = Parameters<Ack>[0] extends undefined
   ? void
   : Parameters<Ack>[0]
 
@@ -58,9 +58,9 @@ export function createWsEffect<
 >(socket: Socket<any, ClientToServerEvents>, event: K) {
   type ThisPayload = Payload<ClientToServerEvents, K>
   type ThisAck = Ack<ClientToServerEvents, K>
-  type ThisAckPayload = AckPayload<ThisAck>
+  type ThisAckPayload = AckOutput<ThisAck>
 
-  return createEffect(async (payload: Payload<ClientToServerEvents, K>) => {
+  return createEffect(async (input: Payload<ClientToServerEvents, K>) => {
     const defer = createDefer<unknown>()
 
     const ack = (output: unknown) => {
@@ -69,9 +69,10 @@ export function createWsEffect<
     }
 
     const parameters = (
-      payload !== undefined ? [payload, ack] : [ack]
+      input !== undefined ? [input, ack] : [ack]
     ) as Parameters<ClientToServerEvents[K]>
 
     socket.timeout(5000).emit(event, ...parameters)
+    return defer.promise
   }) as Effect<ThisPayload, ThisAckPayload>
 }
