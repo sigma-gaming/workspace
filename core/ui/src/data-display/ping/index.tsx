@@ -28,8 +28,7 @@ const LoadedPing = ({ ping }: Props) => {
       return (ping) => {
         const node = nodeRef.current
         if (!node) return
-        const rounded = Math.ceil(ping / 10) * 10
-        node.textContent = `${rounded} ms`
+        node.textContent = `${Math.ceil(ping)} ms`
       }
     },
   })
