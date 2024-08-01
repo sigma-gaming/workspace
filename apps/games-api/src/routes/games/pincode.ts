@@ -35,7 +35,7 @@ export const playPincodeRoute = new Hono().post(
   async (ctx) => {
     const logger = loggerService.forRequest(ctx.req)
     const payload = ctx.req.valid('json')
-    const session = await sessionService.getHonoSession(ctx.req)
+    const session = await sessionService.getHonoSession(ctx)
     const user = sessionService.getUser(session)
 
     if (payload.bet < gemInt(1)) {

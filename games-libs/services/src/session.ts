@@ -10,7 +10,7 @@ import { Session, SessionState } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { parse } from 'cookie'
 import { desc, eq, inArray } from 'drizzle-orm'
-import { Context as HonoContext, HonoRequest } from 'hono'
+import { Context as HonoContext } from 'hono'
 import { deleteCookie, setCookie } from 'hono/cookie'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
 import { singleton } from 'tsyringe-neo'
@@ -78,8 +78,11 @@ export class SessionService {
     return created
   }
 
-  getHonoSession = async (req: HonoRequest): Promise<Session> => {
-    const cookie = req.header('cookie')
+  getHonoSession = async (ctx: HonoContext): Promise<Session> => {
+    const saved = ctx.get('session')
+    if (saved) return saved
+
+    const cookie = ctx.req.header('cookie')
 
     if (!cookie) {
       return { state: SessionState.Empty, user: null }
@@ -152,6 +155,20 @@ export class SessionService {
     }
 
     return session
+  }
+
+  async getHonoUserSafe(ctx: HonoContext): Promise<UserSelect | null> {
+    const saved = ctx.get('user')
+    if (saved) return saved
+    const session = await this.getHonoSession(ctx)
+    return this.getUserSafe(session)
+  }
+
+  async getHonoUser(ctx: HonoContext): Promise<UserSelect> {
+    const saved = ctx.get('user')
+    if (saved) return saved
+    const session = await this.getHonoSession(ctx)
+    return this.getUser(session)
   }
 
   attachSession(ctx: HonoContext, session: Session) {

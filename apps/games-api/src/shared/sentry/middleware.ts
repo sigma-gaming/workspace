@@ -1,3 +1,4 @@
+import { sessionService } from '@games/services'
 import * as Sentry from '@sentry/bun'
 import { MiddlewareHandler } from 'hono'
 import { sentry } from './init'
@@ -8,7 +9,7 @@ type Options = {
 
 export const sentryMiddleware =
   (options: Options): MiddlewareHandler =>
-  (ctx, next) => {
+  async (ctx, next) => {
     if (!options.enabled) {
       return next()
     }
@@ -19,6 +20,8 @@ export const sentryMiddleware =
     if (!traceId || !baggage) {
       return next()
     }
+
+    const user = await sessionService.getHonoUserSafe(ctx)
 
     return Sentry.continueTrace({ sentryTrace: traceId, baggage }, () => {
       const url = new URL(ctx.req.url)
@@ -31,6 +34,7 @@ export const sentryMiddleware =
             'http.query': url.search,
             'http.request.method': ctx.req.method,
             'server.address': url.hostname,
+            'user.id': user?.id,
           },
         },
         async (span) => {

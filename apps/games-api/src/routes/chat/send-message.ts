@@ -8,7 +8,7 @@ export const sendMessageRoute = new Hono().post(
   zValidator('json', ChatValidation.MessagePayloadSchema),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const session = await sessionService.getHonoSession(ctx.req)
+    const session = await sessionService.getHonoSession(ctx)
     const user = sessionService.getUser(session)
 
     const chatMessage = await chatService.sendMessage({

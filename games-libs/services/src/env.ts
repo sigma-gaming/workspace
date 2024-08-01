@@ -16,6 +16,7 @@ const EnvSchema = z
     PUBLIC_CONTROL_API_URL: z.string(),
     PUBLIC_CONTROL_API_VERSION: z.string().default('unknown'),
     PUBLIC_GAMES_WS_URL: z.string(),
+    PUBLIC_GAMES_WS_VERSION: z.string().default('unknown'),
     JWT_SECRET: z.string(),
 
     POSTGRES_URL: z.string(),
@@ -49,12 +50,13 @@ const EnvSchema = z
     },
 
     gamesApi: {
-      version: raw.PUBLIC_GAMES_API_VERSION,
       url: raw.PUBLIC_GAMES_API_URL,
+      version: raw.PUBLIC_GAMES_API_VERSION,
     },
 
     gamesWs: {
       url: raw.PUBLIC_GAMES_WS_URL,
+      version: raw.PUBLIC_GAMES_WS_VERSION,
     },
 
     controlApp: {
@@ -62,8 +64,8 @@ const EnvSchema = z
     },
 
     controlApi: {
-      version: raw.PUBLIC_CONTROL_API_VERSION,
       url: raw.PUBLIC_CONTROL_API_URL,
+      version: raw.PUBLIC_CONTROL_API_VERSION,
     },
 
     jwt: {

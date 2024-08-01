@@ -13,7 +13,7 @@ import {
 import { Hono } from 'hono'
 
 export const withdrawRoute = new Hono().post('/', async (ctx) => {
-  const session = await sessionService.getHonoSession(ctx.req)
+  const session = await sessionService.getHonoSession(ctx)
   const user = sessionService.getUser(session)
   const amount = 1000000
 

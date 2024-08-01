@@ -95,6 +95,8 @@ export const withSentry = <TInput, TOutput>(
             attributes: {
               'http.query': ctx.url.search,
               'server.address': ctx.url.hostname,
+              'user.id': ctx.user.id,
+              'user.username': ctx.profile.username ?? 'unknown',
             },
           },
           async (span) => {

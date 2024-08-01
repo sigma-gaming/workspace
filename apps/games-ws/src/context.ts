@@ -1,9 +1,10 @@
 import { IncomingHttpHeaders } from 'http'
 import { UserSelect } from '@dbs/games-schema'
-import { Session } from '@games/model'
+import { ProfileDetailed, Session } from '@games/model'
 
 export type Context = {
   user: UserSelect
+  profile: ProfileDetailed
   session: Session
   headers: IncomingHttpHeaders
   url: URL

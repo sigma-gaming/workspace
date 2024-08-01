@@ -9,7 +9,7 @@ import {
   gamesRedis,
   maintenanceCache,
 } from '@games/redis'
-import { env, sessionService } from '@games/services'
+import { env, profileService, sessionService } from '@games/services'
 import { parse } from 'cookie'
 import { Server } from 'socket.io'
 import { App, SSLApp } from 'uWebSockets.js'
@@ -42,9 +42,12 @@ io.on('connection', async (socket) => {
     return
   }
 
+  const profile = await profileService.getDetailedProfile(user.id)
+
   const context: Context = {
     user,
     session,
+    profile,
     url: new URL(env.gamesWs.url),
     headers: socket.handshake.headers,
   }

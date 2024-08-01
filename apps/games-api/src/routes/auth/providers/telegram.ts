@@ -35,7 +35,7 @@ export const signInViaTelegramRoute = new Hono().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const currentSession = await sessionService.getHonoSession(ctx.req)
+    const currentSession = await sessionService.getHonoSession(ctx)
 
     const tgAuthResult = TgAuthResultSchema.parse(
       JSON.parse(atob(payload.tgAuthResult)),

@@ -62,7 +62,7 @@ export const signInViaVkRoute = new Hono().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const currentSession = await sessionService.getHonoSession(ctx.req)
+    const currentSession = await sessionService.getHonoSession(ctx)
 
     const authResult = VkAuthResultSchema.parse(JSON.parse(payload.payload))
 
