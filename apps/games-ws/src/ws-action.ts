@@ -5,6 +5,7 @@ import {
 } from '@core/exceptions'
 import { WsAction, WsActionHandler } from '@core/io-client'
 import { logger } from '@core/logger'
+import { env } from '@games/services'
 import * as Sentry from '@sentry/node'
 import { Schema } from 'zod'
 import { Context } from './context'
@@ -78,6 +79,10 @@ export const withSentry = <TInput, TOutput>(
   handler: WsActionHandler<TInput, TOutput>,
 ): WsActionHandler<TInput, TOutput> => {
   return (input, ack) => {
+    if (env.isDev) {
+      return handler(input, ack)
+    }
+
     const traceId = ctx.headers['sentry-trace']
     const baggage = ctx.headers.baggage
 
