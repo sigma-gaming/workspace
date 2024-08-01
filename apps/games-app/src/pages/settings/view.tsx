@@ -1,4 +1,4 @@
-import { Avatar } from '@core/ui'
+import { Avatar, WithError } from '@core/ui'
 import { AccountProvider } from '@dbs/games-types'
 import { getUserFullName, getUserInitials } from '@games/model'
 import {
@@ -66,15 +66,17 @@ const Profile = () => {
       <Title order={3}>Профиль</Title>
 
       <Skeleton className="sm:w-fit" visible={!loaded}>
-        <TextInput
-          label="Никнейм"
-          description="Используется для ссылки на профиль"
-          placeholder="Введите никнейм"
-          value={username}
-          onChange={(event) => updateUsername(event.target.value)}
-          error={errors.username[0]}
-          spellCheck={false}
-        />
+        <WithError error={errors.username[0]} position="right">
+          <TextInput
+            label="Никнейм"
+            description="Используется для ссылки на профиль"
+            placeholder="Введите никнейм"
+            value={username}
+            onChange={(event) => updateUsername(event.target.value)}
+            error={errors.username[0]}
+            spellCheck={false}
+          />
+        </WithError>
       </Skeleton>
 
       <Skeleton className="sm:w-fit" visible={!loaded}>
@@ -93,15 +95,17 @@ const Profile = () => {
       </Skeleton>
 
       <Skeleton className="sm:w-fit" visible={!loaded}>
-        <TextInput
-          label="Имя в профиле и в чате"
-          description="Переопределить имя из социальной сети"
-          placeholder="Введите имя"
-          value={name}
-          onChange={(event) => updateName(event.target.value)}
-          error={errors.name[0]}
-          spellCheck={false}
-        />
+        <WithError error={errors.name[0]} position="right">
+          <TextInput
+            label="Имя в профиле и в чате"
+            description="Переопределить имя из социальной сети"
+            placeholder="Введите имя"
+            value={name}
+            onChange={(event) => updateName(event.target.value)}
+            error={errors.name[0]}
+            spellCheck={false}
+          />
+        </WithError>
       </Skeleton>
 
       <Skeleton className="sm:w-fit" visible={!loaded}>

@@ -8,6 +8,8 @@ import {
   createTheme,
   CSSVariablesResolver,
   Input,
+  InputError,
+  InputWrapper,
   LoadingOverlay,
   MantineProvider,
   Menu,
@@ -34,6 +36,7 @@ import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
 import checkboxClassNames from './checkbox.module.css'
 import inputClassNames from './input.module.css'
+import inputWrapperClassNames from './input-wrapper.module.css'
 import loadingOverlayClassNames from './loading-overlay.module.css'
 import menuClassNames from './menu.module.css'
 import modalClassNames from './modal.module.css'
@@ -84,6 +87,12 @@ export const theme = createTheme({
     }),
     Input: Input.extend({
       classNames: inputClassNames,
+    }),
+    InputWrapper: InputWrapper.extend({
+      classNames: inputWrapperClassNames,
+    }),
+    InputError: InputError.extend({
+      defaultProps: { display: 'none' },
     }),
     Card: Card.extend({
       classNames: cardClassNames,

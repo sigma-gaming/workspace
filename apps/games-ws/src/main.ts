@@ -1,4 +1,5 @@
 import './setup'
+import './sentry/init'
 import { shutdownServices } from '@core/di'
 import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
@@ -41,7 +42,12 @@ io.on('connection', async (socket) => {
     return
   }
 
-  const context: Context = { user, session }
+  const context: Context = {
+    user,
+    session,
+    url: new URL(env.gamesWs.url),
+    headers: socket.handshake.headers,
+  }
 
   socket.join(userRoom(user.id))
 

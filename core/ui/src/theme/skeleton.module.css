@@ -1,3 +1,7 @@
+.root {
+  @apply z-20;
+}
+
 .root[data-visible]:before {
   background-color: #25273C;
 }

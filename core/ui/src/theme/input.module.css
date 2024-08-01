@@ -1,5 +1,9 @@
 .wrapper {
   margin-top: var(--mantine-spacing-xs);
+
+  &[data-error="true"] {
+    margin-bottom: 0;
+  }
 }
 
 .input {

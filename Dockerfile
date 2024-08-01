@@ -79,9 +79,20 @@ FROM node:20-alpine AS ws-base
 ENV NODE_ENV=production
 RUN apk add --no-cache gcompat
 
+FROM build AS games-ws-build
+ARG sentry_auth_token
+ARG sentry_release
+ENV SENTRY_ORG=sigma-games
+ENV SENTRY_PROJECT=games-ws
+ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
+RUN pnpm sentry-cli releases new -p games-ws ${sentry_release}
+RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
+RUN pnpm sentry-cli sourcemaps inject /build/apps/games-ws/dist
+RUN pnpm sentry-cli sourcemaps upload /build/apps/games-ws/dist --release ${sentry_release}
+
 FROM ws-base AS games-ws
 WORKDIR /workspace
-COPY --from=build /build ./
+COPY --from=games-ws-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
 
 # Migrations

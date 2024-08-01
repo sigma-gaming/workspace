@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { RouteException } from '@core/exceptions'
+import {
+  InternalServerException,
+  recreateException,
+  RouteException,
+} from '@core/exceptions'
 import { createEffect, Effect } from 'effector'
 import { Socket } from 'socket.io-client'
 import {
@@ -45,8 +49,9 @@ export function createWsEffect<
     const defer = createDefer<ThisOutput>()
 
     const ack = (_: unknown, result: WsActionResult<ThisOutput>) => {
-      if (result[0] === 1) defer.resolve(result[1])
-      else defer.reject(new RouteException(result[1]))
+      if (result[0] === 1) return defer.resolve(result[1])
+      const exception = recreateException(result[1])
+      defer.reject(exception ?? new InternalServerException())
     }
 
     const parameters = [input !== undefined ? input : null, ack] as Parameters<

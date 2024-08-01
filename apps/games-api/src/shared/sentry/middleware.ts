@@ -38,7 +38,7 @@ export const sentryMiddleware =
 
           span.setAttribute('http.response.status_code', ctx.res.status)
 
-          if (ctx.error) {
+          if (ctx.res.status >= 500 && ctx.error) {
             sentry?.captureException(ctx.error)
           }
         },

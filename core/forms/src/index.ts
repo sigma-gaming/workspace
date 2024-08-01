@@ -147,6 +147,11 @@ export function createField<TValue>(
     target: $value,
   })
 
+  sample({
+    clock: reset,
+    target: resetErrors,
+  })
+
   return {
     emptyValue,
     initialize,

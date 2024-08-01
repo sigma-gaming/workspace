@@ -10,11 +10,14 @@ import { createApiEffect } from '@core/hono-client'
 import { AccountProvider } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { getUserFullName, ProfileValidation } from '@games/model'
-import { sample } from 'effector'
+import { createEvent, sample } from 'effector'
 import { z } from 'zod'
 import { $$notifications } from '../../entities/notifications'
 import { $$profile } from '../../entities/profile'
+import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
+
+const reset = createEvent()
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
@@ -115,6 +118,16 @@ sample({
       message: `Ты великолепен!`,
     }),
   target: $$notifications.show,
+})
+
+sample({
+  clock: reset,
+  target: profileForm.reset,
+})
+
+sample({
+  clock: routes.settings.closed,
+  target: reset,
 })
 
 export const $$settingsPage = {

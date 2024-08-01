@@ -1,3 +1,4 @@
+import { WithError } from '@core/ui'
 import { ActionIcon, InputLabel, NumberInput } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { $$pincodePage } from '../model'
@@ -12,18 +13,22 @@ export const BetField = () => {
       <InputLabel htmlFor="bet-field">Ставка</InputLabel>
       <div className="flex flex-col">
         <div className="flex flex-row gap-2 items-start">
-          <NumberInput
-            id="bet-field"
-            className="grow"
-            classNames={{ wrapper: 'mt-0' }}
-            value={bet}
-            onChange={(value) => $$pincodePage.fields.bet.update(String(value))}
-            allowedDecimalSeparators={[',', '.']}
-            error={errors.bet[0]}
-            disabled={autoplaying}
-            min={1}
-            decimalScale={2}
-          />
+          <WithError error={errors.bet[0]}>
+            <NumberInput
+              id="bet-field"
+              className="grow"
+              classNames={{ wrapper: 'mt-0' }}
+              value={bet}
+              onChange={(value) =>
+                $$pincodePage.fields.bet.update(String(value))
+              }
+              allowedDecimalSeparators={[',', '.']}
+              error={errors.bet[0]}
+              disabled={autoplaying}
+              min={1}
+              decimalScale={2}
+            />
+          </WithError>
           <ActionIcon
             className="text-sm text-[var(--input-color)] disabled:bg-[color:var(--mantine-color-input-bg)] disabled:opacity-60"
             size={36}

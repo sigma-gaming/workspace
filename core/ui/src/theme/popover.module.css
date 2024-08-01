@@ -3,3 +3,7 @@
   background-color: #25273E;
   border: none;
 }
+
+.arrow {
+  border-color: var(--mantine-color-borders);
+}
