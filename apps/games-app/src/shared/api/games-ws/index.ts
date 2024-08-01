@@ -15,6 +15,8 @@ if (rootSpan) {
   if (baggage) extraHeaders.baggage = baggage
 }
 
+console.log(rootSpan, extraHeaders)
+
 export const gamesWs: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   env.gamesWs.url,
   {
