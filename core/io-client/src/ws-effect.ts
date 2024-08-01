@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { RouteException } from '@core/exceptions'
 import { createEffect, Effect } from 'effector'
 import { Socket } from 'socket.io-client'
+import {
+  EventNames,
+  EventsMap,
+  WsActionInput,
+  WsActionOutput,
+  WsActionResult,
+} from './types'
 
 export type Defer<T> = {
   readonly promise: Promise<T>
@@ -26,53 +34,26 @@ export function createDefer<T extends unknown = void>(): Defer<T> {
   }
 }
 
-type EventsMap = {
-  [event: string]: any
-}
-
-export type EventNames<Map extends EventsMap> = keyof Map & (string | symbol)
-
-type AnyFunction = (...args: any[]) => any
-
-type Payload<Events extends EventsMap, K extends keyof Events> = Parameters<
-  Events[K]
->[0] extends AnyFunction
-  ? void
-  : Parameters<Events[K]>[0]
-
-type Ack<Events extends EventsMap, K extends keyof Events> = Parameters<
-  Events[K]
->[0] extends AnyFunction
-  ? Parameters<Events[K]>[0]
-  : Parameters<Events[K]>[1] extends AnyFunction
-    ? Parameters<Events[K]>[1]
-    : never
-
-type AckOutput<Ack extends AnyFunction> = Parameters<Ack>[0] extends undefined
-  ? void
-  : Parameters<Ack>[0]
-
 export function createWsEffect<
   ClientToServerEvents extends EventsMap,
   K extends EventNames<ClientToServerEvents>,
 >(socket: Socket<any, ClientToServerEvents>, event: K) {
-  type ThisPayload = Payload<ClientToServerEvents, K>
-  type ThisAck = Ack<ClientToServerEvents, K>
-  type ThisAckPayload = AckOutput<ThisAck>
+  type ThisPayload = WsActionInput<ClientToServerEvents, K>
+  type ThisOutput = WsActionOutput<ClientToServerEvents, K>
 
-  return createEffect(async (input: Payload<ClientToServerEvents, K>) => {
-    const defer = createDefer<unknown>()
+  return createEffect(async (input: ThisPayload) => {
+    const defer = createDefer<ThisOutput>()
 
-    const ack = (output: unknown) => {
-      if (output instanceof Error) defer.reject(output)
-      else defer.resolve(output)
+    const ack = (_: unknown, result: WsActionResult<ThisOutput>) => {
+      if (result[0] === 1) defer.resolve(result[1])
+      else defer.reject(new RouteException(result[1]))
     }
 
-    const parameters = (
-      input !== undefined ? [input, ack] : [ack]
-    ) as Parameters<ClientToServerEvents[K]>
+    const parameters = [input !== undefined ? input : null, ack] as Parameters<
+      ClientToServerEvents[K]
+    >
 
     socket.timeout(5000).emit(event, ...parameters)
     return defer.promise
-  }) as Effect<ThisPayload, ThisAckPayload>
+  }) as Effect<ThisPayload, ThisOutput, RouteException<unknown>>
 }

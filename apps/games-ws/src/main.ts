@@ -1,5 +1,6 @@
 import './setup'
 import { shutdownServices } from '@core/di'
+import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
 import {
   gamesCaches,
@@ -11,7 +12,11 @@ import { env, sessionService } from '@games/services'
 import { parse } from 'cookie'
 import { Server } from 'socket.io'
 import { App, SSLApp } from 'uWebSockets.js'
+import { GamesPincodeAction } from './actions/games/pincode'
+import { PingAction } from './actions/ping'
+import { Context } from './context'
 import { ClientToServerEvents, ServerToClientEvents } from './types'
+import { WsActionGenerator } from './ws-action'
 
 const app = env.isDev
   ? SSLApp({
@@ -36,15 +41,23 @@ io.on('connection', async (socket) => {
     return
   }
 
+  const context: Context = { user, session }
+
   socket.join(userRoom(user.id))
 
-  socket.on('ping', (ack) => {
-    ack('pong')
-  })
-})
+  function registerAction<E extends EventNames<ClientToServerEvents>>(
+    generator: WsActionGenerator<
+      E,
+      WsActionInput<ClientToServerEvents, E>,
+      WsActionOutput<ClientToServerEvents, E>
+    >,
+  ) {
+    const action = generator(context)
+    socket.on(action.name, action.handler as any)
+  }
 
-io.on('ping', (ack) => {
-  ack('pong')
+  registerAction(PingAction)
+  registerAction(GamesPincodeAction)
 })
 
 /**

@@ -1,6 +1,6 @@
 import { BadRequestException } from '@core/exceptions'
 import { createField, createForm } from '@core/forms'
-import { createApiEffect } from '@core/hono-client'
+import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
@@ -14,13 +14,13 @@ import { $$user } from '../../entities/user'
 import { $$gameHistory } from '../../features/game-history'
 import { $$ping } from '../../features/ping'
 import { routes } from '../../routing'
-import { gamesApi } from '../../shared/api/games'
+import { gamesWs } from '../../shared/api/games-ws'
 
 export type PincodeMode = 'easy' | 'hardcore'
 
 const playGameMutation = createMutation({
   name: 'games/pincode/play',
-  effect: createApiEffect(gamesApi.games.playPincode.$post),
+  effect: createWsEffect(gamesWs, 'games/pincode'),
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)

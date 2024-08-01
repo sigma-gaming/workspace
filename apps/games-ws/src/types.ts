@@ -1,8 +1,10 @@
+import { WsActionHandler } from '@core/io-client'
 import {
   ChatMessageSelect,
   GameRecordSelect,
   NotificationSelect,
 } from '@dbs/games-schema'
+import { GamesPincodeInput, GamesPincodeOutput } from './actions/games/pincode'
 
 export type ServerToClientEvents = {
   'chat/message': (message: ChatMessageSelect) => void
@@ -14,5 +16,6 @@ export type ServerToClientEvents = {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export type ClientToServerEvents = {
-  ping: (ack: (pong: 'pong') => void) => void
+  'ping': WsActionHandler<void, 'pong'>
+  'games/pincode': WsActionHandler<GamesPincodeInput, GamesPincodeOutput>
 }
