@@ -81,8 +81,6 @@ export const withSentry = <TInput, TOutput>(
     const traceId = ctx.headers['sentry-trace']
     const baggage = ctx.headers.baggage
 
-    console.log({ traceId, baggage })
-
     if (!traceId || !baggage) {
       return handler(input, ack)
     }
@@ -109,6 +107,8 @@ export const withSentry = <TInput, TOutput>(
                 'ws.action.result',
                 result[0] === 1 ? 'success' : 'failure',
               )
+
+              span.end()
             })
           },
         )
