@@ -81,6 +81,8 @@ export const withSentry = <TInput, TOutput>(
     const traceId = ctx.headers['sentry-trace']
     const baggage = ctx.headers.baggage
 
+    console.log({ traceId, baggage })
+
     if (!traceId || !baggage) {
       return handler(input, ack)
     }
