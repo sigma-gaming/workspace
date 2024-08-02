@@ -4,6 +4,7 @@ import {
   recreateException,
   RouteException,
 } from '@core/exceptions'
+import { createDefer } from '@core/utils'
 import { createEffect, Effect } from 'effector'
 import { Socket } from 'socket.io-client'
 import {
@@ -13,30 +14,6 @@ import {
   WsActionOutput,
   WsActionResult,
 } from './types'
-
-export type Defer<T> = {
-  readonly promise: Promise<T>
-  readonly resolve: (value: T) => void
-  readonly reject: (error: Error) => void
-}
-
-export function createDefer<T extends unknown = void>(): Defer<T> {
-  let resolveFn: Defer<T>['resolve']
-  let rejectFn: Defer<T>['reject']
-
-  return {
-    promise: new Promise((resolve, reject) => {
-      resolveFn = resolve
-      rejectFn = reject
-    }),
-    get resolve() {
-      return resolveFn
-    },
-    get reject() {
-      return rejectFn
-    },
-  }
-}
 
 export function createWsEffect<
   ClientToServerEvents extends EventsMap,

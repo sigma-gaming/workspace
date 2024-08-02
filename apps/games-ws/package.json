@@ -29,6 +29,7 @@
     "@core/logger": "workspace:*",
     "@tooling/env": "workspace:*",
     "@core/events": "workspace:*",
-    "@core/io-client": "workspace:*"
+    "@core/io-client": "workspace:*",
+    "@core/utils": "workspace:*"
   }
 }

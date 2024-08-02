@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  InternalServerException,
-  RouteException,
-} from '@core/exceptions'
-import { loggerService } from '@core/logger'
+import { BadRequestException } from '@core/exceptions'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { gemInt, getPincodeMultiplier } from '@games/model'
@@ -39,8 +34,6 @@ export const GamesPincodeAction = createWsAction({
     ctx: Context,
     { bet }: GamesPincodeInput,
   ): Promise<GamesPincodeOutput> {
-    const logger = loggerService.forWsAction()
-
     if (bet < gemInt(1)) {
       throw new BadRequestException({
         path: ['bet'],
@@ -85,13 +78,6 @@ export const GamesPincodeAction = createWsAction({
         record: gameRecord,
         updatedBalance: transaction.closingBalance,
       }
-    } catch (error) {
-      if (error instanceof RouteException) {
-        throw error
-      }
-
-      logger.error(error)
-      throw new InternalServerException()
     } finally {
       await lock.release()
     }

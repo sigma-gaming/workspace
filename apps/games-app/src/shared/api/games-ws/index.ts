@@ -16,24 +16,11 @@ function getSentryTracing() {
   return { trace, baggage }
 }
 
-const activeSpan = Sentry.getActiveSpan()
-const rootSpan = activeSpan ? Sentry.getRootSpan(activeSpan) : undefined
-
-const extraHeaders: Record<string, string> = {}
-
-if (rootSpan) {
-  const trace = Sentry.spanToTraceHeader(rootSpan)
-  const baggage = Sentry.spanToBaggageHeader(rootSpan)
-  extraHeaders['sentry-trace'] = trace
-  if (baggage) extraHeaders.baggage = baggage
-}
-
 export const gamesWs: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   env.gamesWs.url,
   {
     transports: ['websocket', 'polling', 'webtransport'],
     withCredentials: true,
-    extraHeaders,
   },
 )
 

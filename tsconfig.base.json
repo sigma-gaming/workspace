@@ -94,6 +94,9 @@
       ],
       "@core/flow": [
         "core/flow/src/index.ts"
+      ],
+      "@core/utils": [
+        "core/utils/src/index.ts"
       ]
     }
   }

@@ -5,6 +5,7 @@ import {
 } from '@core/exceptions'
 import { WsAction, WsActionHandler } from '@core/io-client'
 import { logger } from '@core/logger'
+import { createDefer } from '@core/utils'
 import { env } from '@games/services'
 import * as Sentry from '@sentry/node'
 import { Schema } from 'zod'
@@ -101,16 +102,19 @@ export const withSentry = <TInput, TOutput>(
           },
         },
         async (span) => {
-          handler(input, (result) => {
-            ack(result)
+          const defer = createDefer()
 
+          handler(input, (result) => {
             span.setAttribute(
               'ws.action.result',
               result[0] === 1 ? 'success' : 'failure',
             )
 
-            span.end()
+            ack(result)
+            defer.resolve()
           })
+
+          return defer.promise
         },
       )
     })
