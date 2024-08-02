@@ -1,4 +1,4 @@
-import { useLazyAnimate } from '@core/ui'
+import { Icons, useLazyAnimate } from '@core/ui'
 import { getPincodeHighlight } from '@games/model'
 import { useUnit } from 'effector-react'
 import { memo, useMemo, useRef } from 'react'
@@ -100,8 +100,14 @@ const PincodeNumber = memo(() => {
 
 export const AnimatedPincode = () => {
   return (
-    <div className="flex items-center justify-center min-h-32 select-none">
-      <PincodeNumber />
+    <div className="w-full flex items-center justify-center min-h-32 select-none">
+      <div className="relative flex items-center justify-center p-4 aspect-[1.588/1] max-w-[424px] w-full bg-[#25273E] bg-opacity-40 rounded-xl">
+        <div className="hidden sm:flex absolute bottom-4 left-4 items-start gap-2 opacity-25 -rotate-90 origin-top-left translate-y-8">
+          <Icons.Sigma color="currentColor" width={32} height={32} />
+          <p className="text-xl font-medium uppercase leading-tight">Sigma</p>
+        </div>
+        <PincodeNumber />
+      </div>
     </div>
   )
 }

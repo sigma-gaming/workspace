@@ -1,27 +1,27 @@
 .pincodeNumber {
-  @apply inline-block text-center w-10 px-2 py-1 rounded-lg bg-[#25273E];
+  @apply inline-block text-center w-10 px-2 py-1 rounded-lg bg-[#2c2e49];
 
   &[data-highlight='1'] {
-    @apply text-green-400 bg-[#253e3c];
+    @apply text-green-400 bg-[#2c4947];
     animation: number-highlight-1 0.5s ease-in-out;
     animation-iteration-count: 3;
   }
 
   &[data-highlight='2'] {
-    @apply text-green-400 bg-[#253e3c];
+    @apply text-green-400 bg-[#2c4947];
     animation: number-highlight-2 0.5s ease-in-out;
     animation-iteration-count: 3;
   }
 }
 
 @keyframes number-highlight-1 {
-  0% { @apply text-[var(--mantine-color-text)] bg-[#25273E] }
-  50% { @apply text-green-400 bg-[#253e3c] }
-  100% { @apply text-[var(--mantine-color-text)] bg-[#25273E] }
+  0% { @apply text-[var(--mantine-color-text)] bg-[#2c2e49] }
+  50% { @apply text-green-400 bg-[#2c4947] }
+  100% { @apply text-[var(--mantine-color-text)] bg-[#2c2e49] }
 }
 
 @keyframes number-highlight-2 {
-  0% { @apply text-[var(--mantine-color-text)] bg-[#25273E] }
-  50% { @apply text-green-400 bg-[#253e3c] }
-  100% { @apply text-[var(--mantine-color-text)] bg-[#25273E] }
+  0% { @apply text-[var(--mantine-color-text)] bg-[#2c2e49] }
+  50% { @apply text-green-400 bg-[#2c4947] }
+  100% { @apply text-[var(--mantine-color-text)] bg-[#2c2e49] }
 }

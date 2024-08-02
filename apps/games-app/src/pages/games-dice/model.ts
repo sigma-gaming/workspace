@@ -6,7 +6,7 @@ import { createMutation } from '@farfetched/core'
 import { calculateDiceFullWinAmount } from '@games/model'
 import type { Rive } from '@rive-app/react-canvas'
 import { attach, combine, createEvent, createStore, sample } from 'effector'
-import { and, condition, delay, not } from 'patronum'
+import { and, combineEvents, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$balance } from '../../entities/balance'
 import { $$notifications } from '../../entities/notifications'
@@ -31,6 +31,7 @@ const autoplayToggled = createEvent()
 const autoplayChanged = createEvent<boolean>()
 const riveChanged = createEvent<Rive | null>()
 const animationLoaded = createEvent()
+const startLoaded = createEvent()
 const animationStarted = createEvent()
 const animationFinished = createEvent()
 const reset = createEvent()
@@ -43,8 +44,17 @@ const $autoplaying = createStore(false)
 
 const $rive = createStore<Rive | null>(null).on(riveChanged, (_, rive) => rive)
 
+const $started = createStore(false)
+  .on(playGameMutation.finished.success, () => true)
+  .reset(reset)
+
+const animationsLoaded = combineEvents({
+  events: [startLoaded, animationLoaded],
+  reset,
+})
+
 const $animationLoaded = createStore(false)
-  .on(animationLoaded, () => true)
+  .on(animationsLoaded, () => true)
   .reset(reset)
 
 const $animationPlaying = createStore(false)
@@ -228,6 +238,8 @@ export const $$dicePage = {
   $autoplaying,
   $animationPlaying,
   $animationLoaded,
+  $started,
+  startLoaded,
   playPressed,
   autoplayPressed,
   riveChanged,

@@ -1,4 +1,4 @@
-import { Menu, MenuLink, MenuSection } from '@core/ui'
+import { Icons, Menu, MenuLink, MenuSection } from '@core/ui'
 import { rem } from '@mantine/core'
 import {
   IconBarrierBlock,
@@ -9,7 +9,6 @@ import {
 import { Link } from 'atomic-router-react'
 import { PropsWithChildren } from 'react'
 import { routes } from '../../routing/index.ts'
-import { Logo } from './logo.tsx'
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
   return (
@@ -27,7 +26,7 @@ const Left = () => {
         to={routes.dashboard}
         className="w-full flex items-center justify-center gap-2 p-2 mb-4"
       >
-        <Logo />
+        <Icons.Sigma />
         <h1 className="hidden md:block font-text text-2xl font-medium">
           Sigma
         </h1>

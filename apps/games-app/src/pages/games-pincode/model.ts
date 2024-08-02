@@ -112,6 +112,7 @@ condition({
 
 sample({
   clock: startPlay,
+  filter: not($animationPlaying),
   target: form.submit,
 })
 

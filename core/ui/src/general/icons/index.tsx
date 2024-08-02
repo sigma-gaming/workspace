@@ -5,6 +5,7 @@ import { Gem } from './gem.tsx'
 import { History } from './history.tsx'
 import { Play } from './play.tsx'
 import { Send } from './send.tsx'
+import { Sigma } from './sigma.tsx'
 import { Telegram } from './telegram.tsx'
 import { Transfer } from './transfer.tsx'
 import { TrendingUp } from './trending-up.tsx'
@@ -22,4 +23,5 @@ export const Icons = {
   Send,
   Card,
   Connection,
+  Sigma,
 }

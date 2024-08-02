@@ -7,7 +7,7 @@ import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
-import { memo, ReactNode, useEffect } from 'react'
+import { memo, ReactNode, useEffect, useRef } from 'react'
 import { $$user } from '../../entities/user'
 import { $$gameHistory, Tab } from '../../features/game-history'
 import { routes } from '../../routing'
@@ -39,11 +39,29 @@ function getGameResult(snapshot: GameSnapshot): string {
 export const GameHistoryTable = () => {
   const tab = useUnit($$gameHistory.$tab)
   const loggedIn = useUnit($$user.$loggedIn)
+  const tabListRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     $$gameHistory.initialize()
     return () => $$gameHistory.reset()
   }, [])
+
+  useEffect(() => {
+    if (!tab) return
+
+    const tabList = tabListRef.current
+    if (!tabList) return
+
+    const tabElement = document.querySelector<HTMLButtonElement>(
+      `[data-tab="${tab}"]`,
+    )
+    if (!tabElement) return
+
+    tabList.scrollTo({
+      left: tabElement.offsetLeft,
+      behavior: 'smooth',
+    })
+  }, [tab])
 
   return (
     <Card className="grow p-0 rounded-xl md:rounded-2xl">
@@ -51,7 +69,7 @@ export const GameHistoryTable = () => {
         value={tab}
         onChange={(tab) => $$gameHistory.setTab(tab as Tab | null)}
       >
-        <Tabs.List>
+        <Tabs.List ref={tabListRef} className="scroll-smooth">
           <div className="mr-auto h-[46px] px-6 flex gap-2 items-center justify-center select-none">
             <span className="inline-block relative w-3 h-3">
               <div
@@ -67,6 +85,7 @@ export const GameHistoryTable = () => {
 
           <Tabs.Tab
             value="last-wins"
+            data-tab="last-wins"
             className="px-4 md:px-6 py-3"
             leftSection={<Icons.Transfer width={20} height={20} />}
           >
@@ -74,6 +93,7 @@ export const GameHistoryTable = () => {
           </Tabs.Tab>
           <Tabs.Tab
             value="big-wins"
+            data-tab="big-wins"
             className="px-4 md:px-6 py-3"
             leftSection={<Icons.TrendingUp width={20} height={20} />}
           >
@@ -82,6 +102,7 @@ export const GameHistoryTable = () => {
           {loggedIn && (
             <Tabs.Tab
               value="my-games"
+              data-tab="my-games"
               className="px-4 md:px-6 py-3"
               leftSection={<Icons.History width={20} height={20} />}
             >
