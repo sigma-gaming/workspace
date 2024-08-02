@@ -13,6 +13,7 @@ import { env, profileService, sessionService } from '@games/services'
 import { parse } from 'cookie'
 import { Server } from 'socket.io'
 import { App, SSLApp } from 'uWebSockets.js'
+import { GamesDiceAction } from './actions/games/dice'
 import { GamesPincodeAction } from './actions/games/pincode'
 import { PingAction } from './actions/ping'
 import { Context } from './context'
@@ -37,22 +38,22 @@ io.on('connection', async (socket) => {
   const session = await sessionService.getSession(cookie.session)
   const user = sessionService.getUserSafe(session)
 
-  if (!user) {
-    socket.disconnect()
-    return
-  }
-
-  const profile = await profileService.getDetailedProfile(user.id)
-
   const context: Context = {
-    user,
-    session,
-    profile,
     url: new URL(env.gamesWs.url),
     headers: socket.handshake.headers,
   }
 
-  socket.join(userRoom(user.id))
+  if (user) {
+    const profile = await profileService.getDetailedProfile(user.id)
+
+    context.session = {
+      session,
+      user,
+      profile,
+    }
+
+    socket.join(userRoom(user.id))
+  }
 
   function registerAction<E extends EventNames<ClientToServerEvents>>(
     generator: WsActionGenerator<
@@ -67,6 +68,7 @@ io.on('connection', async (socket) => {
 
   registerAction(PingAction)
   registerAction(GamesPincodeAction)
+  registerAction(GamesDiceAction)
 })
 
 /**

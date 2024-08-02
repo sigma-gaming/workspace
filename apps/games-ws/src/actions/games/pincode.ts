@@ -1,4 +1,7 @@
-import { BadRequestException } from '@core/exceptions'
+import {
+  BadRequestException,
+  NotAuthenticatedException,
+} from '@core/exceptions'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { gemInt, getPincodeMultiplier } from '@games/model'
@@ -30,10 +33,13 @@ export type GamesPincodeOutput = {
 export const GamesPincodeAction = createWsAction({
   name: 'games/pincode',
   schema: InputSchema,
-  async handler(
-    ctx: Context,
-    { bet }: GamesPincodeInput,
-  ): Promise<GamesPincodeOutput> {
+  async handler(ctx: Context, { bet }): Promise<GamesPincodeOutput> {
+    const { session } = ctx
+
+    if (!session) {
+      throw new NotAuthenticatedException()
+    }
+
     if (bet < gemInt(1)) {
       throw new BadRequestException({
         path: ['bet'],
@@ -41,11 +47,11 @@ export const GamesPincodeAction = createWsAction({
       })
     }
 
-    const lock = await transactionService.lock(ctx.user.id)
+    const lock = await transactionService.lock(session.user.id)
 
     try {
       const lastTransaction = await transactionService.getLastTransaction(
-        ctx.user.id,
+        session.user.id,
       )
 
       const { closingBalance: lastBalance = 0 } = lastTransaction ?? {}
@@ -62,7 +68,7 @@ export const GamesPincodeAction = createWsAction({
       const payout = hasWon ? winAmount : -bet
 
       const { gameRecord, transaction } = await gameService.saveGame({
-        userId: ctx.user.id,
+        userId: session.user.id,
         game: Game.Pincode,
         bet,
         payout,

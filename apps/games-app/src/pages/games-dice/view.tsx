@@ -1,5 +1,6 @@
 import { useUnit } from 'effector-react'
 import { memo } from 'react'
+import { Ping } from '../../features/ping'
 import { GamePlaygroundLayout } from '../../layouts/game-playground/view.tsx'
 import { $$dicePage } from './model.ts'
 import { AnimatedDice } from './ui/animated-dice.tsx'
@@ -16,6 +17,7 @@ export const DiceGamePageView = memo(() => {
       title="Dice"
       onSubmit={() => $$dicePage.playPressed()}
       animation={<AnimatedDice />}
+      cornerControls={<Ping />}
       loading={!loaded}
       fields={
         <>

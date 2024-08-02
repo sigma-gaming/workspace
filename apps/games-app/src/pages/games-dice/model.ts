@@ -1,6 +1,6 @@
 import { BadRequestException } from '@core/exceptions'
 import { createField, createForm } from '@core/forms'
-import { createApiEffect } from '@core/hono-client'
+import { createWsEffect } from '@core/io-client'
 import { Game } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { calculateDiceFullWinAmount } from '@games/model'
@@ -13,11 +13,11 @@ import { $$notifications } from '../../entities/notifications'
 import { $$user } from '../../entities/user'
 import { $$gameHistory } from '../../features/game-history'
 import { routes } from '../../routing'
-import { gamesApi } from '../../shared/api/games'
+import { gamesWs } from '../../shared/api/games-ws'
 
 const playGameMutation = createMutation({
   name: 'games/dice/play',
-  effect: createApiEffect(gamesApi.games.playDice.$post),
+  effect: createWsEffect(gamesWs, 'games/dice'),
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)

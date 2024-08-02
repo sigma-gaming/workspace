@@ -4,6 +4,7 @@ import {
   GameRecordSelect,
   NotificationSelect,
 } from '@dbs/games-schema'
+import { GamesDiceInput, GamesDiceOutput } from './actions/games/dice'
 import { GamesPincodeInput, GamesPincodeOutput } from './actions/games/pincode'
 
 export type ServerToClientEvents = {
@@ -18,4 +19,5 @@ export type ServerToClientEvents = {
 export type ClientToServerEvents = {
   'ping': WsActionHandler<void, 'pong'>
   'games/pincode': WsActionHandler<GamesPincodeInput, GamesPincodeOutput>
+  'games/dice': WsActionHandler<GamesDiceInput, GamesDiceOutput>
 }
