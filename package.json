@@ -104,6 +104,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@fastify/vite": "^5.0.4",
+    "@floating-ui/react": "^0.26.20",
     "@nx/js": "17.0.2",
     "@nx/workspace": "17.0.2",
     "@sentry/cli": "^2.32.1",
