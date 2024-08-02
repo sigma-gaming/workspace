@@ -30,6 +30,7 @@ import { Notifications } from '@mantine/notifications'
 import { PropsWithChildren } from 'react'
 import { colors } from '../colors'
 import { fontSizes } from '../font-sizes'
+import { createFlipOptions } from '../lib/popover'
 import actionIconClassNames from './action-icon.module.css'
 import badgeClassNames from './badge.module.css'
 import buttonClassNames from './button.module.css'
@@ -113,6 +114,11 @@ export const theme = createTheme({
     }),
     Popover: Popover.extend({
       classNames: popoverClassNames,
+      defaultProps: {
+        middlewares: {
+          flip: createFlipOptions(),
+        },
+      },
     }),
     Skeleton: Skeleton.extend({
       classNames: skeletonClassNames,

@@ -6,9 +6,11 @@ import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useUnit } from 'effector-react'
 import { memo, UIEventHandler, useCallback, useEffect, useRef } from 'react'
+import { $$user } from '../../entities/user'
 import { $$chatWidget, ExtendedMessage } from './model'
 
 export const Chat = () => {
+  const loggedIn = useUnit($$user.$loggedIn)
   const text = useUnit($$chatWidget.fields.text.$value)
   const updateText = useUnit($$chatWidget.fields.text.update)
   const submit = useUnit($$chatWidget.form.submit)
@@ -54,6 +56,7 @@ export const Chat = () => {
           className={clsx(
             'w-full bg-transparent resize-none outline-none scrollbar-hide',
             'text-[color:var(--mantine-color-text)] placeholder-[color:var(--mantine-color-placeholder)]',
+            'disabled:opacity-50',
           )}
           value={text}
           onChange={(event) => updateText(event.target.value)}
@@ -61,6 +64,7 @@ export const Chat = () => {
           rows={isMobile ? 1 : 3}
           wrap={isMobile ? 'off' : 'soft'}
           placeholder="Введите сообщение..."
+          disabled={!loggedIn}
         />
         {isMobile ? (
           <ActionIcon size={36} type="submit" disabled={text.length === 0}>
@@ -72,7 +76,7 @@ export const Chat = () => {
             radius={12}
             size="sm"
             type="submit"
-            disabled={text.length === 0}
+            disabled={text.length === 0 || !loggedIn}
           >
             Отправить
           </Button>
