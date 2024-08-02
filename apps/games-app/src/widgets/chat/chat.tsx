@@ -17,6 +17,8 @@ export const Chat = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const isMobile = useMedia({ to: 'md' })
 
+  const disabled = !loggedIn
+
   const handleSubmit = () => {
     submit()
     if (isMobile) textareaRef.current?.blur()
@@ -34,6 +36,7 @@ export const Chat = () => {
           'focus-within:outline outline-2 outline-[color:var(--mantine-color-input-border-focus)] outline-offset-2',
           !isMobile && 'h-[142px]',
           isMobile && 'flex gap-4 items-center',
+          disabled && 'select-none cursor-not-allowed',
         )}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
@@ -56,7 +59,7 @@ export const Chat = () => {
           className={clsx(
             'w-full bg-transparent resize-none outline-none scrollbar-hide',
             'text-[color:var(--mantine-color-text)] placeholder-[color:var(--mantine-color-placeholder)]',
-            'disabled:opacity-50',
+            'disabled:opacity-50 disabled:pointer-events-none',
           )}
           value={text}
           onChange={(event) => updateText(event.target.value)}
@@ -64,7 +67,7 @@ export const Chat = () => {
           rows={isMobile ? 1 : 3}
           wrap={isMobile ? 'off' : 'soft'}
           placeholder="Введите сообщение..."
-          disabled={!loggedIn}
+          disabled={disabled}
         />
         {isMobile ? (
           <ActionIcon size={36} type="submit" disabled={text.length === 0}>
