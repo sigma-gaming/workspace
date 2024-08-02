@@ -59,7 +59,7 @@ export function createWsAction<
           return ack([0, error])
         }
 
-        sentry?.captureException(error)
+        if (env.isProd) sentry?.captureException(error)
         logger.child('WsAction').child(name).error(error)
         const exception = new InternalServerException()
         return ack([0, exception])
@@ -83,41 +83,36 @@ export const withSentry = <TInput, TOutput>(
       return handler(input, ack)
     }
 
-    const traceId = ctx.headers['sentry-trace']
-    const baggage = ctx.headers.baggage
+    const { sentryTrace, sentryBaggage } = ctx
 
-    if (!traceId || !baggage) {
+    if (!sentryTrace || !sentryBaggage) {
       return handler(input, ack)
     }
 
-    return Sentry.continueTrace(
-      { sentryTrace: String(traceId), baggage },
-      () => {
-        return Sentry.startSpan(
-          {
-            name: `WsAction ${name}`,
-            op: 'ws.action',
-            attributes: {
-              'http.query': ctx.url.search,
-              'server.address': ctx.url.hostname,
-              'user.id': ctx.user.id,
-              'user.username': ctx.profile.username ?? 'unknown',
-            },
+    return Sentry.continueTrace({ sentryTrace, baggage: sentryBaggage }, () => {
+      return Sentry.startSpan(
+        {
+          name: `WsAction ${name}`,
+          op: 'ws.action',
+          attributes: {
+            'server.address': ctx.url.hostname,
+            'user.id': ctx.user.id,
+            'user.username': ctx.profile.username ?? 'unknown',
           },
-          async (span) => {
-            handler(input, (result) => {
-              ack(result)
+        },
+        async (span) => {
+          handler(input, (result) => {
+            ack(result)
 
-              span.setAttribute(
-                'ws.action.result',
-                result[0] === 1 ? 'success' : 'failure',
-              )
+            span.setAttribute(
+              'ws.action.result',
+              result[0] === 1 ? 'success' : 'failure',
+            )
 
-              span.end()
-            })
-          },
-        )
-      },
-    )
+            span.end()
+          })
+        },
+      )
+    })
   }
 }

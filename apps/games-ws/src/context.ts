@@ -8,4 +8,6 @@ export type Context = {
   session: Session
   headers: IncomingHttpHeaders
   url: URL
+  sentryTrace?: string
+  sentryBaggage?: string
 }

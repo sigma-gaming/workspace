@@ -15,6 +15,7 @@ import { Server } from 'socket.io'
 import { App, SSLApp } from 'uWebSockets.js'
 import { GamesPincodeAction } from './actions/games/pincode'
 import { PingAction } from './actions/ping'
+import { SentryTracingAction } from './actions/sentry/tracing'
 import { Context } from './context'
 import { ClientToServerEvents, ServerToClientEvents } from './types'
 import { WsActionGenerator } from './ws-action'
@@ -65,6 +66,7 @@ io.on('connection', async (socket) => {
     socket.on(action.name, action.handler as any)
   }
 
+  registerAction(SentryTracingAction)
   registerAction(PingAction)
   registerAction(GamesPincodeAction)
 })
