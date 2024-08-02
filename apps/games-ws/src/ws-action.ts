@@ -69,12 +69,12 @@ export function createWsAction<
 
     return {
       name,
-      handler: withSentry(name, ctx, actionHandler),
+      handler: withTracing(name, ctx, actionHandler),
     }
   }
 }
 
-export const withSentry = <TInput, TOutput>(
+export const withTracing = <TInput, TOutput>(
   name: string,
   ctx: Context,
   handler: WsActionHandler<TInput, TOutput>,
@@ -84,13 +84,7 @@ export const withSentry = <TInput, TOutput>(
       return handler(input, ack)
     }
 
-    const { sentryTrace, sentryBaggage } = ctx
-
-    if (!sentryTrace || !sentryBaggage) {
-      return handler(input, ack)
-    }
-
-    return Sentry.continueTrace({ sentryTrace, baggage: sentryBaggage }, () => {
+    return Sentry.startNewTrace(() => {
       return Sentry.startSpan(
         {
           name: `WsAction ${name}`,

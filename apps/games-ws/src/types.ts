@@ -5,7 +5,6 @@ import {
   NotificationSelect,
 } from '@dbs/games-schema'
 import { GamesPincodeInput, GamesPincodeOutput } from './actions/games/pincode'
-import { SentryTracingInput } from './actions/sentry/tracing'
 
 export type ServerToClientEvents = {
   'chat/message': (message: ChatMessageSelect) => void
@@ -19,5 +18,4 @@ export type ServerToClientEvents = {
 export type ClientToServerEvents = {
   'ping': WsActionHandler<void, 'pong'>
   'games/pincode': WsActionHandler<GamesPincodeInput, GamesPincodeOutput>
-  'sentry/tracing': WsActionHandler<SentryTracingInput, void>
 }
