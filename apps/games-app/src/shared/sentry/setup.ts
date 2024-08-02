@@ -1,12 +1,17 @@
 import * as Sentry from '@sentry/react'
-import { env } from './shared/env/index.ts'
+import { env } from '../env'
 
 if (process.env.NODE_ENV === 'production') {
   Sentry.init({
     environment: env.stage,
     release: env.gamesApp.version,
     dsn: 'https://SENTRY_DSN_REMOVED',
-    integrations: [Sentry.browserTracingIntegration()],
+    integrations: [
+      Sentry.browserTracingIntegration({
+        traceFetch: false, // Attach headers manually instead
+        traceXHR: false, // Attach headers manually instead
+      }),
+    ],
     tracesSampleRate: 1,
     tracePropagationTargets: [env.gamesApi.url, env.gamesWs.url],
   })

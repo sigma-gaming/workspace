@@ -1,5 +1,5 @@
 import '@core/ui'
-import './setup'
+import './shared/sentry/setup.ts'
 import ReactDOM from 'react-dom/client'
 import { $$app } from './app/model.ts'
 import { AppView } from './app/view.tsx'

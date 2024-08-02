@@ -1,20 +1,8 @@
 import { ClientToServerEvents, ServerToClientEvents } from '@apis/games-ws'
 import { createWsEffect } from '@core/io-client'
-import * as Sentry from '@sentry/react'
 import { io, Socket } from 'socket.io-client'
 import { env } from '../../env'
-
-function getSentryTracing() {
-  const activeSpan = Sentry.getActiveSpan()
-  const rootSpan = activeSpan ? Sentry.getRootSpan(activeSpan) : undefined
-  if (!rootSpan) return null
-
-  const trace = Sentry.spanToTraceHeader(rootSpan)
-  const baggage = Sentry.spanToBaggageHeader(rootSpan)
-  if (!baggage) return null
-
-  return { trace, baggage }
-}
+import { getSentryTracing } from '../../sentry'
 
 export const gamesWs: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   env.gamesWs.url,
