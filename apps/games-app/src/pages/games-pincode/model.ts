@@ -112,7 +112,7 @@ condition({
 
 sample({
   clock: startPlay,
-  filter: not($animationPlaying),
+  filter: and(not($playing), not($animationPlaying)),
   target: form.submit,
 })
 
@@ -172,10 +172,10 @@ sample({
   filter: (record) => record?.outcome === GameOutcome.Win,
   fn: (record) => {
     if (record!.multiplier >= 10000 * 0.95) {
-      return Sound.PincodeBigWin
+      return Sound.WinBigDefault
     }
 
-    return Sound.PincodeWin
+    return Sound.WinDefault
   },
   target: $$audio.play,
 })

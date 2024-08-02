@@ -1,7 +1,27 @@
 .root {
   @apply bg-[#25273E];
+
+  &[data-disabled] {
+    @apply opacity-60;
+  }
 }
 
 .indicator {
   background-color: var(--sc-color, var(--mantine-primary-color-filled));
+}
+
+.label {
+  @apply text-[#b8b8b8];
+
+  &[data-disabled] {
+    @apply text-opacity-60;
+  }
+}
+
+.input:checked + .label {
+  @apply text-white;
+
+  &[data-disabled] {
+    @apply text-opacity-60;
+  }
 }

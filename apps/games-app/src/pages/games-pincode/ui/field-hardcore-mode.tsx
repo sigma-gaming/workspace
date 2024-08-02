@@ -33,6 +33,7 @@ const colorMap: Record<PincodeMode, string> = {
 
 export const HardcoreModeField = () => {
   const value = useUnit($$pincodePage.fields.mode.$value)
+  const autoplaying = useUnit($$pincodePage.$autoplaying)
 
   return (
     <SegmentedControl
@@ -45,6 +46,7 @@ export const HardcoreModeField = () => {
       }
       color={colorMap[value]}
       data={options}
+      disabled={autoplaying}
     />
   )
 }

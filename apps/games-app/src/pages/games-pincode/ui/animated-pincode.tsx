@@ -2,6 +2,7 @@ import { Icons, useLazyAnimate } from '@core/ui'
 import { getPincodeHighlight } from '@games/model'
 import { useUnit } from 'effector-react'
 import { memo, useMemo, useRef } from 'react'
+import { $$profile } from '../../../entities/profile'
 import { $$pincodePage } from '../model'
 import styles from './styles.module.css'
 
@@ -99,14 +100,24 @@ const PincodeNumber = memo(() => {
 })
 
 export const AnimatedPincode = () => {
+  const name = useUnit($$profile.$name)
+
   return (
     <div className="w-full flex items-center justify-center min-h-32 select-none">
-      <div className="relative flex items-center justify-center p-4 aspect-[1.588/1] max-w-[424px] w-full bg-[#25273E] bg-opacity-40 rounded-xl">
-        <div className="hidden sm:flex absolute bottom-4 left-4 items-start gap-2 opacity-25 -rotate-90 origin-top-left translate-y-8">
+      <div className="relative flex items-center justify-center p-4 aspect-[1.588/1] max-w-[424px] w-full bg-[#25273E] bg-opacity-60 rounded-xl">
+        <div className="hidden sm:flex absolute bottom-4 left-4 items-start gap-2 opacity-30 -rotate-90 origin-top-left translate-y-8">
           <Icons.Sigma color="currentColor" width={32} height={32} />
           <p className="text-xl font-medium uppercase leading-tight">Sigma</p>
         </div>
-        <PincodeNumber />
+
+        <p className="hidden sm:block absolute bottom-4 right-4 items-start opacity-30 font-medium leading-none">
+          {name}
+        </p>
+
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-medium opacity-30">Pin</span>
+          <PincodeNumber />
+        </div>
       </div>
     </div>
   )

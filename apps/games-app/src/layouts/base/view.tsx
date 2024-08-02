@@ -1,10 +1,9 @@
-import { useMedia } from '@core/ui'
+import { Icons, useMedia } from '@core/ui'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { CSSProperties, ReactNode } from 'react'
 import { routes } from '../../routing/index.ts'
 import { Chat } from '../../widgets/chat'
-import { Logo } from './logo.tsx'
 import { BaseLayoutMenu } from './menu.tsx'
 import { MiniProfile } from './mini-profile.tsx'
 import { MobileTabs } from './mobile-tabs.tsx'
@@ -68,7 +67,7 @@ const Header = () => {
           to={routes.games}
           className="flex items-center gap-2 p-2 focus-visible:outline-primary rounded-xl"
         >
-          <Logo />
+          <Icons.Sigma />
           <h1 className="hidden lg:block text-4xl leading-none font-text font-bold">
             Sigma
           </h1>

@@ -1,13 +1,15 @@
 import { BadRequestException } from '@core/exceptions'
 import { createField, createForm } from '@core/forms'
 import { createWsEffect } from '@core/io-client'
-import { Game } from '@dbs/games-types'
+import { GameRecordSelect } from '@dbs/games-schema'
+import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { calculateDiceFullWinAmount } from '@games/model'
 import type { Rive } from '@rive-app/react-canvas'
 import { attach, combine, createEvent, createStore, sample } from 'effector'
 import { and, combineEvents, condition, delay, not } from 'patronum'
 import { z } from 'zod'
+import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { $$notifications } from '../../entities/notifications'
 import { $$user } from '../../entities/user'
@@ -47,6 +49,8 @@ const $rive = createStore<Rive | null>(null).on(riveChanged, (_, rive) => rive)
 const $started = createStore(false)
   .on(playGameMutation.finished.success, () => true)
   .reset(reset)
+
+const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
 
 const animationsLoaded = combineEvents({
   events: [startLoaded, animationLoaded],
@@ -188,14 +192,31 @@ const receivedGameSnapshot = receivedGameRecord.filterMap((record) => {
 })
 
 sample({
+  source: receivedGameRecord,
+  target: $lastGame,
+})
+
+sample({
   source: receivedGameSnapshot,
   fn: ({ outputSide }) => `Shake_${outputSide}`,
   target: playAnimationFx,
 })
 
 sample({
+  source: receivedGameSnapshot,
+  target: $$audio.play.prepend(() => Sound.Dice),
+})
+
+sample({
   source: receivedGameRecord,
   target: $$gameHistory.appendMyGame,
+})
+
+sample({
+  clock: animationFinished,
+  source: $lastGame,
+  filter: (record) => record?.outcome === GameOutcome.Win,
+  target: $$audio.play.prepend(() => Sound.WinDefault),
 })
 
 sample({
