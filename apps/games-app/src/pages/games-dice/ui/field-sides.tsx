@@ -30,7 +30,7 @@ export const SidesField = () => {
             <button
               name={`Грань ${label}`}
               type="button"
-              className="block w-full outline-none"
+              className="block w-full outline-none disabled:opacity-60 disabled:cursor-not-allowed"
               onClick={() =>
                 update(
                   sides.includes(value)
