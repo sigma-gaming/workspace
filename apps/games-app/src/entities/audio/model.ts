@@ -10,9 +10,7 @@ export enum Sound {
   Dice = 'dice',
 }
 
-const defaultVolumeMap: Partial<Record<Sound, number>> = {
-  [Sound.Pincode]: 0.75,
-}
+const defaultVolumeMap: Partial<Record<Sound, number>> = {}
 
 const howlMap = Object.values(Sound).reduce(
   (acc, sound) => {
