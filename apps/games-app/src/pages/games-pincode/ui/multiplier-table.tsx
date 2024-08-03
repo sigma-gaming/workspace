@@ -38,52 +38,18 @@ export const MultiplierTable = () => {
       />
 
       <Multiplier
-        label="0000"
+        label="0000-6666"
         multiplier={250}
         color="yellow"
-        highlighted={combination === '0000'}
-      />
-
-      <Multiplier
-        label="1111"
-        multiplier={250}
-        color="yellow"
-        highlighted={combination === '1111'}
-      />
-
-      <Multiplier
-        label="2222"
-        multiplier={250}
-        color="yellow"
-        highlighted={combination === '2222'}
-      />
-
-      <Multiplier
-        label="3333"
-        multiplier={250}
-        color="yellow"
-        highlighted={combination === '3333'}
-      />
-
-      <Multiplier
-        label="4444"
-        multiplier={250}
-        color="yellow"
-        highlighted={combination === '4444'}
-      />
-
-      <Multiplier
-        label="5555"
-        multiplier={250}
-        color="yellow"
-        highlighted={combination === '5555'}
-      />
-
-      <Multiplier
-        label="6666"
-        multiplier={250}
-        color="yellow"
-        highlighted={combination === '6666'}
+        highlighted={
+          combination === '0000' ||
+          combination === '1111' ||
+          combination === '2222' ||
+          combination === '3333' ||
+          combination === '4444' ||
+          combination === '5555' ||
+          combination === '6666'
+        }
       />
 
       <Multiplier
@@ -122,7 +88,7 @@ const Multiplier = ({
   highlighted?: boolean
 }) => {
   return (
-    <div className="w-24 flex items-center justify-center gap-2">
+    <div className="min-w-24 flex items-center justify-center gap-2">
       <span className="text-xs">{label}</span>
       <Badge
         className={clsx(highlighted && styles.multiplierPulse)}

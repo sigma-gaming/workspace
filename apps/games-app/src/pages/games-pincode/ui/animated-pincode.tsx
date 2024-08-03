@@ -130,7 +130,7 @@ export const AnimatedPincode = () => {
           {trimText(name, 20)}
         </p>
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 mt-8 sm:mt-0">
           <span className="text-sm font-medium opacity-30">Pin</span>
           <PincodeNumber />
         </div>

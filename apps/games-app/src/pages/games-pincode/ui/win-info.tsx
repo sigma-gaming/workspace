@@ -20,20 +20,20 @@ export const WinInfo = () => {
     <AnimatePresence>
       {winInfo && (
         <m.div
-          className="absolute top-4 left-4 flex flex-col gap-1 font-medium"
+          className="absolute top-4 left-4 flex flex-col gap-1 sm:gap-1 font-medium"
           variants={container}
           initial="hidden"
           animate="visible"
           exit="hidden"
         >
           <m.span
-            className="text-green-400 text-lg leading-none text-opacity-75"
+            className="text-green-400 text-md sm:text-lg leading-none sm:leading-none text-opacity-75"
             variants={child}
           >
             + {formatGem(winInfo.amount / 100)}g
           </m.span>
           <m.span
-            className="text-green-400 leading-none text-opacity-50"
+            className="text-green-400 text-sm sm:text-base leading-none sm:leading-none text-opacity-50"
             variants={child}
           >
             {Math.round(winInfo.multiplier / 100)}x
