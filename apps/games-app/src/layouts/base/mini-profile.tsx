@@ -7,6 +7,7 @@ import {
   IconLoader2,
   IconLogout,
   IconSettings,
+  IconTicket,
   IconWallet,
 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
@@ -131,6 +132,15 @@ export const MiniProfile = () => {
           }
         >
           {balanceWithdrawing ? 'Выводим деньги...' : 'Вывести деньги'}
+        </Menu.Item>
+
+        <Menu.Item
+          className="text-amber-400"
+          leftSection={
+            <IconTicket style={{ width: rem(16), height: rem(16) }} />
+          }
+        >
+          Ввести промокод
         </Menu.Item>
 
         <Menu.Divider />

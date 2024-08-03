@@ -6,9 +6,11 @@ import {
   Button,
   Card,
   Group,
+  Input,
   LoadingOverlay,
   Select,
   Skeleton,
+  Slider,
   Space,
   Text,
   TextInput,
@@ -16,6 +18,7 @@ import {
 } from '@mantine/core'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
+import { $$audio } from '../../entities/audio/model.ts'
 import { $$profile } from '../../entities/profile/index.ts'
 import {
   ProviderInfoMap,
@@ -31,6 +34,8 @@ export const SettingsPageView = () => {
       <Profile />
       <Space h={36} />
       <SocialNetworks />
+      <Space h={36} />
+      <Audio />
     </>
   )
 }
@@ -232,6 +237,42 @@ const SocialNetworks = () => {
           )}
         </div>
       )}
+    </Card>
+  )
+}
+
+const Audio = () => {
+  const volume = useUnit($$audio.$volume)
+  const changeVolume = useUnit($$audio.changeVolume)
+
+  return (
+    <Card
+      component="form"
+      className="p-4 rounded-xl md:p-6 md:rounded-2xl"
+      style={{ gap: 'var(--mantine-spacing-md)' }}
+    >
+      <Title order={3}>Звуки</Title>
+
+      <div className="flex flex-col">
+        <Input.Label>Громкость</Input.Label>
+        <Input.Description>
+          Сохраняется в браузере. При смене устройства или браузера, вам
+          потребуется заново настроить громкость
+        </Input.Description>
+        <Slider
+          className="mt-2 mb-6"
+          value={volume}
+          onChange={(value) => changeVolume(value)}
+          min={0}
+          max={100}
+          step={1}
+          marks={[
+            { value: 25, label: '25%' },
+            { value: 50, label: '50%' },
+            { value: 75, label: '75%' },
+          ]}
+        />
+      </div>
     </Card>
   )
 }

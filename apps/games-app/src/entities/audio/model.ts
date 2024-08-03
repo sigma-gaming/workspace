@@ -1,5 +1,7 @@
-import { createEffect, createEvent, sample } from 'effector'
+import { createEffect, createEvent, createStore, sample } from 'effector'
+import { persist } from 'effector-storage/local'
 import { Howl } from 'howler'
+import { debounce } from 'patronum'
 
 export enum Sound {
   TopUp = 'top_up',
@@ -10,13 +12,20 @@ export enum Sound {
   Dice = 'dice',
 }
 
-const defaultVolumeMap: Partial<Record<Sound, number>> = {}
+const volumeMultiplierMap: Partial<Record<Sound, number>> = {
+  [Sound.Pincode]: 0.75,
+  [Sound.TopUp]: 0.3,
+}
+
+function getVolumeMultiplier(sound: Sound) {
+  return volumeMultiplierMap[sound] ?? 0.5
+}
 
 const howlMap = Object.values(Sound).reduce(
   (acc, sound) => {
     acc[sound] = new Howl({
       src: [`/sounds/${sound}.mp3`],
-      volume: defaultVolumeMap[sound] ?? 0.5,
+      volume: volumeMultiplierMap[sound] ?? 0.5,
     })
 
     return acc
@@ -25,11 +34,15 @@ const howlMap = Object.values(Sound).reduce(
 )
 
 const play = createEvent<Sound>()
+const changeVolume = createEvent<number>()
 
 const playFx = createEffect((options: { sound: Sound; volume?: number }) => {
   const howl = howlMap[options.sound]
   howl.play()
 })
+
+const $volume = createStore(100).on(changeVolume, (_, volume) => volume)
+persist({ store: $volume, key: 'audio/volume' })
 
 sample({
   source: play,
@@ -37,7 +50,18 @@ sample({
   target: playFx,
 })
 
+sample({
+  source: debounce($volume, 500),
+  target: createEffect((volume: number) => {
+    Object.values(Sound).forEach((sound) => {
+      howlMap[sound].volume((volume / 100) * getVolumeMultiplier(sound))
+    })
+  }),
+})
+
 export const $$audio = {
   play,
   playFx,
+  changeVolume,
+  $volume,
 }

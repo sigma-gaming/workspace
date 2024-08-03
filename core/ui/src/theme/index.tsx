@@ -22,6 +22,7 @@ import {
   SegmentedControl,
   Select,
   Skeleton,
+  Slider,
   Switch,
   Tabs,
   Title,
@@ -50,6 +51,7 @@ import popoverClassNames from './popover.module.css'
 import segmentedControlClassNames from './segmented-control.module.css'
 import selectClassNames from './select.module.css'
 import skeletonClassNames from './skeleton.module.css'
+import sliderClassNames from './slider.module.css'
 import switchClassNames from './switch.module.css'
 import tabsClassNames from './tabs.module.css'
 import titleClassNames from './title.module.css'
@@ -157,6 +159,9 @@ export const theme = createTheme({
     }),
     Badge: Badge.extend({
       classNames: badgeClassNames,
+    }),
+    Slider: Slider.extend({
+      classNames: sliderClassNames,
     }),
   },
 })

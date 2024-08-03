@@ -1,0 +1,7 @@
+.track:before {
+  --track-bg: #25273E;
+}
+
+.label {
+  @apply shadow-border bg-[#25263D];
+}
