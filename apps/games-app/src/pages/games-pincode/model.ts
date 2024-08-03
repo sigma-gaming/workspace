@@ -19,6 +19,11 @@ import { gamesWs } from '../../shared/api/games-ws'
 
 export type PincodeMode = 'easy' | 'hardcore'
 
+type WinInfo = {
+  amount: number
+  multiplier: number
+}
+
 const playGameMutation = createMutation({
   name: 'games/pincode/play',
   effect: createWsEffect(gamesWs, 'games/pincode'),
@@ -35,6 +40,8 @@ const autoplayToggled = createEvent()
 const autoplayChanged = createEvent<boolean>()
 const pincodeChanged = createEvent<number>()
 const highlightCombination = createEvent<string | null>()
+const showWinInfo = createEvent<WinInfo | null>()
+
 const animationFinished = createEvent()
 const reset = createEvent()
 
@@ -55,6 +62,10 @@ const $activePincode = createStore<number>(-1)
 
 const $highlightedCombination = createStore<string | null>(null)
   .on(highlightCombination, (_, combination) => combination)
+  .reset(reset)
+
+const $winInfo = createStore<WinInfo | null>(null)
+  .on(showWinInfo, (_, winInfo) => winInfo)
   .reset(reset)
 
 const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
@@ -197,6 +208,17 @@ sample({
   target: highlightCombination,
 })
 
+sample({
+  clock: animationFinished,
+  source: $lastGame,
+  filter: Boolean,
+  fn: ({ outcome, bet, payout, multiplier }): WinInfo | null =>
+    outcome === GameOutcome.Win
+      ? { amount: bet + payout, multiplier: multiplier + 100 }
+      : null,
+  target: showWinInfo,
+})
+
 const receivedWin = sample({
   source: receivedGameRecord,
   filter: ({ outcome }) => outcome === GameOutcome.Win,
@@ -305,4 +327,5 @@ export const $$pincodePage = {
   $animationPlaying,
   $activePincode,
   $highlightedCombination,
+  $winInfo,
 }

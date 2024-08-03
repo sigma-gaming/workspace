@@ -2,10 +2,15 @@ import { Icons, useLazyAnimate } from '@core/ui'
 import { trimText } from '@core/utils'
 import { getPincodeHighlight } from '@games/model'
 import { useUnit } from 'effector-react'
-import { memo, useMemo, useRef } from 'react'
+import { lazy, memo, Suspense, useMemo, useRef } from 'react'
 import { $$profile } from '../../../entities/profile'
 import { $$pincodePage } from '../model'
 import styles from './styles.module.css'
+
+const WinInfo = lazy(async () => {
+  const module = await import('./win-info')
+  return { default: module.WinInfo }
+})
 
 function formatPincode(number: number) {
   return number.toFixed(0).padStart(4, '0')
@@ -116,6 +121,10 @@ export const AnimatedPincode = () => {
           {mode === 'hardcore' && 'HARDCORE'}
           {mode === 'easy' && 'EASY'}
         </p>
+
+        <Suspense fallback={null}>
+          <WinInfo />
+        </Suspense>
 
         <p className="hidden sm:block absolute bottom-4 right-4 items-start opacity-30 font-medium leading-none">
           {trimText(name, 20)}
