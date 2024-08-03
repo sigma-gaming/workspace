@@ -1,6 +1,7 @@
 import { Icons } from '@core/ui'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome, GameSnapshot } from '@dbs/games-types'
+import { formatGem } from '@games/model'
 import { Card, LoadingOverlay, Tabs, Text } from '@mantine/core'
 import { useIsFirstRender } from '@mantine/hooks'
 import { RouteInstance, RouteParams } from 'atomic-router'
@@ -11,7 +12,6 @@ import { memo, ReactNode, useEffect, useRef } from 'react'
 import { $$user } from '../../entities/user'
 import { $$gameHistory, Tab } from '../../features/game-history'
 import { routes } from '../../routing'
-import { formatGem } from '../../shared/lib/format/currency'
 import styles from './table.module.css'
 
 const gameToLabelMap: Record<Game, string> = {

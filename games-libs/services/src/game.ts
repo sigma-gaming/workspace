@@ -11,6 +11,7 @@ import {
   GameSnapshot,
   TransactionType,
 } from '@dbs/games-types'
+import { gemInt } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
@@ -55,6 +56,7 @@ export class GameService {
       totalWon = 0,
       totalLost = 0,
       totalRTP = 0,
+      wageringRequired = 0,
     } = previousTransaction ?? {}
 
     const rtp = payout + bet
@@ -63,6 +65,8 @@ export class GameService {
 
     const { gameRecord, transaction } = await gamesDb.transaction(
       async (tx) => {
+        const closingBalance = lastBalance + payout
+
         const [{ id: transactionId }] = await tx
           .insert(TransactionTable)
           .values({
@@ -71,11 +75,13 @@ export class GameService {
             game,
             amount: payout,
             openingBalance: lastBalance,
-            closingBalance: lastBalance + payout,
+            closingBalance,
             totalBet: totalBet + bet,
             totalWon: totalWon + won,
             totalLost: totalLost + lost,
             totalRTP: totalRTP + rtp,
+            wageringRequired:
+              closingBalance <= gemInt(1) ? 0 : wageringRequired - bet,
           })
           .returning()
 

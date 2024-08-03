@@ -1,9 +1,9 @@
 import { Icons, useLazyAnimate } from '@core/ui'
+import { formatGem } from '@games/model'
 import { Skeleton, Text } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { memo, useRef } from 'react'
 import { $$balance } from '../../entities/balance'
-import { formatGem } from '../../shared/lib/format/currency.ts'
 
 export const Balance = memo(() => {
   const balanceLoading = useUnit($$balance.$loading)

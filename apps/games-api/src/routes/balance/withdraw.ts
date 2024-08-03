@@ -4,6 +4,7 @@ import {
   RouteException,
 } from '@core/exceptions'
 import { TransactionType } from '@dbs/games-types'
+import { formatGem, gemFloat } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import {
   budgetService,
@@ -23,10 +24,17 @@ export const withdrawRoute = new Hono().post('/', async (ctx) => {
     const lastTransaction = await transactionService.getLastTransaction(user.id)
 
     const lastBalance = lastTransaction?.closingBalance ?? 0
+    const lastWageringRequired = lastTransaction?.wageringRequired ?? 0
 
     if (lastBalance < amount) {
       throw new BadRequestException({
         message: 'Недостаточно голды на балике',
+      })
+    }
+
+    if (lastWageringRequired > 0) {
+      throw new BadRequestException({
+        message: `Нужно отыграть еще ${formatGem(gemFloat(lastWageringRequired))}g`,
       })
     }
 
@@ -44,6 +52,7 @@ export const withdrawRoute = new Hono().post('/', async (ctx) => {
       totalWon: lastTransaction.totalWon,
       totalLost: lastTransaction.totalLost,
       totalRTP: lastTransaction.totalRTP,
+      wageringRequired: 0,
     })
 
     await budgetService.decreaseAvailable(amount)

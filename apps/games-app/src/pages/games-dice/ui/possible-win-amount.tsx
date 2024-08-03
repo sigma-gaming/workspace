@@ -1,3 +1,4 @@
+import { formatGem } from '@games/model'
 import { IconFlame } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
 import { $$dicePage } from '../model.ts'
@@ -12,7 +13,9 @@ export const PossibleWinAmount = () => {
       <p className="text-sm">
         Возможный выигрыш:{' '}
         <span className="text-green-400 font-medium">
-          {sides.length === 0 || sides.length === 6 ? '?' : possibleWinAmount}
+          {sides.length === 0 || sides.length === 6
+            ? '?'
+            : `${formatGem(possibleWinAmount)}g`}
         </span>
       </p>
     </div>

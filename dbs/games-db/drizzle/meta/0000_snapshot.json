@@ -1,10 +1,8 @@
 {
-  "id": "2182e740-e97e-4996-9a3e-220397b591bb",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "5",
-  "dialect": "pg",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "Account": {
+    "public.Account": {
       "name": "Account",
       "schema": "",
       "columns": {
@@ -77,21 +75,21 @@
         "Account_userId_User_id_fk": {
           "name": "Account_userId_User_id_fk",
           "tableFrom": "Account",
-          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Budget": {
+    "public.Budget": {
       "name": "Budget",
       "schema": "",
       "columns": {
@@ -150,7 +148,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "ChatMessage": {
+    "public.ChatMessage": {
       "name": "ChatMessage",
       "schema": "",
       "columns": {
@@ -230,21 +228,21 @@
         "ChatMessage_userId_User_id_fk": {
           "name": "ChatMessage_userId_User_id_fk",
           "tableFrom": "ChatMessage",
-          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "GlobalSettings": {
+    "public.GlobalSettings": {
       "name": "GlobalSettings",
       "schema": "",
       "columns": {
@@ -275,7 +273,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Notification": {
+    "public.Notification": {
       "name": "Notification",
       "schema": "",
       "columns": {
@@ -347,21 +345,21 @@
         "Notification_userId_User_id_fk": {
           "name": "Notification_userId_User_id_fk",
           "tableFrom": "Notification",
-          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "Profile": {
+    "public.Profile": {
       "name": "Profile",
       "schema": "",
       "columns": {
@@ -415,29 +413,29 @@
         "Profile_userId_User_id_fk": {
           "name": "Profile_userId_User_id_fk",
           "tableFrom": "Profile",
-          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "Profile_username_unique": {
           "name": "Profile_username_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "username"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
-    "Session": {
+    "public.Session": {
       "name": "Session",
       "schema": "",
       "columns": {
@@ -478,29 +476,29 @@
         "Session_userId_User_id_fk": {
           "name": "Session_userId_User_id_fk",
           "tableFrom": "Session",
-          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "Session_token_unique": {
           "name": "Session_token_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "token"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       }
     },
-    "Transaction": {
+    "public.Transaction": {
       "name": "Transaction",
       "schema": "",
       "columns": {
@@ -589,21 +587,21 @@
         "Transaction_userId_User_id_fk": {
           "name": "Transaction_userId_User_id_fk",
           "tableFrom": "Transaction",
-          "tableTo": "User",
           "columnsFrom": [
             "userId"
           ],
+          "tableTo": "User",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "User": {
+    "public.User": {
       "name": "User",
       "schema": "",
       "columns": {
@@ -649,58 +647,66 @@
     }
   },
   "enums": {
-    "AccountProvider": {
+    "public.AccountProvider": {
       "name": "AccountProvider",
-      "values": {
-        "VK": "VK",
-        "Telegram": "Telegram"
-      }
+      "schema": "public",
+      "values": [
+        "VK",
+        "Telegram"
+      ]
     },
-    "ChatMessageType": {
+    "public.ChatMessageType": {
       "name": "ChatMessageType",
-      "values": {
-        "UserMessage": "UserMessage",
-        "SystemMessage": "SystemMessage"
-      }
+      "schema": "public",
+      "values": [
+        "UserMessage",
+        "SystemMessage"
+      ]
     },
-    "Game": {
+    "public.Game": {
       "name": "Game",
-      "values": {
-        "Dice": "Dice"
-      }
+      "schema": "public",
+      "values": [
+        "Dice"
+      ]
     },
-    "NotificationKind": {
+    "public.NotificationKind": {
       "name": "NotificationKind",
-      "values": {
-        "Success": "Success",
-        "Info": "Info",
-        "Warning": "Warning",
-        "Failure": "Failure"
-      }
+      "schema": "public",
+      "values": [
+        "Success",
+        "Info",
+        "Warning",
+        "Failure"
+      ]
     },
-    "TransactionType": {
+    "public.TransactionType": {
       "name": "TransactionType",
-      "values": {
-        "Deposit": "Deposit",
-        "Withdrawal": "Withdrawal",
-        "Bet": "Bet",
-        "Win": "Win",
-        "Loss": "Loss"
-      }
+      "schema": "public",
+      "values": [
+        "Deposit",
+        "Withdrawal",
+        "Bet",
+        "Win",
+        "Loss"
+      ]
     },
-    "UserRole": {
+    "public.UserRole": {
       "name": "UserRole",
-      "values": {
-        "User": "User",
-        "Admin": "Admin",
-        "Moderator": "Moderator"
-      }
+      "schema": "public",
+      "values": [
+        "User",
+        "Admin",
+        "Moderator"
+      ]
     }
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "2182e740-e97e-4996-9a3e-220397b591bb",
+  "prevId": "00000000-0000-0000-0000-000000000000"
 }

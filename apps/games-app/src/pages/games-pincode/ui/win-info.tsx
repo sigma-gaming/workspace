@@ -1,6 +1,6 @@
+import { formatGem } from '@games/model'
 import { useUnit } from 'effector-react'
 import { AnimatePresence, m, Variants } from 'framer-motion'
-import { formatGem } from '../../../shared/lib/format/currency'
 import { $$pincodePage } from '../model'
 
 const container: Variants = {

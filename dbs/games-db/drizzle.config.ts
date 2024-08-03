@@ -2,11 +2,11 @@ import { defineConfig } from 'drizzle-kit'
 
 // eslint-disable-next-line import-x/no-default-export
 export default defineConfig({
-  schema: '../games-schema/src/*',
+  schema: '../games-schema/src/*.ts',
   out: './drizzle',
-  driver: 'pg',
+  dialect: 'postgresql',
   dbCredentials: {
-    connectionString: process.env.POSTGRES_URL!,
+    url: process.env.POSTGRES_URL!,
   },
   verbose: true,
   strict: true,

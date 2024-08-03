@@ -8,7 +8,7 @@
   "types": "./src/index.ts",
   "scripts": {
     "copy-env": "copy-env",
-    "migration:generate": "dotenv -e .env.development -- drizzle-kit generate:pg",
+    "migration:generate": "dotenv -e .env.development -- drizzle-kit generate",
     "migration:apply": "node migrate.mjs",
     "migration:apply:dev": "dotenv -e .env.development -- pnpm migration:apply",
     "migration:dev": "pnpm migration:generate && pnpm migration:apply:dev",

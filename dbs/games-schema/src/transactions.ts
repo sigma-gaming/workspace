@@ -17,6 +17,10 @@ export const TransactionTable = pgTable('Transaction', {
   closingBalance: bigint('closingBalance', { mode: 'number' }).notNull(),
   amount: bigint('amount', { mode: 'number' }).notNull(),
 
+  wageringRequired: bigint('wageringRequired', { mode: 'number' })
+    .notNull()
+    .default(0),
+
   totalBet: bigint('totalBet', { mode: 'number' }).notNull().default(0),
   totalWon: bigint('totalWin', { mode: 'number' }).notNull().default(0),
   totalLost: bigint('totalLost', { mode: 'number' }).notNull().default(0),

@@ -77,6 +77,7 @@ export class TransactionService {
       totalWon: sql.placeholder('totalWon'),
       totalLost: sql.placeholder('totalLost'),
       totalRTP: sql.placeholder('totalRTP'),
+      wageringRequired: sql.placeholder('wageringRequired'),
       gameRecordId: null,
     })
     .returning()

@@ -1,0 +1,1 @@
+ALTER TABLE "Transaction" ADD COLUMN "wageringRequired" bigint NOT NULL DEFAULT 0;

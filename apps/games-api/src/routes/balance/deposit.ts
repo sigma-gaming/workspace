@@ -19,6 +19,7 @@ export const depositRoute = new Hono().post('/', async (ctx) => {
     const lastTransaction = await transactionService.getLastTransaction(user.id)
 
     const lastBalance = lastTransaction?.closingBalance ?? 0
+    const lastWageringRequired = lastTransaction?.wageringRequired ?? 0
 
     const newTransaction = await transactionService.createTransaction(user.id, {
       type: TransactionType.Deposit,
@@ -30,6 +31,7 @@ export const depositRoute = new Hono().post('/', async (ctx) => {
       totalWon: lastTransaction?.totalWon ?? 0,
       totalLost: lastTransaction?.totalLost ?? 0,
       totalRTP: lastTransaction?.totalRTP ?? 0,
+      wageringRequired: lastWageringRequired + amount,
     })
 
     await budgetService.increaseAvailable(amount)
