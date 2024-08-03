@@ -1,4 +1,5 @@
 import { Card } from './card.tsx'
+import { Chip } from './chip.tsx'
 import { Connection } from './connection.tsx'
 import { Dice } from './dice.tsx'
 import { Gem } from './gem.tsx'
@@ -24,4 +25,5 @@ export const Icons = {
   Card,
   Connection,
   Sigma,
+  Chip,
 }

@@ -6,19 +6,19 @@
   @apply select-none;
   @apply transition-colors;
 
-  &[data-level="1"] {
+  &[data-color="red"] {
     @apply text-red-400 bg-red-400 bg-opacity-25;
   }
 
-  &[data-level="2"] {
+  &[data-color="orange"] {
     @apply text-orange-400 bg-orange-400 bg-opacity-25;
   }
 
-  &[data-level="3"] {
+  &[data-color="yellow"] {
     @apply text-yellow-400 bg-yellow-400 bg-opacity-25;
   }
 
-  &[data-level="4"] {
+  &[data-color="green"] {
     @apply text-green-400 bg-green-400 bg-opacity-25;
   }
 }

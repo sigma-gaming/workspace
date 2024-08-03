@@ -16,10 +16,10 @@ export const DiceGamePageView = memo(() => {
     <GamePlaygroundLayout
       title="Dice"
       onSubmit={() => $$dicePage.playPressed()}
-      animation={<AnimatedDice />}
-      cornerControls={<Ping />}
+      animationZone={<AnimatedDice />}
+      controlsZone={<Ping />}
       loading={!loaded}
-      fields={
+      formZone={
         <>
           <BetField />
           <SidesField />

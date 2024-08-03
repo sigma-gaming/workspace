@@ -1,4 +1,5 @@
 import { Icons, useLazyAnimate } from '@core/ui'
+import { trimText } from '@core/utils'
 import { getPincodeHighlight } from '@games/model'
 import { useUnit } from 'effector-react'
 import { memo, useMemo, useRef } from 'react'
@@ -101,6 +102,7 @@ const PincodeNumber = memo(() => {
 
 export const AnimatedPincode = () => {
   const name = useUnit($$profile.$name)
+  const mode = useUnit($$pincodePage.fields.mode.$value)
 
   return (
     <div className="w-full flex items-center justify-center min-h-32 select-none">
@@ -110,8 +112,13 @@ export const AnimatedPincode = () => {
           <p className="text-xl font-medium uppercase leading-tight">Sigma</p>
         </div>
 
+        <p className="absolute top-4 right-4 opacity-50 font-medium leading-none">
+          {mode === 'hardcore' && 'HARDCORE'}
+          {mode === 'easy' && 'EASY'}
+        </p>
+
         <p className="hidden sm:block absolute bottom-4 right-4 items-start opacity-30 font-medium leading-none">
-          {name}
+          {trimText(name, 20)}
         </p>
 
         <div className="flex flex-col gap-1">

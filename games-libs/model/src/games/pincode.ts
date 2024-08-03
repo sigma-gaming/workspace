@@ -29,6 +29,21 @@ export const pincodeHighlightMap: Partial<Record<number, number>> = {
   1488: 15,
 }
 
+export const pincodeCombinationMap: Partial<Record<number, string>> = {
+  0: '0000',
+  1111: '1111',
+  2222: '2222',
+  3333: '3333',
+  4444: '4444',
+  5555: '5555',
+  6666: '6666',
+  7777: '7777',
+  8888: '8888',
+  9999: '9999',
+  1337: '1337',
+  1488: '1488',
+}
+
 const CODE_LENGTH = 4
 
 function withBit(bitmask: number, index: number) {
@@ -54,8 +69,16 @@ for (let code = 0; code < 10000; code++) {
   }
 
   let multiplier = 0
-  if (sevenCount === 2) multiplier = 5
-  if (sevenCount === 3) multiplier = 100
+
+  if (sevenCount === 2) {
+    multiplier = 5
+    pincodeCombinationMap[code] = `2x7`
+  }
+
+  if (sevenCount === 3) {
+    multiplier = 100
+    pincodeCombinationMap[code] = `3x7`
+  }
 
   if (multiplier > 0) {
     pincodeMultiplierMap[code] = multiplier
@@ -76,4 +99,8 @@ export function getPincodeHighlight(code: number) {
     hasBit(bitmask, 2),
     hasBit(bitmask, 3),
   ] as const
+}
+
+export function getPincodeCombination(code: number) {
+  return pincodeCombinationMap[code] ?? null
 }

@@ -4,6 +4,7 @@ import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
+import { getPincodeCombination } from '@games/model'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
@@ -33,6 +34,7 @@ const startPlay = createEvent()
 const autoplayToggled = createEvent()
 const autoplayChanged = createEvent<boolean>()
 const pincodeChanged = createEvent<number>()
+const highlightCombination = createEvent<string | null>()
 const animationFinished = createEvent()
 const reset = createEvent()
 
@@ -49,6 +51,10 @@ const $animationPlaying = createStore(false)
 
 const $activePincode = createStore<number>(-1)
   .on(pincodeChanged, (_, pincode) => pincode)
+  .reset(reset)
+
+const $highlightedCombination = createStore<string | null>(null)
+  .on(highlightCombination, (_, combination) => combination)
   .reset(reset)
 
 const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
@@ -180,6 +186,17 @@ sample({
   target: $$audio.play,
 })
 
+sample({
+  clock: animationFinished,
+  source: $lastGame,
+  filter: Boolean,
+  fn: ({ snapshot }) =>
+    snapshot.game === Game.Pincode
+      ? getPincodeCombination(snapshot.outputNumber)
+      : null,
+  target: highlightCombination,
+})
+
 const receivedWin = sample({
   source: receivedGameRecord,
   filter: ({ outcome }) => outcome === GameOutcome.Win,
@@ -287,4 +304,5 @@ export const $$pincodePage = {
   $autoplaying,
   $animationPlaying,
   $activePincode,
+  $highlightedCombination,
 }

@@ -4,9 +4,9 @@ import { createContext, memo, ReactNode, useContext } from 'react'
 type Props = {
   title: string
   onSubmit: () => void
-  animation: ReactNode
-  fields: ReactNode
-  cornerControls?: ReactNode
+  animationZone: ReactNode
+  formZone: ReactNode
+  controlsZone?: ReactNode
   loading?: boolean
 }
 
@@ -37,9 +37,9 @@ export const GamePlaygroundLayout = memo(
   ({
     title,
     loading = false,
-    animation,
-    fields,
-    cornerControls,
+    animationZone,
+    formZone,
+    controlsZone,
     onSubmit,
   }: Props) => {
     return (
@@ -50,21 +50,21 @@ export const GamePlaygroundLayout = memo(
             onSubmit()
           }}
         >
-          <div className="mb-4 flex gap-4 items-center justify-between">
-            <h2 className="font-text text-2xl font-bold">{title}</h2>
-            {cornerControls && (
-              <div className="flex gap-4">{cornerControls}</div>
-            )}
+          <div className="mb-6 flex gap-4 items-center justify-between">
+            <h2 className="font-text text-2xl font-bold leading-none">
+              {title}
+            </h2>
+            {controlsZone && <div className="flex gap-4">{controlsZone}</div>}
           </div>
 
           <div className="flex flex-col xl:flex-row-reverse gap-4">
             <div className="relative grow w-full flex flex-col items-center justify-center shrink-0 xl:max-w-[calc(100%-256px)] overflow-hidden rounded-lg">
               <Loader />
-              {animation}
+              {animationZone}
             </div>
 
             <div className="flex flex-col gap-4 xl:w-[240px] xl:shrink-0">
-              {fields}
+              {formZone}
             </div>
           </div>
         </form>

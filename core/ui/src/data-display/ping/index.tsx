@@ -1,13 +1,20 @@
 import { useRef } from 'react'
 import { useLazyAnimate } from '../../animations'
 import { Icons } from '../../general/icons'
-import styles from './styles.module.css'
+import { Badge } from '../badge'
 
 function calculateLevel(ping: number) {
   if (ping >= 300) return 1
   if (ping >= 200) return 2
   if (ping >= 100) return 3
   return 4
+}
+
+function getBadgeColor(level: 1 | 2 | 3 | 4) {
+  if (level === 1) return 'red'
+  if (level === 2) return 'orange'
+  if (level === 3) return 'yellow'
+  return 'green'
 }
 
 type Props = {
@@ -34,16 +41,21 @@ const LoadedPing = ({ ping }: Props) => {
   })
 
   const level = calculateLevel(ping)
+  const color = getBadgeColor(level)
 
   return (
-    <div className={styles.root} data-level={level}>
+    <Badge
+      color={color}
+      right={
+        <Icons.Connection
+          className="shrink-0"
+          level={level}
+          width={14}
+          height={14}
+        />
+      }
+    >
       <span ref={nodeRef} />
-      <Icons.Connection
-        className="shrink-0"
-        level={level}
-        width={14}
-        height={14}
-      />
-    </div>
+    </Badge>
   )
 }
