@@ -25,7 +25,8 @@ export function createWsEffect<
   return createEffect(async (input: ThisPayload) => {
     const defer = createDefer<ThisOutput>()
 
-    const ack = (_: unknown, result: WsActionResult<ThisOutput>) => {
+    const ack = (_: unknown, result?: WsActionResult<ThisOutput>) => {
+      if (!result) return defer.reject(new InternalServerException())
       if (result[0] === 1) return defer.resolve(result[1])
       const exception = recreateException(result[1])
       defer.reject(exception ?? new InternalServerException())
