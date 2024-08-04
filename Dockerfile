@@ -37,16 +37,19 @@ FROM app-base AS games-app
 WORKDIR /app
 COPY --from=games-app-build /build/apps/games-app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=games-app-build /build/apps/games-app/dist ./
+RUN chmod -R 755 /app
 
 FROM app-base AS control-app
 WORKDIR /app
 COPY --from=build /build/apps/control-app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /build/apps/control-app/dist ./
+RUN chmod -R 755 /app
 
 FROM app-base AS maintenance-app
 WORKDIR /app
 COPY --from=build /build/apps/maintenance-app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /build/apps/maintenance-app/dist ./
+RUN chmod -R 755 /app
 
 # APIs
 
