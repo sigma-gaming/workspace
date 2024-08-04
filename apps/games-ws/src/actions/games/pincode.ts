@@ -4,23 +4,16 @@ import {
 } from '@core/exceptions'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
-import { gemInt, getPincodeMultiplier } from '@games/model'
+import { gemInt, getPincodeMultiplier, PincodeMode } from '@games/model'
 import { gameService, transactionService } from '@games/services'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 import { Context } from '../../context'
 import { createWsAction } from '../../ws-action'
 
-export function runGame(bet: number) {
-  const number = crypto.randomInt(10000)
-  const multiplier = getPincodeMultiplier(number)
-  const hasWon = multiplier > 0
-  const winAmount = Math.ceil(bet * multiplier - bet)
-  return { number, multiplier, hasWon, winAmount }
-}
-
 const InputSchema = z.object({
   bet: z.number().int(),
+  mode: z.nativeEnum(PincodeMode),
 })
 
 export type GamesPincodeInput = z.infer<typeof InputSchema>
@@ -33,7 +26,7 @@ export type GamesPincodeOutput = {
 export const GamesPincodeAction = createWsAction({
   name: 'games/pincode',
   schema: InputSchema,
-  async handler(ctx: Context, { bet }): Promise<GamesPincodeOutput> {
+  async handler(ctx: Context, { bet, mode }): Promise<GamesPincodeOutput> {
     const { session } = ctx
 
     if (!session) {
@@ -63,20 +56,32 @@ export const GamesPincodeAction = createWsAction({
         })
       }
 
-      const { number, hasWon, winAmount } = runGame(bet)
+      const { payout, outcome, snapshot } = await gameService.runGame({
+        runner: () => {
+          const number = crypto.randomInt(10000)
+          const multiplier = getPincodeMultiplier(mode, number)
+          const outcome = multiplier > 0 ? GameOutcome.Win : GameOutcome.Loss
+          const winAmount = Math.ceil(bet * multiplier - bet)
+          const payout = outcome === GameOutcome.Win ? winAmount : -bet
 
-      const payout = hasWon ? winAmount : -bet
+          return {
+            outcome,
+            payout,
+            snapshot: {
+              game: Game.Pincode,
+              outputNumber: number,
+            },
+          }
+        },
+      })
 
       const { gameRecord, transaction } = await gameService.saveGame({
         userId: session.user.id,
         game: Game.Pincode,
         bet,
         payout,
-        snapshot: {
-          game: Game.Pincode,
-          outputNumber: number,
-        },
-        outcome: hasWon ? GameOutcome.Win : GameOutcome.Loss,
+        snapshot,
+        outcome,
         previousTransaction: lastTransaction,
       })
 

@@ -1,7 +1,8 @@
+import { PincodeMode } from '@games/model'
 import { Input, SegmentedControl, SegmentedControlItem } from '@mantine/core'
 import { IconBabyCarriage, IconFlame } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
-import { $$pincodePage, PincodeMode } from '../model'
+import { $$pincodePage } from '../model'
 
 type Option = SegmentedControlItem & { value: PincodeMode }
 
@@ -13,7 +14,7 @@ const options: Option[] = [
         <span>Easy</span>
       </div>
     ),
-    value: 'easy',
+    value: PincodeMode.Easy,
   },
   {
     label: (
@@ -22,7 +23,7 @@ const options: Option[] = [
         <span>Hardcore</span>
       </div>
     ),
-    value: 'hardcore',
+    value: PincodeMode.Hardcore,
   },
 ]
 

@@ -9,7 +9,6 @@ import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { calculateDiceWinAmount, gemInt } from '@games/model'
 import {
-  budgetService,
   gameService,
   sessionService,
   transactionService,
@@ -22,27 +21,13 @@ import { Context } from '../../context'
 import { createWsAction } from '../../ws-action'
 
 export async function runGame(bet: number, sides: number[]) {
-  const unwantedLoss = await budgetService.getUnwantedLoss()
-  const maxLoss = await budgetService.getMaxLoss()
   const uniqueSides = new Set(sides)
   const winAmount = calculateDiceWinAmount(bet, sides)
 
-  let tries = 1
-  if (winAmount > unwantedLoss) tries = 2
-  if (winAmount > maxLoss) tries = Infinity
+  const side = crypto.randomInt(1, 7)
+  const hasWon = uniqueSides.has(side)
 
-  for (let i = 1; i <= tries; i++) {
-    const side = crypto.randomInt(1, 7)
-    const hasWon = uniqueSides.has(side)
-
-    if (hasWon && i < tries) {
-      continue
-    }
-
-    return { side, hasWon, winAmount }
-  }
-
-  throw new Error('Unreachable')
+  return { side, hasWon, winAmount }
 }
 
 const InputSchema = z.object({
@@ -90,21 +75,34 @@ export const GamesDiceAction = createWsAction({
         })
       }
 
-      const { hasWon, winAmount, side } = await runGame(bet, sides)
+      const { payout, outcome, snapshot } = await gameService.runGame({
+        runner: () => {
+          const uniqueSides = new Set(sides)
+          const winAmount = calculateDiceWinAmount(bet, sides)
 
-      const payout = hasWon ? winAmount : -bet
+          const side = crypto.randomInt(1, 7)
+
+          const outcome = uniqueSides.has(side)
+            ? GameOutcome.Win
+            : GameOutcome.Loss
+
+          const payout = outcome === GameOutcome.Win ? winAmount : -bet
+
+          return {
+            outcome,
+            payout,
+            snapshot: { game: Game.Dice, inputSides: sides, outputSide: side },
+          }
+        },
+      })
 
       const { gameRecord, transaction } = await gameService.saveGame({
         userId: session.user.id,
         game: Game.Dice,
         bet,
         payout,
-        snapshot: {
-          game: Game.Dice,
-          inputSides: sides,
-          outputSide: side,
-        },
-        outcome: hasWon ? GameOutcome.Win : GameOutcome.Loss,
+        snapshot,
+        outcome,
         previousTransaction: lastTransaction,
       })
 

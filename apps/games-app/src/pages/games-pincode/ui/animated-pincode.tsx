@@ -38,6 +38,7 @@ function getRandomPlaceholder() {
 
 const PincodeNumber = memo(() => {
   const current = useUnit($$pincodePage.$activePincode)
+  const mode = useUnit($$pincodePage.fields.mode.$value)
   const number1Ref = useRef<HTMLSpanElement>(null)
   const number2Ref = useRef<HTMLSpanElement>(null)
   const number3Ref = useRef<HTMLSpanElement>(null)
@@ -58,7 +59,7 @@ const PincodeNumber = memo(() => {
   }
 
   const highlight = (value: number) => {
-    const highlight = getPincodeHighlight(value)
+    const highlight = getPincodeHighlight(mode, value)
 
     for (const [i, node] of numbers.entries()) {
       const element = node.current

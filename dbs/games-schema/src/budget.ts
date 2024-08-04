@@ -14,10 +14,6 @@ export const BudgetTable = pgTable('Budget', {
   available: bigint('available', { mode: 'number' })
     .notNull()
     .default(100_000_00),
-  unwantedLoss: bigint('unwantedLoss', { mode: 'number' })
-    .notNull()
-    .default(50_000_00),
-  maxLoss: bigint('maxLoss', { mode: 'number' }).notNull().default(100_000_00),
 })
 
 export type BudgetSelect = typeof BudgetTable.$inferSelect

@@ -1,47 +1,114 @@
 /* eslint-disable no-bitwise */
-export const pincodeMultiplierMap: Partial<Record<number, number>> = {
-  0: 250,
-  1111: 250,
-  2222: 250,
-  3333: 250,
-  4444: 250,
-  5555: 250,
-  6666: 250,
-  7777: 1000,
-  8888: 250,
-  9999: 250,
-  1337: 111,
-  1488: 111,
+export enum PincodeMode {
+  Easy = 'easy',
+  Hardcore = 'hardcore',
 }
 
-export const pincodeHighlightMap: Partial<Record<number, number>> = {
-  0: 15,
-  1111: 15,
-  2222: 15,
-  3333: 15,
-  4444: 15,
-  5555: 15,
-  6666: 15,
-  7777: 15,
-  8888: 15,
-  9999: 15,
-  1337: 15,
-  1488: 15,
+type PincodeConfig = {
+  [Mode in PincodeMode]: {
+    multiplierMap: Partial<Record<number, number>>
+    highlightMap: Partial<Record<number, number>>
+    combinationMap: Partial<Record<number, string>>
+  }
 }
 
-export const pincodeCombinationMap: Partial<Record<number, string>> = {
-  0: '0000',
-  1111: '1111',
-  2222: '2222',
-  3333: '3333',
-  4444: '4444',
-  5555: '5555',
-  6666: '6666',
-  7777: '7777',
-  8888: '8888',
-  9999: '9999',
-  1337: '1337',
-  1488: '1488',
+const config: PincodeConfig = {
+  easy: {
+    multiplierMap: {
+      1111: 69,
+      2222: 69,
+      3333: 69,
+      4444: 69,
+      5555: 69,
+      8888: 69,
+      0: 100,
+      9999: 100,
+      1234: 123,
+      4321: 321,
+      1337: 337,
+      1488: 488,
+      6666: 666,
+      7777: 777,
+    },
+    highlightMap: {
+      1111: 15,
+      2222: 15,
+      3333: 15,
+      4444: 15,
+      5555: 15,
+      8888: 15,
+      0: 15,
+      9999: 15,
+      1234: 15,
+      4321: 15,
+      1337: 15,
+      1488: 15,
+      6666: 15,
+      7777: 15,
+    },
+    combinationMap: {
+      0: '0000',
+      1111: '1111',
+      2222: '2222',
+      3333: '3333',
+      4444: '4444',
+      5555: '5555',
+      6666: '6666',
+      7777: '7777',
+      8888: '8888',
+      9999: '9999',
+      1337: '1337',
+      1488: '1488',
+    },
+  },
+  hardcore: {
+    multiplierMap: {
+      1111: 69,
+      2222: 69,
+      3333: 69,
+      4444: 69,
+      5555: 69,
+      8888: 69,
+      0: 100,
+      9999: 100,
+      1234: 123,
+      4321: 321,
+      1337: 337,
+      1488: 488,
+      6666: 666,
+      7777: 777,
+    },
+    highlightMap: {
+      1111: 15,
+      2222: 15,
+      3333: 15,
+      4444: 15,
+      5555: 15,
+      8888: 15,
+      0: 15,
+      9999: 15,
+      1234: 15,
+      4321: 15,
+      1337: 15,
+      1488: 15,
+      6666: 15,
+      7777: 15,
+    },
+    combinationMap: {
+      0: '0000',
+      1111: '1111',
+      2222: '2222',
+      3333: '3333',
+      4444: '4444',
+      5555: '5555',
+      6666: '6666',
+      7777: '7777',
+      8888: '8888',
+      9999: '9999',
+      1337: '1337',
+      1488: '1488',
+    },
+  },
 }
 
 const CODE_LENGTH = 4
@@ -71,27 +138,27 @@ for (let code = 0; code < 10000; code++) {
   let multiplier = 0
 
   if (sevenCount === 2) {
-    multiplier = 5
-    pincodeCombinationMap[code] = `2x7`
+    multiplier = 7
+    config.hardcore.combinationMap[code] = `2x7`
   }
 
   if (sevenCount === 3) {
-    multiplier = 100
-    pincodeCombinationMap[code] = `3x7`
+    multiplier = 77
+    config.hardcore.combinationMap[code] = `3x7`
   }
 
   if (multiplier > 0) {
-    pincodeMultiplierMap[code] = multiplier
-    pincodeHighlightMap[code] = highlightBitmask
+    config.hardcore.multiplierMap[code] = multiplier
+    config.hardcore.highlightMap[code] = highlightBitmask
   }
 }
 
-export function getPincodeMultiplier(code: number) {
-  return pincodeMultiplierMap[code] ?? 0
+export function getPincodeMultiplier(mode: PincodeMode, code: number) {
+  return config[mode].multiplierMap[code] ?? 0
 }
 
-export function getPincodeHighlight(code: number) {
-  const bitmask = pincodeHighlightMap[code] ?? 0
+export function getPincodeHighlight(mode: PincodeMode, code: number) {
+  const bitmask = config[mode].highlightMap[code] ?? 0
 
   return [
     hasBit(bitmask, 0),
@@ -101,6 +168,11 @@ export function getPincodeHighlight(code: number) {
   ] as const
 }
 
-export function getPincodeCombination(code: number) {
-  return pincodeCombinationMap[code] ?? null
+export function getPincodeCombination(mode: PincodeMode, code: number) {
+  return config[mode].combinationMap[code] ?? null
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const __ = {
+  config,
 }

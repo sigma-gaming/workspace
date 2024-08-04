@@ -4,7 +4,7 @@ import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { getPincodeCombination } from '@games/model'
+import { getPincodeCombination, PincodeMode } from '@games/model'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
@@ -16,8 +16,6 @@ import { $$gameHistory } from '../../features/game-history'
 import { $$ping } from '../../features/ping'
 import { routes } from '../../routing'
 import { gamesWs } from '../../shared/api/games-ws'
-
-export type PincodeMode = 'easy' | 'hardcore'
 
 type WinInfo = {
   amount: number
@@ -77,7 +75,7 @@ const fields = {
     persistInitialValue: true,
   }),
   mode: createField<PincodeMode>({
-    emptyValue: 'hardcore',
+    emptyValue: PincodeMode.Hardcore,
     persistKey: 'games/pincode/mode',
     persistInitialValue: true,
   }),
@@ -96,7 +94,7 @@ export const form = createForm({
       .min(1, 'Минимальная ставка - 1 гем')
       .step(0.01, 'Ставка должна быть кратна 0.01')
       .transform((gems) => Math.floor(gems * 100)),
-    mode: z.enum(['easy', 'hardcore']),
+    mode: z.nativeEnum(PincodeMode),
   }),
 })
 
@@ -193,7 +191,8 @@ sample({
   source: $lastGame,
   filter: (record) => record?.outcome === GameOutcome.Win,
   fn: (record) => {
-    if (record!.multiplier >= 10000 * 0.95) {
+    // 100x - bet (1x)
+    if (record!.multiplier >= 9900) {
       return Sound.WinBigDefault
     }
 
@@ -204,11 +203,14 @@ sample({
 
 sample({
   clock: animationFinished,
-  source: $lastGame,
+  source: {
+    lastGame: $lastGame,
+    mode: fields.mode.$value,
+  },
   filter: Boolean,
-  fn: ({ snapshot }) =>
-    snapshot.game === Game.Pincode
-      ? getPincodeCombination(snapshot.outputNumber)
+  fn: ({ lastGame, mode }) =>
+    lastGame?.snapshot.game === Game.Pincode
+      ? getPincodeCombination(mode, lastGame.snapshot.outputNumber)
       : null,
   target: highlightCombination,
 })

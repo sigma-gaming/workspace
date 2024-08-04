@@ -20,8 +20,6 @@ export const CacheVersionToken: InjectionToken<string> = Symbol('CacheVersion')
 export class CacheRegistry {
   budget: GlobalJsonEntityService<BudgetSelect>
   budgetAvailable: GlobalNumberEntityService
-  budgetMaxLoss: GlobalNumberEntityService
-  budgetUnwantedLoss: GlobalNumberEntityService
   budgetSyncedAt: GlobalStringEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
   session: KeyJsonEntityService<Session>
@@ -41,16 +39,6 @@ export class CacheRegistry {
 
     this.budgetAvailable = new GlobalNumberEntityService({
       key: `global:budgetAvailable`,
-      ttl: 60 * 60 * 24, // 1 day
-    })
-
-    this.budgetMaxLoss = new GlobalNumberEntityService({
-      key: `global:budgetMaxLoss`,
-      ttl: 60 * 60 * 24, // 1 day
-    })
-
-    this.budgetUnwantedLoss = new GlobalNumberEntityService({
-      key: `global:budgetUnwantedLoss`,
       ttl: 60 * 60 * 24, // 1 day
     })
 

@@ -15,6 +15,7 @@ import { gemInt } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
+import { budgetService } from './budget'
 import { GameHistoryService } from './game-history'
 import { ProfileService } from './profile'
 
@@ -28,6 +29,12 @@ type SaveGamePayload = {
   previousTransaction?: TransactionSelect | null
 }
 
+type GameRunnerResult = {
+  snapshot: GameSnapshot
+  outcome: GameOutcome
+  payout: number
+}
+
 @singleton()
 export class GameService {
   constructor(
@@ -37,6 +44,31 @@ export class GameService {
 
   lock = async (userId: string, ms = 3000) => {
     return gamesCaches.lastTransaction.lock(userId, ms)
+  }
+
+  runGame = async ({
+    runner,
+    minPayout = 0,
+  }: {
+    runner: () => GameRunnerResult | Promise<GameRunnerResult>
+    minPayout?: number
+  }): Promise<GameRunnerResult> => {
+    const availableBudget = await budgetService.getAvailable()
+
+    if (minPayout > availableBudget) {
+      throw new Error('Budget is not enough')
+    }
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const result = await runner()
+
+      if (result.payout > availableBudget) {
+        continue
+      }
+
+      return result
+    }
   }
 
   saveGame = async ({
@@ -110,8 +142,11 @@ export class GameService {
       },
     )
 
+    budgetService.changeAvailable(-payout)
+    this.gameHistoryService.addGameRecord(gameRecord)
+
     await gamesCaches.lastTransaction.set(userId, transaction)
-    await this.gameHistoryService.addGameRecord(gameRecord)
+
     return { gameRecord, transaction }
   }
 }

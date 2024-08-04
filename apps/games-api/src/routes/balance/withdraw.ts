@@ -6,11 +6,7 @@ import {
 import { TransactionType } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
 import { gamesCaches } from '@games/redis'
-import {
-  budgetService,
-  sessionService,
-  transactionService,
-} from '@games/services'
+import { sessionService, transactionService } from '@games/services'
 import { Hono } from 'hono'
 
 export const withdrawRoute = new Hono().post('/', async (ctx) => {
@@ -54,8 +50,6 @@ export const withdrawRoute = new Hono().post('/', async (ctx) => {
       totalRTP: lastTransaction.totalRTP,
       wageringRequired: 0,
     })
-
-    await budgetService.decreaseAvailable(amount)
 
     return ctx.json({
       status: 'success',

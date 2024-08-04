@@ -41,22 +41,6 @@ export class BudgetService {
     return budget.available
   }
 
-  getUnwantedLoss = async (): Promise<number> => {
-    const cached = await gamesCaches.budgetUnwantedLoss.get()
-    if (cached) return cached
-    const budget = await this.getBudget()
-    await gamesCaches.budgetUnwantedLoss.set(budget.unwantedLoss)
-    return budget.unwantedLoss
-  }
-
-  getMaxLoss = async (): Promise<number> => {
-    const cached = await gamesCaches.budgetMaxLoss.get()
-    if (cached) return cached
-    const budget = await this.getBudget()
-    await gamesCaches.budgetMaxLoss.set(budget.maxLoss)
-    return budget.maxLoss
-  }
-
   getSyncedAt = async (): Promise<Date> => {
     const cached = await gamesCaches.budgetSyncedAt.get()
     if (cached) return new Date(cached)
@@ -79,6 +63,14 @@ export class BudgetService {
       await gamesCaches.budgetAvailable.decrBy(amount)
     } catch (error) {
       logger.error('Failed to decrease budget')
+    }
+  }
+
+  changeAvailable = async (amount: number) => {
+    if (amount > 0) {
+      await this.increaseAvailable(amount)
+    } else {
+      await this.decreaseAvailable(Math.abs(amount))
     }
   }
 }
