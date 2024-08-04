@@ -1,4 +1,4 @@
-import { SegmentedControl, SegmentedControlItem } from '@mantine/core'
+import { Input, SegmentedControl, SegmentedControlItem } from '@mantine/core'
 import { IconBabyCarriage, IconFlame } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
 import { $$pincodePage, PincodeMode } from '../model'
@@ -36,17 +36,20 @@ export const HardcoreModeField = () => {
   const autoplaying = useUnit($$pincodePage.$autoplaying)
 
   return (
-    <SegmentedControl
-      fullWidth
-      withItemsBorders={false}
-      radius="xl"
-      value={value}
-      onChange={(value) =>
-        $$pincodePage.fields.mode.update(value as PincodeMode)
-      }
-      color={colorMap[value]}
-      data={options}
-      disabled={autoplaying}
-    />
+    <div className="flex flex-col gap-2">
+      <Input.Label>Сложность</Input.Label>
+      <SegmentedControl
+        fullWidth
+        withItemsBorders={false}
+        radius="xl"
+        value={value}
+        onChange={(value) =>
+          $$pincodePage.fields.mode.update(value as PincodeMode)
+        }
+        color={colorMap[value]}
+        data={options}
+        disabled={autoplaying}
+      />
+    </div>
   )
 }

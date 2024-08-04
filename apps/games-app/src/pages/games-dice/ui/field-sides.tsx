@@ -1,4 +1,4 @@
-import { InputError, InputLabel } from '@mantine/core'
+import { Input, InputError } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { $$dicePage } from '../model'
 import { Dice } from './dice'
@@ -20,7 +20,7 @@ export const SidesField = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <InputLabel htmlFor="sides-field">Грани</InputLabel>
+      <Input.Label htmlFor="sides-field">Грани</Input.Label>
       <ul
         id="sides-field"
         className="grid grid-cols-3 min-[396px]:grid-cols-4 min-[396px]:max-w-[360px] min-[576px]:grid-cols-6 min-[576px]:max-w-[540px] lg:grid-cols-4 lg:max-w-[360px] xl:grid-cols-3 xl:max-w-none grid-flow-row gap-4"

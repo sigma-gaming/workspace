@@ -5,7 +5,7 @@ import { ActionIcon, Button, Skeleton } from '@mantine/core'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useUnit } from 'effector-react'
-import { memo, UIEventHandler, useCallback, useEffect, useRef } from 'react'
+import { memo, useRef } from 'react'
 import { $$user } from '../../entities/user'
 import { $$chatWidget, ExtendedMessage } from './model'
 
@@ -92,66 +92,15 @@ export const Chat = () => {
 const MessageList = () => {
   const messages = useUnit($$chatWidget.$messages)
   const containerRef = useRef<HTMLDivElement>(null)
-  const previousMessagesCount = useRef(0)
-  const messagesCount = useRef(0)
-  const stickyBottom = useRef(true)
-  const initializedRef = useRef(false)
   const loadingMessages = useUnit($$chatWidget.$loadingMessages)
-
-  const autoscroll = useCallback(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    const lastMessage = container.querySelector(
-      '[data-chat-message]:last-child',
-    )
-
-    if (!lastMessage) return
-
-    if (!initializedRef.current) {
-      lastMessage.scrollIntoView()
-      initializedRef.current = true
-      return
-    }
-
-    const { scrollTop, scrollHeight, clientHeight } = container
-    const lastMessageHeight = lastMessage.clientHeight
-
-    const wasAtBottom =
-      Math.abs(scrollHeight - scrollTop - clientHeight - lastMessageHeight) <=
-      10
-
-    if (wasAtBottom) {
-      lastMessage.scrollIntoView()
-    }
-  }, [])
-
-  useEffect(() => {
-    autoscroll()
-  }, [autoscroll, messages.length])
-
-  useEffect(() => {
-    window.addEventListener('resize', autoscroll)
-    return () => window.removeEventListener('resize', autoscroll)
-  }, [autoscroll])
-
-  const handleScroll: UIEventHandler<HTMLDivElement> = (event) => {
-    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget
-    const scrolledToBottom = scrollHeight - scrollTop === clientHeight
-    if (messagesCount.current !== previousMessagesCount.current) return
-    stickyBottom.current = scrolledToBottom
-  }
 
   return (
     <div
       ref={containerRef}
       className={clsx(
-        'flex-1 scrollbar-hide my-2 flex gap-2 rounded-2xl',
-        loadingMessages
-          ? 'overflow-hidden flex-col-reverse'
-          : 'overflow-auto flex-col',
+        'flex-1 scrollbar-hide my-2 flex gap-2 rounded-2xl flex-col-reverse',
+        loadingMessages ? 'overflow-hidden' : 'overflow-auto',
       )}
-      onScroll={handleScroll}
       data-scroll-lock-scrollable
     >
       {loadingMessages
@@ -159,9 +108,12 @@ const MessageList = () => {
             // eslint-disable-next-line react/no-array-index-key
             return <MessageSkeleton key={`skeleton-${index}`} />
           })
-        : messages.map((message) => {
-            return <Message key={message.id} message={message} />
-          })}
+        : messages
+            .slice()
+            .reverse()
+            .map((message) => {
+              return <Message key={message.id} message={message} />
+            })}
     </div>
   )
 }

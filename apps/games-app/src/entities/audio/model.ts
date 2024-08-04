@@ -56,6 +56,8 @@ sample({
     Object.values(Sound).forEach((sound) => {
       howlMap[sound].volume((volume / 100) * getVolumeMultiplier(sound))
     })
+
+    play(Sound.WinDefault)
   }),
 })
 

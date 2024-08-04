@@ -1,5 +1,5 @@
 import { WithError } from '@core/ui'
-import { ActionIcon, InputLabel, NumberInput } from '@mantine/core'
+import { ActionIcon, Input, NumberInput } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { $$dicePage } from '../model'
 
@@ -10,7 +10,7 @@ export const BetField = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <InputLabel htmlFor="bet-field">Ставка</InputLabel>
+      <Input.Label htmlFor="bet-field">Ставка</Input.Label>
       <div className="flex flex-col">
         <div className="flex flex-row gap-2 items-start">
           <WithError error={errors.bet[0]}>
