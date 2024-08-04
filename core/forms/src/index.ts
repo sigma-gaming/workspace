@@ -64,6 +64,7 @@ type Form<
   update: EventCallable<Partial<TValues>>
   submit: EventCallable<void>
   submitted: Event<TValidated>
+  failed: Event<void>
   updateErrors: EventCallable<Partial<FormErrors<TValues>>>
   setErrors: EventCallable<Partial<FormErrors<TValues>>>
   reset: EventCallable<void>
@@ -227,6 +228,7 @@ export function createForm<
 
   const submit = createEvent()
   const submitted = createEvent<TValidated>()
+  const failed = createEvent()
 
   const reset = createEvent()
   const empty = createEvent()
@@ -349,7 +351,7 @@ export function createForm<
     filter: (result: ValidationResult): result is InvalidResult =>
       !result.valid,
     fn: (result) => result.errors,
-    target: setErrors,
+    target: [setErrors, failed],
   })
 
   sample({
@@ -367,6 +369,7 @@ export function createForm<
     update,
     submit,
     submitted: submitted as Event<TValidated>,
+    failed,
     updateErrors,
     setErrors,
     reset,

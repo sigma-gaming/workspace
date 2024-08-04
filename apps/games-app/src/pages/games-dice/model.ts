@@ -142,6 +142,11 @@ sample({
 })
 
 sample({
+  clock: form.failed,
+  target: autoplayChanged.prepend(() => false),
+})
+
+sample({
   clock: betDoubled,
   source: { bet: fields.bet.$value, balance: $$balance.$available },
   fn: ({ bet, balance }) => {
