@@ -1,7 +1,9 @@
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import { persist } from 'effector-storage/local'
-import { Howl } from 'howler'
+import { Howl, Howler } from 'howler'
 import { debounce } from 'patronum'
+
+Howler.autoSuspend = false
 
 export enum Sound {
   TopUp = 'top_up',
