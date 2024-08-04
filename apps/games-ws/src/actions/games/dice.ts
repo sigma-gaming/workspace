@@ -86,7 +86,7 @@ export const GamesDiceAction = createWsAction({
       if (lastBalance < bet) {
         throw new BadRequestException({
           path: ['bet'],
-          message: 'Голда не на балике',
+          message: 'Недостаточно гемов',
         })
       }
 
@@ -152,7 +152,7 @@ export const playDiceRoute = new Hono().post(
       if (lastBalance < payload.bet) {
         throw new BadRequestException({
           path: ['bet'],
-          message: 'Голда не на балике',
+          message: 'Недостаточно гемов',
         })
       }
 

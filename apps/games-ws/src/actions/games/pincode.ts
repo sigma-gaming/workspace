@@ -59,7 +59,7 @@ export const GamesPincodeAction = createWsAction({
       if (lastBalance < bet) {
         throw new BadRequestException({
           path: ['bet'],
-          message: 'Голда не на балике',
+          message: 'Недостаточно гемов',
         })
       }
 

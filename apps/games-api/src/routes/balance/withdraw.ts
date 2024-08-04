@@ -28,7 +28,7 @@ export const withdrawRoute = new Hono().post('/', async (ctx) => {
 
     if (lastBalance < amount) {
       throw new BadRequestException({
-        message: 'Недостаточно голды на балике',
+        message: 'Недостаточно гемов',
       })
     }
 
