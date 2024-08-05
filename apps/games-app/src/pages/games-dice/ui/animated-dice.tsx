@@ -15,9 +15,10 @@ const AnimatedStartRive = lazy(async () => {
 
 export const AnimatedDice = memo(() => {
   const started = useUnit($$dicePage.$started)
+  const loaded = useUnit($$dicePage.$animationLoaded)
 
   return (
-    <>
+    <div className={clsx('w-full h-64', !loaded && 'invisible')}>
       <div className={clsx('w-full h-64', started && 'hidden')}>
         <Suspense fallback={null}>
           <AnimatedStartRive />
@@ -28,6 +29,6 @@ export const AnimatedDice = memo(() => {
           <AnimatedDiceRive />
         </Suspense>
       </div>
-    </>
+    </div>
   )
 })

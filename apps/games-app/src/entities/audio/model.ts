@@ -1,6 +1,6 @@
+import { Howl, Howler } from '@risenx/howler'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import { persist } from 'effector-storage/local'
-import { Howl, Howler } from 'howler'
 import { debounce } from 'patronum'
 
 Howler.autoSuspend = false
