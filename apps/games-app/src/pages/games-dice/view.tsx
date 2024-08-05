@@ -19,14 +19,14 @@ export const DiceGamePageView = memo(() => {
       animationZone={<AnimatedDice />}
       controlsZone={<Ping />}
       loading={!loaded}
-      formZone={
+      fieldsZone={
         <>
           <BetField />
           <SidesField />
           <PossibleWinAmount />
-          <FormActions />
         </>
       }
+      actionsZone={<FormActions />}
     />
   )
 })

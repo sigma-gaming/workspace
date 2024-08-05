@@ -1,11 +1,15 @@
-import { LoadingOverlay } from '@mantine/core'
-import { createContext, memo, ReactNode, useContext } from 'react'
+import { useMedia } from '@core/ui'
+import { Button, Collapse, LoadingOverlay } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
+import { IconEye, IconEyeClosed } from '@tabler/icons-react'
+import { createContext, memo, ReactNode, useContext, useEffect } from 'react'
 
 type Props = {
   title: string
   onSubmit: () => void
   animationZone: ReactNode
-  formZone: ReactNode
+  fieldsZone: ReactNode
+  actionsZone: ReactNode
   controlsZone?: ReactNode
   loading?: boolean
 }
@@ -38,7 +42,8 @@ export const GamePlaygroundLayout = memo(
     title,
     loading = false,
     animationZone,
-    formZone,
+    fieldsZone,
+    actionsZone,
     controlsZone,
     onSubmit,
   }: Props) => {
@@ -54,6 +59,7 @@ export const GamePlaygroundLayout = memo(
             <h2 className="font-text text-2xl font-bold leading-none">
               {title}
             </h2>
+
             {controlsZone && <div className="flex gap-4">{controlsZone}</div>}
           </div>
 
@@ -63,12 +69,47 @@ export const GamePlaygroundLayout = memo(
               {animationZone}
             </div>
 
-            <div className="flex flex-col gap-4 xl:w-[240px] xl:shrink-0">
-              {formZone}
-            </div>
+            <FormZone fieldsZone={fieldsZone} actionsZone={actionsZone} />
           </div>
         </form>
       </GamePlaygroundContext.Provider>
     )
   },
 )
+
+const FormZone = ({
+  fieldsZone,
+  actionsZone,
+}: Pick<Props, 'fieldsZone' | 'actionsZone'>) => {
+  const [formOpened, { toggle: toggleForm, open: openForm }] =
+    useDisclosure(true)
+
+  const isTabletPlus = useMedia({ from: 'sm' })
+
+  useEffect(() => {
+    if (!formOpened && isTabletPlus) {
+      openForm()
+    }
+  }, [formOpened, isTabletPlus, openForm])
+
+  return (
+    <div className="flex flex-col gap-4 xl:w-[240px] xl:shrink-0">
+      <Collapse in={formOpened}>
+        <div className="flex flex-col gap-4 w-full">{fieldsZone}</div>
+      </Collapse>
+
+      <div className="flex flex-col gap-4 w-full mt-auto">{actionsZone}</div>
+
+      <Button
+        className="sm:hidden"
+        color="violet"
+        onClick={toggleForm}
+        leftSection={
+          formOpened ? <IconEyeClosed size={20} /> : <IconEye size={20} />
+        }
+      >
+        {formOpened ? 'Скрыть форму' : 'Показать форму'}
+      </Button>
+    </div>
+  )
+}

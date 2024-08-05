@@ -20,13 +20,13 @@ export const PincodeGamePageView = memo(() => {
         </div>
       }
       controlsZone={<Ping />}
-      formZone={
+      fieldsZone={
         <>
           <BetField />
           <HardcoreModeField />
-          <FormActions />
         </>
       }
+      actionsZone={<FormActions />}
     />
   )
 })

@@ -9,7 +9,7 @@ export const FormActions = () => {
   const loaded = useUnit($$dicePage.$animationLoaded)
 
   return (
-    <div className="flex flex-col gap-3 mt-2">
+    <div className="flex flex-col gap-3">
       <Button
         type="submit"
         disabled={!loaded || autoplaying || animationPlaying}
