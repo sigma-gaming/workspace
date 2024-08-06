@@ -4,6 +4,7 @@ import { GameRecordTable } from './game-records'
 import { ProfileTable } from './profiles'
 import { SessionTable } from './sessions'
 import { TransactionTable } from './transactions'
+import { UserSecurityTable } from './user-security'
 import { UserTable } from './users'
 
 export const UserRelations = relations(UserTable, ({ one, many }) => ({
@@ -15,4 +16,8 @@ export const UserRelations = relations(UserTable, ({ one, many }) => ({
   sessions: many(SessionTable),
   transactions: many(TransactionTable),
   gameRecords: many(GameRecordTable),
+  userSecurity: one(UserSecurityTable, {
+    fields: [UserTable.securityId],
+    references: [UserSecurityTable.id],
+  }),
 }))

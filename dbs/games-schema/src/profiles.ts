@@ -13,6 +13,7 @@ export const ProfileTable = pgTable('Profile', {
   name: text('name'),
   username: text('username').unique(),
   usedProvider: accountProviderEnum('usedProvider').notNull(),
+
   userId: uuid('userId')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),

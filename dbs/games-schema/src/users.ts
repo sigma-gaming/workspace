@@ -16,6 +16,7 @@ export const UserTable = pgTable('User', {
     .default(sql`'{"User"}'`),
 
   profileId: integer('profileId'),
+  securityId: uuid('securityId'),
 })
 
 export type UserSelect = typeof UserTable.$inferSelect

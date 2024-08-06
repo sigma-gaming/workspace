@@ -1,3 +1,5 @@
+import { PaymentFailureCallbackPage } from './callbacks/payment-failure'
+import { PaymentSuccessCallbackPage } from './callbacks/payment-success'
 import { TelegramCallbackPage } from './callbacks/telegram'
 import { VkCallbackPage } from './callbacks/vk'
 import { GamesPage } from './games'
@@ -12,4 +14,6 @@ export const PAGES = [
   SettingsPage,
   VkCallbackPage,
   TelegramCallbackPage,
+  PaymentSuccessCallbackPage,
+  PaymentFailureCallbackPage,
 ]
