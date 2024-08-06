@@ -1,4 +1,3 @@
 .root {
-  @apply font-text;
   color: var(--mantine-color-text);
 }

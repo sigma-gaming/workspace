@@ -26,7 +26,7 @@ export const Chat = () => {
 
   return (
     <div className="flex flex-col gap-2 h-full">
-      <h2 className="font-text text-2xl font-bold m-0">Чат</h2>
+      <h2 className="text-2xl font-medium m-0">Чат</h2>
       <MessageList />
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <form

@@ -3,6 +3,8 @@ import { createEffect, createEvent, createStore, sample } from 'effector'
 import { persist } from 'effector-storage/local'
 import { debounce } from 'patronum'
 
+const initialize = createEvent()
+
 Howler.autoSuspend = false
 
 export enum Sound {
@@ -27,7 +29,7 @@ const howlMap = Object.values(Sound).reduce(
   (acc, sound) => {
     acc[sound] = new Howl({
       src: [`/sounds/${sound}.mp3`],
-      volume: volumeMultiplierMap[sound] ?? 0.5,
+      volume: getVolumeMultiplier(sound),
     })
 
     return acc
@@ -52,18 +54,27 @@ sample({
   target: playFx,
 })
 
+const setVolumeFx = createEffect((volume: number) => {
+  Object.values(Sound).forEach((sound) => {
+    howlMap[sound].volume((volume / 100) * getVolumeMultiplier(sound))
+  })
+
+  play(Sound.WinDefault)
+})
+
+sample({
+  clock: initialize,
+  source: $volume,
+  target: setVolumeFx,
+})
+
 sample({
   source: debounce($volume, 500),
-  target: createEffect((volume: number) => {
-    Object.values(Sound).forEach((sound) => {
-      howlMap[sound].volume((volume / 100) * getVolumeMultiplier(sound))
-    })
-
-    play(Sound.WinDefault)
-  }),
+  target: setVolumeFx,
 })
 
 export const $$audio = {
+  initialize,
   play,
   playFx,
   changeVolume,

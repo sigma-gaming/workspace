@@ -11,7 +11,9 @@ export const Balance = memo(() => {
   return (
     <div className="flex flex-col gap-1 items-end">
       <Skeleton visible={balanceLoading} width="fit-content">
-        <Text className="!leading-tight text-xs lg:text-sm">Баланс</Text>
+        <Text className="!leading-tight text-xs lg:text-sm select-none">
+          Баланс
+        </Text>
       </Skeleton>
       <Skeleton
         visible={balanceLoading}

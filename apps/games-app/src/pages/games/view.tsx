@@ -23,7 +23,7 @@ const GameCard = ({ route, label, imageSrc }: GameCardProps) => {
   return (
     <Link
       to={route}
-      className="relative block w-full h-full aspect-square rounded-2xl overflow-hidden transition-all ease-in-out hover:opacity-90 hover:-translate-y-0.5 bg-[#232337]"
+      className="relative block w-full h-full aspect-square rounded-2xl overflow-hidden transition-all ease-in-out hover:opacity-90 hover:-translate-y-0.5 bg-[#232337] select-none"
     >
       <img
         src={imageSrc}

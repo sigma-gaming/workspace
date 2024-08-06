@@ -1,6 +1,5 @@
-import { LinkAnchor } from '@core/ui'
-import { rem, Text, Title } from '@mantine/core'
-import { IconError404 } from '@tabler/icons-react'
+import { Icons, LinkAnchor } from '@core/ui'
+import { Text } from '@mantine/core'
 import { CenteredLayout } from '../../layouts/centered'
 import { routes } from '../../routing'
 
@@ -9,15 +8,12 @@ export const NotFoundPageView = () => {
     <CenteredLayout>
       <div className="flex flex-col items-center gap-4 max-w-[320px]">
         <div className="flex flex-col items-center gap-4">
-          <IconError404
-            color="orange"
-            style={{ width: rem(128), height: rem(128) }}
-          />
-          <Title order={2} className="text-center" lh="1.2">
+          <Icons.NotFound color="orange" width={128} height={128} />
+          <h1 className="text-2xl font-medium text-center">
             Упс! Здесь ничего нет
-          </Title>
+          </h1>
         </div>
-        <Text className="text-center" size="lg" lh="md">
+        <Text className="text-center" size="md" lh="md">
           <LinkAnchor to={routes.games}>Вернуться на главную</LinkAnchor>
         </Text>
       </div>

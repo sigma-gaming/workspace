@@ -56,9 +56,7 @@ export const GamePlaygroundLayout = memo(
           }}
         >
           <div className="mb-6 flex gap-4 items-center justify-between">
-            <h2 className="font-text text-2xl font-bold leading-none">
-              {title}
-            </h2>
+            <h2 className="text-2xl font-medium leading-none">{title}</h2>
 
             {controlsZone && <div className="flex gap-4">{controlsZone}</div>}
           </div>

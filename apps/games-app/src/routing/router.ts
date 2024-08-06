@@ -1,5 +1,7 @@
 import { createHistoryRouter } from 'atomic-router'
 import {
+  affiliate,
+  bonuses,
   diceGame,
   games,
   paymentFailureCallback,
@@ -15,6 +17,8 @@ const routes = [
   { path: '/games/dice', route: diceGame },
   { path: '/games/pincode', route: pincodeGame },
   { path: '/settings', route: settings },
+  { path: '/bonuses', route: bonuses },
+  { path: '/affiliate', route: affiliate },
   { path: '/callbacks/vk', route: vkCallback },
   { path: '/callbacks/telegram', route: telegramCallback },
   { path: '/callbacks/payment/success', route: paymentSuccessCallback },

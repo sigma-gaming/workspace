@@ -1,5 +1,5 @@
 import { LinkAnchor } from '@core/ui'
-import { rem, Text, Title } from '@mantine/core'
+import { rem, Text } from '@mantine/core'
 import { IconCheck } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
 import { routes } from '../../../routing'
@@ -15,11 +15,11 @@ export const PaymentSuccessPageView = () => {
           className="text-green-500"
           style={{ width: rem(128), height: rem(128) }}
         />
-        <Title order={2} className="text-center" lh="1.2">
+        <h1 className="text-2xl font-medium text-center">
           Баланс успешно пополнен
-        </Title>
+        </h1>
       </div>
-      <Text className="text-center" size="lg" lh="md">
+      <Text className="text-center" size="md" lh="md">
         <LinkAnchor to={routes.games}>
           Вернуться на главную ({secondsToRedirect})
         </LinkAnchor>

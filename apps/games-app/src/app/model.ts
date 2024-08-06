@@ -1,6 +1,7 @@
 import { createEvent, sample } from 'effector'
 import { createBrowserHistory } from 'history'
 import { not } from 'patronum'
+import { $$audio } from '../entities/audio'
 import { $$balance } from '../entities/balance'
 import { $$profile } from '../entities/profile'
 import { $$user } from '../entities/user'
@@ -26,6 +27,7 @@ sample({
 sample({
   clock: started,
   target: [
+    $$audio.initialize,
     $$notificationEvents.initialize,
     $$chatWidget.initialize,
     $$maintenance.startChecking,

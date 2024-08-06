@@ -68,7 +68,7 @@ const Profile = () => {
     >
       <LoadingOverlay visible={updatingProfile} />
 
-      <Title order={3}>Профиль</Title>
+      <h3 className="text-2xl font-medium">Профиль</h3>
 
       <Skeleton className="sm:w-fit" visible={!loaded}>
         <WithError error={errors.username[0]} position="right">
@@ -145,7 +145,7 @@ const SocialNetworks = () => {
       className="p-4 rounded-xl md:p-6 md:rounded-2xl"
       style={{ gap: 'var(--mantine-spacing-md)' }}
     >
-      <Title order={3}>Социальные сети</Title>
+      <h3 className="text-2xl font-medium">Социальные сети</h3>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {loaded
@@ -251,7 +251,7 @@ const Audio = () => {
       className="p-4 rounded-xl md:p-6 md:rounded-2xl"
       style={{ gap: 'var(--mantine-spacing-md)' }}
     >
-      <Title order={3}>Звуки</Title>
+      <h3 className="text-2xl font-medium">Звуки</h3>
 
       <div className="flex flex-col">
         <Input.Label>Громкость</Input.Label>

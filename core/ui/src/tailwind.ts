@@ -91,7 +91,10 @@ export function createConfig(config: { content: string[] }): Config {
           text: `DM Sans, sans-serif`,
           interface: `Rubik, sans-serif`,
         },
-        colors: tailwindColors,
+        colors: {
+          ...tailwindColors,
+          dimmed: 'var(--mantine-color-dimmed)',
+        },
       },
     },
   }

@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { CSSProperties, ReactNode } from 'react'
 import { routes } from '../../routing/index.ts'
 import { Chat } from '../../widgets/chat'
+import { Copyright } from '../../widgets/copyright/index.tsx'
 import { BaseLayoutMenu } from './menu.tsx'
 import { MiniProfile } from './mini-profile.tsx'
 import { MobileTabs } from './mobile-tabs.tsx'
@@ -82,8 +83,11 @@ const Header = () => {
 
 const Left = () => {
   return (
-    <div className="fixed top-[112px] left-0 bottom-0 w-[280px] p-6 pt-0">
+    <div className="fixed top-[112px] left-0 bottom-0 flex flex-col gap-4 w-[280px] p-6 pt-0">
       <BaseLayoutMenu />
+      <div className="mt-auto">
+        <Copyright />
+      </div>
     </div>
   )
 }

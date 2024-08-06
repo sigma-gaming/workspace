@@ -21,6 +21,20 @@ export const BaseLayoutMenu = ({ onNavigate }: { onNavigate?: () => void }) => {
           Pincode
         </MenuLink>
       </MenuSection>
+      <MenuSection label="Бонусы">
+        <MenuLink
+          to={routes.bonuses}
+          icon={<Icons.Sparkle width={24} height={24} />}
+        >
+          Бонусы
+        </MenuLink>
+        <MenuLink
+          to={routes.affiliate}
+          icon={<Icons.Announcement width={24} height={24} />}
+        >
+          Партнерам
+        </MenuLink>
+      </MenuSection>
     </Menu>
   )
 }

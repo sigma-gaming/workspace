@@ -1,4 +1,4 @@
-import { Text, Title } from '@mantine/core'
+import { Text } from '@mantine/core'
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
@@ -22,7 +22,9 @@ export const Menu = ({
 }: PropsWithChildren<MenuProps>) => {
   return (
     <MenuContext.Provider value={{ onNavigate }}>
-      <div className={clsx(className, 'flex flex-col gap-2')}>{children}</div>
+      <div className={clsx(className, 'flex flex-col gap-2 select-none')}>
+        {children}
+      </div>
     </MenuContext.Provider>
   )
 }
@@ -33,12 +35,9 @@ export const MenuSection = ({
 }: PropsWithChildren<{ label: string }>) => {
   return (
     <div className="flex flex-col gap-2 mt-4">
-      <Title
-        className="px-4 uppercase text-sm mb-1 text-[color:var(--mantine-color-dimmed)]"
-        order={3}
-      >
+      <h3 className="px-4 text-base font-medium mb-1 text-[color:var(--mantine-color-dimmed)]">
         {label}
-      </Title>
+      </h3>
       {children}
     </div>
   )
