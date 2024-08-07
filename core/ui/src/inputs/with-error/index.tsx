@@ -16,6 +16,7 @@ export const WithError = ({ error, position, children }: Props) => {
   return (
     <Popover
       opened={Boolean(error)}
+      zIndex={50}
       withArrow
       position={position}
       middlewares={{

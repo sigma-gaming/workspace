@@ -2,7 +2,7 @@ import { IconCategory2, IconMenu2, IconMessage } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { disablePageScroll, enablePageScroll } from 'scroll-lock'
 import { router, routes } from '../../routing'
 import { Chat } from '../../widgets/chat'
@@ -15,7 +15,8 @@ enum Tab {
 
 export const MobileTabs = () => {
   const [tab, setTab] = useState<Tab | null>(null)
-  const isAtHome = useUnit(router.$activeRoutes).includes(routes.games)
+  const activeRoutes = useUnit(router.$activeRoutes)
+  const isAtHome = activeRoutes.includes(routes.games)
 
   const toggle = (tab: Tab) => {
     setTab((previous) => (previous === tab ? null : tab))
@@ -35,9 +36,13 @@ export const MobileTabs = () => {
     }
   }, [tab])
 
+  useEffect(() => {
+    setTab(null)
+  }, [activeRoutes])
+
   return (
     <>
-      <div className="fixed z-[400] left-0 right-0 bottom-0 bg-[#1B1C2F] flex justify-around h-[--tabs-height] px-4 bg-opacity-80 backdrop-blur-md shadow-border">
+      <div className="fixed z-[200] left-0 right-0 bottom-0 bg-[#1B1C2F] flex justify-around h-[--tabs-height] px-4 bg-opacity-80 backdrop-blur-md shadow-border">
         <button
           className={clsx(
             'relative flex flex-col gap-0.5 w-12 items-center justify-center',
@@ -82,17 +87,17 @@ export const MobileTabs = () => {
 
       {tab === Tab.Menu && (
         <div
-          className="fixed z-[350] inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]"
+          className="fixed z-[100] inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623] overflow-y-auto"
           data-scroll-lock-scrollable
         >
-          <div className="px-4 py-6 h-full">
-            <BaseLayoutMenu onNavigate={() => setTab(null)} />
+          <div className="px-4 py-6">
+            <BaseLayoutMenu />
           </div>
         </div>
       )}
 
       {tab === Tab.Chat && (
-        <div className="fixed z-[350] inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]">
+        <div className="fixed z-[100] inset-0 pt-[--header-height] pb-[--tabs-height] bg-[#181623]">
           <div className="px-4 py-6 h-full">
             <Chat />
           </div>

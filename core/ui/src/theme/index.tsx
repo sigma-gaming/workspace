@@ -80,7 +80,7 @@ export const theme = createTheme({
     }),
     Notifications: Notifications.extend({
       classNames: notificationsClassNames,
-      defaultProps: { zIndex: 290 },
+      defaultProps: { zIndex: 150 },
     }),
     Title: Title.extend({
       classNames: titleClassNames,
@@ -103,7 +103,7 @@ export const theme = createTheme({
     Modal: Modal.extend({
       classNames: modalClassNames,
       defaultProps: {
-        zIndex: 500,
+        zIndex: 300,
       },
     }),
     ModalCloseButton: Modal.CloseButton.extend({
@@ -130,7 +130,7 @@ export const theme = createTheme({
     }),
     LoadingOverlay: LoadingOverlay.extend({
       classNames: loadingOverlayClassNames,
-      defaultProps: { zIndex: 150 },
+      defaultProps: { zIndex: 40 },
     }),
     Pill: Pill.extend({
       classNames: pillClassNames,

@@ -50,7 +50,7 @@ export const MiniProfile = () => {
       position="bottom-end"
       offset={isMobile ? 32 : 16}
       disabled={userLoading}
-      zIndex={450}
+      zIndex={250}
     >
       <Menu.Target>
         <div
