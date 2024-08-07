@@ -41,17 +41,21 @@ export const BaseLayout = ({ className, children }: Props) => {
   return (
     <div className="min-h-full flex flex-col" style={cssVariablesStyle}>
       <Header />
-      <main
+      <div
         className={clsx(
-          className,
-          'pb-4 lg:pb-6',
+          'grow flex flex-col gap-6 pb-4 lg:pb-6',
           leftVisible ? 'pl-[280px]' : 'pl-4 lg:pl-6',
           rightVisible ? 'pr-[320px]' : 'pr-4 lg:pr-6',
           isMobile && 'pt-6 pb-[84px]',
         )}
       >
-        {children}
-      </main>
+        <main className={className}>{children}</main>
+        {isMobile && (
+          <footer className="mt-auto pt-12">
+            <Copyright className="text-sm text-center" />
+          </footer>
+        )}
+      </div>
       {leftVisible && <Left />}
       {rightVisible && <Right />}
       {isMobile && <MobileTabs />}
