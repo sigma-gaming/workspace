@@ -102,6 +102,9 @@ export const theme = createTheme({
     }),
     Modal: Modal.extend({
       classNames: modalClassNames,
+      defaultProps: {
+        zIndex: 500,
+      },
     }),
     ModalCloseButton: Modal.CloseButton.extend({
       defaultProps: {

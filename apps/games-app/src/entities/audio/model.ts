@@ -37,6 +37,12 @@ const howlMap = Object.values(Sound).reduce(
   {} as Record<Sound, Howl>,
 )
 
+const setVolumeFx = createEffect((volume: number) => {
+  Object.values(Sound).forEach((sound) => {
+    howlMap[sound].volume((volume / 100) * getVolumeMultiplier(sound))
+  })
+})
+
 const play = createEvent<Sound>()
 const changeVolume = createEvent<number>()
 
@@ -54,14 +60,6 @@ sample({
   target: playFx,
 })
 
-const setVolumeFx = createEffect((volume: number) => {
-  Object.values(Sound).forEach((sound) => {
-    howlMap[sound].volume((volume / 100) * getVolumeMultiplier(sound))
-  })
-
-  play(Sound.WinDefault)
-})
-
 sample({
   clock: initialize,
   source: $volume,
@@ -70,7 +68,7 @@ sample({
 
 sample({
   source: debounce($volume, 500),
-  target: setVolumeFx,
+  target: [setVolumeFx, play.prepend(() => Sound.WinDefault)],
 })
 
 export const $$audio = {

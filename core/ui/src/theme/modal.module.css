@@ -8,11 +8,11 @@
 }
 
 .header {
-  background-color: transparent;
+  background: linear-gradient(180deg, #25273c, rgba(37, 39, 60, 0.95) 50%, rgba(37, 39, 60, 0.8) 70%, rgba(37, 39, 60, 0.4) 85%, rgba(37, 39, 60, 0));
 }
 
 .title {
-  @apply text-lg font-semibold text-white;
+  @apply text-lg font-medium;
 }
 
 .body {
