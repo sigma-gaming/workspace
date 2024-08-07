@@ -1,0 +1,3 @@
+.root[data-orientation="horizontal"] {
+  @apply border-[#25273e];
+}

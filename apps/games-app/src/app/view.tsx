@@ -1,5 +1,5 @@
 import './global.css'
-import { ThemeProvider, useMedia } from '@core/ui'
+import { ThemeProvider } from '@core/ui'
 import { Notifications } from '@mantine/notifications'
 import { createRoutesView, RouterProvider } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
@@ -56,8 +56,6 @@ const OptimizedPages = () => {
 }
 
 export const AppView = () => {
-  const isMobile = useMedia({ to: 'md' })
-
   return (
     <LazyMotion strict features={loadFramerFeatures}>
       <RouterProvider router={router}>
@@ -66,7 +64,7 @@ export const AppView = () => {
             limit={3}
             position="bottom-left"
             containerWidth={320}
-            bottom={isMobile ? 64 : 'var(--mantine-spacing-md)'}
+            bottom="calc(var(--tabs-height) + 16px)"
           />
           <OptimizedPages />
           <MaintenanceOverlay />

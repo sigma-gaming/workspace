@@ -7,6 +7,7 @@ import {
   Checkbox,
   createTheme,
   CSSVariablesResolver,
+  Divider,
   Input,
   InputError,
   InputWrapper,
@@ -37,6 +38,7 @@ import badgeClassNames from './badge.module.css'
 import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
 import checkboxClassNames from './checkbox.module.css'
+import dividerClassNames from './divider.module.css'
 import inputClassNames from './input.module.css'
 import inputWrapperClassNames from './input-wrapper.module.css'
 import loadingOverlayClassNames from './loading-overlay.module.css'
@@ -44,7 +46,6 @@ import menuClassNames from './menu.module.css'
 import modalClassNames from './modal.module.css'
 import multiSelectClassNames from './multi-select.module.css'
 import notificationClassNames from './notification.module.css'
-import notificationsClassNames from './notifications.module.css'
 import numberInputClassNames from './number-input.module.css'
 import pillClassNames from './pill.module.css'
 import popoverClassNames from './popover.module.css'
@@ -79,7 +80,6 @@ export const theme = createTheme({
       classNames: notificationClassNames,
     }),
     Notifications: Notifications.extend({
-      classNames: notificationsClassNames,
       defaultProps: { zIndex: 150 },
     }),
     Title: Title.extend({
@@ -96,6 +96,9 @@ export const theme = createTheme({
     }),
     InputError: InputError.extend({
       defaultProps: { display: 'none' },
+    }),
+    Divider: Divider.extend({
+      classNames: dividerClassNames,
     }),
     Card: Card.extend({
       classNames: cardClassNames,

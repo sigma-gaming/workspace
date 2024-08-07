@@ -1,7 +1,8 @@
 import { Icons, useMedia } from '@core/ui'
+import { Divider } from '@mantine/core'
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
-import { CSSProperties, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { routes } from '../../routing/index.ts'
 import { Chat } from '../../widgets/chat'
 import { Copyright } from '../../widgets/copyright/index.tsx'
@@ -18,6 +19,8 @@ function useHeaderHeight() {
 }
 
 function useTabsHeight() {
+  const fromLg = useMedia({ from: 'lg' })
+  if (fromLg) return '0px'
   return '56px'
 }
 
@@ -33,26 +36,32 @@ export const BaseLayout = ({ className, children }: Props) => {
   const leftVisible = !isMobile
   const rightVisible = !isMobile
 
-  const cssVariablesStyle = {
-    '--header-height': headerHeight,
-    '--tabs-height': tabsHeight,
-  } as CSSProperties
-
   return (
-    <div className="min-h-full flex flex-col" style={cssVariablesStyle}>
+    <div className="min-h-full flex flex-col">
+      <style>
+        {`
+          :root {
+            --header-height: ${headerHeight};
+            --tabs-height: ${tabsHeight};
+          }
+        `}
+      </style>
       <Header />
       <div
         className={clsx(
           'grow flex flex-col gap-6 pb-4 lg:pb-6',
           leftVisible ? 'pl-[280px]' : 'pl-4 lg:pl-6',
           rightVisible ? 'pr-[320px]' : 'pr-4 lg:pr-6',
-          isMobile && 'pt-6 pb-[84px]',
+          isMobile && 'pt-6 pb-[--tabs-height]',
         )}
       >
         <main className={className}>{children}</main>
         {isMobile && (
-          <footer className="mt-auto pt-12">
-            <Copyright className="text-sm text-center" />
+          <footer className="mt-auto pt-6">
+            <Divider />
+            <div className="py-6">
+              <Copyright className="text-sm text-center" />
+            </div>
           </footer>
         )}
       </div>
