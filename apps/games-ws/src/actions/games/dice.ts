@@ -18,6 +18,7 @@ import { Hono } from 'hono'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 import { Context } from '../../context'
+import { userRoom } from '../../shared/rooms/user'
 import { createWsAction } from '../../ws-action'
 
 export async function runGame(bet: number, sides: number[]) {
@@ -104,6 +105,10 @@ export const GamesDiceAction = createWsAction({
         snapshot,
         outcome,
         previousTransaction: lastTransaction,
+      })
+
+      ctx.socket.to(userRoom(session.user.id)).emit('balance/updated', {
+        available: transaction.closingBalance,
       })
 
       return {

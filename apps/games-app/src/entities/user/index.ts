@@ -27,7 +27,6 @@ const logoutMutation = createQuery({
 })
 
 const loaded = userQuery.finished.success
-const settled = userQuery.finished.finally
 
 const $user = userQuery.$data
 const $loading = userQuery.$pending
@@ -75,7 +74,6 @@ export const $$user = {
   refresh,
   logout,
   loaded,
-  settled,
   $user,
   $loading,
   $loaded,

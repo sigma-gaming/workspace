@@ -17,6 +17,7 @@ import { GamesDiceAction } from './actions/games/dice'
 import { GamesPincodeAction } from './actions/games/pincode'
 import { PingAction } from './actions/ping'
 import { Context } from './context'
+import { userRoom } from './shared/rooms/user'
 import { ClientToServerEvents, ServerToClientEvents } from './types'
 import { WsActionGenerator } from './ws-action'
 
@@ -31,8 +32,6 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>()
 
 io.attachApp(app)
 
-const userRoom = (userId: string) => `user:${userId}`
-
 io.on('connection', async (socket) => {
   const cookie = parse(socket.handshake.headers.cookie ?? '')
   const session = await sessionService.getSession(cookie.session)
@@ -41,6 +40,7 @@ io.on('connection', async (socket) => {
   const context: Context = {
     url: new URL(env.gamesWs.url),
     headers: socket.handshake.headers,
+    socket,
   }
 
   if (user) {

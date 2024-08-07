@@ -9,6 +9,7 @@ import { gameService, transactionService } from '@games/services'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 import { Context } from '../../context'
+import { userRoom } from '../../shared/rooms/user'
 import { createWsAction } from '../../ws-action'
 
 const InputSchema = z.object({
@@ -83,6 +84,10 @@ export const GamesPincodeAction = createWsAction({
         snapshot,
         outcome,
         previousTransaction: lastTransaction,
+      })
+
+      ctx.socket.to(userRoom(session.user.id)).emit('balance/updated', {
+        available: transaction.closingBalance,
       })
 
       return {

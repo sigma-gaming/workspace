@@ -31,7 +31,6 @@ function receiveUpdates<T>(
 }
 
 const loaded = profileQuery.finished.success
-const settled = profileQuery.finished.finally
 
 const $profile = profileQuery.$data
 const $loading = profileQuery.$pending
@@ -62,7 +61,6 @@ export const $$profile = {
   request,
   refresh,
   loaded,
-  settled,
   $loading,
   $loaded,
   $accounts,

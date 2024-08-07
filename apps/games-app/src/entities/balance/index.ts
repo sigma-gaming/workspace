@@ -4,17 +4,20 @@ import {
   notExceptionFilter,
 } from '@core/exceptions'
 import { createApiEffect } from '@core/hono-client'
-import { createMutation, createQuery, Mutation, update } from '@farfetched/core'
-import { createEvent, sample } from 'effector'
-import { and, previous } from 'patronum'
+import { subscriptionFactory } from '@core/io-client'
+import { createMutation, Mutation } from '@farfetched/core'
+import { BalanceDetailed } from '@games/model'
+import { invoke } from '@withease/factories'
+import { createEvent, createStore, sample } from 'effector'
+import { previous, status } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
+import { gamesWs } from '../../shared/api/games-ws'
 import { $$audio, Sound } from '../audio'
 import { $$notifications } from '../notifications'
 
-const balanceQuery = createQuery({
-  name: 'balance/get',
-  effect: createApiEffect(gamesApi.me.getDetailedBalance.$get),
-})
+const getDetailedBalanceFx = createApiEffect(
+  gamesApi.me.getDetailedBalance.$get,
+)
 
 const depositMutation = createMutation({
   name: 'balance/deposit',
@@ -26,36 +29,39 @@ const withdrawMutation = createMutation({
   effect: createApiEffect(gamesApi.balance.withdraw.$post),
 })
 
+const { receivedData: balanceUpdated } = invoke(() =>
+  subscriptionFactory({
+    ws: gamesWs,
+    event: 'balance/updated',
+  }),
+)
+
+const request = createEvent()
+const deposit = createEvent()
+const withdraw = createEvent()
+const loaded = createEvent()
+
+const $balance = createStore<BalanceDetailed | null>(null)
+const $status = status(getDetailedBalanceFx)
+
 function receiveUpdates<T>(
   mutation: Mutation<any, T, any>,
   selector: (data: T) => number,
 ) {
-  update(balanceQuery, {
-    on: mutation,
-    by: {
-      success: ({ query, mutation }) => {
-        if (query && 'error' in query) return { error: query.error }
-
-        const available = selector(mutation.result)
-        return { result: { ...query?.result, available } }
-      },
-    },
+  sample({
+    clock: mutation.finished.success,
+    source: $balance,
+    filter: Boolean,
+    fn: (balance, { result }) => ({
+      ...balance,
+      available: selector(result),
+    }),
+    target: $balance,
   })
 }
 
-receiveUpdates(depositMutation, (data) => data.updatedBalance)
-receiveUpdates(withdrawMutation, (data) => data.updatedBalance)
-
-const request = createEvent()
-const refresh = createEvent()
-const deposit = createEvent()
-const withdraw = createEvent()
-const loaded = balanceQuery.finished.success
-const settled = balanceQuery.finished.finally
-
-const $balance = balanceQuery.$data
-const $loading = balanceQuery.$pending
-const $loaded = and($balance)
+const $loading = $status.map((status) => status === 'pending')
+const $loaded = $status.map((status) => status === 'done')
 const $depositing = depositMutation.$pending
 const $withdrawing = withdrawMutation.$pending
 
@@ -64,13 +70,25 @@ const $previousAvailable = previous($available)
 
 sample({
   clock: request,
-  target: balanceQuery.start,
+  target: getDetailedBalanceFx,
 })
 
 sample({
-  clock: refresh,
-  fn: () => true,
-  target: [balanceQuery.$stale, balanceQuery.refresh],
+  clock: getDetailedBalanceFx.done,
+  target: loaded,
+})
+
+sample({
+  source: getDetailedBalanceFx.doneData,
+  target: $balance,
+})
+
+receiveUpdates(depositMutation, (data) => data.updatedBalance)
+receiveUpdates(withdrawMutation, (data) => data.updatedBalance)
+
+sample({
+  clock: balanceUpdated,
+  target: $balance,
 })
 
 sample({
@@ -139,11 +157,9 @@ sample({
 export const $$balance = {
   receiveUpdates,
   request,
-  refresh,
   deposit,
   withdraw,
   loaded,
-  settled,
   $balance,
   $loading,
   $loaded,
