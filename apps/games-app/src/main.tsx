@@ -1,4 +1,5 @@
 import '@core/ui'
+import './setup-sticky.ts'
 import './shared/sentry/setup.ts'
 import ReactDOM from 'react-dom/client'
 import { $$app } from './app/model.ts'
