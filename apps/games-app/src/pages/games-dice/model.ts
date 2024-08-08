@@ -36,6 +36,7 @@ const animationLoaded = createEvent()
 const startLoaded = createEvent()
 const animationStarted = createEvent()
 const animationFinished = createEvent()
+const animationFailed = createEvent()
 const reset = createEvent()
 
 const $playing = playGameMutation.$pending
@@ -57,8 +58,13 @@ const animationsLoaded = combineEvents({
   reset,
 })
 
-const $animationLoaded = createStore(false)
-  .on(animationsLoaded, () => true)
+const $animationLoading = createStore(true)
+  .on(animationsLoaded, () => false)
+  .on(animationFailed, () => false)
+  .reset(reset)
+
+const $animationFailed = createStore(false)
+  .on(animationFailed, () => true)
   .reset(reset)
 
 const $animationPlaying = createStore(false)
@@ -263,7 +269,8 @@ export const $$dicePage = {
   $playing,
   $autoplaying,
   $animationPlaying,
-  $animationLoaded,
+  $animationLoading,
+  $animationFailed,
   $started,
   startLoaded,
   playPressed,
@@ -272,6 +279,7 @@ export const $$dicePage = {
   animationLoaded,
   animationStarted,
   animationFinished,
+  animationFailed,
   betDoubled,
   betHalved,
 }

@@ -1,6 +1,8 @@
+import { LazyWrapper } from '@core/ui'
+import { Button } from '@mantine/core'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
-import { lazy, memo, Suspense } from 'react'
+import { lazy, memo } from 'react'
 import { $$dicePage } from '../model.ts'
 
 const AnimatedDiceRive = lazy(async () => {
@@ -13,21 +15,47 @@ const AnimatedStartRive = lazy(async () => {
   return { default: AnimatedStartRive }
 })
 
+const FailureFallback = () => {
+  return (
+    <div className="h-full flex flex-col gap-2 items-center justify-center text-center">
+      <p className="leading-tight">Не удалось загрузить&nbsp;анимацию</p>
+      <p className="text-dimmed text-sm leading-tight">
+        Попробуйте еще&nbsp;раз или&nbsp;напишите в&nbsp;поддержку
+      </p>
+      <Button
+        className="mt-2"
+        size="xs"
+        onClick={() => {
+          window.location.reload()
+        }}
+      >
+        Обновить страницу
+      </Button>
+    </div>
+  )
+}
+
 export const AnimatedDice = memo(() => {
   const started = useUnit($$dicePage.$started)
-  const loaded = useUnit($$dicePage.$animationLoaded)
+  const loading = useUnit($$dicePage.$animationLoading)
 
   return (
-    <div className={clsx('w-full h-64', !loaded && 'invisible')}>
+    <div className={clsx('w-full h-64', loading && 'invisible')}>
       <div className={clsx('w-full h-64', started && 'hidden')}>
-        <Suspense fallback={null}>
+        <LazyWrapper
+          onFailure={$$dicePage.animationFailed}
+          failureFallback={<FailureFallback />}
+        >
           <AnimatedStartRive />
-        </Suspense>
+        </LazyWrapper>
       </div>
       <div className={clsx('w-full h-64', !started && 'hidden')}>
-        <Suspense fallback={null}>
+        <LazyWrapper
+          onFailure={$$dicePage.animationFailed}
+          failureFallback={<FailureFallback />}
+        >
           <AnimatedDiceRive />
-        </Suspense>
+        </LazyWrapper>
       </div>
     </div>
   )

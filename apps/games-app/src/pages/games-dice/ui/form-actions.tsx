@@ -6,13 +6,13 @@ export const FormActions = () => {
   const playing = useUnit($$dicePage.$playing)
   const autoplaying = useUnit($$dicePage.$autoplaying)
   const animationPlaying = useUnit($$dicePage.$animationPlaying)
-  const loaded = useUnit($$dicePage.$animationLoaded)
+  const loading = useUnit($$dicePage.$animationLoading)
 
   return (
     <div className="flex flex-col gap-3">
       <Button
         type="submit"
-        disabled={!loaded || autoplaying || animationPlaying}
+        disabled={loading || autoplaying || animationPlaying}
         loading={playing}
         fullWidth={true}
       >
@@ -21,7 +21,7 @@ export const FormActions = () => {
       <Button
         onClick={() => $$dicePage.autoplayPressed()}
         fullWidth={true}
-        disabled={!loaded}
+        disabled={loading}
       >
         {autoplaying ? 'Остановить автоигру' : 'Автоигра'}
       </Button>

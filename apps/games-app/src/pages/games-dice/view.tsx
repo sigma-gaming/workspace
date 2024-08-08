@@ -10,7 +10,7 @@ import { FormActions } from './ui/form-actions.tsx'
 import { PossibleWinAmount } from './ui/possible-win-amount.tsx'
 
 export const DiceGamePageView = memo(() => {
-  const loaded = useUnit($$dicePage.$animationLoaded)
+  const loading = useUnit($$dicePage.$animationLoading)
 
   return (
     <GamePlaygroundLayout
@@ -18,7 +18,7 @@ export const DiceGamePageView = memo(() => {
       onSubmit={() => $$dicePage.playPressed()}
       animationZone={<AnimatedDice />}
       controlsZone={<Ping />}
-      loading={!loaded}
+      loading={loading}
       fieldsZone={
         <>
           <BetField />

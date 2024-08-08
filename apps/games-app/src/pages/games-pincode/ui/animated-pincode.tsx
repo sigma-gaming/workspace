@@ -1,8 +1,8 @@
-import { Icons, useLazyAnimate } from '@core/ui'
+import { Icons, LazyWrapper, useLazyAnimate } from '@core/ui'
 import { trimText } from '@core/utils'
 import { getPincodeHighlight } from '@games/model'
 import { useUnit } from 'effector-react'
-import { lazy, memo, Suspense, useMemo, useRef } from 'react'
+import { lazy, memo, useMemo, useRef } from 'react'
 import { $$profile } from '../../../entities/profile'
 import { $$pincodePage } from '../model'
 import styles from './styles.module.css'
@@ -123,9 +123,9 @@ export const AnimatedPincode = () => {
           {mode === 'easy' && 'EASY'}
         </p>
 
-        <Suspense fallback={null}>
+        <LazyWrapper>
           <WinInfo />
-        </Suspense>
+        </LazyWrapper>
 
         <p className="hidden sm:block absolute bottom-4 right-4 items-start opacity-30 font-medium leading-none">
           {trimText(name, 20)}
