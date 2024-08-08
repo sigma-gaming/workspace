@@ -3,24 +3,19 @@ import './sentry/init'
 import { shutdownServices } from '@core/di'
 import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
-import {
-  gamesCaches,
-  gamesPubsubs,
-  gamesRedis,
-  maintenanceCache,
-} from '@games/redis'
+import { gamesPubsubs, gamesRedis, maintenanceCache } from '@games/redis'
 import { env, profileService, sessionService } from '@games/services'
-import { createAdapter } from '@socket.io/redis-adapter'
 import { parse } from 'cookie'
-import { gamesPubSub } from 'games-libs/redis/src/pubsub/service'
-import { Server } from 'socket.io'
 import { App, SSLApp } from 'uWebSockets.js'
 import { GamesDiceAction } from './actions/games/dice'
 import { GamesPincodeAction } from './actions/games/pincode'
 import { PingAction } from './actions/ping'
 import { Context } from './context'
+import { io } from './io'
+import { startLastWinsBroadcast } from './processes/last-wins'
 import { userRoom } from './shared/rooms/user'
-import { ClientToServerEvents, ServerToClientEvents } from './types'
+import { sendToAllLocal, sendToUser } from './shared/send'
+import { ClientToServerEvents } from './types'
 import { WsActionGenerator } from './ws-action'
 
 const app = env.isDev
@@ -29,17 +24,6 @@ const app = env.isDev
       cert_file_name: '../../ssl/local.crt',
     })
   : App()
-
-const allowedOrigins = [env.gamesApp.url]
-
-const io = new Server<ClientToServerEvents, ServerToClientEvents>({
-  adapter: createAdapter(gamesPubSub.pub, gamesPubSub.sub),
-  allowRequest(req, callback) {
-    const isCorrectOrigin = allowedOrigins.includes(req.headers.origin ?? '')
-    if (isCorrectOrigin) callback(null, true)
-    else callback('Origin not allowed', false)
-  },
-})
 
 io.attachApp(app)
 
@@ -66,6 +50,10 @@ io.on('connection', async (socket) => {
     socket.join(userRoom(user.id))
   }
 
+  /**
+   * Actions
+   */
+
   function registerAction<E extends EventNames<ClientToServerEvents>>(
     generator: WsActionGenerator<
       E,
@@ -86,116 +74,23 @@ io.on('connection', async (socket) => {
  * Business logic
  */
 
-function sendToUser<K extends keyof ServerToClientEvents>(
-  userId: string,
-  event: K,
-  ...payload: Parameters<ServerToClientEvents[K]>
-) {
-  io.to(userRoom(userId)).emit(event, ...payload)
-}
-
-function sendToAll<K extends keyof ServerToClientEvents>(
-  event: K,
-  ...payload: Parameters<ServerToClientEvents[K]>
-) {
-  io.emit(event, ...payload)
-}
+startLastWinsBroadcast()
 
 gamesPubsubs.chatMessages.subscribe((payload) => {
-  sendToAll('chat/message', payload)
+  sendToAllLocal('chat/message', payload)
 })
 
 gamesPubsubs.notifications.subscribe((payload) => {
   if (payload.userId) {
     sendToUser(payload.userId, 'notification', payload)
   } else {
-    sendToAll('notification', payload)
+    sendToAllLocal('notification', payload)
   }
 })
 
 gamesPubsubs.maintenanceStarted.subscribe(() => {
-  sendToAll('maintenance/started')
+  sendToAllLocal('maintenance/started')
 })
-
-let lastWinSent: string | null = null
-let lastBigWinSent: string | null = null
-
-async function sendLastWins() {
-  // Add 100ms compensation for network delays
-  const next = (ms = 900) => {
-    setTimeout(sendLastWins, ms)
-  }
-
-  try {
-    const lastWins = await gamesCaches.lastWinHistory.get()
-
-    const lastSentIndex = lastWins.findIndex(
-      (gameRecord) => gameRecord.id === lastWinSent,
-    )
-
-    // Send only new records
-    const newWins = lastWins.slice(0, lastSentIndex)
-
-    if (newWins.length === 0) {
-      return next()
-    }
-
-    lastWinSent = newWins[0].id
-    sendToAll('gameHistory/lastWins', newWins)
-
-    /*
-     * ~1 win per second is enough for history table
-     * So, send new records later if we got more than one new win
-     * Max delay is 4000ms, so new visitors will not wait too long for the first portions
-     * Add 100ms compensation for network delays
-     */
-    const delay = Math.min(4000, 1000 * newWins.length - 100)
-    next(delay)
-  } catch {
-    logger.error('Failed to send last wins')
-    return next()
-  }
-}
-
-async function sendBigWins() {
-  // Add 100ms compensation for network delays
-  const next = (ms = 900) => {
-    setTimeout(sendBigWins, ms)
-  }
-
-  try {
-    const bigWins = await gamesCaches.bigWinHistory.get()
-
-    const lastSentIndex = bigWins.findIndex(
-      (gameRecord) => gameRecord.id === lastBigWinSent,
-    )
-
-    // Send only new records
-    const newWins = bigWins.slice(0, lastSentIndex)
-
-    if (newWins.length === 0) {
-      return next()
-    }
-
-    lastBigWinSent = newWins[0].id
-    sendToAll('gameHistory/bigWins', newWins)
-
-    /*
-     * ~1 win per second is enough for history table
-     * So, send new records later if we got more than one new win
-     * Max delay is 4000ms, so new visitors will not wait too long for the first portions
-     * Add 100ms compensation for network delays
-     */
-    const delay = Math.min(4000, 1000 * newWins.length - 100)
-    next(delay)
-  } catch {
-    logger.error('Failed to send big wins')
-    return next()
-  }
-}
-
-setTimeout(sendLastWins, 3000)
-setTimeout(sendBigWins, 3000)
 
 /**
  * Setup
