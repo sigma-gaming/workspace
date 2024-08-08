@@ -30,8 +30,15 @@ const app = env.isDev
     })
   : App()
 
+const allowedOrigins = [env.gamesApp.url]
+
 const io = new Server<ClientToServerEvents, ServerToClientEvents>({
   adapter: createAdapter(gamesPubSub.pub, gamesPubSub.sub),
+  allowRequest(req, callback) {
+    const isCorrectOrigin = allowedOrigins.includes(req.headers.origin ?? '')
+    if (isCorrectOrigin) callback(null, true)
+    else callback('Origin not allowed', false)
+  },
 })
 
 io.attachApp(app)
