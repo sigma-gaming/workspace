@@ -5,6 +5,8 @@ export function trimText<T extends string | null | undefined>(
 ): T {
   if (!text && text !== '') return text as T
   const cut =
-    text.length > maxLength ? `${text.slice(0, maxLength)}${end}` : text
+    text.length > maxLength
+      ? `${text.slice(0, maxLength).trimEnd()}${end}`
+      : text
   return cut as T
 }
