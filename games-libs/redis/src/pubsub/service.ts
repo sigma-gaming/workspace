@@ -1,4 +1,4 @@
-import { OnApplicationShutdown } from '@core/di'
+import { createSingletonProxy, OnApplicationShutdown } from '@core/di'
 import { Logger, LoggerService } from '@core/logger'
 import { Callback, Redis } from 'ioredis'
 import { singleton } from 'tsyringe-neo'
@@ -30,6 +30,14 @@ export class PubSubService implements OnApplicationShutdown {
     this.redis = redisService.redis
     this.subRedis = subRedisService.redis
     this.logger = loggerService.logger.child('GamesPubSub')
+  }
+
+  get pub() {
+    return this.redis
+  }
+
+  get sub() {
+    return this.subRedis
   }
 
   private subscribedPubSubs = new Set<string>()
@@ -128,3 +136,5 @@ export class PubSubService implements OnApplicationShutdown {
     this.logger.info('Successfully unsubscribed from all channels')
   }
 }
+
+export const gamesPubSub = createSingletonProxy(PubSubService)

@@ -10,7 +10,9 @@ import {
   maintenanceCache,
 } from '@games/redis'
 import { env, profileService, sessionService } from '@games/services'
+import { createAdapter } from '@socket.io/redis-adapter'
 import { parse } from 'cookie'
+import { gamesPubSub } from 'games-libs/redis/src/pubsub/service'
 import { Server } from 'socket.io'
 import { App, SSLApp } from 'uWebSockets.js'
 import { GamesDiceAction } from './actions/games/dice'
@@ -28,7 +30,9 @@ const app = env.isDev
     })
   : App()
 
-const io = new Server<ClientToServerEvents, ServerToClientEvents>()
+const io = new Server<ClientToServerEvents, ServerToClientEvents>({
+  adapter: createAdapter(gamesPubSub.pub, gamesPubSub.sub),
+})
 
 io.attachApp(app)
 
