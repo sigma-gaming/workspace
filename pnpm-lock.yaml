@@ -39,7 +39,7 @@ importers:
         specifier: ^7.12.1
         version: 7.12.1(react@18.3.1)
       '@mantine/notifications':
-        specifier: 7.12.1
+        specifier: ^7.12.1
         version: 7.12.1(@mantine/core@7.12.1(@mantine/hooks@7.12.1(react@18.3.1))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mantine/hooks@7.12.1(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@neodx/colors':
         specifier: ^0.2.8
