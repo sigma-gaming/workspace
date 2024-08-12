@@ -16,6 +16,7 @@ module.exports = configure({
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'sonarjs/no-identical-functions': 'off',
+      '@stylistic/quote-props': ['warn', 'consistent-as-needed']
     },
   },
 })

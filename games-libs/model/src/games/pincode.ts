@@ -6,29 +6,50 @@ export enum PincodeMode {
 
 type PincodeConfig = {
   [Mode in PincodeMode]: {
-    multiplierMap: Partial<Record<number, number>>
-    highlightMap: Partial<Record<number, number>>
     combinationMap: Partial<Record<number, string>>
+    multiplierMap: Partial<Record<string, number>>
+    highlightMap: Partial<Record<number, number>>
   }
 }
 
 const config: PincodeConfig = {
   easy: {
+    combinationMap: {
+      0: '0000',
+      1111: '1111',
+      2222: '2222',
+      3333: '3333',
+      4444: '4444',
+      5555: '5555',
+      6666: '6666',
+      7777: '7777',
+      8888: '8888',
+      9999: '9999',
+      1337: '1337',
+      1488: '1488',
+      1234: '1234',
+      4321: '4321',
+    },
     multiplierMap: {
-      1111: 69,
-      2222: 69,
-      3333: 69,
-      4444: 69,
-      5555: 69,
-      8888: 69,
-      0: 100,
-      9999: 100,
-      1234: 123,
-      4321: 321,
-      1337: 337,
-      1488: 488,
-      6666: 666,
-      7777: 777,
+      '2x0': 2,
+      '2x9': 2,
+      '2x7': 3,
+      '3xN': 7,
+      '3x7': 15,
+      '1111': 69,
+      '2222': 69,
+      '3333': 69,
+      '4444': 69,
+      '5555': 69,
+      '8888': 69,
+      '0000': 100,
+      '9999': 100,
+      '1234': 123,
+      '4321': 321,
+      '1337': 337,
+      '1488': 488,
+      '6666': 666,
+      '7777': 777,
     },
     highlightMap: {
       1111: 15,
@@ -45,38 +66,42 @@ const config: PincodeConfig = {
       1488: 15,
       6666: 15,
       7777: 15,
-    },
-    combinationMap: {
-      0: '0000',
-      1111: '1111',
-      2222: '2222',
-      3333: '3333',
-      4444: '4444',
-      5555: '5555',
-      6666: '6666',
-      7777: '7777',
-      8888: '8888',
-      9999: '9999',
-      1337: '1337',
-      1488: '1488',
     },
   },
   hardcore: {
+    combinationMap: {
+      0: '0000',
+      1111: '1111',
+      2222: '2222',
+      3333: '3333',
+      4444: '4444',
+      5555: '5555',
+      6666: '6666',
+      7777: '7777',
+      8888: '8888',
+      9999: '9999',
+      1337: '1337',
+      1488: '1488',
+      1234: '1234',
+      4321: '4321',
+    },
     multiplierMap: {
-      1111: 69,
-      2222: 69,
-      3333: 69,
-      4444: 69,
-      5555: 69,
-      8888: 69,
-      0: 100,
-      9999: 100,
-      1234: 123,
-      4321: 321,
-      1337: 337,
-      1488: 488,
-      6666: 666,
-      7777: 777,
+      '2x7': 7,
+      '3x7': 77,
+      '1111': 69,
+      '2222': 69,
+      '3333': 69,
+      '4444': 69,
+      '5555': 69,
+      '8888': 69,
+      '0000': 100,
+      '9999': 100,
+      '1234': 123,
+      '4321': 321,
+      '1337': 337,
+      '1488': 488,
+      '6666': 666,
+      '7777': 777,
     },
     highlightMap: {
       1111: 15,
@@ -93,20 +118,6 @@ const config: PincodeConfig = {
       1488: 15,
       6666: 15,
       7777: 15,
-    },
-    combinationMap: {
-      0: '0000',
-      1111: '1111',
-      2222: '2222',
-      3333: '3333',
-      4444: '4444',
-      5555: '5555',
-      6666: '6666',
-      7777: '7777',
-      8888: '8888',
-      9999: '9999',
-      1337: '1337',
-      1488: '1488',
     },
   },
 }
@@ -123,38 +134,92 @@ function hasBit(bitmask: number, index: number) {
   return (bitmask & bit) !== 0
 }
 
-for (let code = 0; code < 10000; code++) {
-  let sevenCount = 0
-  let highlightBitmask = 0
-  const codeString = code.toString().padStart(4, '0')
+function markNumbers(bitmask: number, codeString: string, number: number) {
+  let result = bitmask
 
   for (let i = 0; i < 4; i++) {
-    if (codeString[i] === '7') {
-      sevenCount += 1
-      highlightBitmask = withBit(highlightBitmask, i)
+    if (codeString[i] === String(number)) {
+      result = withBit(result, i)
     }
   }
 
-  let multiplier = 0
+  return result
+}
 
-  if (sevenCount === 2) {
-    multiplier = 7
-    config.hardcore.combinationMap[code] = `2x7`
+function setCombination(mode: PincodeMode, code: number, combination: string) {
+  const current = getPincodeCombination(mode, code)
+
+  if (current === null) {
+    config[mode].combinationMap[code] = combination
+    return
   }
 
-  if (sevenCount === 3) {
-    multiplier = 77
-    config.hardcore.combinationMap[code] = `3x7`
-  }
+  const oldMultiplier = config[mode].multiplierMap[current] ?? 0
+  const newMultiplier = config[mode].multiplierMap[combination] ?? 0
 
-  if (multiplier > 0) {
-    config.hardcore.multiplierMap[code] = multiplier
-    config.hardcore.highlightMap[code] = highlightBitmask
+  if (newMultiplier >= oldMultiplier) {
+    config[mode].combinationMap[code] = combination
   }
 }
 
+for (let code = 0; code < 10000; code++) {
+  const codeString = code.toString().padStart(4, '0')
+  const countMap = new Map<string, number>()
+
+  for (let i = 0; i < 4; i++) {
+    const current = countMap.get(codeString[i]) ?? 0
+    countMap.set(codeString[i], current + 1)
+  }
+
+  if (countMap.get('0') === 2) {
+    setCombination(PincodeMode.Easy, code, `2x0`)
+    config.easy.highlightMap[code] = markNumbers(0, codeString, 0)
+  }
+
+  if (countMap.get('9') === 2) {
+    setCombination(PincodeMode.Easy, code, `2x9`)
+    config.easy.highlightMap[code] = markNumbers(0, codeString, 9)
+  }
+
+  if (countMap.get('7') === 2) {
+    setCombination(PincodeMode.Hardcore, code, '2x7')
+    setCombination(PincodeMode.Easy, code, '2x7')
+    config.hardcore.highlightMap[code] = markNumbers(0, codeString, 7)
+    config.easy.highlightMap[code] = markNumbers(0, codeString, 7)
+  }
+
+  for (const [number, count] of countMap) {
+    if (count === 3) {
+      setCombination(PincodeMode.Easy, code, `3xN`)
+
+      config.easy.highlightMap[code] = markNumbers(
+        0,
+        codeString,
+        Number(number),
+      )
+    }
+  }
+
+  if (countMap.get('7') === 3) {
+    setCombination(PincodeMode.Easy, code, '3x7')
+    setCombination(PincodeMode.Hardcore, code, `3x7`)
+    config.hardcore.highlightMap[code] = markNumbers(0, codeString, 7)
+    config.easy.highlightMap[code] = markNumbers(0, codeString, 7)
+  }
+}
+
+export function getPincodeCombination(mode: PincodeMode, code: number) {
+  return config[mode].combinationMap[code] ?? null
+}
+
 export function getPincodeMultiplier(mode: PincodeMode, code: number) {
-  return config[mode].multiplierMap[code] ?? 0
+  const combination = getPincodeCombination(mode, code)
+  if (combination === null) return 0
+  return config[mode].multiplierMap[combination] ?? 0
+}
+
+export function getPincodeMultiplierMap(mode: PincodeMode) {
+  return config[mode].multiplierMap
 }
 
 export function getPincodeHighlight(mode: PincodeMode, code: number) {
@@ -166,10 +231,6 @@ export function getPincodeHighlight(mode: PincodeMode, code: number) {
     hasBit(bitmask, 2),
     hasBit(bitmask, 3),
   ] as const
-}
-
-export function getPincodeCombination(mode: PincodeMode, code: number) {
-  return config[mode].combinationMap[code] ?? null
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -1,103 +1,76 @@
 import { Badge, BadgeColor } from '@core/ui'
+import { getPincodeMultiplierMap } from '@games/model'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { $$pincodePage } from '../model'
 import styles from './styles.module.css'
 
+const combinedCombinations: Array<{
+  label: string
+  combineIn: string
+  combinations: string[]
+}> = [
+  {
+    label: '1111-5555',
+    combineIn: '1111',
+    combinations: ['1111', '2222', '3333', '4444', '5555'],
+  },
+]
+
+function getColor(multiplier: number) {
+  if (multiplier >= 250) return 'green'
+  if (multiplier >= 100) return 'yellow'
+  if (multiplier >= 50) return 'orange'
+  return 'red'
+}
+
 export const MultiplierTable = () => {
-  const combination = useUnit($$pincodePage.$highlightedCombination)
+  const highlightedCombination = useUnit($$pincodePage.$highlightedCombination)
+  const mode = useUnit($$pincodePage.fields.mode.$value)
+  const multiplierMap = getPincodeMultiplierMap(mode)
+
+  const multiplierList = Object.entries(multiplierMap)
+    .reduce(
+      (acc, [combination, multiplier = 0]) => {
+        const combined = combinedCombinations.find((combined) =>
+          combined.combinations.includes(combination),
+        )
+
+        if (!combined) {
+          acc.push({ combination, multiplier })
+          return acc
+        }
+
+        if (combined.combineIn !== combination) {
+          return acc
+        }
+
+        return acc.concat({
+          combination: combined.label,
+          multiplier,
+        })
+      },
+      [] as { combination: string; multiplier: number }[],
+    )
+    .sort((a, b) => {
+      if (a.multiplier === b.multiplier) {
+        return a.combination.localeCompare(b.combination)
+      }
+
+      return a.multiplier - b.multiplier
+    })
 
   return (
     <div className="w-full flex justify-center flex-wrap gap-2">
-      <Multiplier
-        label="2x7"
-        multiplier={7}
-        color="red"
-        highlighted={combination === '2x7'}
-      />
-
-      <Multiplier
-        label="1111-5555"
-        multiplier={69}
-        color="orange"
-        highlighted={
-          combination === '1111' ||
-          combination === '2222' ||
-          combination === '3333' ||
-          combination === '4444' ||
-          combination === '5555'
-        }
-      />
-
-      <Multiplier
-        label="8888"
-        multiplier={69}
-        color="orange"
-        highlighted={combination === '8888'}
-      />
-
-      <Multiplier
-        label="3x7"
-        multiplier={77}
-        color="orange"
-        highlighted={combination === '3x7'}
-      />
-
-      <Multiplier
-        label="0000"
-        multiplier={100}
-        color="yellow"
-        highlighted={combination === '0000'}
-      />
-
-      <Multiplier
-        label="9999"
-        multiplier={100}
-        color="yellow"
-        highlighted={combination === '9999'}
-      />
-
-      <Multiplier
-        label="1234"
-        multiplier={123}
-        color="yellow"
-        highlighted={combination === '1234'}
-      />
-
-      <Multiplier
-        label="4321"
-        multiplier={321}
-        color="green"
-        highlighted={combination === '4321'}
-      />
-
-      <Multiplier
-        label="1337"
-        multiplier={337}
-        color="green"
-        highlighted={combination === '1337'}
-      />
-
-      <Multiplier
-        label="1488"
-        multiplier={488}
-        color="green"
-        highlighted={combination === '1488'}
-      />
-
-      <Multiplier
-        label="6666"
-        multiplier={666}
-        color="green"
-        highlighted={combination === '6666'}
-      />
-
-      <Multiplier
-        label="7777"
-        multiplier={777}
-        color="green"
-        highlighted={combination === '7777'}
-      />
+      {multiplierList.map(({ combination, multiplier }) => (
+        <Multiplier
+          key={combination}
+          label={combination}
+          multiplier={multiplier}
+          color={getColor(multiplier)}
+          highlighted={combination === highlightedCombination}
+        />
+      ))}
     </div>
   )
 }
