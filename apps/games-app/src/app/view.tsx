@@ -64,6 +64,7 @@ export const AppView = () => {
             limit={3}
             position="bottom-left"
             containerWidth={320}
+            top="auto"
             bottom="calc(var(--tabs-height) + 16px)"
           />
           <OptimizedPages />
