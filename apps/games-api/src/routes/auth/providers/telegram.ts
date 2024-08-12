@@ -1,16 +1,13 @@
 import { BadRequestException } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
-import {
-  AccountInsert,
-  AccountTable,
-  ProfileTable,
-  UserTable,
-} from '@dbs/games-schema'
 import { AccountProvider } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
-import { env, sessionService, telegramBotService } from '@games/services'
+import {
+  AuthResult,
+  authService,
+  env,
+  sessionService,
+  telegramBotService,
+} from '@games/services'
 import { zValidator } from '@hono/zod-validator'
-import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import crypto from 'node:crypto'
 import { z } from 'zod'
@@ -35,7 +32,7 @@ export const signInViaTelegramRoute = new Hono().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const currentSession = await sessionService.getHonoSession(ctx)
+    const session = await sessionService.getHonoSession(ctx)
 
     const tgAuthResult = TgAuthResultSchema.parse(
       JSON.parse(atob(payload.tgAuthResult)),
@@ -73,48 +70,23 @@ export const signInViaTelegramRoute = new Hono().post(
       throw new Error('tgAuthResult is already expired')
     }
 
-    let account = await gamesDb.query.AccountTable.findFirst({
-      where: and(
-        eq(AccountTable.provider, AccountProvider.Telegram),
-        eq(AccountTable.providerUserId, tgAuthResult.id),
-      ),
-    })
-
-    if (currentSession.user && account) {
-      if (currentSession.user.id !== account.userId) {
-        throw new BadRequestException({
-          message: 'Аккаунт VK уже привязан к другому пользователю',
-        })
-      }
-
-      return ctx.json({ status: 'success' })
-    }
-
-    const accountSharedInput: Omit<AccountInsert, 'userId'> = {
+    const result = await authService.authenticate({
+      session,
       provider: AccountProvider.Telegram,
       providerUserId: tgAuthResult.id,
       providerUsername: tgAuthResult.username,
       providerUserFirstName: tgAuthResult.first_name,
       providerUserLastName: tgAuthResult.last_name,
-    }
+      providerUserImage: tgAuthResult.photo_url,
+    })
 
-    if (tgAuthResult.photo_url) {
-      const response = await fetch(tgAuthResult.photo_url)
-
-      if (response.ok) {
-        accountSharedInput.providerUserImage = tgAuthResult.photo_url
-      }
-    }
-
-    /**
-     * If user is logged in and account is not found, create account and connect it to user
-     */
-    if (currentSession.user && !account) {
-      await gamesDb.insert(AccountTable).values({
-        userId: currentSession.user.id,
-        ...accountSharedInput,
+    if (result.result === AuthResult.ConnectedToAnotherUser) {
+      throw new BadRequestException({
+        message: 'Аккаунт Telegram уже привязан к другому пользователю',
       })
+    }
 
+    if (result.result === AuthResult.Connected) {
       void telegramBotService.messageUser(Number(tgAuthResult.id), [
         `Привет, ${tgAuthResult.first_name}!`,
         'Твой Telegram успешно привязан к аккаунту Sigma Games - наслаждайся бонусами =)',
@@ -123,42 +95,10 @@ export const signInViaTelegramRoute = new Hono().post(
         'Также не забудь подписаться на наш канал: @SigmaGamesFeed',
       ])
 
-      await gamesCaches.detailedProfile.del(currentSession.user.id)
-
       return ctx.json({ status: 'success' })
     }
 
-    /**
-     * If user is not logged in and account is not found, perform registration
-     */
-    if (!account) {
-      account = await gamesDb.transaction(async (tx) => {
-        const [{ id: userId }] = await tx
-          .insert(UserTable)
-          .values({})
-          .returning()
-
-        const [{ id: profileId }] = await tx
-          .insert(ProfileTable)
-          .values({
-            userId,
-            usedProvider: AccountProvider.Telegram,
-          })
-          .returning()
-
-        await tx
-          .update(UserTable)
-          .set({ profileId })
-          .where(eq(UserTable.id, userId))
-
-        const [account] = await tx
-          .insert(AccountTable)
-          .values({ userId, ...accountSharedInput })
-          .returning()
-
-        return account
-      })
-
+    if (result.result === AuthResult.SignedUp) {
       void telegramBotService.messageUser(Number(tgAuthResult.id), [
         `Добро пожаловать на Sigma Games, ${tgAuthResult.first_name}!`,
         'Мы автоматически привязали твой Telegram к аккаунту на сайте - наслаждайся бонусами =)',
@@ -169,7 +109,7 @@ export const signInViaTelegramRoute = new Hono().post(
     }
 
     const newSession = await sessionService.createSession({
-      userId: account.userId,
+      userId: result.account.userId,
       provider: AccountProvider.Telegram,
     })
 

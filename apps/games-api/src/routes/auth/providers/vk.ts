@@ -1,17 +1,8 @@
 import { BadRequestException } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
-import {
-  AccountInsert,
-  AccountTable,
-  ProfileTable,
-  UserTable,
-} from '@dbs/games-schema'
 import { AccountProvider } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
-import { env, sessionService } from '@games/services'
+import { AuthResult, authService, env, sessionService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
 import axios from 'axios'
-import { and, eq } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 
@@ -66,7 +57,7 @@ export const signInViaVkRoute = new Hono().post(
 
     const authResult = VkAuthResultSchema.parse(JSON.parse(payload.payload))
 
-    const { user_id, access_token } = await axios({
+    const { access_token } = await axios({
       url: 'https://api.vk.com/method/auth.exchangeSilentAuthToken',
       method: 'GET',
       params: {
@@ -79,23 +70,6 @@ export const signInViaVkRoute = new Hono().post(
       return VkExchangeSilentAuthTokenSchema.parse(response.data)
     })
 
-    let account = await gamesDb.query.AccountTable.findFirst({
-      where: and(
-        eq(AccountTable.provider, AccountProvider.VK),
-        eq(AccountTable.providerUserId, user_id.toString()),
-      ),
-    })
-
-    if (currentSession.user && account) {
-      if (currentSession.user.id !== account.userId) {
-        throw new BadRequestException({
-          message: 'Аккаунт VK уже привязан к другому пользователю',
-        })
-      }
-
-      return ctx.json({ status: 'success' })
-    }
-
     const vkProfile = await axios({
       url: 'https://api.vk.com/method/account.getProfileInfo',
       method: 'GET',
@@ -107,63 +81,28 @@ export const signInViaVkRoute = new Hono().post(
       return VkGetProfileSchema.parse(response.data)
     })
 
-    const accountSharedInput: Omit<AccountInsert, 'userId'> = {
+    const result = await authService.authenticate({
+      session: currentSession,
       provider: AccountProvider.VK,
       providerUserId: vkProfile.id.toString(),
       providerUsername: vkProfile.screen_name,
       providerUserFirstName: vkProfile.first_name,
       providerUserLastName: vkProfile.last_name,
       providerUserImage: vkProfile.photo_200,
+    })
+
+    if (result.result === AuthResult.ConnectedToAnotherUser) {
+      throw new BadRequestException({
+        message: 'Аккаунт VK уже привязан к другому пользователю',
+      })
     }
 
-    /**
-     * If user is logged in and account is not found, create account and connect it to user
-     */
-    if (currentSession.user && !account) {
-      await gamesDb.insert(AccountTable).values({
-        userId: currentSession.user.id,
-        ...accountSharedInput,
-      })
-
-      await gamesCaches.detailedProfile.del(currentSession.user.id)
-
+    if (result.result === AuthResult.Connected) {
       return ctx.json({ status: 'success' })
     }
 
-    /**
-     * If user is not logged in and account is not found, perform registration
-     */
-    if (!account) {
-      account = await gamesDb.transaction(async (tx) => {
-        const [{ id: userId }] = await tx
-          .insert(UserTable)
-          .values({})
-          .returning()
-
-        const [{ id: profileId }] = await tx
-          .insert(ProfileTable)
-          .values({
-            userId,
-            usedProvider: AccountProvider.VK,
-          })
-          .returning()
-
-        await tx
-          .update(UserTable)
-          .set({ profileId })
-          .where(eq(UserTable.id, userId))
-
-        const [account] = await tx
-          .insert(AccountTable)
-          .values({ userId, ...accountSharedInput })
-          .returning()
-
-        return account
-      })
-    }
-
     const session = await sessionService.createSession({
-      userId: account.userId,
+      userId: result.account.userId,
       provider: AccountProvider.VK,
     })
 
