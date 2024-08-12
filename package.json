@@ -51,7 +51,7 @@
     "@hono/zod-validator": "^0.2.2",
     "@mantine/core": "^7.12.1",
     "@mantine/hooks": "^7.12.1",
-    "@mantine/notifications": "^7.12.1",
+    "@mantine/notifications": "7.11.2",
     "@neodx/colors": "^0.2.8",
     "@neodx/log": "^0.3.0",
     "@risenx/howler": "^2.3.2",
