@@ -14,7 +14,6 @@ import {
   Space,
   Text,
   TextInput,
-  Title,
 } from '@mantine/core'
 import { Link } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
@@ -194,8 +193,8 @@ const SocialNetworks = () => {
                           bordered={true}
                         />
                       )}
-                      <div className="flex flex-col gap-1">
-                        <Title order={4}>{label}</Title>
+                      <div className="flex flex-col">
+                        <h4 className="text-lg font-medium">{label}</h4>
                         <Text ff="Rubik, sans-serif" className="leading-[1.25]">
                           {fullName} {profileLink && <>({profileLink})</>}
                         </Text>
