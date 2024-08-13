@@ -5,7 +5,8 @@ import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { getPincodeCombination, PincodeMode } from '@games/model'
-import { createEvent, createStore, sample } from 'effector'
+import { NotificationData } from '@mantine/notifications'
+import { createEvent, createStore, sample, split } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$audio, Sound } from '../../entities/audio'
@@ -306,14 +307,27 @@ sample({
   target: $autoplaying,
 })
 
-sample({
-  source: receivedApiError,
-  filter: (error): error is BadRequestException =>
+const { receivedBadRequest, __: receivedOtherError } = split(receivedApiError, {
+  receivedBadRequest: (error): error is BadRequestException =>
     error instanceof BadRequestException,
-  fn: ({ payload }: BadRequestException) => ({
+})
+
+sample({
+  source: receivedBadRequest,
+  fn: ({ payload }) => ({
     [payload.path?.join('.') ?? 'root']: [payload.message ?? ''],
   }),
   target: form.setErrors,
+})
+
+sample({
+  source: receivedOtherError,
+  fn: (): NotificationData => ({
+    title: 'Неизвестная ошибка',
+    message: 'Попробуйте еще раз',
+    color: 'red',
+  }),
+  target: $$notifications.show,
 })
 
 sample({
