@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig } from 'vite'
+import lqip from 'vite-plugin-lqip'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 const monorepo = (end: string) => path.resolve(__dirname, '../..', end)
@@ -33,6 +34,7 @@ export default defineConfig({
         excludeReplayWorker: true,
       },
     }),
+    lqip(),
   ],
   build: {
     sourcemap: true,

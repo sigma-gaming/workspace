@@ -1,14 +1,24 @@
 import { RouteInstance, RouteParams } from 'atomic-router'
 import { Link } from 'atomic-router-react'
 import { routes } from '../../routing'
-import diceSrc from './assets/dice.webp'
-import pincode from './assets/pincode.webp'
+import dice from './assets/dice.webp?lqip'
+import pincode from './assets/pincode.webp?lqip'
 
 export const GamesPageView = () => {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-      <GameCard route={routes.diceGame} label="Dice" imageSrc={diceSrc} />
-      <GameCard route={routes.pincodeGame} label="Pincode" imageSrc={pincode} />
+      <GameCard
+        route={routes.diceGame}
+        label="Dice"
+        imageSrc={dice.src}
+        lqip={dice.lqip}
+      />
+      <GameCard
+        route={routes.pincodeGame}
+        label="Pincode"
+        imageSrc={pincode.src}
+        lqip={pincode.lqip}
+      />
     </div>
   )
 }
@@ -17,9 +27,10 @@ type GameCardProps = {
   route: RouteInstance<RouteParams>
   label: string
   imageSrc: string
+  lqip: string
 }
 
-const GameCard = ({ route, label, imageSrc }: GameCardProps) => {
+const GameCard = ({ route, label, imageSrc, lqip }: GameCardProps) => {
   return (
     <Link
       to={route}
@@ -28,6 +39,8 @@ const GameCard = ({ route, label, imageSrc }: GameCardProps) => {
       <img
         src={imageSrc}
         alt={label}
+        className="w-full h-full"
+        style={{ backgroundImage: `url("${lqip}")`, backgroundSize: 'cover' }}
         onError={(event) => (event.currentTarget.style.display = 'none')}
       />
       <div
