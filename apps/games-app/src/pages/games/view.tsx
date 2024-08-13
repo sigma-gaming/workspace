@@ -36,11 +36,14 @@ const GameCard = ({ route, label, imageSrc, lqip }: GameCardProps) => {
       to={route}
       className="relative block w-full h-full aspect-square rounded-2xl overflow-hidden transition-all ease-in-out hover:opacity-90 hover:-translate-y-0.5 bg-[#232337] select-none"
     >
+      <div
+        className="absolute top-0 left-0 w-full h-full"
+        style={{ backgroundImage: `url("${lqip}")`, backgroundSize: 'cover' }}
+      />
       <img
+        className="relative"
         src={imageSrc}
         alt={label}
-        className="w-full h-full"
-        style={{ backgroundImage: `url("${lqip}")`, backgroundSize: 'cover' }}
         onError={(event) => (event.currentTarget.style.display = 'none')}
       />
       <div
