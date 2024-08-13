@@ -21,19 +21,19 @@ describe('Pincode Model', () => {
   test('Easy RTP is correct', () => {
     const totalMultiplier = calculateTotalMultiplier(PincodeMode.Easy)
 
-    expect(getPincodeMultiplier(PincodeMode.Easy, 777)).toBe(15)
-    expect(getPincodeMultiplier(PincodeMode.Easy, 7077)).toBe(15)
-    expect(getPincodeMultiplier(PincodeMode.Easy, 7770)).toBe(15)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 777)).toBe(14)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 7077)).toBe(14)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 7770)).toBe(14)
 
-    expect(getPincodeMultiplier(PincodeMode.Easy, 555)).toBe(7)
-    expect(getPincodeMultiplier(PincodeMode.Easy, 5055)).toBe(7)
-    expect(getPincodeMultiplier(PincodeMode.Easy, 5550)).toBe(7)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 555)).toBe(10)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 5055)).toBe(10)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 5550)).toBe(10)
 
-    expect(getPincodeMultiplier(PincodeMode.Easy, 77)).toBe(3)
-    expect(getPincodeMultiplier(PincodeMode.Easy, 707)).toBe(3)
-    expect(getPincodeMultiplier(PincodeMode.Easy, 770)).toBe(3)
-    expect(getPincodeMultiplier(PincodeMode.Easy, 7007)).toBe(3)
-    expect(getPincodeMultiplier(PincodeMode.Easy, 7700)).toBe(3)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 77)).toBe(5)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 707)).toBe(5)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 770)).toBe(5)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 7007)).toBe(5)
+    expect(getPincodeMultiplier(PincodeMode.Easy, 7700)).toBe(5)
 
     expect(getPincodeMultiplier(PincodeMode.Easy, 99)).toBe(2)
     expect(getPincodeMultiplier(PincodeMode.Easy, 909)).toBe(2)

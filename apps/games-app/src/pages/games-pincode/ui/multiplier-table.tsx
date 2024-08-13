@@ -37,7 +37,12 @@ export const MultiplierTable = () => {
         )
 
         if (!combined) {
-          acc.push({ combination, multiplier })
+          acc.push({
+            label: combination,
+            combinations: [combination],
+            multiplier,
+          })
+
           return acc
         }
 
@@ -46,15 +51,16 @@ export const MultiplierTable = () => {
         }
 
         return acc.concat({
-          combination: combined.label,
+          label: combined.label,
+          combinations: combined.combinations,
           multiplier,
         })
       },
-      [] as { combination: string; multiplier: number }[],
+      [] as { label: string; combinations: string[]; multiplier: number }[],
     )
     .sort((a, b) => {
       if (a.multiplier === b.multiplier) {
-        return a.combination.localeCompare(b.combination)
+        return a.label.localeCompare(b.label)
       }
 
       return a.multiplier - b.multiplier
@@ -62,13 +68,16 @@ export const MultiplierTable = () => {
 
   return (
     <div className="w-full flex justify-center flex-wrap gap-2">
-      {multiplierList.map(({ combination, multiplier }) => (
+      {multiplierList.map(({ label, combinations, multiplier }) => (
         <Multiplier
-          key={combination}
-          label={combination}
+          key={label}
+          label={label}
           multiplier={multiplier}
           color={getColor(multiplier)}
-          highlighted={combination === highlightedCombination}
+          highlighted={
+            Boolean(highlightedCombination) &&
+            combinations.includes(highlightedCombination!)
+          }
         />
       ))}
     </div>
