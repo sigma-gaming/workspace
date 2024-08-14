@@ -1,4 +1,4 @@
-FROM imbios/bun-node:1.1.20-20-alpine AS base
+FROM node:20-alpine AS base
 WORKDIR /workspace
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -51,11 +51,13 @@ COPY --from=build /build/apps/maintenance-app/nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /build/apps/maintenance-app/dist ./
 RUN chmod -R 755 /app
 
-# APIs
+# API Base
 
-FROM oven/bun:1.1.20-alpine AS api-base
-WORKDIR /workspace
+FROM base AS api-base
 ENV NODE_ENV=production
+RUN apk add --no-cache gcompat
+
+# APIs
 
 FROM build AS games-api-build
 ARG sentry_auth_token
@@ -70,17 +72,13 @@ RUN pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release ${sen
 
 FROM api-base AS games-api
 COPY --from=games-api-build /build ./
-CMD [ "bun", "run", "apps/games-api/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
 
 FROM api-base AS control-api
 COPY --from=build /build ./
-CMD [ "bun", "run", "apps/control-api/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]
 
 # WS APIs
-
-FROM node:20-alpine AS ws-base
-ENV NODE_ENV=production
-RUN apk add --no-cache gcompat
 
 FROM build AS games-ws-build
 ARG sentry_auth_token
@@ -93,7 +91,7 @@ RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-ws/dist
 RUN pnpm sentry-cli sourcemaps upload /build/apps/games-ws/dist --release ${sentry_release}
 
-FROM ws-base AS games-ws
+FROM api-base AS games-ws
 WORKDIR /workspace
 COPY --from=games-ws-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]

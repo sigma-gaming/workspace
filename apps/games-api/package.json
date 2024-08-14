@@ -11,8 +11,8 @@
     "dev:start": "NODE_ENV=development nodemon --signal SIGTERM dist/main.js",
     "build": "NODE_ENV=production webpack",
     "build:dev": "NODE_ENV=development webpack",
-    "start": "NODE_ENV=production bun run dist/main.js",
-    "preview": "dotenv -e .env.development -- bun run dist/main.js",
+    "start": "NODE_ENV=production node dist/main.js",
+    "preview": "dotenv -e .env.development -- node dist/main.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"

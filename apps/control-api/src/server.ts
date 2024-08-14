@@ -1,11 +1,11 @@
 import './setup'
 import { shutdownServices } from '@core/di'
 import { createErrorHandler } from '@core/exceptions'
+import { createServer } from '@core/hono-uws'
 import { logger, loggerService } from '@core/logger'
 import { gamesDb } from '@dbs/games-db'
 import { gamesRedis } from '@games/redis'
 import { env } from '@games/services'
-import { TLSServeOptions } from 'bun'
 import { sql } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 import { app } from './app'
@@ -44,23 +44,24 @@ app.onError(
   }),
 )
 
-// eslint-disable-next-line import-x/no-anonymous-default-export, import-x/no-default-export
-const config: TLSServeOptions = {
-  port: 5051,
-  fetch: app.fetch,
-}
+const server = createServer({
+  app,
+  uwsOptions: env.isDev
+    ? {
+        key_file_name: '../../ssl/local.key',
+        cert_file_name: '../../ssl/local.crt',
+      }
+    : {},
+})
 
-if (env.isDev) {
-  config.development = true
-  config.tls = {
-    key: Bun.file('../../ssl/local.key'),
-    cert: Bun.file('../../ssl/local.crt'),
+server.listen(5051, (token) => {
+  if (!token) {
+    logger.error('Failed to start server')
+    process.exit(1)
   }
-}
 
-const server = Bun.serve(config)
-
-logger.info(`🚀 Server ready at ${env.controlApi.url}`)
+  logger.info(`🚀 Server ready at ${env.controlApi.url}`)
+})
 
 process.on('uncaughtException', (error) => {
   logger.info('Uncaught exception')
@@ -90,7 +91,7 @@ async function handleExit() {
     process.exit(0)
   }, 5000)
 
-  server.stop()
+  server.close()
   logger.info('Server closed')
 
   logger.info('Cleaning up..')

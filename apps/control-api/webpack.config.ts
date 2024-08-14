@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+import { resolve } from 'node:path'
 import { loadConfig } from 'tsconfig-paths'
 import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin'
 import { Configuration } from 'webpack'
@@ -31,7 +31,7 @@ const config: Configuration = {
   ],
   externalsPresets: { node: true },
   ignoreWarnings: [/^(?!CriticalDependenciesWarning$)/],
-  optimization: { nodeEnv: false },
+  optimization: { nodeEnv: false, minimize: false },
   resolve: {
     extensions: ['.ts', '.js'],
     plugins: [
@@ -43,6 +43,10 @@ const config: Configuration = {
   module: {
     rules: [
       {
+        test: /\.node$/,
+        loader: 'node-loader',
+      },
+      {
         test: /.ts$/,
         use: [
           {
@@ -53,10 +57,6 @@ const config: Configuration = {
           },
         ],
         exclude: /node_modules/,
-      },
-      {
-        test: /\.node$/,
-        loader: 'node-loader',
       },
     ],
   },
