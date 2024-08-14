@@ -1,4 +1,4 @@
-import { Anchor, rem, Text, Title } from '@mantine/core'
+import { Anchor, rem, Text } from '@mantine/core'
 import { IconBarrierBlock } from '@tabler/icons-react'
 import { useEffect } from 'react'
 import { CenteredLayout } from '../../layouts/centered'
@@ -20,11 +20,11 @@ export const HomePageView = () => {
             color="orange"
             style={{ width: rem(96), height: rem(96) }}
           />
-          <Title order={2} className="text-center" lh="1.2">
+          <h1 className="text-2xl font-medium text-center">
             Выполняются технические работы
-          </Title>
+          </h1>
         </div>
-        <Text className="text-center" size="lg" lh="md">
+        <Text className="text-center" size="md" lh="md">
           Следите за&nbsp;обновлениями в&nbsp;нашем{' '}
           <Anchor href="https://t.me/SigmaGamesFeed">
             Telegram&nbsp;канале
