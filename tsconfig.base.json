@@ -41,6 +41,9 @@
       "@apis/control-api": [
         "apps/control-api/src/client.ts"
       ],
+      "@core/hono-uws": [
+        "core/hono-uws/src/index.ts"
+      ],
       "@core/exceptions": [
         "core/exceptions/src/index.ts"
       ],

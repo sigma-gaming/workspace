@@ -64,6 +64,7 @@ export class GameService {
       const result = await runner()
 
       if (result.payout > availableBudget) {
+        console.log('DECLINED')
         continue
       }
 

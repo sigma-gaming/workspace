@@ -1,5 +1,5 @@
 import { env } from '@games/services'
-import * as Sentry from '@sentry/bun'
+import * as Sentry from '@sentry/node'
 
 export const sentry = Sentry.init({
   dsn: 'https://SENTRY_DSN_REMOVED',

@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/bun'
+import * as Sentry from '@sentry/node'
 import { CronJob as OriginalCronJob, CronJobParams } from 'cron'
 
 export function createCronJob(name: string, params: CronJobParams) {

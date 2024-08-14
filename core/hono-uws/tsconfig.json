@@ -8,9 +8,4 @@
     "**.mjs",
     "**.cjs"
   ],
-  "compilerOptions": {
-    "module": "CommonJS",
-    "noEmit": false,
-    "outDir": "dist"
-  }
 }

@@ -4,12 +4,13 @@
   "main": "./src/client.ts",
   "module": "./src/client.ts",
   "types": "./src/client.ts",
-  "type": "module",
   "scripts": {
     "copy-env": "copy-env",
-    "dev": "bun run --hot src/main.ts",
-    "build": "NODE_ENV=production bun run build.mjs",
-    "build:dev": "NODE_ENV=development bun run build.mjs",
+    "dev": "pnpm build:dev && concurrently 'pnpm:dev:*' -c auto -k",
+    "dev:build": "NODE_ENV=development webpack --watch",
+    "dev:start": "NODE_ENV=development nodemon --signal SIGTERM dist/main.js",
+    "build": "NODE_ENV=production webpack",
+    "build:dev": "NODE_ENV=development webpack",
     "start": "NODE_ENV=production bun run dist/main.js",
     "preview": "dotenv -e .env.development -- bun run dist/main.js",
     "typecheck": "tsc --noEmit",
@@ -29,6 +30,7 @@
     "@games/model": "workspace:*",
     "@games/redis": "workspace:*",
     "@games/services": "workspace:*",
+    "@core/hono-uws": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

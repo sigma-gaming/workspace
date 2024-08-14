@@ -1,5 +1,5 @@
 import { sessionService } from '@games/services'
-import * as Sentry from '@sentry/bun'
+import * as Sentry from '@sentry/node'
 import { MiddlewareHandler } from 'hono'
 import { sentry } from './init'
 
