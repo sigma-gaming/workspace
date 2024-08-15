@@ -18,5 +18,8 @@
     "@games/redis": "workspace:*",
     "@core/di": "workspace:*",
     "@core/logger": "workspace:*"
+  },
+  "devDependencies": {
+    "@core/hono-uws": "workspace:*"
   }
 }

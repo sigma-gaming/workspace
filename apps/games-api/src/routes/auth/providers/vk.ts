@@ -1,6 +1,13 @@
 import { BadRequestException } from '@core/exceptions'
+import { HonoUwsEnv } from '@core/hono-uws'
 import { AccountProvider } from '@dbs/games-types'
-import { AuthResult, authService, env, sessionService } from '@games/services'
+import {
+  AuthResult,
+  authService,
+  env,
+  fraudService,
+  sessionService,
+} from '@games/services'
 import { zValidator } from '@hono/zod-validator'
 import axios from 'axios'
 import { Hono } from 'hono'
@@ -43,7 +50,7 @@ const VkGetProfileSchema = z
   })
   .transform((result) => result.response)
 
-export const signInViaVkRoute = new Hono().post(
+export const signInViaVkRoute = new Hono<HonoUwsEnv>().post(
   '/',
   zValidator(
     'json',
@@ -53,7 +60,7 @@ export const signInViaVkRoute = new Hono().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const currentSession = await sessionService.getHonoSession(ctx)
+    const session = await sessionService.getHonoSession(ctx)
 
     const authResult = VkAuthResultSchema.parse(JSON.parse(payload.payload))
 
@@ -82,7 +89,7 @@ export const signInViaVkRoute = new Hono().post(
     })
 
     const result = await authService.authenticate({
-      session: currentSession,
+      session,
       provider: AccountProvider.VK,
       providerUserId: vkProfile.id.toString(),
       providerUsername: vkProfile.screen_name,
@@ -101,12 +108,13 @@ export const signInViaVkRoute = new Hono().post(
       return ctx.json({ status: 'success' })
     }
 
-    const session = await sessionService.createSession({
+    const newSession = await sessionService.createSession({
       userId: result.account.userId,
       provider: AccountProvider.VK,
     })
 
-    sessionService.attachSession(ctx, session)
+    sessionService.attachSession(ctx, newSession)
+    fraudService.actualizeIP(ctx, newSession.user.id)
 
     return ctx.json({ status: 'success' })
   },

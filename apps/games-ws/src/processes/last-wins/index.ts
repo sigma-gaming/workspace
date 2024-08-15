@@ -14,9 +14,13 @@ async function sendLastWins() {
   try {
     const lastWins = await gamesCaches.lastWinHistory.get()
 
-    const lastSentIndex = lastWins.findIndex(
+    let lastSentIndex = lastWins.findIndex(
       (gameRecord) => gameRecord.id === lastWinSent,
     )
+
+    if (lastSentIndex === -1) {
+      lastSentIndex = lastWins.length
+    }
 
     // Send only new records
     const newWins = lastWins.slice(0, lastSentIndex)
@@ -51,9 +55,13 @@ async function sendBigWins() {
   try {
     const bigWins = await gamesCaches.bigWinHistory.get()
 
-    const lastSentIndex = bigWins.findIndex(
+    let lastSentIndex = bigWins.findIndex(
       (gameRecord) => gameRecord.id === lastBigWinSent,
     )
+
+    if (lastSentIndex === -1) {
+      lastSentIndex = bigWins.length
+    }
 
     // Send only new records
     const newWins = bigWins.slice(0, lastSentIndex)

@@ -1,3 +1,4 @@
+import { HonoUwsEnv } from '@core/hono-uws'
 import { env } from '@games/services'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -12,7 +13,7 @@ import { notificationsRouter } from './routes/notifications'
 import { settingsRouter } from './routes/settings'
 import { sentryMiddleware } from './shared/sentry'
 
-export const app = new Hono()
+export const app = new Hono<HonoUwsEnv>()
   .use('*', sessionMiddleware)
   .use('*', sentryMiddleware({ enabled: env.isProd }))
   .use('*', logger())

@@ -53,6 +53,8 @@ app.onError(
 
 const server = createServer({
   app,
+  origin: env.gamesApp.url,
+  trustProxy: true,
   uwsOptions: env.isDev
     ? {
         key_file_name: '../../ssl/local.key',

@@ -5,6 +5,7 @@ import {
   AccountSelect,
   AccountTable,
   ProfileTable,
+  UserSecurityTable,
   UserTable,
 } from '@dbs/games-schema'
 import { AccountProvider } from '@dbs/games-types'
@@ -132,6 +133,10 @@ export class AuthService {
           .insert(AccountTable)
           .values({ userId, ...accountSharedInput })
           .returning()
+
+        await tx.insert(UserSecurityTable).values({
+          userId,
+        })
 
         return account
       })

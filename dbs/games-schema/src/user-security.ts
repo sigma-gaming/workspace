@@ -3,7 +3,7 @@ import { UserTable } from './users'
 
 export const UserSecurityTable = pgTable('UserSecurity', {
   id: uuid('id').defaultRandom().primaryKey(),
-  lastIP: text('lastIP').notNull(),
+  lastIP: text('lastIP'),
   addressUsdt: text('addressUsdt'),
   addressUsdc: text('addressUsdc'),
   addressTrx: text('addressTrx'),

@@ -3,9 +3,9 @@ import { HTTPException } from 'hono/http-exception'
 import { StatusCode } from 'hono/utils/http-status'
 import { InternalServerException, RouteException } from './exceptions'
 
-export function createErrorHandler(options: {
-  onInternalError?: (error: Error, ctx: Context) => void
-}): ErrorHandler<Env> {
+export function createErrorHandler<E extends Env>(options: {
+  onInternalError?: (error: Error, ctx: Context<E>) => void
+}): ErrorHandler<E> {
   return (error, ctx) => {
     if (error instanceof HTTPException) {
       return error.getResponse()

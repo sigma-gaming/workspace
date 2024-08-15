@@ -43,6 +43,13 @@
       "when": 1722957375405,
       "tag": "0005_public_zaran",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1723734609845,
+      "tag": "0006_lucky_lilandra",
+      "breakpoints": true
     }
   ]
 }

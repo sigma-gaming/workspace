@@ -1,7 +1,23 @@
 /* eslint-disable unicorn/number-literal-case */
 import { createDefer } from '@core/utils'
-import { Hono } from 'hono'
-import { App, AppOptions, SSLApp } from 'uWebSockets.js'
+import { Context, Hono } from 'hono'
+import {
+  App,
+  AppOptions,
+  HttpRequest,
+  HttpResponse,
+  SSLApp,
+} from 'uWebSockets.js'
+
+export type UwsBindings = {
+  getIP: () => string
+  req: HttpRequest
+  res: HttpResponse
+}
+
+export type HonoUwsEnv = { Bindings: UwsBindings }
+export type HonoUwsContext = Context<HonoUwsEnv>
+export type HonoUwsApp = Hono<HonoUwsEnv>
 
 export function createServer({
   origin,
@@ -12,7 +28,7 @@ export function createServer({
   origin?: string
   trustProxy?: boolean
   uwsOptions?: AppOptions
-  app: Hono
+  app: HonoUwsApp
 }) {
   let { protocol, host } = origin
     ? new URL(origin)
@@ -51,13 +67,11 @@ export function createServer({
       (isSSL && 'https') ||
       'http'
 
-    const ipAddress = ipAddressBytesToString(res.getRemoteAddress())
-
     host =
       host ||
       (trustProxy && getForwardedHeader('host')) ||
       headers.get('host') ||
-      ipAddress
+      void 0
 
     if (!host) {
       console.warn(
@@ -68,7 +82,14 @@ export function createServer({
       host = 'localhost'
     }
 
-    // const ip = (trustProxy && getForwardedHeader('for')) || ipAddress || ''
+    function getIP() {
+      return (
+        (trustProxy && headers.get('cf-connecting-ip')) ||
+        (trustProxy && getForwardedHeader('for')) ||
+        ipAddressBytesToString(res.getRemoteAddress()) ||
+        ''
+      )
+    }
 
     const query = req.getQuery()
     const url = protocol + '://' + host + path + (query ? '?' + query : '')
@@ -107,7 +128,11 @@ export function createServer({
         })
       }
 
-      const responseOrPromise = app.fetch(request)
+      const responseOrPromise = app.fetch(request, {
+        req,
+        res,
+        getIP,
+      })
 
       if (responseOrPromise instanceof Promise) {
         responseOrPromise.then(finish).catch(handleError)
