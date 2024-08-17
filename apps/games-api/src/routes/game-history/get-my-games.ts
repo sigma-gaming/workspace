@@ -1,7 +1,7 @@
 import { gameHistoryService, sessionService } from '@games/services'
-import { Hono } from 'hono'
+import { createRouter } from '../../hono'
 
-export const getMyGames = new Hono().get('/', async (ctx) => {
+export const getMyGamesRoute = createRouter().get('/', async (ctx) => {
   const session = await sessionService.getHonoSession(ctx)
   const user = sessionService.getUser(session)
   const lastWins = await gameHistoryService.getUserGameHistory(user.id)

@@ -1,6 +1,7 @@
 import {
   AccountProvider,
   ChatMessageType,
+  FraudRisk,
   Game,
   GameOutcome,
   NotificationKind,
@@ -40,3 +41,5 @@ export const chatMessageTypeEnum = pgEnum(
   'ChatMessageType',
   enumValues(ChatMessageType),
 )
+
+export const fraudRiskEnum = pgEnum('FraudRisk', enumValues(FraudRisk))

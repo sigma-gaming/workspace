@@ -1,7 +1,7 @@
 import { sessionService } from '@games/services'
-import { Hono } from 'hono'
+import { createRouter } from '../../hono'
 
-export const logoutRoute = new Hono().post('/', async (ctx) => {
+export const logoutRoute = createRouter().post('/', async (ctx) => {
   const session = await sessionService.getHonoSession(ctx)
 
   await sessionService.removeSession(session)

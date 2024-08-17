@@ -1,7 +1,7 @@
 import { sessionService, transactionService } from '@games/services'
-import { Hono } from 'hono'
+import { createRouter } from '../../hono'
 
-export const getDetailedBalanceRoute = new Hono().get('/', async (ctx) => {
+export const getDetailedBalanceRoute = createRouter().get('/', async (ctx) => {
   const session = await sessionService.getHonoSession(ctx)
   const user = sessionService.getUser(session)
 

@@ -7,10 +7,10 @@ import { gamesCaches } from '@games/redis'
 import { profileService, sessionService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
 import { eq } from 'drizzle-orm'
-import { Hono } from 'hono'
 import { z } from 'zod'
+import { createRouter } from '../../hono'
 
-export const updateProfileRoute = new Hono().post(
+export const updateProfileRoute = createRouter().post(
   '/',
   zValidator(
     'json',

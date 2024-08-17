@@ -1,9 +1,9 @@
 import { ChatValidation } from '@games/model'
 import { chatService, sessionService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
-import { Hono } from 'hono'
+import { createRouter } from '../../hono'
 
-export const sendMessageRoute = new Hono().post(
+export const sendMessageRoute = createRouter().post(
   '/',
   zValidator('json', ChatValidation.MessagePayloadSchema),
   async (ctx) => {

@@ -7,6 +7,7 @@ export enum UserRole {
   User = 'User',
   Admin = 'Admin',
   Moderator = 'Moderator',
+  Support = 'Support',
 }
 
 export enum TransactionType {
@@ -41,4 +42,12 @@ export enum ChatMessageType {
 
 export enum ChatMessageAttachmentType {
   Game = 'Game',
+}
+
+export enum FraudRisk {
+  Clear = 'Clear',
+  Low = 'Low',
+  Medium = 'Medium',
+  High = 'High',
+  Unknown = 'Unknown',
 }

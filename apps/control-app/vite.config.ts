@@ -16,6 +16,7 @@ export default defineConfig({
       cert: fs.readFileSync(monorepo('ssl/local.crt')),
       key: fs.readFileSync(monorepo('ssl/local.key')),
     },
+    open: true,
   },
   plugins: [
     react({

@@ -17,7 +17,7 @@ import { $$balance } from '../../entities/balance'
 import { $$profile } from '../../entities/profile/index.ts'
 import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
-import { routes } from '../../routing'
+import { router, routes } from '../../routing'
 import { Balance } from './balance.tsx'
 
 function useAvatarSize() {
@@ -170,7 +170,9 @@ export const MiniProfile = () => {
 }
 
 export const ExpiredProfile = () => {
-  const [opened, { open, close }] = useDisclosure(false)
+  const { view } = useUnit(router.$query)
+  const initialOpened = view === 'sign-in'
+  const [opened, { open, close }] = useDisclosure(initialOpened)
 
   return (
     <>

@@ -2,9 +2,9 @@ import { InternalServerException, RouteException } from '@core/exceptions'
 import { TransactionType } from '@dbs/games-types'
 import { gamesCaches } from '@games/redis'
 import { sessionService, transactionService } from '@games/services'
-import { Hono } from 'hono'
+import { createRouter } from '../../hono'
 
-export const depositRoute = new Hono().post('/', async (ctx) => {
+export const depositRoute = createRouter().post('/', async (ctx) => {
   const session = await sessionService.getHonoSession(ctx)
   const user = sessionService.getUser(session)
   const amount = 1000000

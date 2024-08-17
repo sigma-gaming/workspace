@@ -1,68 +1,91 @@
-import { Icons, Menu, MenuLink, MenuSection } from '@core/ui'
-import { rem } from '@mantine/core'
-import {
-  IconBarrierBlock,
-  IconCoins,
-  IconDashboard,
-  IconNotification,
-} from '@tabler/icons-react'
+import { Icons, useMedia } from '@core/ui'
 import { Link } from 'atomic-router-react'
-import { PropsWithChildren } from 'react'
+import clsx from 'clsx'
+import { ReactNode } from 'react'
 import { routes } from '../../routing/index.ts'
+import { BaseLayoutMenu } from './menu.tsx'
+import { MiniProfile } from './mini-profile.tsx'
+import { MobileTabs } from './mobile-tabs.tsx'
 
-export const BaseLayout = ({ children }: PropsWithChildren) => {
+function useHeaderHeight() {
+  const fromLg = useMedia({ from: 'lg' })
+  const fromMd = useMedia({ from: 'sm' })
+  if (fromLg) return '112px'
+  if (fromMd) return '80px'
+  return '64px'
+}
+
+function useTabsHeight() {
+  const fromLg = useMedia({ from: 'lg' })
+  if (fromLg) return '0px'
+  return '56px'
+}
+
+type Props = {
+  className?: string
+  children?: ReactNode
+}
+
+export const BaseLayout = ({ className, children }: Props) => {
+  const headerHeight = useHeaderHeight()
+  const tabsHeight = useTabsHeight()
+  const isMobile = useMedia({ to: 'md' })
+  const leftVisible = !isMobile
+  const rightVisible = !isMobile
+
   return (
     <div className="min-h-full flex flex-col">
-      <Left />
-      <main className="pl-[280px] pr-6 pt-[104px] pb-6">{children}</main>
+      <style>
+        {`
+          :root {
+            --header-height: ${headerHeight};
+            --tabs-height: ${tabsHeight};
+          }
+        `}
+      </style>
+      <Header />
+      <div
+        className={clsx(
+          'grow flex flex-col gap-6 pb-4 lg:pb-6',
+          leftVisible ? 'pl-[280px]' : 'pl-4 lg:pl-6',
+          rightVisible ? 'pr-[320px]' : 'pr-4 lg:pr-6',
+          isMobile && 'pt-6 pb-[calc(var(--tabs-height)+24px)]',
+        )}
+      >
+        <main className={className}>{children}</main>
+      </div>
+      {leftVisible && <Left />}
+      {isMobile && <MobileTabs />}
+    </div>
+  )
+}
+
+const Header = () => {
+  return (
+    <div className="pointer-events-none sticky top-0 z-[200] h-[--header-height] py-2 bg-[#1B1C2F] bg-opacity-80 lg:bg-transparent flex items-center justify-between backdrop-blur-md lg:backdrop-blur-none shadow-border lg:shadow-none">
+      <div className="pointer-events-auto w-[280px] pl-2 lg:py-2 lg:px-6 flex justify-start lg:justify-center">
+        <Link
+          aria-label="Перейти на главную страницу"
+          to={routes.dashboard}
+          className="flex items-center gap-2 p-2 focus-visible:outline-primary rounded-xl"
+        >
+          <Icons.Sigma />
+          <h1 className="hidden lg:block text-4xl leading-none font-text font-bold">
+            Sigma
+          </h1>
+        </Link>
+      </div>
+      <div className="pointer-events-auto pr-4 py-2 lg:pr-6">
+        <MiniProfile />
+      </div>
     </div>
   )
 }
 
 const Left = () => {
   return (
-    <div className="fixed top-0 left-0 bottom-0 w-[280px] p-6">
-      <Link
-        to={routes.dashboard}
-        className="w-full flex items-center justify-center gap-2 p-2 mb-4"
-      >
-        <Icons.Sigma />
-        <h1 className="hidden md:block font-text text-2xl font-medium">
-          Sigma
-        </h1>
-      </Link>
-      <Menu>
-        <MenuLink
-          to={routes.dashboard}
-          icon={<IconDashboard style={{ width: rem(24), height: rem(24) }} />}
-        >
-          Главная
-        </MenuLink>
-        <MenuLink
-          to={routes.budget}
-          icon={<IconCoins style={{ width: rem(24), height: rem(24) }} />}
-        >
-          Бюджет
-        </MenuLink>
-        <MenuLink
-          to={routes.notifications}
-          icon={
-            <IconNotification style={{ width: rem(24), height: rem(24) }} />
-          }
-        >
-          Уведомления
-        </MenuLink>
-        <MenuSection label="Обслуживание">
-          <MenuLink
-            to={routes.maintenance}
-            icon={
-              <IconBarrierBlock style={{ width: rem(24), height: rem(24) }} />
-            }
-          >
-            Тех. работы
-          </MenuLink>
-        </MenuSection>
-      </Menu>
+    <div className="fixed top-[112px] left-0 bottom-0 flex flex-col gap-4 w-[280px] p-6 pt-0">
+      <BaseLayoutMenu />
     </div>
   )
 }

@@ -1,5 +1,4 @@
 import { BadRequestException } from '@core/exceptions'
-import { HonoUwsEnv } from '@core/hono-uws'
 import { AccountProvider } from '@dbs/games-types'
 import {
   AuthResult,
@@ -10,8 +9,8 @@ import {
 } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
 import axios from 'axios'
-import { Hono } from 'hono'
 import { z } from 'zod'
+import { createRouter } from '../../../hono'
 
 const VkAuthResultSchema = z.object({
   type: z.literal('silent_token'),
@@ -50,7 +49,7 @@ const VkGetProfileSchema = z
   })
   .transform((result) => result.response)
 
-export const signInViaVkRoute = new Hono<HonoUwsEnv>().post(
+export const signInViaVkRoute = createRouter().post(
   '/',
   zValidator(
     'json',
@@ -114,7 +113,7 @@ export const signInViaVkRoute = new Hono<HonoUwsEnv>().post(
     })
 
     sessionService.attachSession(ctx, newSession)
-    fraudService.actualizeIP(ctx, newSession.user.id)
+    fraudService.actualizeRisk(newSession.user.id, { ctx })
 
     return ctx.json({ status: 'success' })
   },

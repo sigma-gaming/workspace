@@ -10,7 +10,7 @@ import {
 } from 'uWebSockets.js'
 
 export type UwsBindings = {
-  getIP: () => string
+  ip: string
   req: HttpRequest
   res: HttpResponse
 }
@@ -19,7 +19,7 @@ export type HonoUwsEnv = { Bindings: UwsBindings }
 export type HonoUwsContext = Context<HonoUwsEnv>
 export type HonoUwsApp = Hono<HonoUwsEnv>
 
-export function createServer({
+export function createServer<E extends HonoUwsEnv>({
   origin,
   trustProxy,
   app,
@@ -28,7 +28,7 @@ export function createServer({
   origin?: string
   trustProxy?: boolean
   uwsOptions?: AppOptions
-  app: HonoUwsApp
+  app: Hono<E>
 }) {
   let { protocol, host } = origin
     ? new URL(origin)
@@ -54,8 +54,13 @@ export function createServer({
     const method = req.getCaseSensitiveMethod()
     const path = req.getUrl()
 
+    let cfIP: string | null = null
+
     const headers = new Headers()
-    req.forEach((key, value) => headers.append(key, value))
+    req.forEach((key, value) => {
+      if (key === 'cf-connecting-ip') cfIP = value
+      headers.append(key, value)
+    })
 
     function getForwardedHeader(name: string) {
       return (headers.get('x-forwarded-' + name) || '').split(',', 1)[0].trim()
@@ -82,14 +87,11 @@ export function createServer({
       host = 'localhost'
     }
 
-    function getIP() {
-      return (
-        (trustProxy && headers.get('cf-connecting-ip')) ||
-        (trustProxy && getForwardedHeader('for')) ||
-        ipAddressBytesToString(res.getRemoteAddress()) ||
-        ''
-      )
-    }
+    const ip =
+      cfIP ||
+      getForwardedHeader('for') ||
+      ipAddressBytesToString(res.getRemoteAddress()) ||
+      ''
 
     const query = req.getQuery()
     const url = protocol + '://' + host + path + (query ? '?' + query : '')
@@ -131,7 +133,7 @@ export function createServer({
       const responseOrPromise = app.fetch(request, {
         req,
         res,
-        getIP,
+        ip,
       })
 
       if (responseOrPromise instanceof Promise) {

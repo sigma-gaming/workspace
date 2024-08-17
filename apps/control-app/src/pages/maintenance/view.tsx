@@ -1,11 +1,4 @@
-import {
-  Button,
-  Card,
-  LoadingOverlay,
-  Skeleton,
-  Switch,
-  Title,
-} from '@mantine/core'
+import { Button, Card, LoadingOverlay, Skeleton, Switch } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { $$maintenancePage } from './model'
 
@@ -28,7 +21,7 @@ export const MaintenancePageView = () => {
     >
       <LoadingOverlay visible={submitting} />
 
-      <Title order={3}>Технические работы</Title>
+      <h3 className="text-xl font-medium">Технические работы</h3>
 
       <Skeleton className="sm:w-fit" visible={loading}>
         <Switch

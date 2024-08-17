@@ -10,7 +10,6 @@ import {
   Switch,
   Text,
   TextInput,
-  Title,
 } from '@mantine/core'
 import { IconCircleFilled } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
@@ -55,7 +54,7 @@ export const NotificationsPageView = () => {
     >
       <LoadingOverlay visible={submitting} />
 
-      <Title order={3}>Уведомления</Title>
+      <h3 className="text-xl font-medium">Уведомления</h3>
 
       <TextInput
         label="Заголовок"

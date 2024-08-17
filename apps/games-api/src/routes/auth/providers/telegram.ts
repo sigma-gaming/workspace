@@ -1,5 +1,4 @@
 import { BadRequestException } from '@core/exceptions'
-import { HonoUwsEnv } from '@core/hono-uws'
 import { AccountProvider } from '@dbs/games-types'
 import {
   AuthResult,
@@ -10,9 +9,9 @@ import {
   telegramBotService,
 } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
-import { Hono } from 'hono'
 import crypto from 'node:crypto'
 import { z } from 'zod'
+import { createRouter } from '../../../hono'
 
 const TgAuthResultSchema = z.object({
   id: z.number().transform(String),
@@ -24,7 +23,7 @@ const TgAuthResultSchema = z.object({
   hash: z.string(),
 })
 
-export const signInViaTelegramRoute = new Hono<HonoUwsEnv>().post(
+export const signInViaTelegramRoute = createRouter().post(
   '/',
   zValidator(
     'json',
@@ -116,7 +115,7 @@ export const signInViaTelegramRoute = new Hono<HonoUwsEnv>().post(
     })
 
     sessionService.attachSession(ctx, newSession)
-    fraudService.actualizeIP(ctx, newSession.user.id)
+    fraudService.actualizeRisk(newSession.user.id, { ctx })
 
     return ctx.json({ status: 'success' })
   },

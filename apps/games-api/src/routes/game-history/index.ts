@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
-import { getBigWins } from './get-big-wins'
-import { getLastWins } from './get-last-wins'
-import { getMyGames } from './get-my-games'
+import { getBigWinsRoute } from './get-big-wins'
+import { getLastWinsRoute } from './get-last-wins'
+import { getMyGamesRoute } from './get-my-games'
 
 export const gameHistoryRouter = new Hono()
-  .route('/getLastWins', getLastWins)
-  .route('/getBigWins', getBigWins)
-  .route('/getMyGames', getMyGames)
+  .route('/getLastWins', getLastWinsRoute)
+  .route('/getBigWins', getBigWinsRoute)
+  .route('/getMyGames', getMyGamesRoute)

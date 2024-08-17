@@ -1,7 +1,7 @@
 import { notificationService, sessionService } from '@games/services'
-import { Hono } from 'hono'
+import { createRouter } from '../../hono'
 
-export const getActualRoute = new Hono().get('/', async (ctx) => {
+export const getActualRoute = createRouter().get('/', async (ctx) => {
   const session = await sessionService.getHonoSession(ctx)
   const user = sessionService.getUserSafe(session)
   const actual = await notificationService.getActual(user?.id)

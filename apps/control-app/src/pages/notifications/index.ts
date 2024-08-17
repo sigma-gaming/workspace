@@ -1,4 +1,4 @@
-import { BaseLayout } from '../../layouts/base/index.ts'
+import { BaseLayout } from '../../layouts/base'
 import { createPage, routes } from '../../routing/index.ts'
 import { NotificationsPageView } from './view.tsx'
 

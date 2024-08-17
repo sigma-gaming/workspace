@@ -1,6 +1,8 @@
 import { Icons, LinkButton, LinkButtonProps } from '@core/ui'
 import { AccountProvider } from '@dbs/games-types'
+import { attach } from 'effector'
 import { v4 } from 'uuid'
+import { router } from '../../routing'
 import { env } from '../../shared/env'
 
 type ProviderInfo = {
@@ -28,12 +30,16 @@ type Meta = {
 
 const META_KEY = 'auth/meta'
 
-function saveMeta({ flow }: Pick<Meta, 'flow'>) {
-  if (typeof window === 'undefined') return '/'
-  const returnUrl = window.location.pathname + window.location.search
-  const meta: Meta = { flow, returnUrl }
-  window.localStorage.setItem(META_KEY, JSON.stringify(meta))
-}
+const saveMetaFx = attach({
+  source: router.$query,
+  effect(query, { flow }: Pick<Meta, 'flow'>) {
+    if (typeof window === 'undefined') return '/'
+    const returnUrl =
+      query.returnUrl ?? window.location.pathname + window.location.search
+    const meta: Meta = { flow, returnUrl }
+    window.localStorage.setItem(META_KEY, JSON.stringify(meta))
+  },
+})
 
 export function getMeta() {
   if (typeof window === 'undefined') return null
@@ -76,7 +82,7 @@ export const VkButton = ({
   return (
     <LinkButton
       to={createVkUrl()}
-      onClick={() => saveMeta({ flow })}
+      onClick={() => saveMetaFx({ flow })}
       color="#3375F6"
       className="!outline-[#3375F6]"
       leftSection={<Icons.Vk />}
@@ -97,7 +103,7 @@ export const TelegramButton = ({
   return (
     <LinkButton
       to={createTelegramUrl()}
-      onClick={() => saveMeta({ flow })}
+      onClick={() => saveMetaFx({ flow })}
       color="#51A2DD"
       className="!outline-[#51A2DD]"
       leftSection={<Icons.Telegram />}

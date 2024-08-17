@@ -23,8 +23,13 @@ const takeMetaFx = createEffect(() => {
 
 const redirectFx = attach({
   source: router.$history,
-  effect(history, returnPath: string) {
-    history.replace(returnPath)
+  effect(history, returnUrl: string) {
+    if (returnUrl.startsWith('http')) {
+      window.location.replace(returnUrl)
+      return
+    }
+
+    history.replace(returnUrl)
   },
 })
 

@@ -16,6 +16,13 @@ import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
 import { singleton } from 'tsyringe-neo'
 import { Env, EnvService } from './env'
 
+type HonoEnvWithSession = {
+  Variables: {
+    session?: Session
+    user?: UserSelect
+  }
+}
+
 type AddSessionOptions = {
   userId: string
   provider: AccountProvider
@@ -78,7 +85,9 @@ export class SessionService {
     return created
   }
 
-  getHonoSession = async (ctx: HonoContext): Promise<Session> => {
+  getHonoSession = async <E extends HonoEnvWithSession>(
+    ctx: HonoContext<E>,
+  ): Promise<Session> => {
     const saved = ctx.get('session')
     if (saved) return saved
 
@@ -157,21 +166,28 @@ export class SessionService {
     return session
   }
 
-  async getHonoUserSafe(ctx: HonoContext): Promise<UserSelect | null> {
+  async getHonoUserSafe<E extends HonoEnvWithSession>(
+    ctx: HonoContext<E>,
+  ): Promise<UserSelect | null> {
     const saved = ctx.get('user')
     if (saved) return saved
     const session = await this.getHonoSession(ctx)
     return this.getUserSafe(session)
   }
 
-  async getHonoUser(ctx: HonoContext): Promise<UserSelect> {
+  async getHonoUser<E extends HonoEnvWithSession>(
+    ctx: HonoContext<E>,
+  ): Promise<UserSelect> {
     const saved = ctx.get('user')
     if (saved) return saved
     const session = await this.getHonoSession(ctx)
     return this.getUser(session)
   }
 
-  attachSession(ctx: HonoContext, session: Session) {
+  attachSession<E extends HonoEnvWithSession>(
+    ctx: HonoContext<E>,
+    session: Session,
+  ) {
     if (session.state !== SessionState.Authenticated) {
       return
     }
@@ -218,7 +234,7 @@ export class SessionService {
     }
   }
 
-  detachSession(ctx: HonoContext) {
+  detachSession<E extends HonoEnvWithSession>(ctx: HonoContext<E>) {
     deleteCookie(ctx, 'session')
     deleteCookie(ctx, 'sessionExpiresAt')
   }
