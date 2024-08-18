@@ -50,6 +50,7 @@
     "@hono/node-ws": "^1.0.1",
     "@hono/zod-validator": "^0.2.2",
     "@mantine/core": "^7.12.1",
+    "@mantine/dates": "^7.12.1",
     "@mantine/hooks": "^7.12.1",
     "@mantine/notifications": "^7.12.1",
     "@neodx/colors": "^0.2.8",

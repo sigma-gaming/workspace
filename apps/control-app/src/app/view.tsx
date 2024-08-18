@@ -1,5 +1,8 @@
 import './global.css'
+import 'dayjs/locale/ru'
+import '@mantine/dates/styles.css'
 import { ThemeProvider } from '@core/ui'
+import { DatesProvider } from '@mantine/dates'
 import { Notifications } from '@mantine/notifications'
 import { createRoutesView, RouterProvider } from 'atomic-router-react'
 import { useUnit } from 'effector-react'
@@ -41,8 +44,21 @@ export const AppView = () => {
   return (
     <RouterProvider router={router}>
       <ThemeProvider>
-        <Notifications limit={3} position="bottom-left" containerWidth={320} />
-        <OptimizedPages />
+        <DatesProvider
+          settings={{
+            locale: 'ru',
+            firstDayOfWeek: 1,
+            weekendDays: [0, 6],
+            timezone: 'Europe/Moscow',
+          }}
+        >
+          <Notifications
+            limit={3}
+            position="bottom-left"
+            containerWidth={320}
+          />
+          <OptimizedPages />
+        </DatesProvider>
       </ThemeProvider>
     </RouterProvider>
   )

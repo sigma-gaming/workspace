@@ -4,6 +4,7 @@ import {
   IconBarrierBlock,
   IconCoins,
   IconDashboard,
+  IconGift,
   IconNotification,
 } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
@@ -21,6 +22,14 @@ export const BaseLayoutMenu = () => {
       >
         Главная
       </MenuLink>
+      {isAdmin && (
+        <MenuLink
+          to={routes.promocodes}
+          icon={<IconGift style={{ width: rem(24), height: rem(24) }} />}
+        >
+          Промокоды
+        </MenuLink>
+      )}
       {isAdmin && (
         <MenuLink
           to={routes.budget}

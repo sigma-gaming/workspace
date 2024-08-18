@@ -4,7 +4,7 @@ import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { calculateDiceFullWinAmount } from '@games/model'
+import { calculateDiceFullWinAmount, gemInt } from '@games/model'
 import { NotificationData } from '@mantine/notifications'
 import type { Rive } from '@rive-app/react-canvas'
 import {
@@ -90,25 +90,21 @@ const playAnimationFx = attach({
 
 const fields = {
   bet: createField({
-    emptyValue: '1',
+    emptyValue: 100,
     persistKey: 'games/dice/bet',
-    persistInitialValue: true,
+    resetToPersisted: true,
   }),
   sides: createField<string[]>({
     emptyValue: ['1'],
     persistKey: 'games/dice/sides',
-    persistInitialValue: true,
+    resetToPersisted: true,
   }),
 }
 
 export const form = createForm({
   fields,
   schema: z.object({
-    bet: z.coerce
-      .number()
-      .min(1, 'Минимальная ставка - 1 гем')
-      .step(0.01, 'Ставка должна быть кратна 0.01')
-      .transform((gems) => Math.floor(gems * 100)),
+    bet: z.number().min(gemInt(1), 'Минимальная ставка - 1 гем'),
     sides: z
       .array(z.string().transform(Number))
       .min(1, 'Выберите как минимум одну грань')
@@ -119,7 +115,7 @@ export const form = createForm({
 const $possibleWinAmount = combine(
   fields.bet.$value,
   fields.sides.$value.map((sides) => sides.map(Number)),
-  (bet, sides) => calculateDiceFullWinAmount(Number(bet) * 100, sides) / 100,
+  (bet, sides) => calculateDiceFullWinAmount(bet, sides),
 )
 
 const showActionNotAllowed = $$notifications.show.prepend(() => ({
@@ -163,24 +159,14 @@ sample({
 sample({
   clock: betDoubled,
   source: { bet: fields.bet.$value, balance: $$balance.$available },
-  fn: ({ bet, balance }) => {
-    const doubled = Math.min(
-      balance / 100,
-      Math.ceil(Number(bet) * 2 * 100) / 100,
-    )
-
-    return String(doubled)
-  },
+  fn: ({ bet, balance }) => Math.min(balance, bet * 2),
   target: fields.bet.update,
 })
 
 sample({
   clock: betHalved,
   source: fields.bet.$value,
-  fn: (bet) => {
-    const halved = Math.max(1, Math.ceil((Number(bet) / 2) * 100) / 100)
-    return String(halved)
-  },
+  fn: (bet) => Math.max(1, bet / 2),
   target: fields.bet.update,
 })
 

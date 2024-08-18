@@ -2,10 +2,10 @@ import { gamesDb } from '@dbs/games-db'
 import { UserSecurityTable } from '@dbs/games-schema'
 import { zValidator } from '@hono/zod-validator'
 import { eq } from 'drizzle-orm'
-import { Hono } from 'hono'
 import { z } from 'zod'
+import { createRouter } from '../../hono'
 
-export const getInfoRoute = new Hono().post(
+export const getInfoRoute = createRouter().post(
   '/',
   zValidator(
     'json',

@@ -22,7 +22,7 @@ export const updateProfileRoute = createRouter().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const session = await sessionService.getHonoSession(ctx)
+    const session = ctx.get('session')
     const user = sessionService.getUser(session)
 
     if (payload.username) {

@@ -27,7 +27,7 @@ export function normalizeFieldErrors<TValues extends FormValues>(
 type FieldOptions<TValue> = {
   emptyValue: TValue
   persistKey?: string
-  persistInitialValue?: boolean
+  resetToPersisted?: boolean
 }
 
 type Field<TValue> = {
@@ -119,7 +119,7 @@ export function createField<TValue>(
   if (options.persistKey) {
     persist({ store: $value, key: options.persistKey })
 
-    if (options.persistInitialValue) {
+    if (options.resetToPersisted) {
       sample({
         source: $value,
         target: $initialValue,

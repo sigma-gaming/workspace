@@ -26,9 +26,9 @@ export const TransactionTable = pgTable('Transaction', {
   totalLost: bigint('totalLost', { mode: 'number' }).notNull().default(0),
   totalRTP: bigint('totalRTP', { mode: 'number' }).notNull().default(0),
 
-  userId: uuid('userId')
-    .references(() => UserTable.id)
-    .notNull(),
+  userId: uuid('userId').references(() => UserTable.id, {
+    onDelete: 'set null',
+  }),
   gameRecordId: uuid('gameRecordId'),
 })
 

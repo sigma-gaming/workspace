@@ -1,9 +1,11 @@
+import { UserRole } from '@dbs/games-types'
 import { gamesPubsubs, maintenanceCache } from '@games/redis'
+import { roleService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
-import { Hono } from 'hono'
 import { z } from 'zod'
+import { createRouter } from '../../hono'
 
-export const updateMaintenanceRoute = new Hono().post(
+export const updateMaintenanceRoute = createRouter().post(
   '/',
   zValidator(
     'json',
@@ -12,6 +14,9 @@ export const updateMaintenanceRoute = new Hono().post(
     }),
   ),
   async (ctx) => {
+    const user = ctx.get('user')
+    roleService.assert(user, UserRole.Admin)
+
     const payload = ctx.req.valid('json')
     await maintenanceCache.setMaintenanceMode(payload.value)
 

@@ -4,8 +4,7 @@ import { Logger, LoggerService } from '@core/logger'
 import { gamesDb } from '@dbs/games-db'
 import { UserSecuritySelect, UserSecurityTable } from '@dbs/games-schema'
 import { FraudRisk } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
-import { and, eq, lt } from 'drizzle-orm'
+import { and, count, eq, lt } from 'drizzle-orm'
 import { Context as HonoContext } from 'hono'
 import { singleton } from 'tsyringe-neo'
 
@@ -96,7 +95,6 @@ export class FraudService {
 
           // eslint-disable-next-line require-atomic-updates
           security.lastIP = lastIP
-          await gamesCaches.userIdsByIP.del(lastIP)
         } else {
           this.logger.warn(`Failed to get IP. Probably ctx is not specified`)
         }
@@ -111,15 +109,15 @@ export class FraudService {
           return
         }
 
-        const entries = await gamesDb
-          .select({ userId: UserSecurityTable.userId })
+        const [{ count: sameCount }] = await gamesDb
+          .select({ count: count() })
           .from(UserSecurityTable)
           .where(and(eq(UserSecurityTable[field], value)))
 
-        const newScore = entries.length * multiplier
+        const newScore = sameCount * multiplier
 
         this.logger.info(
-          `Updating ${scoreField} for ${entries.length} users with the same ${field}`,
+          `Updating ${scoreField} for ${sameCount} users with the same ${field}`,
         )
 
         await gamesDb
@@ -146,8 +144,7 @@ export class FraudService {
         0,
       )
 
-      const risk = this.calculateRisk(totalScore)
-      return risk
+      return this.calculateRisk(totalScore)
     } catch (error) {
       this.logger.error('Failed to actualize risk', error)
       return FraudRisk.Unknown

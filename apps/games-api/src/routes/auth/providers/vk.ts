@@ -59,7 +59,7 @@ export const signInViaVkRoute = createRouter().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const session = await sessionService.getHonoSession(ctx)
+    const session = ctx.get('session')
 
     const authResult = VkAuthResultSchema.parse(JSON.parse(payload.payload))
 

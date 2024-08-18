@@ -77,7 +77,7 @@ export const MiniProfile = () => {
                 @{profile.username}
               </Text>
             )}
-            <Text>Роли: {roles.join(', ')}</Text>
+            <p className="mt-2 text-sm">Роли: {roles.join(', ')}</p>
           </div>
         )}
       </Menu.Dropdown>

@@ -1,0 +1,16 @@
+.calendarHeaderControl:hover,
+.calendarHeaderLevel:hover {
+  @apply !bg-[#36374C];
+}
+
+.day:not([data-selected='true']):hover {
+  @apply !bg-[#36374C];
+}
+
+.timeWrapper {
+  --mantine-color-input-bg: #2e304d;
+}
+
+.timeInput > div {
+  @apply mt-0;
+}

@@ -1,4 +1,8 @@
-import { ChatMessageAttachmentType, Game } from './enums-raw'
+import {
+  ChatMessageAttachmentType,
+  Game,
+  PromocodeBonusType,
+} from './enums-raw'
 
 export type GameSnapshotDice = {
   game: Game.Dice
@@ -19,3 +23,22 @@ export type ChatMessageAttachmentGame = {
 }
 
 export type ChatMessageAttachment = ChatMessageAttachmentGame
+
+export type PromocodeBonus =
+  | {
+      type: PromocodeBonusType.DepositMultiplier
+      multiplier: number
+      minDeposit?: number
+      maxPayout?: number
+      activeHours: number
+    }
+  | {
+      type: PromocodeBonusType.DepositFixed
+      payout: number
+      minDeposit: number
+      activeHours: number
+    }
+  | {
+      type: PromocodeBonusType.Payout
+      payout: number
+    }

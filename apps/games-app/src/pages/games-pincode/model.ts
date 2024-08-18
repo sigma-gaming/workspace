@@ -4,7 +4,7 @@ import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { getPincodeCombination, PincodeMode } from '@games/model'
+import { gemInt, getPincodeCombination, PincodeMode } from '@games/model'
 import { NotificationData } from '@mantine/notifications'
 import { createEvent, createStore, sample, split } from 'effector'
 import { and, condition, delay, not } from 'patronum'
@@ -71,30 +71,26 @@ const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
 
 const fields = {
   bet: createField({
-    emptyValue: '1',
+    emptyValue: 1,
     persistKey: 'games/pincode/bet',
-    persistInitialValue: true,
+    resetToPersisted: true,
   }),
   mode: createField<PincodeMode>({
     emptyValue: PincodeMode.Hardcore,
     persistKey: 'games/pincode/mode',
-    persistInitialValue: true,
+    resetToPersisted: true,
   }),
   stopOnBigWin: createField({
     emptyValue: false,
     persistKey: 'games/pincode/stopOnBigWin',
-    persistInitialValue: true,
+    resetToPersisted: true,
   }),
 }
 
 export const form = createForm({
   fields,
   schema: z.object({
-    bet: z.coerce
-      .number()
-      .min(1, 'Минимальная ставка - 1 гем')
-      .step(0.01, 'Ставка должна быть кратна 0.01')
-      .transform((gems) => Math.floor(gems * 100)),
+    bet: z.number().min(gemInt(1), 'Минимальная ставка - 1 гем'),
     mode: z.nativeEnum(PincodeMode),
   }),
 })
@@ -140,24 +136,14 @@ sample({
 sample({
   clock: betDoubled,
   source: { bet: fields.bet.$value, balance: $$balance.$available },
-  fn: ({ bet, balance }) => {
-    const doubled = Math.min(
-      balance / 100,
-      Math.ceil(Number(bet) * 2 * 100) / 100,
-    )
-
-    return String(doubled)
-  },
+  fn: ({ bet, balance }) => Math.min(balance, bet * 2),
   target: fields.bet.update,
 })
 
 sample({
   clock: betHalved,
   source: fields.bet.$value,
-  fn: (bet) => {
-    const halved = Math.max(1, Math.ceil((Number(bet) / 2) * 100) / 100)
-    return String(halved)
-  },
+  fn: (bet) => Math.max(1, bet / 2),
   target: fields.bet.update,
 })
 

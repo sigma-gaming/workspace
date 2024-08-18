@@ -19,7 +19,6 @@ import { Env, EnvService } from './env'
 type HonoEnvWithSession = {
   Variables: {
     session?: Session
-    user?: UserSelect
   }
 }
 
@@ -164,24 +163,6 @@ export class SessionService {
     }
 
     return session
-  }
-
-  async getHonoUserSafe<E extends HonoEnvWithSession>(
-    ctx: HonoContext<E>,
-  ): Promise<UserSelect | null> {
-    const saved = ctx.get('user')
-    if (saved) return saved
-    const session = await this.getHonoSession(ctx)
-    return this.getUserSafe(session)
-  }
-
-  async getHonoUser<E extends HonoEnvWithSession>(
-    ctx: HonoContext<E>,
-  ): Promise<UserSelect> {
-    const saved = ctx.get('user')
-    if (saved) return saved
-    const session = await this.getHonoSession(ctx)
-    return this.getUser(session)
   }
 
   attachSession<E extends HonoEnvWithSession>(

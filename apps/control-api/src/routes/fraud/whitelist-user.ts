@@ -1,9 +1,10 @@
-import { fraudService } from '@games/services'
+import { UserRole } from '@dbs/games-types'
+import { fraudService, roleService } from '@games/services'
 import { zValidator } from '@hono/zod-validator'
-import { Hono } from 'hono'
 import { z } from 'zod'
+import { createRouter } from '../../hono'
 
-export const whitelistUserRoute = new Hono().post(
+export const whitelistUserRoute = createRouter().post(
   '/',
   zValidator(
     'json',
@@ -12,6 +13,9 @@ export const whitelistUserRoute = new Hono().post(
     }),
   ),
   async (ctx) => {
+    const user = ctx.get('user')
+    roleService.assert(user, [UserRole.Admin, UserRole.Support])
+
     const payload = ctx.req.valid('json')
 
     await fraudService.whitelistUser(payload.userId)

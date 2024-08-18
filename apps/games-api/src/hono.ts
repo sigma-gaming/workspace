@@ -5,8 +5,8 @@ import { Hono } from 'hono'
 
 export type GamesApiEnv = HonoUwsEnv & {
   Variables: {
-    session?: Session
-    user?: UserSelect
+    session: Session
+    user: UserSelect | null
   }
 }
 

@@ -5,6 +5,8 @@ import {
   Game,
   GameOutcome,
   NotificationKind,
+  PromocodeBonusType,
+  PromocodeUsageStatus,
   TransactionType,
   UserRole,
 } from '@dbs/games-types'
@@ -43,3 +45,13 @@ export const chatMessageTypeEnum = pgEnum(
 )
 
 export const fraudRiskEnum = pgEnum('FraudRisk', enumValues(FraudRisk))
+
+export const promocodeBonusTypeEnum = pgEnum(
+  'PromocodeBonusType',
+  enumValues(PromocodeBonusType),
+)
+
+export const promocodeUsageStatusEnum = pgEnum(
+  'PromocodeUsageStatus',
+  enumValues(PromocodeUsageStatus),
+)

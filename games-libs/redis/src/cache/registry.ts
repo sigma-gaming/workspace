@@ -4,6 +4,7 @@ import {
   ChatMessageSelect,
   GameRecordSelect,
   NotificationSelect,
+  PromocodeSelect,
   TransactionSelect,
 } from '@dbs/games-schema'
 import { ProfileDetailed, Session } from '@games/model'
@@ -30,7 +31,7 @@ export class CacheRegistry {
   lastWinHistory: GlobalEntityListService<GameRecordSelect>
   bigWinHistory: GlobalEntityListService<GameRecordSelect>
   userGameHistory: KeyEntityListService<GameRecordSelect>
-  userIdsByIP: KeyJsonEntityService<string[]>
+  promocode: KeyJsonEntityService<PromocodeSelect>
 
   constructor(@inject(CacheVersionToken) version: string) {
     this.budget = new GlobalJsonEntityService<BudgetSelect>({
@@ -96,8 +97,8 @@ export class CacheRegistry {
       ttl: 60 * 15, // 15 minutes
     })
 
-    this.userIdsByIP = new KeyJsonEntityService<string[]>({
-      keygen: (ip: string) => `sameIpUserIds:${ip}`,
+    this.promocode = new KeyJsonEntityService<PromocodeSelect>({
+      keygen: (code: string) => `${version}:promocode:${code}`,
       ttl: 60 * 60, // 1 hour
     })
   }

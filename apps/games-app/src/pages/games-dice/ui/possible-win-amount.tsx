@@ -15,7 +15,7 @@ export const PossibleWinAmount = () => {
         <span className="text-green-400 font-medium">
           {sides.length === 0 || sides.length === 6
             ? '?'
-            : `${formatGem(possibleWinAmount)}g`}
+            : `${formatGem(possibleWinAmount / 100)}g`}
         </span>
       </p>
     </div>

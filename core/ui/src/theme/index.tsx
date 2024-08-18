@@ -28,6 +28,7 @@ import {
   Tabs,
   Title,
 } from '@mantine/core'
+import { DateTimePicker } from '@mantine/dates'
 import { Notifications } from '@mantine/notifications'
 import { PropsWithChildren } from 'react'
 import { colors } from '../colors'
@@ -38,6 +39,7 @@ import badgeClassNames from './badge.module.css'
 import buttonClassNames from './button.module.css'
 import cardClassNames from './card.module.css'
 import checkboxClassNames from './checkbox.module.css'
+import datetimePickerClassNames from './datetime-picker.module.css'
 import dividerClassNames from './divider.module.css'
 import inputClassNames from './input.module.css'
 import inputWrapperClassNames from './input-wrapper.module.css'
@@ -168,6 +170,12 @@ export const theme = createTheme({
     }),
     Slider: Slider.extend({
       classNames: sliderClassNames,
+    }),
+    DateTimePicker: DateTimePicker.extend({
+      classNames: datetimePickerClassNames,
+      defaultProps: {
+        submitButtonProps: { color: '#393c60', variant: 'filled' },
+      },
     }),
   },
 })

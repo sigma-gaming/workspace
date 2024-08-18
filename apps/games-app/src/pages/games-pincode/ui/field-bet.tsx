@@ -1,5 +1,5 @@
-import { WithError } from '@core/ui'
-import { ActionIcon, Input, NumberInput } from '@mantine/core'
+import { GemInput, WithError } from '@core/ui'
+import { ActionIcon, Input } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { $$pincodePage } from '../model'
 
@@ -14,19 +14,14 @@ export const BetField = () => {
       <div className="flex flex-col">
         <div className="flex flex-row gap-2 items-start">
           <WithError error={errors.bet[0]}>
-            <NumberInput
+            <GemInput
               id="bet-field"
               className="grow"
               classNames={{ wrapper: 'mt-0' }}
               value={bet}
-              onChange={(value) =>
-                $$pincodePage.fields.bet.update(String(value))
-              }
-              allowedDecimalSeparators={[',', '.']}
+              onChange={(value) => $$pincodePage.fields.bet.update(value)}
               error={errors.bet[0]}
               disabled={autoplaying}
-              min={1}
-              decimalScale={2}
             />
           </WithError>
           <ActionIcon

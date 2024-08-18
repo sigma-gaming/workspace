@@ -1,6 +1,6 @@
-import { sessionService } from '@games/services'
 import * as Sentry from '@sentry/node'
 import { MiddlewareHandler } from 'hono'
+import { GamesApiEnv } from '../../hono'
 import { sentry } from './init'
 
 type Options = {
@@ -8,7 +8,7 @@ type Options = {
 }
 
 export const sentryMiddleware =
-  (options: Options): MiddlewareHandler =>
+  (options: Options): MiddlewareHandler<GamesApiEnv> =>
   async (ctx, next) => {
     if (!options.enabled) {
       return next()
@@ -21,7 +21,7 @@ export const sentryMiddleware =
       return next()
     }
 
-    const user = await sessionService.getHonoUserSafe(ctx)
+    const user = ctx.get('user')
 
     return Sentry.continueTrace({ sentryTrace: traceId, baggage }, () => {
       const url = new URL(ctx.req.url)

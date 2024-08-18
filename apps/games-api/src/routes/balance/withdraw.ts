@@ -14,7 +14,7 @@ import {
 import { createRouter } from '../../hono'
 
 export const withdrawRoute = createRouter().post('/', async (ctx) => {
-  const session = await sessionService.getHonoSession(ctx)
+  const session = ctx.get('session')
   const user = sessionService.getUser(session)
   const amount = 1000000
 
@@ -50,17 +50,12 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
       throw new InternalServerException()
     }
 
-    const newTransaction = await transactionService.createTransaction(user.id, {
-      type: TransactionType.Withdrawal,
-      game: null,
-      amount: -amount,
-      openingBalance: lastBalance,
-      closingBalance: lastBalance - amount,
-      totalBet: lastTransaction.totalBet,
-      totalWon: lastTransaction.totalWon,
-      totalLost: lastTransaction.totalLost,
-      totalRTP: lastTransaction.totalRTP,
-      wageringRequired: 0,
+    const [newTransaction] = await transactionService.createTransaction({
+      payload: transactionService.generateTransaction(lastTransaction, {
+        userId: user.id,
+        type: TransactionType.Withdrawal,
+        amount: -amount,
+      }),
     })
 
     return ctx.json({

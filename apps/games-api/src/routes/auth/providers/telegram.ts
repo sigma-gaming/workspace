@@ -33,7 +33,7 @@ export const signInViaTelegramRoute = createRouter().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const session = await sessionService.getHonoSession(ctx)
+    const session = ctx.get('session')
 
     const tgAuthResult = TgAuthResultSchema.parse(
       JSON.parse(atob(payload.tgAuthResult)),

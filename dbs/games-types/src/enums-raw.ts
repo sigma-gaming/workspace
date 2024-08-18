@@ -13,6 +13,7 @@ export enum UserRole {
 export enum TransactionType {
   Deposit = 'Deposit',
   Withdrawal = 'Withdrawal',
+  Bonus = 'Bonus',
   Bet = 'Bet',
   Win = 'Win',
   Loss = 'Loss',
@@ -50,4 +51,15 @@ export enum FraudRisk {
   Medium = 'Medium',
   High = 'High',
   Unknown = 'Unknown',
+}
+
+export enum PromocodeBonusType {
+  DepositMultiplier = 'DepositMultiplier',
+  DepositFixed = 'DepositFixed',
+  Payout = 'Payout',
+}
+
+export enum PromocodeUsageStatus {
+  Applied = 'Applied',
+  Pending = 'Pending',
 }

@@ -7,7 +7,7 @@ export const sessionMiddleware = createMiddleware<GamesApiEnv>(
     const session = await sessionService.getHonoSession(ctx)
     const user = sessionService.getUserSafe(session)
     ctx.set('session', session)
-    if (user) ctx.set('user', user)
+    ctx.set('user', user)
     await next()
   },
 )

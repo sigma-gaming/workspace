@@ -11,13 +11,13 @@ import {
   GameSnapshot,
   TransactionType,
 } from '@dbs/games-types'
-import { gemInt } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
 import { budgetService } from './budget'
 import { GameHistoryService } from './game-history'
 import { ProfileService } from './profile'
+import { TransactionService } from './transaction'
 
 type SaveGamePayload = {
   userId: string
@@ -35,11 +35,17 @@ type GameRunnerResult = {
   payout: number
 }
 
+const outcomeToTypeMap: Record<GameOutcome, TransactionType> = {
+  [GameOutcome.Win]: TransactionType.Win,
+  [GameOutcome.Loss]: TransactionType.Loss,
+}
+
 @singleton()
 export class GameService {
   constructor(
     private readonly gameHistoryService: GameHistoryService,
     private readonly profileService: ProfileService,
+    private readonly transactionService: TransactionService,
   ) {}
 
   lock = async (userId: string, ms = 3000) => {
@@ -82,40 +88,22 @@ export class GameService {
   }: SaveGamePayload) => {
     const profile = await this.profileService.getDetailedProfile(userId)
 
-    const {
-      closingBalance: lastBalance = 0,
-      totalBet = 0,
-      totalWon = 0,
-      totalLost = 0,
-      totalRTP = 0,
-      wageringRequired = 0,
-    } = previousTransaction ?? {}
-
-    const rtp = payout + bet
-    const won = Math.max(0, payout)
-    const lost = Math.min(0, payout)
-
     const { gameRecord, transaction } = await gamesDb.transaction(
       async (tx) => {
-        const closingBalance = lastBalance + payout
-
-        const [{ id: transactionId }] = await tx
-          .insert(TransactionTable)
-          .values({
-            userId,
-            type: outcome as unknown as TransactionType,
-            game,
-            amount: payout,
-            openingBalance: lastBalance,
-            closingBalance,
-            totalBet: totalBet + bet,
-            totalWon: totalWon + won,
-            totalLost: totalLost + lost,
-            totalRTP: totalRTP + rtp,
-            wageringRequired:
-              closingBalance <= gemInt(1) ? 0 : wageringRequired - bet,
+        const [{ id: transactionId }] =
+          await this.transactionService.createTransaction({
+            tx,
+            payload: this.transactionService.generateGameTransaction(
+              previousTransaction,
+              {
+                userId,
+                type: outcomeToTypeMap[outcome],
+                game,
+                amount: payout,
+                bet,
+              },
+            ),
           })
-          .returning()
 
         const [gameRecord] = await tx
           .insert(GameRecordTable)

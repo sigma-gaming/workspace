@@ -1,0 +1,81 @@
+import { BadRequestException, InternalServerException } from '@core/exceptions'
+import { PromocodeBonusType } from '@dbs/games-types'
+import {
+  PromocodeActivationResult,
+  promocodeService,
+  sessionService,
+} from '@games/services'
+import { zValidator } from '@hono/zod-validator'
+import { z } from 'zod'
+import { createRouter } from '../../hono'
+
+type FailureActivationResult = Exclude<
+  PromocodeActivationResult,
+  | PromocodeActivationResult.AppliedPayout
+  | PromocodeActivationResult.AppliedDeposit
+>
+
+const MessageMap: Record<FailureActivationResult, string> = {
+  [PromocodeActivationResult.NotFound]: 'Промокод не найден',
+  [PromocodeActivationResult.Expired]: 'Срок действия промокода истёк',
+  [PromocodeActivationResult.WrongUsage]: '{{instruction}}',
+  [PromocodeActivationResult.UsageExceeded]:
+    'Достигнут лимит использования промокода',
+  [PromocodeActivationResult.AlreadyUsed]: 'Вы уже использовали этот промокод',
+  [PromocodeActivationResult.Inactive]: 'Промокод не активен',
+  [PromocodeActivationResult.Failed]:
+    'Не удалось применить промокод. Попробуйте ещё раз или напишите в поддержку',
+  [PromocodeActivationResult.Blocked]:
+    'Не удалось применить промокод. Попробуйте ещё раз или напишите в поддержку',
+}
+
+export const applyRoute = createRouter().post(
+  '/',
+  zValidator(
+    'json',
+    z.object({
+      code: z.string(),
+    }),
+  ),
+  async (ctx) => {
+    const payload = ctx.req.valid('json')
+    const session = ctx.get('session')
+    const user = sessionService.getUser(session)
+
+    const application = await promocodeService.applyPayout({
+      userId: user.id,
+      code: payload.code,
+    })
+
+    if (application.result === PromocodeActivationResult.AppliedPayout) {
+      return ctx.json({ status: 'success' })
+    }
+
+    if (application.result === PromocodeActivationResult.AppliedDeposit) {
+      const cause = new Error('Unreachable')
+      throw new InternalServerException({ cause })
+    }
+
+    if (application.result === PromocodeActivationResult.WrongUsage) {
+      const map: Record<PromocodeBonusType, string> = {
+        [PromocodeBonusType.DepositFixed]:
+          'Данный промокод нужно использовать при пополнении',
+        [PromocodeBonusType.DepositMultiplier]:
+          'Данный промокод нужно использовать при пополнении',
+        [PromocodeBonusType.Payout]:
+          'Данный промокод нужно использовать на странице бонусов',
+      }
+
+      throw new BadRequestException({
+        message: MessageMap[application.result].replace(
+          '{{instruction}}',
+          map[application.bonusType],
+        ),
+      })
+    }
+
+    throw new BadRequestException({
+      message: MessageMap[application.result],
+    })
+  },
+)

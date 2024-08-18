@@ -5,7 +5,7 @@ import { sessionService, transactionService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const depositRoute = createRouter().post('/', async (ctx) => {
-  const session = await sessionService.getHonoSession(ctx)
+  const session = ctx.get('session')
   const user = sessionService.getUser(session)
   const amount = 1000000
 
@@ -14,20 +14,12 @@ export const depositRoute = createRouter().post('/', async (ctx) => {
   try {
     const lastTransaction = await transactionService.getLastTransaction(user.id)
 
-    const lastBalance = lastTransaction?.closingBalance ?? 0
-    const lastWageringRequired = lastTransaction?.wageringRequired ?? 0
-
-    const newTransaction = await transactionService.createTransaction(user.id, {
-      type: TransactionType.Deposit,
-      game: null,
-      amount,
-      openingBalance: lastBalance,
-      closingBalance: lastBalance + amount,
-      totalBet: lastTransaction?.totalBet ?? 0,
-      totalWon: lastTransaction?.totalWon ?? 0,
-      totalLost: lastTransaction?.totalLost ?? 0,
-      totalRTP: lastTransaction?.totalRTP ?? 0,
-      wageringRequired: lastWageringRequired + amount,
+    const [newTransaction] = await transactionService.createTransaction({
+      payload: transactionService.generateTransaction(lastTransaction, {
+        userId: user.id,
+        type: TransactionType.Deposit,
+        amount,
+      }),
     })
 
     return ctx.json({
