@@ -2,9 +2,21 @@
   @apply font-medium;
   @apply transition-colors;
 
+  &[data-variant="default"] {
+    @apply bg-white bg-opacity-0 border-white border-opacity-25;
+
+    &:hover {
+      @apply bg-white bg-opacity-5;
+    }
+  }
+
   &:disabled {
     color: var(--button-color);
     background-color: var(--button-bg, var(--mantine-primary-color-filled));
     opacity: 0.5;
+  }
+
+  &[data-variant="default"]:disabled {
+    @apply bg-white bg-opacity-0;
   }
 }

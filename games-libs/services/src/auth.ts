@@ -118,10 +118,7 @@ export class AuthService {
 
         const [{ id: profileId }] = await tx
           .insert(ProfileTable)
-          .values({
-            userId,
-            usedProvider: provider,
-          })
+          .values({ userId, usedProvider: provider })
           .returning()
 
         await tx

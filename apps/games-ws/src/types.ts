@@ -4,9 +4,13 @@ import {
   GameRecordSelect,
   NotificationSelect,
 } from '@dbs/games-schema'
+import {
+  DicePayload,
+  PincodePayload,
+  PlayDiceOutput,
+  PlayPincodeOutput,
+} from '@games/engine'
 import { BalanceDetailed } from '@games/model'
-import { GamesDiceInput, GamesDiceOutput } from './actions/games/dice'
-import { GamesPincodeInput, GamesPincodeOutput } from './actions/games/pincode'
 
 export type ServerToClientEvents = {
   'chat/message': (message: ChatMessageSelect) => void
@@ -20,6 +24,6 @@ export type ServerToClientEvents = {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export type ClientToServerEvents = {
   'ping': WsActionHandler<void, 'pong'>
-  'games/pincode': WsActionHandler<GamesPincodeInput, GamesPincodeOutput>
-  'games/dice': WsActionHandler<GamesDiceInput, GamesDiceOutput>
+  'games/pincode': WsActionHandler<PincodePayload, PlayPincodeOutput>
+  'games/dice': WsActionHandler<DicePayload, PlayDiceOutput>
 }

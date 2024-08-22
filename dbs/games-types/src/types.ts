@@ -19,7 +19,7 @@ export type GameSnapshot = GameSnapshotDice | GameSnapshotPincode
 
 export type ChatMessageAttachmentGame = {
   type: ChatMessageAttachmentType.Game
-  transactionId: string
+  transactionId: number
 }
 
 export type ChatMessageAttachment = ChatMessageAttachmentGame

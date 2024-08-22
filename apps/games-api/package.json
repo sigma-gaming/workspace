@@ -30,7 +30,7 @@
     "@games/model": "workspace:*",
     "@games/redis": "workspace:*",
     "@games/services": "workspace:*",
-    "@core/hono-uws": "workspace:*",
+    "@core/server": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

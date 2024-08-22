@@ -1,4 +1,4 @@
-import { createApiEffect } from '@core/hono-client'
+import { createApiEffect } from '@core/client'
 import { subscriptionFactory } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { createFactory, invoke } from '@withease/factories'

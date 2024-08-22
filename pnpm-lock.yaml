@@ -41,6 +41,9 @@ importers:
       '@mantine/hooks':
         specifier: ^7.12.1
         version: 7.12.1(react@18.3.1)
+      '@mantine/modals':
+        specifier: ^7.12.1
+        version: 7.12.1(@mantine/core@7.12.1(@mantine/hooks@7.12.1(react@18.3.1))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mantine/hooks@7.12.1(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mantine/notifications':
         specifier: ^7.12.1
         version: 7.12.1(@mantine/core@7.12.1(@mantine/hooks@7.12.1(react@18.3.1))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mantine/hooks@7.12.1(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -342,12 +345,12 @@ importers:
       '@core/exceptions':
         specifier: workspace:*
         version: link:../../core/exceptions
-      '@core/hono-uws':
-        specifier: workspace:*
-        version: link:../../core/hono-uws
       '@core/logger':
         specifier: workspace:*
         version: link:../../core/logger
+      '@core/server':
+        specifier: workspace:*
+        version: link:../../core/server
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db
@@ -369,15 +372,15 @@ importers:
 
   apps/control-app:
     dependencies:
+      '@core/client':
+        specifier: workspace:*
+        version: link:../../core/client
       '@core/exceptions':
         specifier: workspace:*
         version: link:../../core/exceptions
       '@core/forms':
         specifier: workspace:*
         version: link:../../core/forms
-      '@core/hono-client':
-        specifier: workspace:*
-        version: link:../../core/hono-client
       '@core/ui':
         specifier: workspace:*
         version: link:../../core/ui
@@ -408,15 +411,15 @@ importers:
       '@core/flow':
         specifier: workspace:*
         version: link:../../core/flow
-      '@core/hono-uws':
-        specifier: workspace:*
-        version: link:../../core/hono-uws
       '@core/io-client':
         specifier: workspace:*
         version: link:../../core/io-client
       '@core/logger':
         specifier: workspace:*
         version: link:../../core/logger
+      '@core/server':
+        specifier: workspace:*
+        version: link:../../core/server
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db
@@ -438,15 +441,15 @@ importers:
 
   apps/games-app:
     dependencies:
+      '@core/client':
+        specifier: workspace:*
+        version: link:../../core/client
       '@core/exceptions':
         specifier: workspace:*
         version: link:../../core/exceptions
       '@core/forms':
         specifier: workspace:*
         version: link:../../core/forms
-      '@core/hono-client':
-        specifier: workspace:*
-        version: link:../../core/hono-client
       '@core/io-client':
         specifier: workspace:*
         version: link:../../core/io-client
@@ -499,6 +502,9 @@ importers:
       '@dbs/games-schema':
         specifier: workspace:*
         version: link:../../dbs/games-schema
+      '@games/engine':
+        specifier: workspace:*
+        version: link:../../games-libs/engine
       '@games/model':
         specifier: workspace:*
         version: link:../../games-libs/model
@@ -539,6 +545,18 @@ importers:
         specifier: workspace:*
         version: link:../../tooling/env
 
+  core/client:
+    dependencies:
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
+      '@core/forms':
+        specifier: workspace:*
+        version: link:../forms
+      '@core/utils':
+        specifier: workspace:*
+        version: link:../utils
+
   core/cron-jobs:
     dependencies:
       '@core/di':
@@ -555,14 +573,6 @@ importers:
 
   core/forms: {}
 
-  core/hono-client: {}
-
-  core/hono-uws:
-    dependencies:
-      '@core/utils':
-        specifier: workspace:*
-        version: link:../utils
-
   core/io-client:
     dependencies:
       '@core/utils':
@@ -574,6 +584,15 @@ importers:
       '@core/di':
         specifier: workspace:*
         version: link:../di
+
+  core/server:
+    dependencies:
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
+      '@core/utils':
+        specifier: workspace:*
+        version: link:../utils
 
   core/ui:
     devDependencies:
@@ -602,6 +621,34 @@ importers:
         version: link:../games-types
 
   dbs/games-types: {}
+
+  games-libs/engine:
+    dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
+      '@dbs/games-db':
+        specifier: workspace:*
+        version: link:../../dbs/games-db
+      '@dbs/games-schema':
+        specifier: workspace:*
+        version: link:../../dbs/games-schema
+      '@games/model':
+        specifier: workspace:*
+        version: link:../model
+      '@games/redis':
+        specifier: workspace:*
+        version: link:../redis
+      '@games/services':
+        specifier: workspace:*
+        version: link:../services
+    devDependencies:
+      '@core/server':
+        specifier: workspace:*
+        version: link:../../core/server
 
   games-libs/model: {}
 
@@ -650,9 +697,9 @@ importers:
         specifier: workspace:*
         version: link:../redis
     devDependencies:
-      '@core/hono-uws':
+      '@core/server':
         specifier: workspace:*
-        version: link:../../core/hono-uws
+        version: link:../../core/server
 
   tooling/build:
     dependencies:
@@ -2415,6 +2462,14 @@ packages:
     resolution: {integrity: sha512-YPA3qiMHJkWID5+YzakBaLvjHtX3Fg3PdPY49iIb/CaWM9+lrJ+77TOVS7bsY7ZTBHXUfzft1/6Woqt3xSuweA==}
     peerDependencies:
       react: ^18.2.0
+
+  '@mantine/modals@7.12.1':
+    resolution: {integrity: sha512-olS07yDcCFLGylLGaQgBiTnKcRrUZVLKqBFBw5glcmc/wZmJf4SDMgx5mxSwBnsbJOwJ2d3aIYwO/qNTNnluSg==}
+    peerDependencies:
+      '@mantine/core': 7.12.1
+      '@mantine/hooks': 7.12.1
+      react: ^18.2.0
+      react-dom: ^18.2.0
 
   '@mantine/notifications@7.12.1':
     resolution: {integrity: sha512-YIV2ItCRJzbOjEyXtz5Rjf3qn6kwmcz6CqAGurpd+kecxx6wwNoKuKs6YNlz7tcprFegcH/hCUkW2tVbXHKVBA==}
@@ -9439,6 +9494,13 @@ snapshots:
   '@mantine/hooks@7.12.1(react@18.3.1)':
     dependencies:
       react: 18.3.1
+
+  '@mantine/modals@7.12.1(@mantine/core@7.12.1(@mantine/hooks@7.12.1(react@18.3.1))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mantine/hooks@7.12.1(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@mantine/core': 7.12.1(@mantine/hooks@7.12.1(react@18.3.1))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@mantine/hooks': 7.12.1(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@mantine/notifications@7.12.1(@mantine/core@7.12.1(@mantine/hooks@7.12.1(react@18.3.1))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mantine/hooks@7.12.1(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

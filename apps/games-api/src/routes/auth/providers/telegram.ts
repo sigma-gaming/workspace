@@ -1,4 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
+import { zValidator } from '@core/server'
 import { AccountProvider } from '@dbs/games-types'
 import {
   AuthResult,
@@ -8,7 +9,6 @@ import {
   sessionService,
   telegramBotService,
 } from '@games/services'
-import { zValidator } from '@hono/zod-validator'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 import { createRouter } from '../../../hono'

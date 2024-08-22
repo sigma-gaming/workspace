@@ -1,4 +1,4 @@
-import { HonoUwsEnv } from '@core/hono-uws'
+import { HonoUwsEnv } from '@core/server'
 import { UserSelect } from '@dbs/games-schema'
 import { Session } from '@games/model'
 import { Hono } from 'hono'

@@ -1,10 +1,9 @@
+import { $$notifications, createApiEffect } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { createApiEffect } from '@core/hono-client'
 import { createMutation, createQuery } from '@farfetched/core'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
 import { z } from 'zod'
-import { $$notifications } from '../../entities/notifications'
 import { routes } from '../../routing'
 import { controlApi } from '../../shared/api/control'
 

@@ -7,7 +7,6 @@ import {
   IconLoader2,
   IconLogout,
   IconSettings,
-  IconTicket,
   IconWallet,
 } from '@tabler/icons-react'
 import { Link } from 'atomic-router-react'

@@ -1,4 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
+import { zValidator } from '@core/server'
 import { AccountProvider } from '@dbs/games-types'
 import {
   AuthResult,
@@ -7,7 +8,6 @@ import {
   fraudService,
   sessionService,
 } from '@games/services'
-import { zValidator } from '@hono/zod-validator'
 import axios from 'axios'
 import { z } from 'zod'
 import { createRouter } from '../../../hono'

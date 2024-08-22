@@ -20,7 +20,8 @@ if (existingSticky) {
 if (expired) {
   const nextExpiresAt = new Date()
   nextExpiresAt.setHours(nextExpiresAt.getHours() + 2)
-  const random = nextRandom ?? Math.random().toString().padEnd(20, '0').slice(2, 10)
+  const random =
+    nextRandom ?? Math.random().toString().padEnd(20, '0').slice(2, 10)
   Cookie.set('sticky', random + '@' + nextExpiresAt.toISOString(), {
     domain: env.domain,
   })

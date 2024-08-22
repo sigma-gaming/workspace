@@ -1,3 +1,7 @@
 .control {
   @apply !border-none bg-[#25273C];
+
+  &:hover {
+    @apply bg-white/5
+  }
 }

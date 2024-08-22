@@ -1,12 +1,12 @@
-export type Defer<T> = {
-  readonly promise: Promise<T>
-  readonly resolve: (value: T) => void
-  readonly reject: (error: Error) => void
+export type Defer<Rs = void, Rj = Error> = {
+  readonly promise: Promise<Rs>
+  readonly resolve: (value: Rs) => void
+  readonly reject: (error: Rj) => void
 }
 
-export function createDefer<T extends unknown = void>(): Defer<T> {
-  let resolveFn: Defer<T>['resolve']
-  let rejectFn: Defer<T>['reject']
+export function createDefer<Rs = void, Rj = Error>(): Defer<Rs, Rj> {
+  let resolveFn: Defer<Rs, Rj>['resolve']
+  let rejectFn: Defer<Rs, Rj>['reject']
 
   return {
     promise: new Promise((resolve, reject) => {

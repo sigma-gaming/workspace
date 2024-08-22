@@ -1,7 +1,7 @@
+import { InternalServerException, RouteException } from '@core/exceptions'
 import { Context, Env, ErrorHandler } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { StatusCode } from 'hono/utils/http-status'
-import { InternalServerException, RouteException } from './exceptions'
 
 export function createErrorHandler<E extends Env>(options: {
   onInternalError?: (error: Error, ctx: Context<E>) => void

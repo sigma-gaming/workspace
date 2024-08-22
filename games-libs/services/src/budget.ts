@@ -4,13 +4,12 @@ import { gamesDb } from '@dbs/games-db'
 import { BudgetTable } from '@dbs/games-schema'
 import { gamesCaches } from '@games/redis'
 import { singleton } from 'tsyringe-neo'
+import { locks } from './locks'
 
 @singleton()
 export class BudgetService {
   getBudget = async () => {
-    const lock = await gamesCaches.budget.lock(3000)
-
-    try {
+    return await locks.with([locks.budget()], async () => {
       const cached = await gamesCaches.budget.get()
 
       if (cached) {
@@ -28,9 +27,7 @@ export class BudgetService {
 
       await gamesCaches.budget.set(budget)
       return budget
-    } finally {
-      await lock.release()
-    }
+    })
   }
 
   getAvailable = async (): Promise<number> => {

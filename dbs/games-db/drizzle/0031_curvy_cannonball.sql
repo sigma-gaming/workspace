@@ -1,0 +1,1 @@
+ALTER TABLE "ChatMessage" DROP COLUMN IF EXISTS "oldId";

@@ -1,25 +1,16 @@
-import { BadRequestException } from '@core/exceptions'
+import { $$notifications, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { calculateDiceFullWinAmount, gemInt } from '@games/model'
-import { NotificationData } from '@mantine/notifications'
 import type { Rive } from '@rive-app/react-canvas'
-import {
-  attach,
-  combine,
-  createEvent,
-  createStore,
-  sample,
-  split,
-} from 'effector'
+import { attach, combine, createEvent, createStore, sample } from 'effector'
 import { and, combineEvents, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
-import { $$notifications } from '../../entities/notifications'
 import { $$user } from '../../entities/user'
 import { $$gameHistory } from '../../features/game-history'
 import { routes } from '../../routing'
@@ -104,7 +95,10 @@ const fields = {
 export const form = createForm({
   fields,
   schema: z.object({
-    bet: z.number().min(gemInt(1), 'Минимальная ставка - 1 гем'),
+    bet: z
+      .number()
+      .min(gemInt(1), 'Минимальная ставка - 1 гем')
+      .max(gemInt(5000), 'Максимальная ставка - 5000 гемов'),
     sides: z
       .array(z.string().transform(Number))
       .min(1, 'Выберите как минимум одну грань')
@@ -230,38 +224,24 @@ sample({
   target: startPlay,
 })
 
-const receivedApiError = sample({
-  clock: playGameMutation.finished.failure,
-  fn: ({ error }) => error,
-})
-
 sample({
   clock: playGameMutation.finished.failure,
   fn: () => false,
   target: $autoplaying,
 })
 
-const { receivedBadRequest, __: receivedOtherError } = split(receivedApiError, {
-  receivedBadRequest: (error): error is BadRequestException =>
-    error instanceof BadRequestException,
-})
-
-sample({
-  source: receivedBadRequest,
-  fn: ({ payload }) => ({
-    [payload.path?.join('.') ?? 'root']: [payload.message ?? ''],
-  }),
-  target: form.setErrors,
-})
-
-sample({
-  source: receivedOtherError,
-  fn: (): NotificationData => ({
-    title: 'Неизвестная ошибка',
-    message: 'Попробуйте еще раз',
+handleExceptions(playGameMutation, {
+  form,
+  message: (message) => ({
     color: 'red',
+    title: 'Произошла ошибка',
+    message,
   }),
-  target: $$notifications.show,
+  otherMessage: () => ({
+    color: 'red',
+    title: 'Что-то пошло не так',
+    message: 'Попробуйте снова через пару минут',
+  }),
 })
 
 sample({

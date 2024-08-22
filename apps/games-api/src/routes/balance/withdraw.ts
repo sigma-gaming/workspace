@@ -1,13 +1,9 @@
-import {
-  BadRequestException,
-  InternalServerException,
-  RouteException,
-} from '@core/exceptions'
+import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { FraudRisk, TransactionType } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
-import { gamesCaches } from '@games/redis'
 import {
   fraudService,
+  locks,
   sessionService,
   transactionService,
 } from '@games/services'
@@ -18,14 +14,12 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
   const user = sessionService.getUser(session)
   const amount = 1000000
 
-  const lock = await gamesCaches.lastTransaction.lock(user.id, 10000)
-
-  try {
+  return await locks.with([locks.transaction(user.id)], async () => {
     const risk = await fraudService.actualizeRisk(user.id, { ctx })
 
     if (risk === FraudRisk.High) {
       throw new BadRequestException({
-        message: 'Не удалось произвести вывод',
+        message: 'Не удалось произвести вывод. Попробуйте позже',
       })
     }
 
@@ -62,13 +56,5 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
       status: 'success',
       updatedBalance: newTransaction.closingBalance,
     })
-  } catch (error) {
-    if (error instanceof RouteException) {
-      throw error
-    }
-
-    throw new InternalServerException()
-  } finally {
-    await lock.release()
-  }
+  })
 })

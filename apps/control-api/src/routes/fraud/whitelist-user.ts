@@ -1,6 +1,6 @@
+import { zValidator } from '@core/server'
 import { UserRole } from '@dbs/games-types'
 import { fraudService, roleService } from '@games/services'
-import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { createRouter } from '../../hono'
 

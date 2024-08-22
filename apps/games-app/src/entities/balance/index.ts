@@ -1,9 +1,8 @@
 import {
-  BadRequestException,
-  exceptionFilter,
-  notExceptionFilter,
-} from '@core/exceptions'
-import { createApiEffect } from '@core/hono-client'
+  $$notifications,
+  createApiEffect,
+  handleExceptions,
+} from '@core/client'
 import { subscriptionFactory } from '@core/io-client'
 import { createMutation, Mutation } from '@farfetched/core'
 import { BalanceDetailed } from '@games/model'
@@ -13,7 +12,6 @@ import { previous, status } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
 import { $$audio, Sound } from '../audio'
-import { $$notifications } from '../notifications'
 
 const getDetailedBalanceFx = createApiEffect(
   gamesApi.me.getDetailedBalance.$get,
@@ -125,33 +123,17 @@ sample({
   ],
 })
 
-const receivedException = sample({
-  source: withdrawMutation.finished.failure,
-  fn: ({ error }) => error,
-})
-
-sample({
-  source: receivedException,
-  filter: exceptionFilter<BadRequestException>(BadRequestException),
-  fn: (exception) =>
-    $$notifications.options({
-      color: 'red',
-      title: 'Произошла ошибка',
-      message: exception.payload.message,
-    }),
-  target: $$notifications.show,
-})
-
-sample({
-  source: receivedException,
-  filter: notExceptionFilter(BadRequestException),
-  fn: () =>
-    $$notifications.options({
-      color: 'red',
-      title: 'Что-то пошло не так',
-      message: 'Попробуйте снова через пару минут',
-    }),
-  target: $$notifications.show,
+handleExceptions(withdrawMutation, {
+  message: (message) => ({
+    color: 'red',
+    title: 'Произошла ошибка',
+    message,
+  }),
+  otherMessage: () => ({
+    color: 'red',
+    title: 'Что-то пошло не так',
+    message: 'Попробуйте снова через пару минут',
+  }),
 })
 
 export const $$balance = {

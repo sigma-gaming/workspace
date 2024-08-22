@@ -41,8 +41,8 @@
       "@apis/control-api": [
         "apps/control-api/src/client.ts"
       ],
-      "@core/hono-uws": [
-        "core/hono-uws/src/index.ts"
+      "@core/server": [
+        "core/server/src/index.ts"
       ],
       "@core/exceptions": [
         "core/exceptions/src/index.ts"
@@ -68,6 +68,9 @@
       "@games/queue": [
         "games-libs/queue/src/index.ts"
       ],
+      "@games/engine": [
+        "games-libs/engine/src/index.ts"
+      ],
       "@core/logger": [
         "core/logger/src/index.ts"
       ],
@@ -89,8 +92,8 @@
       "@core/events": [
         "core/events/src/index.ts"
       ],
-      "@core/hono-client": [
-        "core/hono-client/src/index.ts"
+      "@core/client": [
+        "core/client/src/index.ts"
       ],
       "@core/io-client": [
         "core/io-client/src/index.ts"

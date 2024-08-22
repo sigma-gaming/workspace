@@ -16,7 +16,8 @@ export const ProfileTable = pgTable('Profile', {
 
   userId: uuid('userId')
     .references(() => UserTable.id, { onDelete: 'cascade' })
-    .notNull(),
+    .notNull()
+    .unique(),
 })
 
 export type ProfileSelect = typeof ProfileTable.$inferSelect

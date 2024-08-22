@@ -1,0 +1,1 @@
+ALTER TABLE "ChatMessage" RENAME COLUMN "id" TO "oldId";

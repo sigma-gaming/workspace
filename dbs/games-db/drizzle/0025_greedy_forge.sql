@@ -1,0 +1,1 @@
+ALTER TABLE "GameRecord" ALTER COLUMN "transactionId" SET DATA TYPE integer;

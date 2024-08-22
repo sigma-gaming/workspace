@@ -1,113 +1,28 @@
-import {
-  BadRequestException,
-  NotAuthenticatedException,
-} from '@core/exceptions'
-import { GameRecordSelect } from '@dbs/games-schema'
-import { Game, GameOutcome } from '@dbs/games-types'
-import { calculateDiceWinAmount, gemInt } from '@games/model'
-import { gameService, transactionService } from '@games/services'
-import crypto from 'node:crypto'
-import { z } from 'zod'
+import { NotAuthenticatedException } from '@core/exceptions'
+import { DicePayloadSchema, Engine } from '@games/engine'
 import { Context } from '../../context'
 import { userRoom } from '../../shared/rooms/user'
 import { createWsAction } from '../../ws-action'
 
-export async function runGame(bet: number, sides: number[]) {
-  const uniqueSides = new Set(sides)
-  const winAmount = calculateDiceWinAmount(bet, sides)
-
-  const side = crypto.randomInt(1, 7)
-  const hasWon = uniqueSides.has(side)
-
-  return { side, hasWon, winAmount }
-}
-
-const InputSchema = z.object({
-  bet: z.number().int(),
-  sides: z.array(z.number().int().min(1).max(6)).min(1).max(5),
-})
-
-export type GamesDiceInput = z.infer<typeof InputSchema>
-
-export type GamesDiceOutput = {
-  updatedBalance: number
-  record: GameRecordSelect
-}
-
 export const GamesDiceAction = createWsAction({
   name: 'games/dice',
-  schema: InputSchema,
-  async handler(ctx: Context, { bet, sides }) {
+  schema: DicePayloadSchema,
+  async handler(ctx: Context, payload) {
     const { session } = ctx
 
     if (!session) {
       throw new NotAuthenticatedException()
     }
 
-    if (bet < gemInt(1)) {
-      throw new BadRequestException({
-        path: ['bet'],
-        message: 'Минимальная ставка - 1 гем',
-      })
-    }
+    const { record, updatedBalance } = await Engine.playDice({
+      userId: session.user.id,
+      payload,
+    })
 
-    const lock = await transactionService.lock(session.user.id)
+    ctx.socket.to(userRoom(session.user.id)).emit('balance/updated', {
+      available: updatedBalance,
+    })
 
-    try {
-      const lastTransaction = await transactionService.getLastTransaction(
-        session.user.id,
-      )
-
-      const { closingBalance: lastBalance = 0 } = lastTransaction ?? {}
-
-      if (lastBalance < bet) {
-        throw new BadRequestException({
-          path: ['bet'],
-          message: 'Недостаточно гемов',
-        })
-      }
-
-      const { payout, outcome, snapshot } = await gameService.runGame({
-        runner: () => {
-          const uniqueSides = new Set(sides)
-          const winAmount = calculateDiceWinAmount(bet, sides)
-
-          const side = crypto.randomInt(1, 7)
-
-          const outcome = uniqueSides.has(side)
-            ? GameOutcome.Win
-            : GameOutcome.Loss
-
-          const payout = outcome === GameOutcome.Win ? winAmount : -bet
-
-          return {
-            outcome,
-            payout,
-            snapshot: { game: Game.Dice, inputSides: sides, outputSide: side },
-          }
-        },
-      })
-
-      const { gameRecord, transaction } = await gameService.saveGame({
-        userId: session.user.id,
-        game: Game.Dice,
-        bet,
-        payout,
-        snapshot,
-        outcome,
-        previousTransaction: lastTransaction,
-      })
-
-      ctx.socket.to(userRoom(session.user.id)).emit('balance/updated', {
-        available: transaction.closingBalance,
-      })
-
-      return {
-        record: gameRecord,
-        updatedBalance: transaction.closingBalance,
-      }
-    } finally {
-      await lock.release()
-    }
+    return { record, updatedBalance }
   },
 })

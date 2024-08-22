@@ -1,11 +1,11 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
+import { zValidator } from '@core/server'
 import { PromocodeBonusType } from '@dbs/games-types'
 import {
   PromocodeActivationResult,
   promocodeService,
   sessionService,
 } from '@games/services'
-import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { createRouter } from '../../hono'
 

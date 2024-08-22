@@ -1,10 +1,17 @@
 import { ChatMessageAttachment } from '@dbs/games-types'
-import { json, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  bigserial,
+  json,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { chatMessageTypeEnum, userRoleEnum } from './enums'
 import { UserTable } from './users'
 
 export const ChatMessageTable = pgTable('ChatMessage', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
   trackingId: uuid('trackingId').notNull().defaultRandom(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()

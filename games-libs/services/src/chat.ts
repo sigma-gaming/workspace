@@ -16,6 +16,7 @@ import {
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { desc } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
+import { locks } from './locks'
 import { profileService } from './profile'
 import { TransactionService } from './transaction'
 
@@ -44,21 +45,17 @@ export class ChatService {
   }
 
   async initializeMessages() {
-    const lock = await gamesCaches.lastChatMessages.lock(3000)
-
-    try {
+    return await locks.with([locks.chat()], async () => {
       const exists = await gamesCaches.lastChatMessages.exists()
       if (exists) return
 
       const messages = await gamesDb.query.ChatMessageTable.findMany({
-        orderBy: desc(ChatMessageTable.createdAt),
+        orderBy: desc(ChatMessageTable.id),
         limit: 100,
       })
 
       await gamesCaches.lastChatMessages.set(messages.reverse())
-    } finally {
-      await lock.release()
-    }
+    })
   }
 
   async getLastMessages(): Promise<ChatMessageSelect[]> {

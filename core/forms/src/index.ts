@@ -30,7 +30,7 @@ type FieldOptions<TValue> = {
   resetToPersisted?: boolean
 }
 
-type Field<TValue> = {
+export type Field<TValue> = {
   emptyValue: TValue
   initialize: EventCallable<TValue>
   update: EventCallable<TValue>
@@ -55,7 +55,7 @@ type CleanValues<
     : TValues[K]
 }
 
-type Form<
+export type Form<
   TValues extends FormValues,
   TCleanEmpty extends { [K in keyof TValues]?: boolean },
   TValidated,
@@ -74,6 +74,7 @@ type Form<
   $dirty: Store<Record<keyof TValues, boolean>>
   $empty: Store<Record<keyof TValues, boolean>>
   $errors: Store<FormErrors<TValues>>
+  readonly $inferOutput: TValidated
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -379,5 +380,6 @@ export function createForm<
     $dirty,
     $empty,
     $errors,
+    $inferOutput: null as TValidated,
   }
 }

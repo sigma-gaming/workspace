@@ -1,18 +1,14 @@
-import { BadRequestException, ValidationException } from '@core/exceptions'
 import {
-  createField,
-  createForm,
-  FormErrors,
-  InferFormValues,
-  normalizeFieldErrors,
-} from '@core/forms'
-import { createApiEffect } from '@core/hono-client'
+  $$notifications,
+  createApiEffect,
+  handleExceptions,
+} from '@core/client'
+import { createField, createForm } from '@core/forms'
 import { AccountProvider } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { getUserFullName, ProfileValidation } from '@games/model'
 import { createEvent, sample } from 'effector'
 import { z } from 'zod'
-import { $$notifications } from '../../entities/notifications'
 import { $$profile } from '../../entities/profile'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
@@ -38,7 +34,7 @@ const profileFields = {
   }),
 }
 
-const profileForm = createForm({
+const form = createForm({
   fields: profileFields,
   schema: z.object({
     name: ProfileValidation.NameSchema.optional(),
@@ -51,32 +47,23 @@ const profileForm = createForm({
   },
 })
 
-type ProfileFormValues = InferFormValues<typeof profileForm>
-type ProfileFormErrors = FormErrors<ProfileFormValues>
-
 sample({
-  source: profileForm.submitted,
+  source: form.submitted,
   target: updateProfileMutation.start,
 })
 
-sample({
-  source: updateProfileMutation.finished.failure,
-  fn: ({ error }): Partial<ProfileFormErrors> => {
-    if (error instanceof BadRequestException) {
-      const errors: Record<string, string[]> = {}
-      const { path = ['root'], message } = error.payload
-      errors[path.join('.')] = [message]
-      return errors
-    }
-
-    if (error instanceof ValidationException) {
-      const { fieldErrors } = error.payload
-      return normalizeFieldErrors(fieldErrors)
-    }
-
-    return {}
-  },
-  target: profileForm.setErrors,
+handleExceptions(updateProfileMutation, {
+  form,
+  message: (message) => ({
+    color: 'red',
+    title: 'Произошла ошибка',
+    message,
+  }),
+  otherMessage: () => ({
+    color: 'red',
+    title: 'Что-то пошло не так',
+    message: 'Попробуйте еще раз',
+  }),
 })
 
 sample({
@@ -87,7 +74,7 @@ sample({
     username: profile.username ?? '',
     provider: profile.usedProvider as AccountProvider,
   }),
-  target: profileForm.initialize,
+  target: form.initialize,
 })
 
 sample({
@@ -122,7 +109,7 @@ sample({
 
 sample({
   clock: reset,
-  target: profileForm.reset,
+  target: form.reset,
 })
 
 sample({
@@ -132,6 +119,6 @@ sample({
 
 export const $$settingsPage = {
   profileFields,
-  profileForm,
+  form,
   $updatingProfile,
 }

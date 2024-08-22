@@ -28,7 +28,7 @@
     "@core/di": "workspace:*",
     "@core/exceptions": "workspace:*",
     "@core/logger": "workspace:*",
-    "@core/hono-uws": "workspace:*",
+    "@core/server": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

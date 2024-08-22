@@ -1,9 +1,15 @@
-import { bigint, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  bigint,
+  bigserial,
+  pgTable,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { gameEnum, transactionTypeEnum } from './enums'
 import { UserTable } from './users'
 
 export const TransactionTable = pgTable('Transaction', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),

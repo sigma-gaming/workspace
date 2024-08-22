@@ -1,11 +1,10 @@
-import { createApiEffect } from '@core/hono-client'
+import { $$notifications, createApiEffect } from '@core/client'
 import { subscriptionFactory } from '@core/io-client'
 import { NotificationSelect } from '@dbs/games-schema'
 import { createQuery } from '@farfetched/core'
 import { mapColor } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEffect, createEvent, sample } from 'effector'
-import { $$notifications } from '../../entities/notifications'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
 

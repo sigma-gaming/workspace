@@ -30,7 +30,7 @@ export const GameRecordTable = pgTable('GameRecord', {
   userId: uuid('userId')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
-  transactionId: uuid('transactionId')
+  transactionId: integer('transactionId')
     .references(() => TransactionTable.id, { onDelete: 'cascade' })
     .notNull(),
 })

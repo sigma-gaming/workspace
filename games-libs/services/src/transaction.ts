@@ -38,7 +38,7 @@ export class TransactionService {
   }
 
   getTransaction = async (
-    transactionId: string,
+    transactionId: number,
   ): Promise<TransactionSelect | null> => {
     const transaction = await gamesDb.query.TransactionTable.findFirst({
       where: eq(TransactionTable.id, transactionId),
@@ -178,7 +178,7 @@ export class TransactionService {
 
   getLastTransactionQuery = gamesDb.query.TransactionTable.findFirst({
     where: eq(TransactionTable.userId, sql.placeholder('userId')),
-    orderBy: desc(TransactionTable.createdAt),
+    orderBy: desc(TransactionTable.id),
   }).prepare('transactionQuery')
 }
 

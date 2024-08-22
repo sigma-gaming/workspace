@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS "codeIdx" ON "Promocode" USING btree ("code");

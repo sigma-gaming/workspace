@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@games/model": "workspace:*",
-    "@core/hono-client": "workspace:*",
+    "@core/client": "workspace:*",
     "@core/exceptions": "workspace:*",
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",

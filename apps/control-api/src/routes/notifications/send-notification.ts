@@ -1,7 +1,7 @@
+import { zValidator } from '@core/server'
 import { UserRole } from '@dbs/games-types'
 import { NotificationSchema } from '@games/model'
 import { notificationService, roleService } from '@games/services'
-import { zValidator } from '@hono/zod-validator'
 import { createRouter } from '../../hono'
 
 export const sendRoute = createRouter().post(

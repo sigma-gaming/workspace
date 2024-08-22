@@ -1,7 +1,7 @@
+import { zValidator } from '@core/server'
 import { UserRole } from '@dbs/games-types'
 import { gamesPubsubs, maintenanceCache } from '@games/redis'
 import { roleService } from '@games/services'
-import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { createRouter } from '../../hono'
 

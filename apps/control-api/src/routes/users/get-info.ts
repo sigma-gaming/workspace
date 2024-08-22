@@ -1,6 +1,6 @@
+import { zValidator } from '@core/server'
 import { gamesDb } from '@dbs/games-db'
 import { UserSecurityTable } from '@dbs/games-schema'
-import { zValidator } from '@hono/zod-validator'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { createRouter } from '../../hono'

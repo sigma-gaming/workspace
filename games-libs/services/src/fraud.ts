@@ -1,6 +1,6 @@
 import { createSingletonProxy } from '@core/di'
-import { HonoUwsEnv } from '@core/hono-uws'
 import { Logger, LoggerService } from '@core/logger'
+import { HonoUwsEnv } from '@core/server'
 import { gamesDb } from '@dbs/games-db'
 import { UserSecuritySelect, UserSecurityTable } from '@dbs/games-schema'
 import { FraudRisk } from '@dbs/games-types'

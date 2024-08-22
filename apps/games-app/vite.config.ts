@@ -27,6 +27,8 @@ export default defineConfig({
     tsconfigPaths(),
     sentryVitePlugin({
       disable: process.env.NODE_ENV === 'development',
+      telemetry: false,
+      sourcemaps: { disable: true }, // Is sent manually on Dockerfile build stage
       bundleSizeOptimizations: {
         excludeDebugStatements: true,
         excludeReplayIframe: true,

@@ -1,5 +1,5 @@
 {
-  "name": "@core/hono-uws",
+  "name": "@core/client",
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,
@@ -12,6 +12,8 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
+    "@core/exceptions": "workspace:*",
+    "@core/forms": "workspace:*",
     "@core/utils": "workspace:*"
   }
 }

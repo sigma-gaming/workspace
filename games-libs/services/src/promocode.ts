@@ -10,9 +10,17 @@ import {
 } from '@dbs/games-types'
 import { gamesCaches } from '@games/redis'
 import { and, eq } from 'drizzle-orm'
+import crypto from 'node:crypto'
 import { singleton } from 'tsyringe-neo'
 import { FraudService } from './fraud'
+import { locks } from './locks'
 import { transactionService } from './transaction'
+
+const DEFAULT_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+function randomChar(alphabet: string) {
+  return alphabet[crypto.randomInt(alphabet.length)]
+}
 
 export enum PromocodeActivationResult {
   AppliedPayout = 'AppliedPayout',
@@ -62,6 +70,30 @@ export class PromocodeService {
     this.logger = loggerService.logger.child('Promocode')
   }
 
+  generateOne({
+    length = 10,
+    alphabet = DEFAULT_ALPHABET,
+  }: {
+    length?: number
+    alphabet?: string
+  } = {}) {
+    return Array.from({ length }, () => randomChar(alphabet)).join('')
+  }
+
+  generateMany({
+    count,
+    length = 10,
+    alphabet = DEFAULT_ALPHABET,
+  }: {
+    count: number
+    length?: number
+    alphabet?: string
+  }) {
+    return Array.from({ length: count }, () =>
+      this.generateOne({ length, alphabet }),
+    )
+  }
+
   async getPromocode(code: string) {
     const cached = await gamesCaches.promocode.get(code)
     if (cached) return cached
@@ -92,115 +124,113 @@ export class PromocodeService {
   }): Promise<ActivationOutput> {
     const { userId, code } = payload
 
-    const locks = [await gamesCaches.promocode.lock(code, 5000)]
-
     try {
-      const promocode = await this.getPromocode(code)
+      return await locks.with([locks.promocode(code)], async (controller) => {
+        const promocode = await this.getPromocode(code)
 
-      if (!promocode) {
-        return { result: PromocodeActivationResult.NotFound }
-      }
-
-      if (promocode.bonusType !== PromocodeBonusType.Payout) {
-        return {
-          result: PromocodeActivationResult.WrongUsage,
-          bonusType: promocode.bonusType,
+        if (!promocode) {
+          return { result: PromocodeActivationResult.NotFound }
         }
-      }
 
-      if (promocode.bonus.type !== PromocodeBonusType.Payout) {
-        return {
-          result: PromocodeActivationResult.WrongUsage,
-          bonusType: promocode.bonus.type,
-        }
-      }
-
-      if (promocode.userId && promocode.userId !== userId) {
-        return { result: PromocodeActivationResult.NotFound }
-      }
-
-      if (!promocode.isActive) {
-        return { result: PromocodeActivationResult.Inactive }
-      }
-
-      if (promocode.expiresAt) {
-        const expiresAt = new Date(promocode.expiresAt)
-
-        if (new Date() >= expiresAt) {
-          return { result: PromocodeActivationResult.Expired }
-        }
-      }
-
-      if (promocode.usages >= promocode.maxUsages) {
-        return { result: PromocodeActivationResult.UsageExceeded }
-      }
-
-      if (await this.isUsed(code, userId)) {
-        return { result: PromocodeActivationResult.AlreadyUsed }
-      }
-
-      const risk = await this.fraudService.actualizeRisk(userId)
-
-      if (risk === FraudRisk.High || risk === FraudRisk.Medium) {
-        return { result: PromocodeActivationResult.Blocked }
-      }
-
-      locks.push(await transactionService.lock(userId, 5000))
-
-      const lastTransaction =
-        await transactionService.getLastTransaction(userId)
-
-      const bonusWageringAmount = Math.ceil(
-        promocode.bonus.payout * (promocode.wageringMultiplier / 100),
-      )
-
-      const { transaction, updatedPromocode } = await gamesDb.transaction(
-        async (tx) => {
-          if (promocode.bonus.type !== PromocodeBonusType.Payout) {
-            return tx.rollback()
+        if (promocode.bonusType !== PromocodeBonusType.Payout) {
+          return {
+            result: PromocodeActivationResult.WrongUsage,
+            bonusType: promocode.bonusType,
           }
+        }
 
-          const [updatedPromocode] = await tx
-            .update(PromocodeTable)
-            .set({ usages: promocode.usages + 1 })
-            .where(eq(PromocodeTable.id, promocode.id))
-            .returning()
+        if (promocode.bonus.type !== PromocodeBonusType.Payout) {
+          return {
+            result: PromocodeActivationResult.WrongUsage,
+            bonusType: promocode.bonus.type,
+          }
+        }
 
-          await tx.insert(PromocodeUsageTable).values({
-            status: PromocodeUsageStatus.Applied,
-            userId,
-            promocodeId: promocode.id,
-          })
+        if (promocode.userId && promocode.userId !== userId) {
+          return { result: PromocodeActivationResult.NotFound }
+        }
 
-          const [transaction] = await transactionService.createTransaction({
-            tx,
-            payload: transactionService.generateTransaction(lastTransaction, {
-              userId,
-              type: TransactionType.Bonus,
-              amount: promocode.bonus.payout,
-              wageringIncrease: bonusWageringAmount,
-            }),
-          })
+        if (!promocode.isActive) {
+          return { result: PromocodeActivationResult.Inactive }
+        }
 
-          return { transaction, updatedPromocode }
-        },
-      )
+        if (promocode.expiresAt) {
+          const expiresAt = new Date(promocode.expiresAt)
 
-      await gamesCaches.lastTransaction.set(userId, transaction)
-      await gamesCaches.promocode.set(code, updatedPromocode)
+          if (new Date() >= expiresAt) {
+            return { result: PromocodeActivationResult.Expired }
+          }
+        }
 
-      return {
-        result: PromocodeActivationResult.AppliedPayout,
-        payout: promocode.bonus.payout,
-        wageringRequired: Math.ceil(
+        if (promocode.usages >= promocode.maxUsages) {
+          return { result: PromocodeActivationResult.UsageExceeded }
+        }
+
+        if (await this.isUsed(code, userId)) {
+          return { result: PromocodeActivationResult.AlreadyUsed }
+        }
+
+        const risk = await this.fraudService.actualizeRisk(userId)
+
+        if (risk === FraudRisk.High || risk === FraudRisk.Medium) {
+          return { result: PromocodeActivationResult.Blocked }
+        }
+
+        await controller.add(locks.transaction(userId))
+
+        const lastTransaction =
+          await transactionService.getLastTransaction(userId)
+
+        const bonusWageringAmount = Math.ceil(
           promocode.bonus.payout * (promocode.wageringMultiplier / 100),
-        ),
-      }
+        )
+
+        const { transaction, updatedPromocode } = await gamesDb.transaction(
+          async (tx) => {
+            if (promocode.bonus.type !== PromocodeBonusType.Payout) {
+              return tx.rollback()
+            }
+
+            const [updatedPromocode] = await tx
+              .update(PromocodeTable)
+              .set({ usages: promocode.usages + 1 })
+              .where(eq(PromocodeTable.id, promocode.id))
+              .returning()
+
+            await tx.insert(PromocodeUsageTable).values({
+              status: PromocodeUsageStatus.Applied,
+              userId,
+              promocodeId: promocode.id,
+            })
+
+            const [transaction] = await transactionService.createTransaction({
+              tx,
+              payload: transactionService.generateTransaction(lastTransaction, {
+                userId,
+                type: TransactionType.Bonus,
+                amount: promocode.bonus.payout,
+                wageringIncrease: bonusWageringAmount,
+              }),
+            })
+
+            return { transaction, updatedPromocode }
+          },
+        )
+
+        await gamesCaches.lastTransaction.set(userId, transaction)
+        await gamesCaches.promocode.set(code, updatedPromocode)
+
+        return {
+          result: PromocodeActivationResult.AppliedPayout,
+          payout: promocode.bonus.payout,
+          wageringRequired: Math.ceil(
+            promocode.bonus.payout * (promocode.wageringMultiplier / 100),
+          ),
+        }
+      })
     } catch (error) {
       this.logger.error('Failed to apply Payout', error)
       return { result: PromocodeActivationResult.Failed }
-    } finally {
-      await Promise.all(locks.map((lock) => lock.release()))
     }
   }
 }

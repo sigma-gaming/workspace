@@ -20,6 +20,6 @@
     "@core/logger": "workspace:*"
   },
   "devDependencies": {
-    "@core/hono-uws": "workspace:*"
+    "@core/server": "workspace:*"
   }
 }

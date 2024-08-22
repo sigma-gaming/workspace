@@ -1,5 +1,5 @@
+import { $$notifications, createApiEffect } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { createApiEffect } from '@core/hono-client'
 import { subscriptionFactory } from '@core/io-client'
 import { ChatMessageSelect } from '@dbs/games-schema'
 import { ChatMessageAttachment, ChatMessageType } from '@dbs/games-types'
@@ -8,7 +8,6 @@ import { NotificationData } from '@mantine/notifications'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { v4 as uuid } from 'uuid'
-import { $$notifications } from '../../entities/notifications'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
@@ -117,8 +116,10 @@ sample({
     messages: $messages,
   },
   fn: ({ user, senderName, profile, messages }, payload) => {
+    const lastId = messages[messages.length - 1]?.id ?? -1
+
     return messages.concat({
-      id: uuid(),
+      id: lastId + 1,
       createdAt: new Date().toISOString(),
       type: ChatMessageType.UserMessage,
       attachments: payload.attachments,

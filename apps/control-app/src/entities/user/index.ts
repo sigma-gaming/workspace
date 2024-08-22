@@ -1,5 +1,5 @@
+import { createApiEffect } from '@core/client'
 import { NotAuthenticatedException } from '@core/exceptions'
-import { createApiEffect } from '@core/hono-client'
 import { UserRole } from '@dbs/games-types'
 import { createQuery } from '@farfetched/core'
 import { createEffect, createEvent, createStore, sample } from 'effector'

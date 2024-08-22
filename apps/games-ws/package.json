@@ -24,6 +24,7 @@
     "@games/model": "workspace:*",
     "@games/redis": "workspace:*",
     "@games/services": "workspace:*",
+    "@games/engine": "workspace:*",
     "@core/di": "workspace:*",
     "@core/exceptions": "workspace:*",
     "@core/logger": "workspace:*",

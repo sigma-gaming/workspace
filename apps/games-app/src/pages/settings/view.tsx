@@ -46,12 +46,12 @@ const Profile = () => {
   const name = useUnit($$settingsPage.profileFields.name.$value)
   const username = useUnit($$settingsPage.profileFields.username.$value)
   const provider = useUnit($$settingsPage.profileFields.provider.$value)
-  const errors = useUnit($$settingsPage.profileForm.$errors)
+  const errors = useUnit($$settingsPage.form.$errors)
 
   const updateUsername = useUnit($$settingsPage.profileFields.username.update)
   const updateProvider = useUnit($$settingsPage.profileFields.provider.update)
   const updateName = useUnit($$settingsPage.profileFields.name.update)
-  const submit = useUnit($$settingsPage.profileForm.submit)
+  const submit = useUnit($$settingsPage.form.submit)
 
   const updatingProfile = useUnit($$settingsPage.$updatingProfile)
 

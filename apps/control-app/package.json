@@ -18,7 +18,7 @@
     "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",
     "@core/exceptions": "workspace:*",
-    "@core/hono-client": "workspace:*",
+    "@core/client": "workspace:*",
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",
     "@tooling/env": "workspace:*"

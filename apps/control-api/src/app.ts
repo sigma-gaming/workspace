@@ -7,6 +7,7 @@ import { sessionMiddleware } from './middlewares/session'
 import { fraudServiceRouter } from './routes/fraud'
 import { maintenanceRouter } from './routes/maintenance'
 import { notificationsRouter } from './routes/notifications'
+import { promocodesRouter } from './routes/promocodes'
 import { usersRouter } from './routes/users'
 
 export const app = new Hono<ControlApiEnv>()
@@ -24,3 +25,4 @@ export const app = new Hono<ControlApiEnv>()
   .route('/maintenance', maintenanceRouter)
   .route('/fraud', fraudServiceRouter)
   .route('/users', usersRouter)
+  .route('/promocodes', promocodesRouter)
