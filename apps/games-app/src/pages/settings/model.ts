@@ -52,19 +52,7 @@ sample({
   target: updateProfileMutation.start,
 })
 
-handleExceptions(updateProfileMutation, {
-  form,
-  message: (message) => ({
-    color: 'red',
-    title: 'Произошла ошибка',
-    message,
-  }),
-  otherMessage: () => ({
-    color: 'red',
-    title: 'Что-то пошло не так',
-    message: 'Попробуйте еще раз',
-  }),
-})
+handleExceptions(updateProfileMutation, { form })
 
 sample({
   source: $$profile.$profile,

@@ -39,6 +39,7 @@ type ActivationOutput =
   | {
       result: PromocodeActivationResult.AppliedPayout
       payout: number
+      updatedBalance: number
       wageringRequired: number
     }
   | {
@@ -107,10 +108,10 @@ export class PromocodeService {
     return promocode
   }
 
-  async isUsed(code: string, userId: string) {
+  async isUsed(promocodeId: string, userId: string) {
     const usage = await gamesDb.query.PromocodeUsageTable.findFirst({
       where: and(
-        eq(PromocodeUsageTable.promocodeId, code),
+        eq(PromocodeUsageTable.promocodeId, promocodeId),
         eq(PromocodeUsageTable.userId, userId),
       ),
     })
@@ -150,6 +151,10 @@ export class PromocodeService {
           return { result: PromocodeActivationResult.NotFound }
         }
 
+        if (await this.isUsed(promocode.id, userId)) {
+          return { result: PromocodeActivationResult.AlreadyUsed }
+        }
+
         if (!promocode.isActive) {
           return { result: PromocodeActivationResult.Inactive }
         }
@@ -164,10 +169,6 @@ export class PromocodeService {
 
         if (promocode.usages >= promocode.maxUsages) {
           return { result: PromocodeActivationResult.UsageExceeded }
-        }
-
-        if (await this.isUsed(code, userId)) {
-          return { result: PromocodeActivationResult.AlreadyUsed }
         }
 
         const risk = await this.fraudService.actualizeRisk(userId)
@@ -223,12 +224,14 @@ export class PromocodeService {
         return {
           result: PromocodeActivationResult.AppliedPayout,
           payout: promocode.bonus.payout,
+          updatedBalance: transaction.closingBalance,
           wageringRequired: Math.ceil(
             promocode.bonus.payout * (promocode.wageringMultiplier / 100),
           ),
         }
       })
     } catch (error) {
+      console.error(error)
       this.logger.error('Failed to apply Payout', error)
       return { result: PromocodeActivationResult.Failed }
     }

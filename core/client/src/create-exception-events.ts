@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   RouteException,
+  TooManyRequestsException,
   ValidationException,
 } from '@core/exceptions'
 import { normalizeFieldErrors } from '@core/forms'
@@ -20,12 +21,15 @@ export function createExceptionEvents(
   const {
     validation,
     badRequest,
+    tooManyRequests,
     __: other,
   } = split(receivedApiError, {
     validation: (error): error is ValidationException =>
       error instanceof ValidationException,
     badRequest: (error): error is BadRequestException =>
       error instanceof BadRequestException,
+    tooManyRequests: (error): error is TooManyRequestsException =>
+      error instanceof TooManyRequestsException,
   })
 
   sample({
@@ -58,6 +62,7 @@ export function createExceptionEvents(
   return {
     badRequest,
     badRequestMessage,
+    tooManyRequests,
     formErrors: receivedFormErrors,
     other,
   }

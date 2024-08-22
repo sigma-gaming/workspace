@@ -48,7 +48,12 @@ export const applyRoute = createRouter().post(
     })
 
     if (application.result === PromocodeActivationResult.AppliedPayout) {
-      return ctx.json({ status: 'success' })
+      return ctx.json({
+        status: 'success',
+        bonusType: PromocodeBonusType.Payout,
+        payout: application.payout,
+        updatedBalance: application.updatedBalance,
+      })
     }
 
     if (application.result === PromocodeActivationResult.AppliedDeposit) {

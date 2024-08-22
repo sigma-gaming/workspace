@@ -116,19 +116,7 @@ sample({
   })),
 })
 
-handleExceptions(createPromocodesMutation, {
-  form,
-  message: (message) => ({
-    color: 'red',
-    title: 'Произошла ошибка',
-    message,
-  }),
-  otherMessage: (exception) => ({
-    color: 'red',
-    title: 'Произошла ошибка',
-    message: exception.message,
-  }),
-})
+handleExceptions(createPromocodesMutation, { form })
 
 reset({
   clock: [routes.promocodes.closed, form.submit],

@@ -123,18 +123,7 @@ sample({
   ],
 })
 
-handleExceptions(withdrawMutation, {
-  message: (message) => ({
-    color: 'red',
-    title: 'Произошла ошибка',
-    message,
-  }),
-  otherMessage: () => ({
-    color: 'red',
-    title: 'Что-то пошло не так',
-    message: 'Попробуйте снова через пару минут',
-  }),
-})
+handleExceptions(withdrawMutation)
 
 export const $$balance = {
   receiveUpdates,

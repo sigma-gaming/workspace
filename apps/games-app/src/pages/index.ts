@@ -1,3 +1,4 @@
+import { BonusesPage } from './bonuses'
 import { PaymentFailureCallbackPage } from './callbacks/payment-failure'
 import { PaymentSuccessCallbackPage } from './callbacks/payment-success'
 import { TelegramCallbackPage } from './callbacks/telegram'
@@ -11,6 +12,7 @@ export const PAGES = [
   GamesPage,
   DiceGamePage,
   PincodeGamePage,
+  BonusesPage,
   SettingsPage,
   VkCallbackPage,
   TelegramCallbackPage,

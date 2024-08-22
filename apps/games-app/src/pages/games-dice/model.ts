@@ -230,19 +230,7 @@ sample({
   target: $autoplaying,
 })
 
-handleExceptions(playGameMutation, {
-  form,
-  message: (message) => ({
-    color: 'red',
-    title: 'Произошла ошибка',
-    message,
-  }),
-  otherMessage: () => ({
-    color: 'red',
-    title: 'Что-то пошло не так',
-    message: 'Попробуйте снова через пару минут',
-  }),
-})
+handleExceptions(playGameMutation, { form })
 
 sample({
   clock: routes.diceGame.closed,

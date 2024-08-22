@@ -1,4 +1,4 @@
-import { RouteException } from '@core/exceptions'
+import { RouteException, TooManyRequestsException } from '@core/exceptions'
 import { Form } from '@core/forms'
 import { Mutation } from '@farfetched/core'
 import { NotificationData } from '@mantine/notifications'
@@ -12,9 +12,30 @@ export function handleExceptions(
     form?: Form<any, any, any>
     message?: (message: string) => NotificationData
     otherMessage?: (exception: RouteException<unknown>) => NotificationData
-  },
+    tooManyRequestsMessage?: (
+      exception: TooManyRequestsException,
+    ) => NotificationData
+  } = {},
 ) {
-  const { form, message, otherMessage } = targets
+  const {
+    form,
+    message = (message) => ({
+      color: 'red',
+      title: 'Произошла ошибка',
+      message,
+    }),
+    tooManyRequestsMessage = () => ({
+      color: 'red',
+      title: 'Слишком много запросов',
+      message: 'Попробуйте через несколько минут',
+    }),
+    otherMessage = () => ({
+      color: 'red',
+      title: 'Что-то пошло не так',
+      message: 'Попробуйте снова через пару минут',
+    }),
+  } = targets
+
   const receivedException = createExceptionEvents(mutation)
 
   if (form) {
@@ -24,19 +45,21 @@ export function handleExceptions(
     })
   }
 
-  if (message) {
-    sample({
-      source: receivedException.badRequestMessage,
-      fn: message,
-      target: $$notifications.show,
-    })
-  }
+  sample({
+    source: receivedException.badRequestMessage,
+    fn: message,
+    target: $$notifications.show,
+  })
 
-  if (otherMessage) {
-    sample({
-      source: receivedException.other,
-      fn: otherMessage,
-      target: $$notifications.show,
-    })
-  }
+  sample({
+    source: receivedException.tooManyRequests,
+    fn: tooManyRequestsMessage,
+    target: $$notifications.show,
+  })
+
+  sample({
+    source: receivedException.other,
+    fn: otherMessage,
+    target: $$notifications.show,
+  })
 }

@@ -9,6 +9,7 @@ import { chatRouter } from './routes/chat'
 import { gameHistoryRouter } from './routes/game-history'
 import { meRouter } from './routes/me'
 import { notificationsRouter } from './routes/notifications'
+import { promocodesRouter } from './routes/promocodes'
 import { settingsRouter } from './routes/settings'
 import { sentryMiddleware } from './shared/sentry'
 
@@ -31,3 +32,4 @@ export const app = createRouter()
   .route('/settings', settingsRouter)
   .route('/balance', balanceRouter)
   .route('/gameHistory', gameHistoryRouter)
+  .route('/promocodes', promocodesRouter)
