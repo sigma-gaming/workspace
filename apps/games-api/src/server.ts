@@ -3,44 +3,10 @@ import './shared/sentry/init'
 import { shutdownServices } from '@core/di'
 import { logger, loggerService } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
-import { gamesDb } from '@dbs/games-db'
-import { gamesRedis, maintenanceCache } from '@games/redis'
 import { env } from '@games/services'
-import { sql } from 'drizzle-orm'
-import { HTTPException } from 'hono/http-exception'
 import { app } from './app'
 import { initializeCronJobs } from './jobs'
 import { sentry } from './shared/sentry'
-
-app.get('/healthy', async (ctx) => {
-  return ctx.text('Yes')
-})
-
-app.get('/ready', async (ctx) => {
-  const redisReady = await gamesRedis
-    .ping()
-    .then(() => true)
-    .catch(() => false)
-
-  if (!redisReady) {
-    throw new HTTPException(503)
-  }
-
-  if (await maintenanceCache.isMaintenanceMode()) {
-    throw new HTTPException(503)
-  }
-
-  const postgresReady = await gamesDb
-    .execute(sql`SELECT 1`)
-    .then(() => true)
-    .catch(() => false)
-
-  if (!postgresReady) {
-    throw new HTTPException(503)
-  }
-
-  return ctx.text('Yes')
-})
 
 app.onError(
   createErrorHandler({

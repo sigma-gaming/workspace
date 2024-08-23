@@ -1,6 +1,7 @@
 import { env } from '@games/services'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
+import { healthyRoute, readyRoute } from './health'
 import { createRouter } from './hono'
 import { sessionMiddleware } from './middlewares/session'
 import { authRouter } from './routes/auth'
@@ -14,9 +15,6 @@ import { settingsRouter } from './routes/settings'
 import { sentryMiddleware } from './shared/sentry'
 
 export const app = createRouter()
-  .use('*', sessionMiddleware)
-  .use('*', sentryMiddleware({ enabled: env.isProd }))
-  .use('*', logger())
   .use(
     '*',
     cors({
@@ -25,6 +23,11 @@ export const app = createRouter()
       allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
     }),
   )
+  .route('/healthy', healthyRoute)
+  .route('/ready', readyRoute)
+  .use('*', sessionMiddleware)
+  .use('*', sentryMiddleware({ enabled: env.isProd }))
+  .use('*', logger())
   .route('/notifications', notificationsRouter)
   .route('/chat', chatRouter)
   .route('/auth', authRouter)
