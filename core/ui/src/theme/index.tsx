@@ -27,6 +27,7 @@ import {
   Switch,
   Tabs,
   Title,
+  Tooltip,
 } from '@mantine/core'
 import { DateTimePicker } from '@mantine/dates'
 import { Notifications } from '@mantine/notifications'
@@ -127,6 +128,15 @@ export const theme = createTheme({
       defaultProps: {
         middlewares: {
           flip: createFlipOptions(),
+        },
+      },
+    }),
+    Tooltip: Tooltip.extend({
+      defaultProps: {
+        events: {
+          hover: true,
+          focus: false,
+          touch: true,
         },
       },
     }),

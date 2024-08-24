@@ -73,7 +73,7 @@ export class TransactionService {
     if (typeof payload.wageringIncrease === 'number') {
       wageringRequired += payload.wageringIncrease
     } else if (payload.type === TransactionType.Deposit) {
-      wageringRequired += payload.amount
+      wageringRequired += Math.ceil(payload.amount * 0.5)
     }
 
     return {

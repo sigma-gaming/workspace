@@ -34,7 +34,7 @@ export const applyRoute = createRouter().post(
   zValidator(
     'json',
     z.object({
-      code: z.string(),
+      code: z.string().min(1, 'Не может быть пустым'),
     }),
   ),
   async (ctx) => {

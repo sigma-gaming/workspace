@@ -8,6 +8,7 @@ import { Gem } from './gem.tsx'
 import { History } from './history.tsx'
 import { NotFound } from './not-found.tsx'
 import { Play } from './play.tsx'
+import { Question } from './question.tsx'
 import { Send } from './send.tsx'
 import { Sigma } from './sigma.tsx'
 import { Sparkle } from './sparkle.tsx'
@@ -17,6 +18,7 @@ import { TrendingUp } from './trending-up.tsx'
 import { Vk } from './vk.tsx'
 
 export const Icons = {
+  Question,
   Vk,
   Telegram,
   Gem,

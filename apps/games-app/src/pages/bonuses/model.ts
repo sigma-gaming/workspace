@@ -32,7 +32,7 @@ const promocodeFields = {
 const promocodeForm = createForm({
   fields: promocodeFields,
   schema: z.object({
-    code: z.string(),
+    code: z.string().min(1, 'Не может быть пустым'),
   }),
 })
 

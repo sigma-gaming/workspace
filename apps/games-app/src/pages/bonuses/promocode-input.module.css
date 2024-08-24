@@ -1,0 +1,17 @@
+.root {
+  --right-section-width: 128px;
+  @apply max-w-[320px] mt-6;
+}
+
+.wrapper {
+  @apply mt-0;
+}
+
+.input {
+  @apply pr-[--right-section-width];
+  @apply tracking-wider font-medium;
+}
+
+.section[data-position="right"] {
+  @apply w-[--right-section-width] p-1;
+}
