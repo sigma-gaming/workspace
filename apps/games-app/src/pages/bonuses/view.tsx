@@ -107,7 +107,7 @@ export const PromocodeCard = () => {
           Бесплатные&nbsp;гемы или&nbsp;бонус к&nbsp;пополнению&nbsp;баланса
         </p>
 
-        <WithError error={errors.code[0]} position="right">
+        <WithError error={errors.code[0]} position="bottom">
           <TextInput
             classNames={promocodeInputStyles}
             size="lg"
@@ -131,9 +131,9 @@ export const PromocodeCard = () => {
         </WithError>
 
         <div className="mt-4 flex gap-2 items-center select-none">
-          <p className="text-sm text-dimmed">Где найти промокод?</p>
+          <p className="text-sm text-dimmed">Где найти промокоды?</p>
           <Tooltip
-            label="Их можно найти в нашем Telegram-канале, а также в видео и постах партнёров"
+            label="Они часто появляются в нашем Telegram-канале, а также в видео и постах партнёров"
             position="bottom"
             multiline
             className="max-w-[250px]"

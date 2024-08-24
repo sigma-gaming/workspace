@@ -8,6 +8,7 @@ import { createMutation } from '@farfetched/core'
 import { formatGem } from '@games/model'
 import { createEvent, sample } from 'effector'
 import { z } from 'zod'
+import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
@@ -52,6 +53,11 @@ sample({
       message: `Баланс пополнен на ${formatGem(result.payout / 100)}g`,
     }),
   target: $$notifications.show,
+})
+
+sample({
+  clock: applyPromocodeMutation.finished.success,
+  target: $$audio.play.prepend(() => Sound.TopUp),
 })
 
 sample({
