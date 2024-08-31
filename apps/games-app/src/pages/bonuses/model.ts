@@ -91,8 +91,31 @@ const $globalTaskStatuses = createStore<GlobalTaskStatuses>(
 )
 const $globalTaskStatusesLoading = getGlobalTaskStatusesFx.pending
 const $applyingPromocode = applyPromocodeMutation.$pending
-const $completingGlobalTask = completeGlobalTaskMutation.$pending
-const $claimingGlobalTaskReward = claimGlobalTaskRewardMutation.$pending
+
+const INITIAL_LOADING = Object.values(GlobalTaskKey).reduce(
+  (acc, key) => ({ ...acc, [key]: false }),
+  {} as Record<GlobalTaskKey, boolean>,
+)
+
+const $completingGlobalTaskMap = createStore(INITIAL_LOADING)
+  .on(completeGlobalTaskMutation.started, (map, { params }) => ({
+    ...map,
+    [params.taskKey]: true,
+  }))
+  .on(completeGlobalTaskMutation.finished.finally, (map, { params }) => ({
+    ...map,
+    [params.taskKey]: false,
+  }))
+
+const $claimingGlobalTaskRewardMap = createStore(INITIAL_LOADING)
+  .on(claimGlobalTaskRewardMutation.started, (map, { params }) => ({
+    ...map,
+    [params.taskKey]: true,
+  }))
+  .on(claimGlobalTaskRewardMutation.finished.finally, (map, { params }) => ({
+    ...map,
+    [params.taskKey]: false,
+  }))
 
 sample({
   source: getGlobalTaskStatusesFx.doneData,
@@ -201,8 +224,8 @@ export const $$bonusesPage = {
   $applyingPromocode,
   $globalTaskStatuses,
   $globalTaskStatusesLoading,
-  $completingGlobalTask,
-  $claimingGlobalTaskReward,
+  $completingGlobalTaskMap,
+  $claimingGlobalTaskRewardMap,
   $globalTasks,
   $globalTasksLoading,
   completeGlobalTask,

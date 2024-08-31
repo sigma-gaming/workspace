@@ -18,7 +18,7 @@ type Props = {
 const titleMap: Record<GlobalTaskKey, ReactNode> = {
   [GlobalTaskKey.TelegramGroupSubscribe]: <>Подписка на&nbsp;Telegram</>,
   [GlobalTaskKey.VkGroupSubscribe]: <>Подписка на&nbsp;VK</>,
-  [GlobalTaskKey.VkPinnedRepost]: <>Репост поста в&nbsp;VK</>,
+  [GlobalTaskKey.VkPinnedRepost]: <>Репост поста&nbsp;в&nbsp;VK</>,
 }
 
 const imageMap: Record<GlobalTaskKey, string> = {
@@ -85,8 +85,10 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
   const tasks = useUnit($$bonusesPage.$globalTasks)
   const statuses = useUnit($$bonusesPage.$globalTaskStatuses)
   const task = tasks?.find((task) => task.key === taskKey)
-  const completing = useUnit($$bonusesPage.$completingGlobalTask)
-  const claimingReward = useUnit($$bonusesPage.$claimingGlobalTaskReward)
+  const completingMap = useUnit($$bonusesPage.$completingGlobalTaskMap)
+  const claimingRewardMap = useUnit($$bonusesPage.$claimingGlobalTaskRewardMap)
+  const completing = completingMap[taskKey]
+  const claimingReward = claimingRewardMap[taskKey]
 
   if (!task) {
     return <CardSkeleton />
@@ -99,7 +101,7 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
   return (
     <Card
       className={clsx(
-        'relative p-0 rounded-2xl md:rounded-3xl',
+        'relative p-0 rounded-2xl md:rounded-3xl xl:w-full xl:max-w-[348px]',
         disabled && 'opacity-60 cursor-not-allowed',
       )}
     >
@@ -117,9 +119,9 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
         </div>
 
         <div className="px-4 pb-6 md:px-6 md:pb-8">
-          <h3 className="text-2xl font-medium">{title}</h3>
+          <h3 className="text-2xl font-medium leading-tight">{title}</h3>
 
-          <p className="mt-1 max-w-[360px] leading-snug">
+          <p className="mt-2 max-w-[360px] leading-snug">
             Получи{' '}
             <span className="inline-block text-primary-4 text-center">
               <Icons.Gem
@@ -132,7 +134,7 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
           </p>
 
           {status === TaskStatus.Pending && (
-            <div className="flex gap-2 mt-6">
+            <div className="flex flex-wrap gap-2 mt-6">
               {actionUrl ? (
                 <LinkButton
                   color="blue"
@@ -173,8 +175,8 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
           )}
 
           {status === TaskStatus.Claimed && (
-            <div className="flex items-center gap-1.5 mt-6 h-9 text-[color:var(--mantine-color-green-6)]">
-              <IconCircleCheck className="w-6 h-6" />
+            <div className="flex items-center gap-1.5 mt-6 h-9 text-[color:var(--mantine-color-green-6)] leading-tight">
+              <IconCircleCheck className="shrink-0 w-6 h-6" />
               <p className="font-medium">Награда получена</p>
             </div>
           )}
@@ -187,7 +189,7 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
               multiline
               className="max-w-[250px]"
             >
-              <Icons.Question className="w-5 h-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
+              <Icons.Question className="shrink-0 w-5 h-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
             </Tooltip>
           </div>
         </div>

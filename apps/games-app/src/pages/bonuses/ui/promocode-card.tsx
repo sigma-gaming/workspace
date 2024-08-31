@@ -57,9 +57,9 @@ export const PromocodeCard = () => {
       </div>
 
       <div className="relative z-10">
-        <h3 className="text-2xl font-medium">Промокод</h3>
+        <h3 className="text-2xl font-medium leading-tight">Промокод</h3>
 
-        <p className="mt-1 max-w-[360px] leading-snug">
+        <p className="mt-2 max-w-[360px] leading-snug">
           Бесплатные&nbsp;гемы или&nbsp;бонус к&nbsp;пополнению&nbsp;баланса
         </p>
 
@@ -94,7 +94,7 @@ export const PromocodeCard = () => {
             multiline
             className="max-w-[250px]"
           >
-            <Icons.Question className="w-5 h-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
+            <Icons.Question className="shrink-0 w-5 h-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
           </Tooltip>
         </div>
       </div>
