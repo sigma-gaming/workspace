@@ -2,8 +2,8 @@ import { logger } from '@core/logger'
 import { gamesCaches } from '@games/redis'
 import { sendToAllLocal } from '../../shared/send'
 
-let lastWinSent: string | null = null
-let lastBigWinSent: string | null = null
+let lastWinSent = -1
+let lastBigWinSent = -1
 
 async function sendLastWins() {
   // Add 100ms compensation for network delays
@@ -14,16 +14,8 @@ async function sendLastWins() {
   try {
     const lastWins = await gamesCaches.lastWinHistory.get()
 
-    let lastSentIndex = lastWins.findIndex(
-      (gameRecord) => gameRecord.id === lastWinSent,
-    )
-
-    if (lastSentIndex === -1) {
-      lastSentIndex = lastWins.length
-    }
-
     // Send only new records
-    const newWins = lastWins.slice(0, lastSentIndex)
+    const newWins = lastWins.filter((gameRecord) => gameRecord.id > lastWinSent)
 
     if (newWins.length === 0) {
       return next()
@@ -55,16 +47,10 @@ async function sendBigWins() {
   try {
     const bigWins = await gamesCaches.bigWinHistory.get()
 
-    let lastSentIndex = bigWins.findIndex(
-      (gameRecord) => gameRecord.id === lastBigWinSent,
-    )
-
-    if (lastSentIndex === -1) {
-      lastSentIndex = bigWins.length
-    }
-
     // Send only new records
-    const newWins = bigWins.slice(0, lastSentIndex)
+    const newWins = bigWins.filter(
+      (gameRecord) => gameRecord.id > lastBigWinSent,
+    )
 
     if (newWins.length === 0) {
       return next()

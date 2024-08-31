@@ -4,7 +4,13 @@ import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { gemInt, getPincodeCombination, PincodeMode } from '@games/model'
+import {
+  clampBet,
+  gemFloat,
+  gemInt,
+  getPincodeCombination,
+  PincodeMode,
+} from '@games/model'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
@@ -85,13 +91,16 @@ const fields = {
   }),
 }
 
+const MIN_BET = gemInt(1)
+const MAX_BET = gemInt(5000)
+
 export const form = createForm({
   fields,
   schema: z.object({
     bet: z
       .number()
-      .min(gemInt(1), 'Минимальная ставка - 1 гем')
-      .max(gemInt(5000), 'Максимальная ставка - 5000 гемов'),
+      .min(MIN_BET, `Минимальная ставка - ${gemFloat(MIN_BET)} гем`)
+      .max(MAX_BET, `Максимальная ставка - ${gemFloat(MAX_BET)} гемов`),
     mode: z.nativeEnum(PincodeMode),
   }),
 })
@@ -137,7 +146,13 @@ sample({
 sample({
   clock: betDoubled,
   source: { bet: fields.bet.$value, balance: $$balance.$available },
-  fn: ({ bet, balance }) => Math.min(balance, bet * 2),
+  fn: ({ bet, balance }) =>
+    clampBet({
+      bet: bet * 2,
+      min: MIN_BET,
+      max: MAX_BET,
+      balance,
+    }),
   target: fields.bet.update,
 })
 

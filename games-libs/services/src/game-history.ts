@@ -16,7 +16,7 @@ export class GameHistoryService {
 
     const records = await gamesDb.query.GameRecordTable.findMany({
       where: eq(GameRecordTable.outcome, GameOutcome.Win),
-      orderBy: desc(GameRecordTable.createdAt),
+      orderBy: desc(GameRecordTable.id),
       limit: 10,
     })
 
@@ -37,7 +37,7 @@ export class GameHistoryService {
           gemInt(3000),
         ),
       ),
-      orderBy: desc(GameRecordTable.createdAt),
+      orderBy: desc(GameRecordTable.id),
       limit: 10,
     })
 
@@ -52,7 +52,7 @@ export class GameHistoryService {
 
     const records = await gamesDb.query.GameRecordTable.findMany({
       where: eq(GameRecordTable.userId, userId),
-      orderBy: desc(GameRecordTable.createdAt),
+      orderBy: desc(GameRecordTable.id),
       limit: 10,
     })
 

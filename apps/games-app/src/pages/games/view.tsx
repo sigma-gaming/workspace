@@ -6,19 +6,22 @@ import pincode from './assets/pincode.webp?lqip'
 
 export const GamesPageView = () => {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-      <GameCard
-        route={routes.diceGame}
-        label="Dice"
-        imageSrc={dice.src}
-        lqip={dice.lqip}
-      />
-      <GameCard
-        route={routes.pincodeGame}
-        label="Pincode"
-        imageSrc={pincode.src}
-        lqip={pincode.lqip}
-      />
+    <div>
+      <h2 className="text-2xl font-medium mt-0 mb-4 md:mb-6">Наши игры</h2>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <GameCard
+          route={routes.diceGame}
+          label="Dice"
+          imageSrc={dice.src}
+          lqip={dice.lqip}
+        />
+        <GameCard
+          route={routes.pincodeGame}
+          label="Pincode"
+          imageSrc={pincode.src}
+          lqip={pincode.lqip}
+        />
+      </div>
     </div>
   )
 }

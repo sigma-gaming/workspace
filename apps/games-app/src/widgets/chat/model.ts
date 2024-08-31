@@ -130,6 +130,7 @@ sample({
       userId: user!.id,
       text: payload.text,
       temporary: true,
+      isPinned: true,
       trackingId: payload.trackingId,
     })
   },

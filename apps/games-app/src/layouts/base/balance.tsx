@@ -1,5 +1,5 @@
 import { Icons, useLazyAnimate } from '@core/ui'
-import { formatGem } from '@games/model'
+import { formatGem, gemFloat } from '@games/model'
 import { Skeleton, Text } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { memo, useRef } from 'react'
@@ -61,7 +61,7 @@ const AnimatedBalanceInternal = () => {
       return (value) => {
         const node = nodeRef.current
         if (!node) return
-        const text = formatGem(value / 100, fractionDigits)
+        const text = formatGem(gemFloat(value), fractionDigits)
         node.textContent = text
       }
     },

@@ -1,4 +1,5 @@
 import { createSingletonProxy } from '@core/di'
+import { GlobalTaskKey } from '@dbs/games-types'
 import { gamesCaches } from '@games/redis'
 import { Lock } from '@sesamecare-oss/redlock'
 import { singleton } from 'tsyringe-neo'
@@ -23,6 +24,15 @@ export class LocksService {
 
   chat() {
     return gamesCaches.lastChatMessages.lock(3000)
+  }
+
+  sessionRefreshed(token: string) {
+    return gamesCaches.sessionRefreshed.lock(token, 3000)
+  }
+
+  globalTaskStatus(taskKey: GlobalTaskKey, userId: string) {
+    const cacheKey = `${userId}:${taskKey}`
+    return gamesCaches.globalTaskStatus.lock(cacheKey, 3000)
   }
 
   async with<T>(

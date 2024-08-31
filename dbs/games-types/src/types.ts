@@ -1,6 +1,7 @@
 import {
   ChatMessageAttachmentType,
   Game,
+  GlobalTaskKey,
   PromocodeBonusType,
 } from './enums-raw'
 
@@ -41,4 +42,22 @@ export type PromocodeBonus =
   | {
       type: PromocodeBonusType.Payout
       payout: number
+    }
+
+export type GlobalTaskRequirements =
+  | {
+      type: GlobalTaskKey.TelegramGroupSubscribe
+      groupHandle: string
+      groupId: number
+    }
+  | {
+      type: GlobalTaskKey.VkGroupSubscribe
+      groupHandle: string
+      groupId: number
+    }
+  | {
+      type: GlobalTaskKey.VkPinnedRepost
+      groupHandle: string
+      groupId: number
+      postId: number
     }

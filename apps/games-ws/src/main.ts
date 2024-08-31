@@ -9,6 +9,8 @@ import { parse } from 'cookie'
 import { App, SSLApp } from 'uWebSockets.js'
 import { GamesDiceAction } from './actions/games/dice'
 import { GamesPincodeAction } from './actions/games/pincode'
+import { GlobalTasksClaimRewardAction } from './actions/global-tasks/claim-reward'
+import { GlobalTasksCompleteAction } from './actions/global-tasks/complete'
 import { PingAction } from './actions/ping'
 import { Context } from './context'
 import { io } from './io'
@@ -68,6 +70,8 @@ io.on('connection', async (socket) => {
   registerAction(PingAction)
   registerAction(GamesPincodeAction)
   registerAction(GamesDiceAction)
+  registerAction(GlobalTasksCompleteAction)
+  registerAction(GlobalTasksClaimRewardAction)
 })
 
 /**

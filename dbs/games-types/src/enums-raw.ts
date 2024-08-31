@@ -63,3 +63,20 @@ export enum PromocodeUsageStatus {
   Applied = 'Applied',
   Pending = 'Pending',
 }
+
+export enum GlobalTaskKey {
+  VkGroupSubscribe = 'VkGroupSubscribe',
+  VkPinnedRepost = 'VkPinnedRepost',
+  TelegramGroupSubscribe = 'TelegramGroupSubscribe',
+}
+
+export enum TaskType {
+  Global = 'Global',
+  Personal = 'Personal',
+}
+
+export enum TaskStatus {
+  Pending = 'Pending',
+  Completed = 'Completed',
+  Claimed = 'Claimed',
+}

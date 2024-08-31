@@ -12,6 +12,7 @@ import { meRouter } from './routes/me'
 import { notificationsRouter } from './routes/notifications'
 import { promocodesRouter } from './routes/promocodes'
 import { settingsRouter } from './routes/settings'
+import { tasksRouter } from './routes/tasks'
 import { sentryMiddleware } from './shared/sentry'
 
 export const app = createRouter()
@@ -36,3 +37,4 @@ export const app = createRouter()
   .route('/balance', balanceRouter)
   .route('/gameHistory', gameHistoryRouter)
   .route('/promocodes', promocodesRouter)
+  .route('/tasks', tasksRouter)

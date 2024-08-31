@@ -29,6 +29,7 @@ const EnvSchema = z
     PUBLIC_VK_APP_ID: z.string(),
     VK_APP_SECRET: z.string(),
     VK_SERVICE_TOKEN: z.string(),
+    VK_GROUP_TOKEN: z.string(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
@@ -82,6 +83,7 @@ const EnvSchema = z
       appId: raw.PUBLIC_VK_APP_ID,
       appSecret: raw.VK_APP_SECRET,
       serviceToken: raw.VK_SERVICE_TOKEN,
+      groupToken: raw.VK_GROUP_TOKEN,
     },
   }))
 

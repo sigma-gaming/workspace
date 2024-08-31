@@ -1,0 +1,1 @@
+ALTER TABLE "Session" ADD COLUMN "preventAutoDelete" boolean DEFAULT false NOT NULL;

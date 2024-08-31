@@ -11,5 +11,8 @@
     "test": "vitest",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"
+  },
+  "dependencies": {
+    "@core/utils": "workspace:*"
   }
 }

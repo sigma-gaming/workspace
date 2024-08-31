@@ -4,9 +4,12 @@ import {
   FraudRisk,
   Game,
   GameOutcome,
+  GlobalTaskKey,
   NotificationKind,
   PromocodeBonusType,
   PromocodeUsageStatus,
+  TaskStatus,
+  TaskType,
   TransactionType,
   UserRole,
 } from '@dbs/games-types'
@@ -54,4 +57,12 @@ export const promocodeBonusTypeEnum = pgEnum(
 export const promocodeUsageStatusEnum = pgEnum(
   'PromocodeUsageStatus',
   enumValues(PromocodeUsageStatus),
+)
+
+export const taskTypeEnum = pgEnum('TaskType', enumValues(TaskType))
+export const taskStatusEnum = pgEnum('TaskStatus', enumValues(TaskStatus))
+
+export const globalTaskKeyEnum = pgEnum(
+  'GlobalTaskKey',
+  enumValues(GlobalTaskKey),
 )

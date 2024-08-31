@@ -1,4 +1,4 @@
-import { formatGem } from '@games/model'
+import { formatGem, gemFloat } from '@games/model'
 import { useUnit } from 'effector-react'
 import { AnimatePresence, m, Variants } from 'framer-motion'
 import { $$pincodePage } from '../model'
@@ -30,13 +30,13 @@ export const WinInfo = () => {
             className="text-green-400 text-md sm:text-lg leading-none sm:leading-none text-opacity-75"
             variants={child}
           >
-            + {formatGem(winInfo.amount / 100)}g
+            + {formatGem(gemFloat(winInfo.amount))}g
           </m.span>
           <m.span
             className="text-green-400 text-sm sm:text-base leading-none sm:leading-none text-opacity-50"
             variants={child}
           >
-            {Math.round(winInfo.multiplier / 100)}x
+            {Math.round(gemFloat(winInfo.multiplier))}x
           </m.span>
         </m.div>
       )}

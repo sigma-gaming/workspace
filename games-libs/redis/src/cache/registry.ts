@@ -3,10 +3,12 @@ import {
   BudgetSelect,
   ChatMessageSelect,
   GameRecordSelect,
+  GlobalTaskSelect,
   NotificationSelect,
   PromocodeSelect,
   TransactionSelect,
 } from '@dbs/games-schema'
+import { TaskStatus } from '@dbs/games-types'
 import { ProfileDetailed, Session } from '@games/model'
 import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe-neo'
 import { GlobalJsonEntityService, KeyJsonEntityService } from './entity-json'
@@ -24,6 +26,7 @@ export class CacheRegistry {
   budgetSyncedAt: GlobalStringEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
   session: KeyJsonEntityService<Session>
+  sessionRefreshed: KeyJsonEntityService<true>
   lastTransaction: KeyJsonEntityService<TransactionSelect>
   globalNotifications: GlobalJsonEntityService<NotificationSelect[]>
   personalNotifications: KeyJsonEntityService<NotificationSelect[]>
@@ -32,6 +35,8 @@ export class CacheRegistry {
   bigWinHistory: GlobalEntityListService<GameRecordSelect>
   userGameHistory: KeyEntityListService<GameRecordSelect>
   promocode: KeyJsonEntityService<PromocodeSelect>
+  globalTasks: GlobalJsonEntityService<GlobalTaskSelect[]>
+  globalTaskStatus: KeyJsonEntityService<[TaskStatus, boolean]>
 
   constructor(@inject(CacheVersionToken) version: string) {
     this.budget = new GlobalJsonEntityService<BudgetSelect>({
@@ -55,6 +60,10 @@ export class CacheRegistry {
 
     this.session = new KeyJsonEntityService<Session>({
       keygen: (token: string) => `${version}:session:${token}`,
+    })
+
+    this.sessionRefreshed = new KeyJsonEntityService<true>({
+      keygen: (token: string) => `${version}:refreshedSession:${token}`,
     })
 
     this.lastTransaction = new KeyJsonEntityService<TransactionSelect>({
@@ -99,6 +108,17 @@ export class CacheRegistry {
 
     this.promocode = new KeyJsonEntityService<PromocodeSelect>({
       keygen: (code: string) => `${version}:promocode:${code}`,
+      ttl: 60 * 60, // 1 hour
+    })
+
+    this.globalTasks = new GlobalJsonEntityService<GlobalTaskSelect[]>({
+      key: `${version}:global:globalTasks`,
+      ttl: 60 * 60, // 1 hour
+    })
+
+    this.globalTaskStatus = new KeyJsonEntityService<[TaskStatus, boolean]>({
+      keygen: (keyAndUserId: string) =>
+        `${version}:globalTaskStatus:${keyAndUserId}`,
       ttl: 60 * 60, // 1 hour
     })
   }

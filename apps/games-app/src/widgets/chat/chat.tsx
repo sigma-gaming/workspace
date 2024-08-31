@@ -25,15 +25,15 @@ export const Chat = () => {
   }
 
   return (
-    <div className="flex flex-col gap-2 h-full">
-      <h2 className="text-2xl font-medium m-0">Чат</h2>
+    <div className="flex flex-col gap-4 h-full">
+      <h2 className="text-2xl font-medium m-0 md:mb-2">Чат</h2>
       <MessageList />
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <form
         className={clsx(
           'relative px-4 py-3 bg-[#1B1C2F] cursor-text transition-colors',
           'border rounded-2xl border-[#1B1C2E]',
-          'focus-within:outline outline-2 outline-[color:var(--mantine-color-input-border-focus)] outline-offset-2',
+          'focus-within:outline outline-2 outline-[color:var(--mantine-color-input-border-focus)]',
           !isMobile && 'h-[142px]',
           isMobile && 'flex gap-4 items-center',
           disabled && 'select-none cursor-not-allowed',
@@ -146,7 +146,7 @@ const MessageList = () => {
     <div
       ref={containerRef}
       className={clsx(
-        'flex-1 scrollbar-hide my-2 flex gap-2 rounded-2xl',
+        'flex-1 scrollbar-hide flex gap-2 rounded-2xl',
         loadingMessages
           ? 'overflow-hidden flex-col-reverse'
           : 'overflow-auto flex-col',

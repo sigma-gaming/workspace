@@ -35,7 +35,7 @@ export const TransactionTable = pgTable('Transaction', {
   userId: uuid('userId').references(() => UserTable.id, {
     onDelete: 'set null',
   }),
-  gameRecordId: uuid('gameRecordId'),
+  gameRecordId: bigint('gameRecordId', { mode: 'number' }),
 })
 
 export type TransactionSelect = typeof TransactionTable.$inferSelect

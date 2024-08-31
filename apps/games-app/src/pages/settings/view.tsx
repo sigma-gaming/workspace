@@ -30,6 +30,7 @@ import { $$settingsPage } from './model.ts'
 export const SettingsPageView = () => {
   return (
     <>
+      <h2 className="text-2xl font-medium mt-0 mb-4 md:mb-6">Настройки</h2>
       <Profile />
       <Space h={36} />
       <SocialNetworks />

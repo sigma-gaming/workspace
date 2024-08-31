@@ -1,7 +1,7 @@
 import { Icons } from '@core/ui'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome, GameSnapshot } from '@dbs/games-types'
-import { formatGem } from '@games/model'
+import { formatGem, gemFloat } from '@games/model'
 import { Card, LoadingOverlay, Tabs, Text } from '@mantine/core'
 import { useIsFirstRender } from '@mantine/hooks'
 import { RouteInstance, RouteParams } from 'atomic-router'
@@ -225,7 +225,7 @@ const Row = memo(
 
     const multiplier = hasWon ? Math.floor(100 + record.multiplier) / 100 : 0
 
-    const payout = formatGem((record.bet + record.payout) / 100)
+    const payout = formatGem(gemFloat(record.bet + record.payout))
 
     return (
       <tr className={styles.row} data-animated={animated}>
@@ -240,7 +240,7 @@ const Row = memo(
           {record.previewUserName}
         </Cell>
         <Cell className={cellDesktop} align="center">
-          {formatGem(record.bet / 100)}g
+          {formatGem(gemFloat(record.bet))}g
         </Cell>
         <Cell className={cellDesktop} align="center">
           {getGameResult(record.snapshot)}

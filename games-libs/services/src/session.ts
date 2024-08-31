@@ -9,12 +9,13 @@ import { AccountProvider } from '@dbs/games-types'
 import { Session, SessionState } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { parse } from 'cookie'
-import { desc, eq, inArray } from 'drizzle-orm'
+import { and, desc, eq, inArray } from 'drizzle-orm'
 import { Context as HonoContext } from 'hono'
 import { deleteCookie, setCookie } from 'hono/cookie'
 import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
 import { singleton } from 'tsyringe-neo'
 import { Env, EnvService } from './env'
+import { LocksService } from './locks'
 
 type HonoEnvWithSession = {
   Variables: {
@@ -31,7 +32,10 @@ type AddSessionOptions = {
 export class SessionService {
   env: Env
 
-  constructor(envService: EnvService) {
+  constructor(
+    envService: EnvService,
+    private locks: LocksService,
+  ) {
     this.env = envService.env
   }
 
@@ -47,7 +51,8 @@ export class SessionService {
     }
 
     try {
-      verify(token, this.env.jwt.secret)
+      const verified = verify(token, this.env.jwt.secret)
+      console.log(verified)
     } catch (error) {
       const state =
         error instanceof TokenExpiredError
@@ -148,7 +153,10 @@ export class SessionService {
     await gamesCaches.session.set(token, session)
 
     const extraSessions = await gamesDb.query.SessionTable.findMany({
-      where: eq(SessionTable.userId, userId),
+      where: and(
+        eq(SessionTable.userId, userId),
+        eq(SessionTable.preventAutoDelete, false),
+      ),
       orderBy: desc(SessionTable.expiresAt),
       offset: 5, // Max 5 sessions per user
     })
@@ -163,6 +171,61 @@ export class SessionService {
     }
 
     return session
+  }
+
+  async refreshSession<E extends HonoEnvWithSession>(
+    ctx: HonoContext<E>,
+    options: {
+      condition: (
+        session: Session & { state: SessionState.Authenticated },
+      ) => boolean
+    },
+  ) {
+    const session = ctx.get('session')
+
+    if (session?.state !== SessionState.Authenticated) {
+      return
+    }
+
+    if (!options.condition(session)) {
+      return
+    }
+
+    await this.locks.with(
+      [this.locks.sessionRefreshed(session.token)],
+      async () => {
+        const isRefreshed = await gamesCaches.sessionRefreshed.exists(
+          session.token,
+        )
+
+        // Already updated in another request, skip
+        if (isRefreshed) {
+          return
+        }
+
+        await gamesDb
+          .update(SessionTable)
+          .set({ preventAutoDelete: true })
+          .where(eq(SessionTable.token, session.token))
+
+        const newSession = await this.createSession({
+          userId: session.user.id,
+          provider: session.provider,
+        })
+
+        this.attachSession(ctx, newSession)
+
+        await gamesCaches.sessionRefreshed.set(session.token, true)
+
+        /**
+         * Remove the old session after 10 seconds to prevent breaking..
+         * ..the concurrent requests, which have the old session token in cookies
+         */
+        setTimeout(() => {
+          this.removeSession(session)
+        }, 10_000)
+      },
+    )
   }
 
   attachSession<E extends HonoEnvWithSession>(
@@ -212,6 +275,7 @@ export class SessionService {
       }
 
       await gamesCaches.session.del(session.token)
+      await gamesCaches.sessionRefreshed.del(session.token)
     }
   }
 
