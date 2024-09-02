@@ -479,6 +479,48 @@ importers:
         specifier: workspace:*
         version: link:../../tooling/env
 
+  apps/games-tasks:
+    dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/events':
+        specifier: workspace:*
+        version: link:../../core/events
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../../core/exceptions
+      '@core/io-client':
+        specifier: workspace:*
+        version: link:../../core/io-client
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
+      '@core/utils':
+        specifier: workspace:*
+        version: link:../../core/utils
+      '@dbs/games-db':
+        specifier: workspace:*
+        version: link:../../dbs/games-db
+      '@dbs/games-schema':
+        specifier: workspace:*
+        version: link:../../dbs/games-schema
+      '@games/engine':
+        specifier: workspace:*
+        version: link:../../games-libs/engine
+      '@games/model':
+        specifier: workspace:*
+        version: link:../../games-libs/model
+      '@games/redis':
+        specifier: workspace:*
+        version: link:../../games-libs/redis
+      '@games/services':
+        specifier: workspace:*
+        version: link:../../games-libs/services
+      '@tooling/env':
+        specifier: workspace:*
+        version: link:../../tooling/env
+
   apps/games-ws:
     dependencies:
       '@core/di':
