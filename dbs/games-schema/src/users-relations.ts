@@ -20,4 +20,8 @@ export const UserRelations = relations(UserTable, ({ one, many }) => ({
     fields: [UserTable.securityId],
     references: [UserSecurityTable.id],
   }),
+  referrer: one(UserTable, {
+    fields: [UserTable.referrerId],
+    references: [UserTable.id],
+  }),
 }))

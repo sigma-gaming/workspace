@@ -133,6 +133,8 @@ export const theme = createTheme({
     }),
     Tooltip: Tooltip.extend({
       defaultProps: {
+        multiline: true,
+        position: 'bottom',
         events: {
           hover: true,
           focus: false,

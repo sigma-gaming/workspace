@@ -1,5 +1,6 @@
 import { Button, Checkbox } from '@mantine/core'
 import { useUnit } from 'effector-react'
+import { $$user } from '../../../entities/user'
 import { $$pincodePage } from '../model'
 
 export const FormActions = () => {
@@ -7,18 +8,23 @@ export const FormActions = () => {
   const autoplaying = useUnit($$pincodePage.$autoplaying)
   const animationPlaying = useUnit($$pincodePage.$animationPlaying)
   const stopOnBigWin = useUnit($$pincodePage.fields.stopOnBigWin.$value)
+  const loggedIn = useUnit($$user.$loggedIn)
 
   return (
     <div className="flex flex-col gap-3 mt-auto">
       <Button
         type="submit"
-        disabled={autoplaying || animationPlaying}
+        disabled={autoplaying || animationPlaying || !loggedIn}
         loading={playing}
         fullWidth={true}
       >
         Играть
       </Button>
-      <Button onClick={() => $$pincodePage.autoplayPressed()} fullWidth={true}>
+      <Button
+        onClick={() => $$pincodePage.autoplayPressed()}
+        fullWidth={true}
+        disabled={!loggedIn}
+      >
         {autoplaying ? 'Остановить автоигру' : 'Автоигра'}
       </Button>
       <div className="flex justify-center px-4">

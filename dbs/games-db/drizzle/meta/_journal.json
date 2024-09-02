@@ -267,6 +267,13 @@
       "when": 1724763018374,
       "tag": "0037_yielding_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1725262411796,
+      "tag": "0038_normal_fallen_one",
+      "breakpoints": true
     }
   ]
 }

@@ -11,6 +11,7 @@ export function handleExceptions(
   targets: {
     form?: Form<any, any, any>
     message?: (message: string) => NotificationData
+    notAuthenticatedMessage?: () => NotificationData
     otherMessage?: (exception: RouteException<unknown>) => NotificationData
     tooManyRequestsMessage?: (
       exception: TooManyRequestsException,
@@ -23,6 +24,11 @@ export function handleExceptions(
       color: 'red',
       title: 'Произошла ошибка',
       message,
+    }),
+    notAuthenticatedMessage = () => ({
+      color: 'red',
+      title: 'Вы не авторизованы',
+      message: 'Пожалуйста, авторизуйтесь',
     }),
     tooManyRequestsMessage = () => ({
       color: 'red',
@@ -48,6 +54,12 @@ export function handleExceptions(
   sample({
     source: receivedException.badRequestMessage,
     fn: message,
+    target: $$notifications.show,
+  })
+
+  sample({
+    source: receivedException.notAuthenticated,
+    fn: notAuthenticatedMessage,
     target: $$notifications.show,
   })
 

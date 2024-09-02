@@ -280,8 +280,18 @@ export class SessionService {
   }
 
   detachSession<E extends HonoEnvWithSession>(ctx: HonoContext<E>) {
-    deleteCookie(ctx, 'session')
-    deleteCookie(ctx, 'sessionExpiresAt')
+    deleteCookie(ctx, 'session', {
+      domain: this.env.domain,
+      path: '/',
+      sameSite: 'lax',
+      httpOnly: true,
+    })
+
+    deleteCookie(ctx, 'sessionExpiresAt', {
+      domain: this.env.domain,
+      path: '/',
+      sameSite: 'lax',
+    })
   }
 }
 

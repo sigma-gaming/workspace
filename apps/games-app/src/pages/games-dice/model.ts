@@ -1,4 +1,4 @@
-import { $$notifications, handleExceptions } from '@core/client'
+import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
@@ -16,7 +16,6 @@ import { and, combineEvents, condition, delay, not } from 'patronum'
 import { z } from 'zod'
 import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
-import { $$user } from '../../entities/user'
 import { $$gameHistory } from '../../features/game-history'
 import { routes } from '../../routing'
 import { gamesWs } from '../../shared/api/games-ws'
@@ -120,24 +119,14 @@ const $possibleWinAmount = combine(
   (bet, sides) => calculateDiceFullWinAmount(bet, sides),
 )
 
-const showActionNotAllowed = $$notifications.show.prepend(() => ({
-  title: 'Действие недоступно',
-  message: 'Чтобы играть, войдите в аккаунт',
-  color: 'red',
-}))
-
-condition({
+sample({
   source: playPressed,
-  if: $$user.$expired,
-  then: showActionNotAllowed,
-  else: startPlay,
+  target: startPlay,
 })
 
-condition({
+sample({
   source: autoplayPressed,
-  if: $$user.$expired,
-  then: showActionNotAllowed,
-  else: autoplayToggled,
+  target: autoplayToggled,
 })
 
 condition({
@@ -250,7 +239,14 @@ sample({
   target: $autoplaying,
 })
 
-handleExceptions(playGameMutation, { form })
+handleExceptions(playGameMutation, {
+  form,
+  notAuthenticatedMessage: () => ({
+    color: 'red',
+    title: 'Действие недоступно',
+    message: 'Чтобы играть, войдите в аккаунт',
+  }),
+})
 
 sample({
   clock: routes.diceGame.closed,

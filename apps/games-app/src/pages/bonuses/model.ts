@@ -166,16 +166,6 @@ sample({
 })
 
 sample({
-  clock: reset,
-  target: promocodeForm.reset,
-})
-
-sample({
-  clock: routes.bonuses.closed,
-  target: reset,
-})
-
-sample({
   clock: completeGlobalTask,
   fn: (taskKey) => ({ taskKey }),
   target: completeGlobalTaskMutation.start,
@@ -216,6 +206,16 @@ sample({
   clock: routes.bonuses.opened,
   filter: $$user.$loggedIn,
   target: [getGlobalTaskStatusesFx],
+})
+
+sample({
+  clock: [routes.bonuses.closed, $$user.loggedOut],
+  target: reset,
+})
+
+sample({
+  clock: reset,
+  target: [promocodeForm.reset, $globalTaskStatuses.reinit],
 })
 
 export const $$bonusesPage = {

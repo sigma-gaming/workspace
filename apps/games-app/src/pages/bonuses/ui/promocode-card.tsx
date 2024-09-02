@@ -1,12 +1,15 @@
-import { Icons, WithError } from '@core/ui'
+import { Icons, useMedia, WithError } from '@core/ui'
 import { Button, Card, TextInput, Tooltip } from '@mantine/core'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
+import { $$user } from '../../../entities/user/index.ts'
 import bonusChestSrc from '../assets/bonus-chest-512.webp'
 import { $$bonusesPage } from '../model.ts'
 import promocodeInputStyles from '../promocode-input.module.css'
 
 export const PromocodeCard = () => {
+  const loggedIn = useUnit($$user.$loggedIn)
+
   const code = useUnit($$bonusesPage.promocodeFields.code.$value)
   const updateCode = useUnit($$bonusesPage.promocodeFields.code.update)
 
@@ -14,6 +17,7 @@ export const PromocodeCard = () => {
   const errors = useUnit($$bonusesPage.promocodeForm.$errors)
 
   const applyingPromocode = useUnit($$bonusesPage.$applyingPromocode)
+  const isMobile = useMedia({ to: 'md' })
 
   return (
     <Card
@@ -57,16 +61,18 @@ export const PromocodeCard = () => {
       </div>
 
       <div className="relative z-10">
-        <h3 className="text-2xl font-medium leading-tight">Промокод</h3>
+        <h3 className="text-xl lg:text-2xl font-medium leading-tight">
+          Промокод
+        </h3>
 
-        <p className="mt-2 max-w-[360px] leading-snug">
+        <p className="text-sm lg:text-base mt-2 max-w-[360px] leading-snug">
           Бесплатные&nbsp;гемы или&nbsp;бонус к&nbsp;пополнению&nbsp;баланса
         </p>
 
         <WithError error={errors.code[0]} position="bottom">
           <TextInput
             classNames={promocodeInputStyles}
-            size="lg"
+            size={isMobile ? 'md' : 'lg'}
             placeholder="SIGMA GAMES"
             value={code}
             onChange={(event) => updateCode(event.target.value)}
@@ -76,9 +82,10 @@ export const PromocodeCard = () => {
             rightSection={
               <Button
                 className="w-full h-full"
+                size={isMobile ? 'xs' : 'sm'}
                 radius={12}
                 type="submit"
-                disabled={applyingPromocode}
+                disabled={applyingPromocode || !loggedIn}
               >
                 Применить
               </Button>
@@ -87,12 +94,10 @@ export const PromocodeCard = () => {
         </WithError>
 
         <div className="mt-4 flex gap-2 items-center select-none">
-          <p className="text-sm text-dimmed">Где найти промокоды?</p>
+          <p className="text-xs lg:text-sm text-dimmed">Где найти промокоды?</p>
           <Tooltip
+            className="max-w-[250px] leading-snug"
             label="Они часто появляются в нашем Telegram-канале, а также в видео и постах партнёров"
-            position="bottom"
-            multiline
-            className="max-w-[250px]"
           >
             <Icons.Question className="shrink-0 w-5 h-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
           </Tooltip>

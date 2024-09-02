@@ -15,6 +15,7 @@ export const UserTable = pgTable('User', {
     .notNull()
     .default(sql`'{"User"}'`),
 
+  referrerId: uuid('referrerId'),
   profileId: integer('profileId'),
   securityId: uuid('securityId'),
 })

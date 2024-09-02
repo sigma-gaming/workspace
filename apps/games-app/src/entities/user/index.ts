@@ -11,6 +11,7 @@ import { env } from '../../shared/env'
 const request = createEvent()
 const refresh = createEvent()
 const logout = createEvent()
+const loggedOut = createEvent()
 
 const clientLogoutFx = createEffect(() => {
   Cookies.remove('sessionExpiresAt', { domain: env.domain })
@@ -69,10 +70,16 @@ sample({
   }),
 })
 
+sample({
+  clock: logoutMutation.finished.success,
+  target: loggedOut,
+})
+
 export const $$user = {
   request,
   refresh,
   logout,
+  loggedOut,
   loaded,
   $user,
   $loading,

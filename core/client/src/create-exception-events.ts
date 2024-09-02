@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  NotAuthenticatedException,
   RouteException,
   TooManyRequestsException,
   ValidationException,
@@ -21,6 +22,7 @@ export function createExceptionEvents(
   const {
     validation,
     badRequest,
+    notAuthenticated,
     tooManyRequests,
     __: other,
   } = split(receivedApiError, {
@@ -30,6 +32,8 @@ export function createExceptionEvents(
       error instanceof BadRequestException,
     tooManyRequests: (error): error is TooManyRequestsException =>
       error instanceof TooManyRequestsException,
+    notAuthenticated: (error): error is NotAuthenticatedException =>
+      error instanceof NotAuthenticatedException,
   })
 
   sample({
@@ -63,6 +67,7 @@ export function createExceptionEvents(
     badRequest,
     badRequestMessage,
     tooManyRequests,
+    notAuthenticated,
     formErrors: receivedFormErrors,
     other,
   }
