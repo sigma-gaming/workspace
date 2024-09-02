@@ -10,7 +10,7 @@ import { env } from '@games/services'
 import * as Sentry from '@sentry/node'
 import { Schema } from 'zod'
 import { Context } from './context'
-import { sentry } from './sentry'
+import { sentry } from './shared/sentry'
 
 export type WsActionGenerator<TName extends string, TInput, TOutput> = (
   ctx: Context,

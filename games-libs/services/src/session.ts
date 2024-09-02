@@ -51,8 +51,7 @@ export class SessionService {
     }
 
     try {
-      const verified = verify(token, this.env.jwt.secret)
-      console.log(verified)
+      verify(token, this.env.jwt.secret)
     } catch (error) {
       const state =
         error instanceof TokenExpiredError

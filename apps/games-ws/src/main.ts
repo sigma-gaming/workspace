@@ -1,5 +1,5 @@
 import './setup'
-import './sentry/init'
+import './shared/sentry/init'
 import { shutdownServices } from '@core/di'
 import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'

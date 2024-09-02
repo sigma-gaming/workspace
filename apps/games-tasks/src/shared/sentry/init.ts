@@ -5,6 +5,6 @@ export const sentry = Sentry.init({
   enabled: env.isProd,
   dsn: 'https://SENTRY_DSN_REMOVED',
   environment: env.stage,
-  release: env.gamesApi.version,
+  release: env.gamesTasks.version,
   tracesSampleRate: 1,
 })

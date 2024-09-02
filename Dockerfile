@@ -70,9 +70,24 @@ RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-api/dist
 RUN pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release ${sentry_release}
 
+FROM build AS games-tasks-build
+ARG sentry_auth_token
+ARG sentry_release
+ENV SENTRY_ORG=sigma-games
+ENV SENTRY_PROJECT=games-tasks
+ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
+RUN pnpm sentry-cli releases new -p games-tasks ${sentry_release}
+RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
+RUN pnpm sentry-cli sourcemaps inject /build/apps/games-tasks/dist
+RUN pnpm sentry-cli sourcemaps upload /build/apps/games-tasks/dist --release ${sentry_release}
+
 FROM api-base AS games-api
 COPY --from=games-api-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
+
+FROM api-base AS games-tasks
+COPY --from=games-tasks-build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/games-tasks/dist/main.js" ]
 
 FROM api-base AS control-api
 COPY --from=build /build ./

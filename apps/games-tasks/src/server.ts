@@ -4,8 +4,14 @@ import { shutdownServices } from '@core/di'
 import { logger, loggerService } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
 import { env } from '@games/services'
-import { app } from './app'
+import { createRouter } from './hono'
+import { initializeCronJobs } from './jobs'
+import { healthyRoute, readyRoute } from './routes/health'
 import { sentry } from './shared/sentry'
+
+const app = createRouter()
+  .route('/healthy', healthyRoute)
+  .route('/ready', readyRoute)
 
 app.onError(
   createErrorHandler({
@@ -17,24 +23,21 @@ app.onError(
 
 const server = createServer({
   app,
-  origin: env.gamesApp.url,
   trustProxy: true,
-  uwsOptions: env.isDev
-    ? {
-        key_file_name: '../../ssl/local.key',
-        cert_file_name: '../../ssl/local.crt',
-      }
-    : {},
 })
 
-server.listen(5050, (token) => {
+const port = 5052
+
+server.listen(port, (token) => {
   if (!token) {
     logger.error('Failed to start server')
     process.exit(1)
   }
 
-  logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
+  logger.info(`🚀 Server ready at :${port}`)
 })
+
+initializeCronJobs()
 
 process.on('uncaughtException', (error) => {
   logger.info('Uncaught exception')
