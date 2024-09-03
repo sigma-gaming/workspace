@@ -47,10 +47,6 @@ export type ExtendedMessage = ChatMessageSelect & {
 
 const $messages = createStore<ExtendedMessage[]>([]).reset(reset)
 
-const $messageIds = $messages.map(
-  (messages) => new Set(messages.map((message) => message.id)),
-)
-
 sample({
   clock: initialize,
   target: getLastMessagesFx,
@@ -58,9 +54,13 @@ sample({
 
 sample({
   clock: getLastMessagesFx.doneData,
-  source: { messages: $messages, ids: $messageIds },
-  fn: ({ messages, ids }, actualMessages) => {
-    const newMessages = actualMessages.filter((message) => !ids.has(message.id))
+  source: $messages,
+  fn: (messages, actualMessages) => {
+    const ids = messages.map((message) => message.id)
+
+    const newMessages = actualMessages.filter(
+      (message) => !ids.includes(message.id),
+    )
 
     const updatedMessages = messages.concat(newMessages).sort((a, b) => {
       const dateA = new Date(a.createdAt).getTime()
@@ -75,9 +75,8 @@ sample({
 
 sample({
   clock: messageReceived,
-  source: { messages: $messages, ids: $messageIds },
-  filter: ({ ids }, message) => !ids.has(message.id),
-  fn: ({ messages }, receivedMessage) => {
+  source: $messages,
+  fn: (messages, receivedMessage) => {
     const hasTemporaryMessage = messages.some(
       (message) => message.trackingId === receivedMessage.trackingId,
     )
@@ -119,7 +118,15 @@ sample({
     const lastId = messages[messages.length - 1]?.id ?? -1
 
     return messages.concat({
-      id: lastId + 1,
+      /*
+       * Should not be possible real id to prevent any conflicts
+       * For example, if someone sends a message in the same moment, its id may be the same as generated here
+       * Last message ID: 1
+       * Your new message temporary ID: 2
+       * Another user's message real ID: 2 (causes the conflict, as there are two messages with the same ID)
+       * Your new message real ID: 3
+       */
+      id: -(lastId + 1),
       createdAt: new Date().toISOString(),
       type: ChatMessageType.UserMessage,
       attachments: payload.attachments,
@@ -163,6 +170,5 @@ export const $$chatWidget = {
   form,
   fields,
   $messages,
-  $messageIds,
   $loadingMessages,
 }
