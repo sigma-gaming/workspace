@@ -14,6 +14,7 @@ export const Chat = () => {
   const text = useUnit($$chatWidget.fields.text.$value)
   const updateText = useUnit($$chatWidget.fields.text.update)
   const submit = useUnit($$chatWidget.form.submit)
+  const sendingMessage = useUnit($$chatWidget.$sendingMessage)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const isMobile = useMedia({ to: 'md' })
 
@@ -31,12 +32,12 @@ export const Chat = () => {
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <form
         className={clsx(
-          'relative px-4 py-3 bg-[#1B1C2F] cursor-text transition-colors',
+          'relative px-4 py-3 bg-[#1B1C2F] transition-colors',
           'border rounded-2xl border-[#1B1C2E]',
           'focus-within:outline outline-2 outline-[color:var(--mantine-color-input-border-focus)]',
           !isMobile && 'h-[142px]',
           isMobile && 'flex gap-4 items-center',
-          disabled && 'select-none cursor-not-allowed',
+          disabled ? 'select-none cursor-not-allowed' : 'cursor-text',
         )}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
@@ -66,11 +67,20 @@ export const Chat = () => {
           spellCheck={false}
           rows={isMobile ? 1 : 3}
           wrap={isMobile ? 'off' : 'soft'}
-          placeholder="Введите сообщение..."
+          placeholder={
+            loggedIn
+              ? 'Введите сообщение...'
+              : 'Для отправки сообщений нужно авторизоваться'
+          }
           disabled={disabled}
         />
         {isMobile ? (
-          <ActionIcon size={36} type="submit" disabled={text.length === 0}>
+          <ActionIcon
+            size={36}
+            type="submit"
+            disabled={text.length === 0}
+            loading={sendingMessage}
+          >
             <Icons.Send className="w-6 h-6" />
           </ActionIcon>
         ) : (
@@ -80,6 +90,7 @@ export const Chat = () => {
             size="sm"
             type="submit"
             disabled={text.length === 0 || !loggedIn}
+            loading={sendingMessage}
           >
             Отправить
           </Button>

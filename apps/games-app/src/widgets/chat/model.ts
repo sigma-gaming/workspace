@@ -1,10 +1,10 @@
-import { $$notifications, createApiEffect } from '@core/client'
+import { createApiEffect, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { subscriptionFactory } from '@core/io-client'
 import { ChatMessageSelect } from '@dbs/games-schema'
 import { ChatMessageAttachment, ChatMessageType } from '@dbs/games-types'
+import { createMutation } from '@farfetched/core'
 import { ChatValidation } from '@games/model'
-import { NotificationData } from '@mantine/notifications'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { v4 as uuid } from 'uuid'
@@ -17,7 +17,11 @@ const initialize = createEvent()
 const reset = createEvent()
 
 const getLastMessagesFx = createApiEffect(gamesApi.chat.getLastMessages.$get)
-const sendMessageFx = createApiEffect(gamesApi.chat.sendMessage.$post)
+
+const sendMessageMutation = createMutation({
+  name: 'chat/sendMessage',
+  effect: createApiEffect(gamesApi.chat.sendMessage.$post),
+})
 
 const $loadingMessages = createStore(true)
   .on(getLastMessagesFx.done, () => false)
@@ -41,10 +45,13 @@ export const form = createForm({
   schema: ChatValidation.MessagePayloadSchema.omit({ trackingId: true }),
 })
 
+handleExceptions(sendMessageMutation, { form })
+
 export type ExtendedMessage = ChatMessageSelect & {
   temporary?: boolean
 }
 
+const $sendingMessage = sendMessageMutation.$pending
 const $messages = createStore<ExtendedMessage[]>([]).reset(reset)
 
 sample({
@@ -55,20 +62,14 @@ sample({
 sample({
   clock: getLastMessagesFx.doneData,
   source: $messages,
-  fn: (messages, actualMessages) => {
+  fn: (messages, receivedMessages) => {
     const ids = messages.map((message) => message.id)
 
-    const newMessages = actualMessages.filter(
+    const newMessages = receivedMessages.filter(
       (message) => !ids.includes(message.id),
     )
 
-    const updatedMessages = messages.concat(newMessages).sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime()
-      const dateB = new Date(b.createdAt).getTime()
-      return dateA - dateB
-    })
-
-    return updatedMessages
+    return messages.concat(newMessages).sort((a, b) => a.id - b.id)
   },
   target: $messages,
 })
@@ -103,7 +104,7 @@ const submitted = sample({
 
 sample({
   clock: submitted,
-  target: [sendMessageFx, form.empty],
+  target: [sendMessageMutation.start, form.empty],
 })
 
 sample({
@@ -145,23 +146,14 @@ sample({
 })
 
 sample({
-  clock: sendMessageFx.fail,
+  clock: sendMessageMutation.finished.failure,
   source: $messages,
   fn: (messages, { params }) => {
     return messages.filter((message) => {
       return message.trackingId !== params.trackingId
     })
   },
-})
-
-sample({
-  clock: sendMessageFx.fail,
-  fn: (): NotificationData => ({
-    title: 'Ошибка отправки сообщения',
-    message: 'Что-то пошло не так, попробуйте через пару минут',
-    color: 'red',
-  }),
-  target: $$notifications.show,
+  target: $messages,
 })
 
 export const $$chatWidget = {
@@ -171,4 +163,5 @@ export const $$chatWidget = {
   fields,
   $messages,
   $loadingMessages,
+  $sendingMessage,
 }
