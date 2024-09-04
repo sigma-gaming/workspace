@@ -60,7 +60,7 @@ export const Chat = () => {
           className={clsx(
             'w-full bg-transparent resize-none outline-none scrollbar-hide',
             'text-[color:var(--mantine-color-text)] placeholder-[color:var(--mantine-color-placeholder)]',
-            'disabled:opacity-50 disabled:pointer-events-none',
+            'disabled:opacity-75 disabled:pointer-events-none',
           )}
           value={text}
           onChange={(event) => updateText(event.target.value)}
