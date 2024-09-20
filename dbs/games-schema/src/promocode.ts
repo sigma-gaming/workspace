@@ -9,7 +9,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { promocodeBonusTypeEnum } from './enums'
-import { UserTable } from './users'
+import { UserTable } from './user'
 
 export const PromocodeTable = pgTable('Promocode', {
   id: uuid('id').defaultRandom().primaryKey(),

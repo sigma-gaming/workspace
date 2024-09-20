@@ -38,6 +38,15 @@ export class BudgetService {
     return budget.available
   }
 
+  sync = async () => {
+    const available = await this.getAvailable()
+
+    await gamesDb.update(BudgetTable).set({
+      lastSyncAt: new Date().toISOString(),
+      available,
+    })
+  }
+
   getSyncedAt = async (): Promise<Date> => {
     const cached = await gamesCaches.budgetSyncedAt.get()
     if (cached) return new Date(cached)

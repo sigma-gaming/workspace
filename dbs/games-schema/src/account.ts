@@ -1,6 +1,6 @@
 import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { accountProviderEnum } from './enums'
-import { UserTable } from './users'
+import { UserTable } from './user'
 
 export const AccountTable = pgTable(
   'Account',

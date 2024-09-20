@@ -1,8 +1,8 @@
 import { relations } from 'drizzle-orm'
+import { UserTable } from './user'
 import { UserSecurityTable } from './user-security'
-import { UserTable } from './users'
 
-export const userSecurityRelations = relations(
+export const UserSecurityRelations = relations(
   UserSecurityTable,
   ({ one }) => ({
     user: one(UserTable, {

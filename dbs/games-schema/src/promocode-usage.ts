@@ -1,7 +1,7 @@
 import { pgTable, primaryKey, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { promocodeUsageStatusEnum } from './enums'
-import { PromocodeTable } from './promocodes'
-import { UserTable } from './users'
+import { PromocodeTable } from './promocode'
+import { UserTable } from './user'
 
 export const PromocodeUsageTable = pgTable(
   'PromocodeUsage',

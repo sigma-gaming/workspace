@@ -7,7 +7,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { accountProviderEnum } from './enums'
-import { UserTable } from './users'
+import { UserTable } from './user'
 
 export const SessionTable = pgTable('Session', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),

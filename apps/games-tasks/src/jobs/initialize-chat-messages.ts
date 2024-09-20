@@ -4,7 +4,7 @@ import { chatService } from '@games/services'
 import { CronJob } from 'cron'
 
 export const initializeChatMessagesJob = CronJob.from({
-  cronTime: '0 */1 * * *', // every 6 hours
+  cronTime: '0 */1 * * *', // every 1 hour
   runOnInit: true,
   onTick: async () => {
     const result = await retry({

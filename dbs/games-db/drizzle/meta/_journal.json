@@ -274,6 +274,41 @@
       "when": 1725262411796,
       "tag": "0038_normal_fallen_one",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1726256175445,
+      "tag": "0039_yellow_kronos",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1726437843226,
+      "tag": "0040_wise_doctor_strange",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1726772472970,
+      "tag": "0041_loving_taskmaster",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1726784173189,
+      "tag": "0042_silky_natasha_romanoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1726847320193,
+      "tag": "0043_volatile_monster_badoon",
+      "breakpoints": true
     }
   ]
 }

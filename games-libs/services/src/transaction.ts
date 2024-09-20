@@ -57,7 +57,8 @@ export class TransactionService {
     if (
       payload.type !== TransactionType.Deposit &&
       payload.type !== TransactionType.Withdrawal &&
-      payload.type !== TransactionType.Bonus
+      payload.type !== TransactionType.Bonus &&
+      payload.type !== TransactionType.Transfer
     ) {
       throw new Error('Invalid transaction type')
     }

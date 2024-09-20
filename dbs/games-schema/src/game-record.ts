@@ -11,8 +11,8 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { gameEnum, gameOutcomeEnum } from './enums'
-import { TransactionTable } from './transactions'
-import { UserTable } from './users'
+import { TransactionTable } from './transaction'
+import { UserTable } from './user'
 
 export const GameRecordTable = pgTable(
   'GameRecord',

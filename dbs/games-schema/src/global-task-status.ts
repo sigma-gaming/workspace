@@ -1,7 +1,7 @@
 import { pgTable, primaryKey, uuid } from 'drizzle-orm/pg-core'
 import { globalTaskKeyEnum, taskStatusEnum } from './enums'
-import { GlobalTaskTable } from './global-tasks'
-import { UserTable } from './users'
+import { GlobalTaskTable } from './global-task'
+import { UserTable } from './user'
 
 export const GlobalTaskStatusTable = pgTable(
   'GlobalTaskStatus',

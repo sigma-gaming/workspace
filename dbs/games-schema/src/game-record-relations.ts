@@ -1,9 +1,9 @@
 import { relations } from 'drizzle-orm'
-import { GameRecordTable } from './game-records'
-import { TransactionTable } from './transactions'
-import { UserTable } from './users'
+import { GameRecordTable } from './game-record'
+import { TransactionTable } from './transaction'
+import { UserTable } from './user'
 
-export const GameRecordsRelations = relations(GameRecordTable, ({ one }) => ({
+export const GameRecordRelations = relations(GameRecordTable, ({ one }) => ({
   user: one(UserTable, {
     fields: [GameRecordTable.userId],
     references: [UserTable.id],

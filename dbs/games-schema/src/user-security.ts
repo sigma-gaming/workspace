@@ -6,7 +6,7 @@ import {
   text,
   uuid,
 } from 'drizzle-orm/pg-core'
-import { UserTable } from './users'
+import { UserTable } from './user'
 
 export const UserSecurityTable = pgTable(
   'UserSecurity',

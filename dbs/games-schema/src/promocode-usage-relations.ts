@@ -1,9 +1,9 @@
 import { relations } from 'drizzle-orm'
-import { PromocodeUsageTable } from './promocode-usages'
-import { PromocodeTable } from './promocodes'
-import { UserTable } from './users'
+import { PromocodeTable } from './promocode'
+import { PromocodeUsageTable } from './promocode-usage'
+import { UserTable } from './user'
 
-export const promocodeUsagesRelations = relations(
+export const PromocodeUsageRelations = relations(
   PromocodeUsageTable,
   ({ one }) => ({
     user: one(UserTable, {

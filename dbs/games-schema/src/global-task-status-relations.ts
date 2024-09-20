@@ -1,9 +1,9 @@
 import { relations } from 'drizzle-orm'
-import { GlobalTaskStatusTable } from './global-task-statuses'
-import { GlobalTaskTable } from './global-tasks'
-import { UserTable } from './users'
+import { GlobalTaskTable } from './global-task'
+import { GlobalTaskStatusTable } from './global-task-status'
+import { UserTable } from './user'
 
-export const globalTaskStatusesRelations = relations(
+export const GlobalTaskStatusRelations = relations(
   GlobalTaskStatusTable,
   ({ one }) => ({
     user: one(UserTable, {

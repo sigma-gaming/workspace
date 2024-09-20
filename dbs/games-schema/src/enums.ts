@@ -8,6 +8,7 @@ import {
   NotificationKind,
   PromocodeBonusType,
   PromocodeUsageStatus,
+  ReferralAction,
   TaskStatus,
   TaskType,
   TransactionType,
@@ -31,6 +32,11 @@ export const accountProviderEnum = pgEnum(
 export const transactionTypeEnum = pgEnum(
   'TransactionType',
   enumValues(TransactionType),
+)
+
+export const referralActionEnum = pgEnum(
+  'ReferralAction',
+  enumValues(ReferralAction),
 )
 
 export const gameEnum = pgEnum('Game', enumValues(Game))

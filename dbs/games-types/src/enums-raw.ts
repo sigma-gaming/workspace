@@ -13,10 +13,16 @@ export enum UserRole {
 export enum TransactionType {
   Deposit = 'Deposit',
   Withdrawal = 'Withdrawal',
+  Transfer = 'Transfer',
   Bonus = 'Bonus',
   Bet = 'Bet',
   Win = 'Win',
   Loss = 'Loss',
+}
+
+export enum ReferralAction {
+  Deposit = 'Deposit',
+  Withdrawal = 'Withdrawal',
 }
 
 export enum Game {

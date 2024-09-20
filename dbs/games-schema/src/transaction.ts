@@ -6,7 +6,8 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { gameEnum, transactionTypeEnum } from './enums'
-import { UserTable } from './users'
+import { ReferralCampaignTable } from './referral-campaign'
+import { UserTable } from './user'
 
 export const TransactionTable = pgTable('Transaction', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
@@ -35,6 +36,13 @@ export const TransactionTable = pgTable('Transaction', {
   userId: uuid('userId').references(() => UserTable.id, {
     onDelete: 'set null',
   }),
+  referrerId: uuid('referrerId').references(() => UserTable.id, {
+    onDelete: 'set null',
+  }),
+  referralCampaignId: uuid('referralCampaignId').references(
+    () => ReferralCampaignTable.id,
+    { onDelete: 'set null' },
+  ),
   gameRecordId: bigint('gameRecordId', { mode: 'number' }),
 })
 
