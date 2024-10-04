@@ -306,8 +306,134 @@
     {
       "idx": 43,
       "version": "7",
-      "when": 1726847320193,
-      "tag": "0043_volatile_monster_badoon",
+      "when": 1726848494537,
+      "tag": "0043_fuzzy_karma",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1726927663722,
+      "tag": "0044_empty_mariko_yashida",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1726929113825,
+      "tag": "0045_jazzy_taskmaster",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1726945294399,
+      "tag": "0046_mean_thaddeus_ross",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1726950569968,
+      "tag": "0047_marvelous_forge",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1727019762113,
+      "tag": "0048_whole_puff_adder",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1727019813833,
+      "tag": "0049_round_inertia",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1727039236862,
+      "tag": "0050_sharp_veda",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1727809758294,
+      "tag": "0051_typical_malcolm_colcord",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1727872020338,
+      "tag": "0052_daffy_living_tribunal",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1727905544696,
+      "tag": "0053_wandering_gambit",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1727905622189,
+      "tag": "0054_slim_vector",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1727905740436,
+      "tag": "0055_new_the_anarchist",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1727955002399,
+      "tag": "0056_lethal_blade",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1727955499695,
+      "tag": "0057_hard_molten_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1727958306169,
+      "tag": "0058_cooing_sabra",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1727958449624,
+      "tag": "0059_dapper_the_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1727959096950,
+      "tag": "0060_volatile_raider",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1727973177002,
+      "tag": "0061_useful_maggott",
       "breakpoints": true
     }
   ]

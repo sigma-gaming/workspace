@@ -29,7 +29,7 @@ function useAvatarSize() {
 
 export const MiniProfile = () => {
   const isMobile = useMedia({ to: 'md' })
-  const userExpired = useUnit($$user.$expired)
+  const userLoggedIn = useUnit($$user.$loggedIn)
   const loggingOut = useUnit($$user.$loggingOut)
   const balanceDepositing = useUnit($$balance.$depositing)
   const balanceWithdrawing = useUnit($$balance.$withdrawing)
@@ -37,7 +37,7 @@ export const MiniProfile = () => {
   const profile = useUnit($$profile.$profile)
   const avatarSize = useAvatarSize()
 
-  if (userExpired) {
+  if (!userLoggedIn) {
     return <ExpiredProfile />
   }
 

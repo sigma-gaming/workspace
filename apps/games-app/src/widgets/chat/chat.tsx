@@ -5,6 +5,7 @@ import { ActionIcon, Button, Skeleton } from '@mantine/core'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useUnit } from 'effector-react'
+import plural from 'plural-ru'
 import { memo, UIEventHandler, useCallback, useEffect, useRef } from 'react'
 import { $$user } from '../../entities/user'
 import { $$chatWidget, ExtendedMessage } from './model'
@@ -177,6 +178,35 @@ const MessageList = () => {
   )
 }
 
+function formatTime(date: string) {
+  const seconds = dayjs().diff(dayjs(date), 'seconds')
+  if (seconds < 5) return 'только что'
+  if (seconds < 45)
+    return plural(seconds, '%d секунда', '%d секунды', '%d секунд') + ' назад'
+  const formatted = dayjs(date, { locale: 'ru' }).fromNow()
+  if (formatted.includes('несколько секунд')) return 'только что'
+  if (formatted === 'день назад') return 'вчера'
+  return formatted
+}
+
+const FormattedTime = memo(({ date }: { date: string }) => {
+  const textRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!textRef.current) return
+      console.log(formatTime(date))
+      textRef.current.textContent = formatTime(date)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [date])
+
+  return <span ref={textRef}>{formatTime(date)}</span>
+})
+
+const AVATAR_SIZE = 32
+
 const Message = memo(({ message }: { message: ExtendedMessage }) => {
   const initials = getUserInitials(message.senderName)
 
@@ -194,20 +224,28 @@ const Message = memo(({ message }: { message: ExtendedMessage }) => {
           src={message.senderImage}
           alt={`Аватар ${message.senderName}`}
           fallback={initials}
-          size={32}
+          size={AVATAR_SIZE}
         />
       ) : (
-        <Avatar src={null} alt="Аватар системы" fallback="S" size={32} />
+        <Avatar
+          src={null}
+          alt="Аватар системы"
+          fallback="S"
+          size={AVATAR_SIZE}
+        />
       )}
-      <div className="flex flex-col gap-1 mt-1">
-        <div className="flex gap-2">
+      <div
+        className="flex flex-col gap-1 mt-1 max-w-[calc(100%-44px)]"
+        style={{ maxWidth: `calc(100% - ${AVATAR_SIZE + 12}px)` }}
+      >
+        <div className="flex items-center gap-2">
           <p className="cursor-default truncate max-w-[150px] text-[#7D7E9C] font-medium text-sm leading-none">
             {message.type === ChatMessageType.UserMessage
               ? message.senderName
               : 'Система'}
           </p>
-          <p className="text-sm leading-none text-[#4F506F]">
-            {dayjs(message.createdAt).format('HH:mm')}
+          <p className="text-xs leading-none text-[#4F506F] whitespace-nowrap">
+            <FormattedTime date={message.createdAt} />
           </p>
         </div>
         <p className="break-words text-sm">{message.text}</p>

@@ -1,4 +1,11 @@
-import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { accountProviderEnum } from './enums'
 import { UserTable } from './user'
 
@@ -10,8 +17,10 @@ export const ProfileTable = pgTable('Profile', {
   updatedAt: timestamp('updatedAt', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),
-  name: text('name'),
+  name: text('name').notNull(),
+  hasCustomName: boolean('hasCustomName').notNull().default(false),
   username: text('username').unique(),
+  image: text('image'),
   usedProvider: accountProviderEnum('usedProvider').notNull(),
 
   userId: uuid('userId')

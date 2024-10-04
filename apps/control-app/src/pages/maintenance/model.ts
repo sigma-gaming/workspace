@@ -9,12 +9,12 @@ import { controlApi } from '../../shared/api/control'
 
 const getMaintenanceQuery = createQuery({
   name: 'maintenance/get',
-  effect: createApiEffect(controlApi.maintenance.get.$get),
+  effect: createApiEffect('query', controlApi.maintenance.get.$get),
 })
 
 const updateMaintenanceMutation = createMutation({
   name: 'maintenance/update',
-  handler: createApiEffect(controlApi.maintenance.update.$post),
+  handler: createApiEffect('json', controlApi.maintenance.update.$post),
 })
 
 const $loading = getMaintenanceQuery.$pending

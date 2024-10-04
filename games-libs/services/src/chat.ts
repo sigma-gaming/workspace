@@ -13,30 +13,31 @@ import {
   ChatMessageType,
   UserRole,
 } from '@dbs/games-types'
+import { ChatMessageDetailed, ProfileDetailed } from '@games/model'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { desc } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
+import { GameService } from './game'
 import { locks } from './locks'
 import { profileService } from './profile'
-import { TransactionService } from './transaction'
 
 @singleton()
 export class ChatService {
-  constructor(private readonly transactionService: TransactionService) {}
+  constructor(private readonly gameService: GameService) {}
 
   private async validateUserGameAttachment(
     userId: string,
     attachment: ChatMessageAttachmentGame,
   ) {
-    const transaction = await this.transactionService.getTransaction(
-      attachment.transactionId,
+    const gameRecord = await this.gameService.getGameRecord(
+      attachment.gameRecordId,
     )
 
-    if (!transaction) {
+    if (!gameRecord) {
       throw new InternalServerException()
     }
 
-    if (transaction.userId !== userId) {
+    if (gameRecord.userId !== userId) {
       throw new BadRequestException({
         path: ['attachments'],
         message: 'Нельзя отправлять чужие игры',
@@ -47,14 +48,34 @@ export class ChatService {
   async initializeMessages() {
     return await locks.with([locks.chat()], async () => {
       const exists = await gamesCaches.lastChatMessages.exists()
-      if (exists) return
+
+      if (exists) {
+        await gamesCaches.lastChatMessages.extend()
+        return
+      }
 
       const messages = await gamesDb.query.ChatMessageTable.findMany({
         orderBy: desc(ChatMessageTable.id),
-        limit: 100,
+        limit: 50,
+        with: {
+          user: true,
+          profile: true,
+        },
       })
 
-      await gamesCaches.lastChatMessages.set(messages.reverse())
+      const detailedMessages = messages.map(
+        ({ user, profile, ...message }): ChatMessageDetailed => {
+          return {
+            ...message,
+            senderName: profile?.name ?? null,
+            senderUsername: profile?.username ?? null,
+            senderImage: profile?.image ?? null,
+            senderRoles: user?.roles ?? null,
+          }
+        },
+      )
+
+      await gamesCaches.lastChatMessages.set(detailedMessages.reverse())
     })
   }
 
@@ -96,18 +117,17 @@ export class ChatService {
     }
 
     let chatMessageInsert: ChatMessageInsert
+    let detailedProfile: ProfileDetailed | null = null
 
     if (userId) {
-      const detailedProfile = await profileService.getDetailedProfile(userId)
+      detailedProfile = await profileService.getDetailedProfile(userId)
 
       chatMessageInsert = {
         type: ChatMessageType.UserMessage,
         text,
         attachments,
-        senderName: detailedProfile.name,
-        senderUsername: detailedProfile.username,
-        senderImage: detailedProfile.image,
-        senderRoles: detailedProfile.roles,
+        userId,
+        profileId: detailedProfile.id,
         trackingId: payload.trackingId,
       }
     } else {
@@ -115,7 +135,6 @@ export class ChatService {
         type: ChatMessageType.SystemMessage,
         text,
         attachments,
-        senderRoles: [UserRole.Admin],
       }
     }
 
@@ -124,8 +143,20 @@ export class ChatService {
       .values(chatMessageInsert)
       .returning()
 
-    await gamesCaches.lastChatMessages.push(message)
-    await gamesPubsubs.chatMessages.publish(message)
+    const detailedMessage: ChatMessageDetailed = message
+
+    if (detailedProfile) {
+      detailedMessage.senderName = detailedProfile.name
+      detailedMessage.senderUsername = detailedProfile.username
+      detailedMessage.senderImage = detailedProfile.image
+      detailedMessage.senderRoles = detailedProfile.roles
+    } else {
+      // System message
+      detailedMessage.senderRoles = [UserRole.Admin]
+    }
+
+    await gamesCaches.lastChatMessages.push(detailedMessage)
+    await gamesPubsubs.chatMessages.publish(detailedMessage)
 
     return message
   }

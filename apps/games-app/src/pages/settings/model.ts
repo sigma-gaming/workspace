@@ -8,6 +8,7 @@ import { AccountProvider } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { getUserFullName, ProfileValidation } from '@games/model'
 import { createEvent, sample } from 'effector'
+import { not } from 'patronum'
 import { z } from 'zod'
 import { $$profile } from '../../entities/profile'
 import { routes } from '../../routing'
@@ -17,7 +18,7 @@ const reset = createEvent()
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
-  effect: createApiEffect(gamesApi.settings.updateProfile.$post),
+  effect: createApiEffect('json', gamesApi.settings.updateProfile.$post),
 })
 
 const $updatingProfile = updateProfileMutation.$pending
@@ -76,6 +77,7 @@ sample({
       account?.providerUserLastName,
     )
   },
+  filter: not($$profile.$hasCustomName),
   target: profileFields.name.update,
 })
 

@@ -89,9 +89,6 @@
       "@core/di": [
         "core/di/src/index.ts"
       ],
-      "@core/events": [
-        "core/events/src/index.ts"
-      ],
       "@core/client": [
         "core/client/src/index.ts"
       ],

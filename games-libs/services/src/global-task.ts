@@ -6,8 +6,8 @@ import { GlobalTaskKey, TaskStatus, TransactionType } from '@dbs/games-types'
 import { gamesCaches } from '@games/redis'
 import { and, eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
+import { BalanceService } from './balance'
 import { locks } from './locks'
-import { TransactionService } from './transaction'
 
 export enum GlobalTaskCompleteResult {
   AlreadyCompleted = 'AlreadyCompleted',
@@ -64,7 +64,7 @@ export class GlobalTaskService {
   logger: Logger
 
   constructor(
-    private transactionService: TransactionService,
+    private transactionService: BalanceService,
     loggerService: LoggerService,
   ) {
     this.logger = loggerService.logger.child('GlobalTask')
@@ -201,32 +201,39 @@ export class GlobalTaskService {
           return { result: GlobalTaskClaimRewardResult.Failed }
         }
 
-        await controller.add(locks.transaction(userId))
+        await controller.add(locks.balance(userId))
 
-        const lastTransaction =
-          await this.transactionService.getLastTransaction(userId)
+        const balance = await this.transactionService.getBalance(userId)
 
-        const wageringIncrease = Math.ceil(
+        const wageringChange = Math.ceil(
           task.payout * (task.wageringMultiplier / 100),
         )
 
-        const [transaction] = await this.transactionService.createTransaction({
-          payload: this.transactionService.generateTransaction(
-            lastTransaction,
-            {
+        const updatedBalance = await gamesDb.transaction(async (tx) => {
+          const transaction = await this.transactionService.createTransaction({
+            tx,
+            payload: {
               userId,
               type: TransactionType.Bonus,
               amount: task.payout,
-              wageringIncrease,
             },
-          ),
+          })
+
+          const updatedBalance = await this.transactionService.updateBalance({
+            tx,
+            balance,
+            transaction,
+            wageringChange,
+          })
+
+          return updatedBalance
         })
 
         await this.updateStatus(taskKey, userId, TaskStatus.Claimed)
 
         return {
           result: GlobalTaskClaimRewardResult.Claimed,
-          updatedBalance: transaction.closingBalance,
+          updatedBalance: updatedBalance.available,
           payout: task.payout,
         }
       },

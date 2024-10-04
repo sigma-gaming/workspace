@@ -1,7 +1,7 @@
 import { BadRequestException } from '@core/exceptions'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { calculateDiceWinAmount } from '@games/model'
-import { gameService, locks, transactionService } from '@games/services'
+import { balanceService, gameService, locks } from '@games/services'
 import crypto from 'node:crypto'
 import { PlayDiceInput, PlayDiceOutput } from './dice.contract'
 
@@ -11,12 +11,10 @@ export async function playDice({
 }: PlayDiceInput): Promise<PlayDiceOutput> {
   const { bet, sides } = payload
 
-  return locks.with([locks.transaction(userId)], async () => {
-    const lastTransaction = await transactionService.getLastTransaction(userId)
+  return locks.with([locks.balance(userId)], async () => {
+    const balance = await balanceService.getBalance(userId)
 
-    const { closingBalance: lastBalance = 0 } = lastTransaction ?? {}
-
-    if (lastBalance < bet) {
+    if (balance.available < bet) {
       throw new BadRequestException({
         path: ['bet'],
         message: 'Недостаточно гемов',
@@ -44,19 +42,19 @@ export async function playDice({
       },
     })
 
-    const { gameRecord, transaction } = await gameService.saveGame({
+    const { gameRecord, updatedBalance } = await gameService.saveGame({
       userId,
       game: Game.Dice,
       bet,
       payout,
       snapshot,
       outcome,
-      previousTransaction: lastTransaction,
+      balance,
     })
 
     return {
       record: gameRecord,
-      updatedBalance: transaction.closingBalance,
+      updatedBalance: updatedBalance.available,
     }
   })
 }

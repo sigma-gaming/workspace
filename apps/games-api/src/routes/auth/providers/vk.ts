@@ -9,6 +9,7 @@ import {
   sessionService,
 } from '@games/services'
 import axios from 'axios'
+import { getCookie } from 'hono/cookie'
 import { z } from 'zod'
 import { createRouter } from '../../../hono'
 
@@ -60,6 +61,7 @@ export const signInViaVkRoute = createRouter().post(
   async (ctx) => {
     const payload = ctx.req.valid('json')
     const session = ctx.get('session')
+    const referralCampaignCode = getCookie(ctx, 'referralCampaign')
 
     const authResult = VkAuthResultSchema.parse(JSON.parse(payload.payload))
 
@@ -95,6 +97,7 @@ export const signInViaVkRoute = createRouter().post(
       providerUserFirstName: vkProfile.first_name,
       providerUserLastName: vkProfile.last_name,
       providerUserImage: vkProfile.photo_200,
+      referralCampaignCode,
     })
 
     if (result.result === AuthResult.ConnectedToAnotherUser) {

@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm'
 import { AccountTable } from './account'
+import { BalanceTable } from './balance'
 import { GameRecordTable } from './game-record'
 import { ProfileTable } from './profile'
 import { ReferralCampaignTable } from './referral-campaign'
@@ -17,6 +18,11 @@ export const UserRelations = relations(UserTable, ({ one, many }) => ({
   }),
   accounts: many(AccountTable),
   sessions: many(SessionTable),
+
+  balance: one(BalanceTable, {
+    fields: [UserTable.id],
+    references: [BalanceTable.userId],
+  }),
   transactions: many(TransactionTable),
   gameRecords: many(GameRecordTable),
   userSecurity: one(UserSecurityTable, {

@@ -1,0 +1,1 @@
+ALTER TABLE "Profile" ADD COLUMN "hasCustomName" boolean DEFAULT false NOT NULL;

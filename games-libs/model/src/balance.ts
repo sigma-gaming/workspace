@@ -12,15 +12,15 @@ export function gemFloat(amount: number) {
   return amount / 100
 }
 
-const formatter0Digits = new Intl.NumberFormat('en-US', {
+const formatter0Digits = new Intl.NumberFormat('ru-RU', {
   maximumFractionDigits: 0,
 })
 
-const formatter1Digits = new Intl.NumberFormat('en-US', {
+const formatter1Digits = new Intl.NumberFormat('ru-RU', {
   maximumFractionDigits: 1,
 })
 
-const formatter2Digits = new Intl.NumberFormat('en-US', {
+const formatter2Digits = new Intl.NumberFormat('ru-RU', {
   maximumFractionDigits: 2,
 })
 

@@ -4,7 +4,7 @@ import { UserRole } from '@dbs/games-types'
 import { createQuery } from '@farfetched/core'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
-import { and, not } from 'patronum'
+import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { env } from '../../shared/env'
 
@@ -18,12 +18,12 @@ const clientLogoutFx = createEffect(() => {
 
 const userQuery = createQuery({
   name: 'user/get',
-  effect: createApiEffect(gamesApi.me.getUser.$get),
+  effect: createApiEffect('query', gamesApi.me.getUser.$get),
 })
 
 const logoutMutation = createQuery({
   name: 'user/logout',
-  effect: createApiEffect(gamesApi.auth.logout.$post),
+  effect: createApiEffect('json', gamesApi.auth.logout.$post),
 })
 
 const loaded = userQuery.finished.success
@@ -39,9 +39,8 @@ const $isModerator = $roles.map((roles) => roles.includes(UserRole.Moderator))
 const $isSupport = $roles.map((roles) => roles.includes(UserRole.Support))
 
 const expiresAt = Cookies.get('sessionExpiresAt') ?? null
-const initialExpired = expiresAt === null || new Date() >= new Date(expiresAt)
-const $expired = createStore(initialExpired)
-const $loggedIn = not($expired)
+const initialLoggedIn = expiresAt !== null && new Date() < new Date(expiresAt)
+const $loggedIn = createStore(initialLoggedIn)
 
 sample({
   clock: request,
@@ -62,8 +61,8 @@ sample({
 
 sample({
   clock: logout,
-  fn: () => true,
-  target: [clientLogoutFx, userQuery.reset, $expired, logoutMutation.start],
+  fn: () => false,
+  target: [clientLogoutFx, userQuery.reset, logoutMutation.start, $loggedIn],
 })
 
 export const $$user = {
@@ -74,7 +73,6 @@ export const $$user = {
   $user,
   $loading,
   $loaded,
-  $expired,
   $loggedIn,
   $loggingOut,
   $roles,

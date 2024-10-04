@@ -17,6 +17,8 @@ const EnvSchema = z
     PUBLIC_CONTROL_API_VERSION: z.string().default('unknown'),
     PUBLIC_GAMES_WS_URL: z.string(),
     PUBLIC_GAMES_WS_VERSION: z.string().default('unknown'),
+    PUBLIC_REFERRAL_REDIRECT_API_URL: z.string(),
+    PUBLIC_REFERRAL_REDIRECT_API_VERSION: z.string().default('unknown'),
     GAMES_TASKS_VERSION: z.string().default('unknown'),
     JWT_SECRET: z.string(),
 
@@ -59,6 +61,11 @@ const EnvSchema = z
     gamesWs: {
       url: raw.PUBLIC_GAMES_WS_URL,
       version: raw.PUBLIC_GAMES_WS_VERSION,
+    },
+
+    referralRedirectApi: {
+      url: raw.PUBLIC_REFERRAL_REDIRECT_API_URL,
+      version: raw.PUBLIC_REFERRAL_REDIRECT_API_VERSION,
     },
 
     gamesTasks: {

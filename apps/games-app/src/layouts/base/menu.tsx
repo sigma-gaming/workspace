@@ -32,7 +32,7 @@ export const BaseLayoutMenu = ({ onNavigate }: { onNavigate?: () => void }) => {
           to={routes.affiliate}
           icon={<Icons.Announcement width={24} height={24} />}
         >
-          Партнерам
+          Партнёрам
         </MenuLink>
       </MenuSection>
     </Menu>

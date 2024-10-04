@@ -199,7 +199,7 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
 
           <p className="mt-2 text-sm lg:text-base max-w-[360px] leading-snug mb-auto">
             Получи{' '}
-            <span className="inline-block text-primary-4 text-center">
+            <span className="inline-block text-primary-400 text-center">
               <Icons.Gem
                 className="inline-block -mt-[3px]"
                 width={20}
@@ -261,7 +261,7 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
 
           {status === TaskStatus.Claimed && (
             <CardActions>
-              <div className="flex items-center gap-1.5 h-[30px] lg:h-9 text-[color:var(--mantine-color-green-6)] leading-tight">
+              <div className="flex items-center gap-1.5 h-[30px] lg:h-9 text-green-600 leading-tight">
                 <IconCircleCheck className="shrink-0 w-5 h-5 lg:w-6 lg:h-6" />
                 <p className="text-sm lg:text-base font-medium">
                   Награда получена

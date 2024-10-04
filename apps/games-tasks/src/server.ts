@@ -3,9 +3,9 @@ import './shared/sentry/init'
 import { shutdownServices } from '@core/di'
 import { logger, loggerService } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
+import { gamesRedis } from '@games/redis'
 import { env } from '@games/services'
 import { createRouter } from './hono'
-import { initializeCronJobs } from './jobs'
 import { healthyRoute, readyRoute } from './routes/health'
 import { sentry } from './shared/sentry'
 
@@ -37,7 +37,9 @@ server.listen(port, (token) => {
   logger.info(`🚀 Server ready at :${port}`)
 })
 
-initializeCronJobs()
+gamesRedis.once('ready', () => {
+  import('./jobs').then((module) => module.initializeCronJobs())
+})
 
 process.on('uncaughtException', (error) => {
   logger.info('Uncaught exception')

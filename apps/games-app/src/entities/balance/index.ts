@@ -14,17 +14,18 @@ import { gamesWs } from '../../shared/api/games-ws'
 import { $$audio, Sound } from '../audio'
 
 const getDetailedBalanceFx = createApiEffect(
+  'query',
   gamesApi.me.getDetailedBalance.$get,
 )
 
 const depositMutation = createMutation({
   name: 'balance/deposit',
-  effect: createApiEffect(gamesApi.balance.deposit.$post),
+  effect: createApiEffect('json', gamesApi.balance.deposit.$post),
 })
 
 const withdrawMutation = createMutation({
   name: 'balance/withdraw',
-  effect: createApiEffect(gamesApi.balance.withdraw.$post),
+  effect: createApiEffect('json', gamesApi.balance.withdraw.$post),
 })
 
 const { receivedData: balanceUpdated } = invoke(() =>
@@ -35,12 +36,13 @@ const { receivedData: balanceUpdated } = invoke(() =>
 )
 
 const request = createEvent()
+const reset = createEvent()
 const deposit = createEvent()
 const withdraw = createEvent()
 const loaded = createEvent()
 
-const $balance = createStore<BalanceDetailed | null>(null)
-const $status = status(getDetailedBalanceFx)
+const $balance = createStore<BalanceDetailed | null>(null).reset(reset)
+const $status = status(getDetailedBalanceFx).reset(reset)
 
 function receiveUpdates<T>(
   mutation: Mutation<any, T, any>,
@@ -131,6 +133,7 @@ export const $$balance = {
   deposit,
   withdraw,
   loaded,
+  reset,
   $balance,
   $loading,
   $loaded,

@@ -38,6 +38,11 @@ export class GlobalEntityListService<TValue> {
     return count > 0
   }
 
+  async extend() {
+    if (this.ttl === Infinity) return
+    await this.redis.expire(this.key, this.ttl)
+  }
+
   async get(count = this.max) {
     const list = await this.redis.lrange(this.key, 0, count - 1)
     return list.map((value) => this.parse(value))

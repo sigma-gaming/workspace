@@ -1,5 +1,5 @@
 {
-  "id": "a616fee9-607b-47fc-ab6f-c864048bc5a3",
+  "id": "410507cb-c23b-4d71-bcd2-f3f7e6c015d7",
   "prevId": "a2d8d9b3-99ff-47d9-9f39-5bde7957bba9",
   "version": "7",
   "dialect": "postgresql",
@@ -94,6 +94,78 @@
         "Account_userId_User_id_fk": {
           "name": "Account_userId_User_id_fk",
           "tableFrom": "Account",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Balance": {
+      "name": "Balance",
+      "schema": "",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "available": {
+          "name": "available",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "wageringRequired": {
+          "name": "wageringRequired",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalBet": {
+          "name": "totalBet",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalWin": {
+          "name": "totalWin",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalLost": {
+          "name": "totalLost",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalRTP": {
+          "name": "totalRTP",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Balance_userId_User_id_fk": {
+          "name": "Balance_userId_User_id_fk",
+          "tableFrom": "Balance",
           "tableTo": "User",
           "columnsFrom": [
             "userId"
@@ -1079,7 +1151,13 @@
           "name": "referralId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "referralCampaignId": {
+          "name": "referralCampaignId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -1107,7 +1185,20 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ReferrerTransaction_referralCampaignId_ReferralCampaign_id_fk": {
+          "name": "ReferrerTransaction_referralCampaignId_ReferralCampaign_id_fk",
+          "tableFrom": "ReferrerTransaction",
+          "tableTo": "ReferralCampaign",
+          "columnsFrom": [
+            "referralCampaignId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -1264,74 +1355,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "openingBalance": {
-          "name": "openingBalance",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "closingBalance": {
-          "name": "closingBalance",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
-        },
         "amount": {
           "name": "amount",
           "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
-        "wageringRequired": {
-          "name": "wageringRequired",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "totalBet": {
-          "name": "totalBet",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "totalWin": {
-          "name": "totalWin",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "totalLost": {
-          "name": "totalLost",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "totalRTP": {
-          "name": "totalRTP",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
         "userId": {
           "name": "userId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "referrerId": {
-          "name": "referrerId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "referralCampaignId": {
-          "name": "referralCampaignId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
@@ -1351,32 +1382,6 @@
           "tableTo": "User",
           "columnsFrom": [
             "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "Transaction_referrerId_User_id_fk": {
-          "name": "Transaction_referrerId_User_id_fk",
-          "tableFrom": "Transaction",
-          "tableTo": "User",
-          "columnsFrom": [
-            "referrerId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "Transaction_referralCampaignId_ReferralCampaign_id_fk": {
-          "name": "Transaction_referralCampaignId_ReferralCampaign_id_fk",
-          "tableFrom": "Transaction",
-          "tableTo": "ReferralCampaign",
-          "columnsFrom": [
-            "referralCampaignId"
           ],
           "columnsTo": [
             "id"

@@ -5,7 +5,7 @@ import { useUnit } from 'effector-react'
 import { $$user } from '../../../entities/user/index.ts'
 import bonusChestSrc from '../assets/bonus-chest-512.webp'
 import { $$bonusesPage } from '../model.ts'
-import promocodeInputStyles from '../promocode-input.module.css'
+import promocodeInputStyles from './promocode-input.module.css'
 
 export const PromocodeCard = () => {
   const loggedIn = useUnit($$user.$loggedIn)
@@ -97,7 +97,12 @@ export const PromocodeCard = () => {
           <p className="text-xs lg:text-sm text-dimmed">Где найти промокоды?</p>
           <Tooltip
             className="max-w-[250px] leading-snug"
-            label="Они часто появляются в нашем Telegram-канале, а также в видео и постах партнёров"
+            label={
+              <>
+                Они часто появляются в&nbsp;нашем Telegram-канале, а&nbsp;также
+                в&nbsp;видео и&nbsp;постах партнёров
+              </>
+            }
           >
             <Icons.Question className="shrink-0 w-5 h-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
           </Tooltip>

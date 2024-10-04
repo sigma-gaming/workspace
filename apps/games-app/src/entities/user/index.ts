@@ -3,7 +3,7 @@ import { NotAuthenticatedException } from '@core/exceptions'
 import { createQuery } from '@farfetched/core'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
-import { and, not } from 'patronum'
+import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
 import { env } from '../../shared/env'
@@ -11,6 +11,7 @@ import { env } from '../../shared/env'
 const request = createEvent()
 const refresh = createEvent()
 const logout = createEvent()
+const loggedIn = createEvent()
 const loggedOut = createEvent()
 
 const clientLogoutFx = createEffect(() => {
@@ -19,12 +20,12 @@ const clientLogoutFx = createEffect(() => {
 
 const userQuery = createQuery({
   name: 'user/get',
-  effect: createApiEffect(gamesApi.me.getUser.$get),
+  effect: createApiEffect('query', gamesApi.me.getUser.$get),
 })
 
 const logoutMutation = createQuery({
   name: 'user/logout',
-  effect: createApiEffect(gamesApi.auth.logout.$post),
+  effect: createApiEffect('json', gamesApi.auth.logout.$post),
 })
 
 const loaded = userQuery.finished.success
@@ -35,9 +36,8 @@ const $loaded = and($user)
 const $loggingOut = logoutMutation.$pending
 
 const expiresAt = Cookies.get('sessionExpiresAt') ?? null
-const initialExpired = expiresAt === null || new Date() >= new Date(expiresAt)
-const $expired = createStore(initialExpired)
-const $loggedIn = not($expired)
+const initialLoggedIn = expiresAt !== null && new Date() < new Date(expiresAt)
+const $loggedIn = createStore(initialLoggedIn)
 
 sample({
   clock: request,
@@ -58,8 +58,8 @@ sample({
 
 sample({
   clock: logout,
-  fn: () => true,
-  target: [clientLogoutFx, userQuery.reset, $expired, logoutMutation.start],
+  fn: () => false,
+  target: [clientLogoutFx, userQuery.reset, logoutMutation.start, $loggedIn],
 })
 
 sample({
@@ -79,12 +79,12 @@ export const $$user = {
   request,
   refresh,
   logout,
+  loggedIn,
   loggedOut,
   loaded,
   $user,
   $loading,
   $loaded,
-  $expired,
   $loggedIn,
   $loggingOut,
 }

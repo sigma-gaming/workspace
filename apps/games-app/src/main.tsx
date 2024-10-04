@@ -1,3 +1,4 @@
+import './setup-dayjs.ts'
 import '@core/ui'
 import './setup-sticky.ts'
 import './shared/sentry/setup.ts'

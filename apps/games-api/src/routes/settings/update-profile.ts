@@ -54,6 +54,7 @@ export const updateProfileRoute = createRouter().post(
     const updates: ProfileUpdate = {
       username: payload.username ?? null,
       usedProvider: payload.provider,
+      image: selectedProvider.providerUserImage,
     }
 
     const nameFromProvider = getUserFullName(
@@ -61,12 +62,12 @@ export const updateProfileRoute = createRouter().post(
       selectedProvider.providerUserLastName,
     )
 
-    if (payload.name && payload.name !== nameFromProvider) {
+    if (payload.name) {
       updates.name = payload.name
-    }
-
-    if (payload.name === nameFromProvider) {
-      updates.name = null
+      updates.hasCustomName = payload.name !== nameFromProvider
+    } else {
+      updates.name = nameFromProvider
+      updates.hasCustomName = false
     }
 
     const [profile] = await gamesDb

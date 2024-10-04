@@ -6,29 +6,25 @@ import { memo, useRef } from 'react'
 import { $$balance } from '../../entities/balance'
 
 export const Balance = memo(() => {
-  const balanceLoading = useUnit($$balance.$loading)
+  const balanceLoaded = useUnit($$balance.$loaded)
 
   return (
     <div className="flex flex-col gap-1 items-end">
-      <Skeleton visible={balanceLoading} width="fit-content">
+      <Skeleton visible={!balanceLoaded} width="fit-content">
         <Text className="!leading-tight text-xs lg:text-sm select-none">
           Баланс
         </Text>
       </Skeleton>
       <Skeleton
-        visible={balanceLoading}
+        visible={!balanceLoaded}
         width="fit-content"
         className="min-w-[100px]"
       >
         <div className="flex items-center justify-end gap-1.5">
-          <Text
-            className="!leading-none text-lg lg:text-xl"
-            fw={500}
-            c="green.6"
-          >
+          <p className="!leading-none text-lg font-medium text-green-500 lg:text-xl">
             <AnimatedBalance />
-          </Text>
-          <Icons.Gem className="w-6 h-6 text-primary-4 -translate-y-[1px]" />
+          </p>
+          <Icons.Gem className="w-6 h-6 text-primary-400 -translate-y-[1px]" />
         </div>
       </Skeleton>
     </div>

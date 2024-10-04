@@ -143,6 +143,9 @@ importers:
       patronum:
         specifier: ^2.2.0
         version: 2.2.0(effector@23.2.1)
+      plural-ru:
+        specifier: ^2.0.2
+        version: 2.0.2
       postgres:
         specifier: ^3.4.3
         version: 3.4.4
@@ -405,9 +408,6 @@ importers:
       '@core/di':
         specifier: workspace:*
         version: link:../../core/di
-      '@core/events':
-        specifier: workspace:*
-        version: link:../../core/events
       '@core/exceptions':
         specifier: workspace:*
         version: link:../../core/exceptions
@@ -484,9 +484,6 @@ importers:
       '@core/di':
         specifier: workspace:*
         version: link:../../core/di
-      '@core/events':
-        specifier: workspace:*
-        version: link:../../core/events
       '@core/exceptions':
         specifier: workspace:*
         version: link:../../core/exceptions
@@ -526,9 +523,6 @@ importers:
       '@core/di':
         specifier: workspace:*
         version: link:../../core/di
-      '@core/events':
-        specifier: workspace:*
-        version: link:../../core/events
       '@core/exceptions':
         specifier: workspace:*
         version: link:../../core/exceptions
@@ -590,6 +584,30 @@ importers:
         specifier: workspace:*
         version: link:../../tooling/env
 
+  apps/referral-redirect-api:
+    dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
+      '@dbs/games-db':
+        specifier: workspace:*
+        version: link:../../dbs/games-db
+      '@dbs/games-schema':
+        specifier: workspace:*
+        version: link:../../dbs/games-schema
+      '@games/redis':
+        specifier: workspace:*
+        version: link:../../games-libs/redis
+      '@games/services':
+        specifier: workspace:*
+        version: link:../../games-libs/services
+      '@tooling/env':
+        specifier: workspace:*
+        version: link:../../tooling/env
+
   core/client:
     dependencies:
       '@core/exceptions':
@@ -609,8 +627,6 @@ importers:
         version: link:../di
 
   core/di: {}
-
-  core/events: {}
 
   core/exceptions: {}
 
@@ -2875,8 +2891,8 @@ packages:
   '@protobufjs/utf8@1.1.0':
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
 
-  '@remix-run/router@1.19.1':
-    resolution: {integrity: sha512-S45oynt/WH19bHbIXjtli6QmwNYvaz+vtnubvNpNDvUOoA/OWh6j1OikIP3G+v5GHdxyC6EXoChG3HgYGEUfcg==}
+  '@remix-run/router@1.19.2':
+    resolution: {integrity: sha512-baiMx18+IMuD1yyvOGaHM9QrVUPGGG0jC+z+IPHnRJWUAUvaKuWKyE8gjDj2rzv3sz9zOGoRSPgeBVHRhZnBlA==}
     engines: {node: '>=14.0.0'}
 
   '@risenx/howler@2.3.2':
@@ -4284,8 +4300,8 @@ packages:
     engines: {node: '>= 4.0.0'}
     hasBin: true
 
-  devalue@5.0.0:
-    resolution: {integrity: sha512-gO+/OMXF7488D+u3ue+G7Y4AA3ZmUnB3eHJXmBTgNHvr4ZNzl36A0ZtG+XCRNYCkYx/bFmw4qtkoFLa+wSrwAA==}
+  devalue@5.1.1:
+    resolution: {integrity: sha512-maua5KUiapvEwiEAe+XnlZ3Rh0GD+qI1J/nb9vrJc3muPXvcF/8gXYTWF76+5DAqHyDUtOIImEuo0YKE9mshVw==}
 
   didyoumean@1.2.2:
     resolution: {integrity: sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==}
@@ -6251,6 +6267,9 @@ packages:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
     engines: {node: '>=8'}
 
+  plural-ru@2.0.2:
+    resolution: {integrity: sha512-zmQv/tMG7fjF8r8JJ2U1p9dP1RgQ54RnP9nOM9dJHlcWU4mVmesKU9RgouxvyrCIU7lwOtGBYJ6cBa00UlzUZQ==}
+
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
@@ -6489,15 +6508,15 @@ packages:
       '@types/react':
         optional: true
 
-  react-router-dom@6.26.1:
-    resolution: {integrity: sha512-veut7m41S1fLql4pLhxeSW3jlqs+4MtjRLj0xvuCEXsxusJCbs6I8yn9BxzzDX2XDgafrccY6hwjmd/bL54tFw==}
+  react-router-dom@6.26.2:
+    resolution: {integrity: sha512-z7YkaEW0Dy35T3/QKPYB1LjMK2R1fxnHO8kWpUMTBdfVzZrWOiY9a7CtN8HqdWtDUWd5FY6Dl8HFsqVwH4uOtQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       react: '>=16.8'
       react-dom: '>=16.8'
 
-  react-router@6.26.1:
-    resolution: {integrity: sha512-kIwJveZNwp7teQRI5QmwWo39A5bXRyqpH0COKKmPnyD2vBvDwgFXSqDUYtt1h+FEyfnE8eXr7oe0MxRzVwCcvQ==}
+  react-router@6.26.2:
+    resolution: {integrity: sha512-tvN1iuT03kHgOFnLPfLJ8V95eijteveqdOSk+srqfePtQvqCExB8eHOYnlilbOcyJyKnYkr1vJvf7YqotAJu1A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       react: '>=16.8'
@@ -7336,8 +7355,8 @@ packages:
   unihead@0.0.6:
     resolution: {integrity: sha512-Wmhd5bVvG/ypM1LxmN6eWR8/uSfqNWCl7++kPmXWivADxMcC+s9dqKQYm+nCHexZ7Ysr8EYN6uhEcZHHcXHL8g==}
 
-  unihead@0.0.7:
-    resolution: {integrity: sha512-sTX/RdNan5WTngX56UL7tOqmeis4Jc42288wr95AOqX679bDDZG+9PqZRUueOOYkDgsNRK8ugBmaASoYcd0WpA==}
+  unihead@0.8.0:
+    resolution: {integrity: sha512-w1QMjMbYF2ULNd7kQ9Cgx9i6ofZbE8sflLfFXmNCumYLXzTycNcsTfVXd1l7mzfO8tKstB+QCVpEcyQZDC8fCQ==}
 
   universalify@0.1.2:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
@@ -9280,13 +9299,13 @@ snapshots:
   '@fastify/react@0.3.0(@fastify/vite@5.0.6)(@types/react@18.3.2)':
     dependencies:
       '@fastify/vite': 5.0.6(@fastify/react@0.3.0)(@fastify/vue@0.3.0)(@types/node@20.12.12)(sugarss@4.0.1(postcss@8.4.38))(terser@5.31.0)
-      devalue: 5.0.0
+      devalue: 5.1.1
       history: 5.3.0
       minipass: 7.1.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-router-dom: 6.26.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      unihead: 0.0.7
+      react-router-dom: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      unihead: 0.8.0
       valtio: 2.0.0(@types/react@18.3.2)(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
@@ -9330,7 +9349,7 @@ snapshots:
   '@fastify/vue@0.3.0(@fastify/vite@5.0.6)(typescript@5.5.3)':
     dependencies:
       '@fastify/vite': 5.0.6(@fastify/react@0.3.0)(@fastify/vue@0.3.0)(@types/node@20.12.12)(sugarss@4.0.1(postcss@8.4.38))(terser@5.31.0)
-      devalue: 5.0.0
+      devalue: 5.1.1
       unihead: 0.0.6
       vue: 3.4.27(typescript@5.5.3)
       vue-router: 4.3.2(vue@3.4.27(typescript@5.5.3))
@@ -10025,7 +10044,7 @@ snapshots:
 
   '@protobufjs/utf8@1.1.0': {}
 
-  '@remix-run/router@1.19.1': {}
+  '@remix-run/router@1.19.2': {}
 
   '@risenx/howler@2.3.2': {}
 
@@ -11650,7 +11669,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  devalue@5.0.0: {}
+  devalue@5.1.1: {}
 
   didyoumean@1.2.2: {}
 
@@ -13988,6 +14007,8 @@ snapshots:
     dependencies:
       find-up: 4.1.0
 
+  plural-ru@2.0.2: {}
+
   pluralize@8.0.0: {}
 
   possible-typed-array-names@1.0.0: {}
@@ -14203,16 +14224,16 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.2
 
-  react-router-dom@6.26.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router-dom@6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@remix-run/router': 1.19.1
+      '@remix-run/router': 1.19.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-router: 6.26.1(react@18.3.1)
+      react-router: 6.26.2(react@18.3.1)
 
-  react-router@6.26.1(react@18.3.1):
+  react-router@6.26.2(react@18.3.1):
     dependencies:
-      '@remix-run/router': 1.19.1
+      '@remix-run/router': 1.19.2
       react: 18.3.1
 
   react-style-singleton@2.2.1(@types/react@18.3.2)(react@18.3.1):
@@ -15198,7 +15219,7 @@ snapshots:
 
   unihead@0.0.6: {}
 
-  unihead@0.0.7: {}
+  unihead@0.8.0: {}
 
   universalify@0.1.2: {}
 

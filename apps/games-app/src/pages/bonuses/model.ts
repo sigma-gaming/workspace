@@ -24,15 +24,16 @@ const reset = createEvent()
 
 const applyPromocodeMutation = createMutation({
   name: 'bonuses/applyPromocode',
-  effect: createApiEffect(gamesApi.promocodes.apply.$post),
+  effect: createApiEffect('json', gamesApi.promocodes.apply.$post),
 })
 
 const getGlobalTasksQuery = createQuery({
   name: 'bonuses/getGlobalTasks',
-  effect: createApiEffect(gamesApi.tasks.global.getTasks.$get),
+  effect: createApiEffect('query', gamesApi.tasks.global.getTasks.$get),
 })
 
 const getGlobalTaskStatusesFx = createApiEffect(
+  'query',
   gamesApi.tasks.global.getStatuses.$get,
 )
 

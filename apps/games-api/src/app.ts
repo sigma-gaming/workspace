@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { createRouter } from './hono'
 import { sessionMiddleware } from './middlewares/session'
+import { affiliateRouter } from './routes/affiliate'
 import { authRouter } from './routes/auth'
 import { balanceRouter } from './routes/balance'
 import { chatRouter } from './routes/chat'
@@ -38,3 +39,4 @@ export const app = createRouter()
   .route('/gameHistory', gameHistoryRouter)
   .route('/promocodes', promocodesRouter)
   .route('/tasks', tasksRouter)
+  .route('/affiliate', affiliateRouter)

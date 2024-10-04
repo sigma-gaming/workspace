@@ -1,15 +1,16 @@
 import { createSingletonProxy } from '@core/di'
 import {
+  BalanceSelect,
   BudgetSelect,
-  ChatMessageSelect,
   GameRecordSelect,
   GlobalTaskSelect,
   NotificationSelect,
   PromocodeSelect,
-  TransactionSelect,
+  ReferrerBalanceSelect,
+  ReferrerSettingsSelect,
 } from '@dbs/games-schema'
 import { TaskStatus } from '@dbs/games-types'
-import { ProfileDetailed, Session } from '@games/model'
+import { ChatMessageDetailed, ProfileDetailed, Session } from '@games/model'
 import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe-neo'
 import { GlobalJsonEntityService, KeyJsonEntityService } from './entity-json'
 import { GlobalEntityListService, KeyEntityListService } from './entity-list'
@@ -27,10 +28,12 @@ export class CacheRegistry {
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
   session: KeyJsonEntityService<Session>
   sessionRefreshed: KeyJsonEntityService<true>
-  lastTransaction: KeyJsonEntityService<TransactionSelect>
+  balance: KeyJsonEntityService<BalanceSelect>
+  referrerBalance: KeyJsonEntityService<ReferrerBalanceSelect>
+  referrerSettings: KeyJsonEntityService<ReferrerSettingsSelect>
   globalNotifications: GlobalJsonEntityService<NotificationSelect[]>
   personalNotifications: KeyJsonEntityService<NotificationSelect[]>
-  lastChatMessages: GlobalEntityListService<ChatMessageSelect>
+  lastChatMessages: GlobalEntityListService<ChatMessageDetailed>
   lastWinHistory: GlobalEntityListService<GameRecordSelect>
   bigWinHistory: GlobalEntityListService<GameRecordSelect>
   userGameHistory: KeyEntityListService<GameRecordSelect>
@@ -66,8 +69,17 @@ export class CacheRegistry {
       keygen: (token: string) => `${version}:refreshedSession:${token}`,
     })
 
-    this.lastTransaction = new KeyJsonEntityService<TransactionSelect>({
-      keygen: (userId: string) => `${version}:lastTransaction:${userId}`,
+    this.balance = new KeyJsonEntityService<BalanceSelect>({
+      keygen: (userId: string) => `${version}:balance:${userId}`,
+    })
+
+    this.referrerBalance = new KeyJsonEntityService<ReferrerBalanceSelect>({
+      keygen: (userId: string) => `${version}:referrerBalance:${userId}`,
+    })
+
+    this.referrerSettings = new KeyJsonEntityService<ReferrerSettingsSelect>({
+      keygen: (referrerId: string) =>
+        `${version}:referrerSettings:${referrerId}`,
     })
 
     this.globalNotifications = new GlobalJsonEntityService<
@@ -82,7 +94,7 @@ export class CacheRegistry {
       },
     )
 
-    this.lastChatMessages = new GlobalEntityListService<ChatMessageSelect>({
+    this.lastChatMessages = new GlobalEntityListService<ChatMessageDetailed>({
       key: `${version}:global:lastChatMessages`,
       max: 50,
       ttl: 60 * 60 * 24 * 1, // 1 day

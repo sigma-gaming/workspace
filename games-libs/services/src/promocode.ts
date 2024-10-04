@@ -12,9 +12,9 @@ import { gamesCaches } from '@games/redis'
 import { and, eq } from 'drizzle-orm'
 import crypto from 'node:crypto'
 import { singleton } from 'tsyringe-neo'
+import { balanceService } from './balance'
 import { FraudService } from './fraud'
 import { locks } from './locks'
-import { transactionService } from './transaction'
 
 const DEFAULT_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
@@ -179,57 +179,57 @@ export class PromocodeService {
             return { result: PromocodeActivationResult.Blocked }
           }
 
-          await controller.add(locks.transaction(userId))
+          await controller.add(locks.balance(userId))
 
-          const lastTransaction =
-            await transactionService.getLastTransaction(userId)
+          const balance = await balanceService.getBalance(userId)
 
-          const bonusWageringAmount = Math.ceil(
+          const wageringChange = Math.ceil(
             promocode.bonus.payout * (promocode.wageringMultiplier / 100),
           )
 
-          const { transaction, updatedPromocode } = await gamesDb.transaction(
-            async (tx) => {
-              if (promocode.bonus.type !== PromocodeBonusType.Payout) {
-                return tx.rollback()
-              }
+          const updatedBalance = await gamesDb.transaction(async (tx) => {
+            if (promocode.bonus.type !== PromocodeBonusType.Payout) {
+              return tx.rollback()
+            }
 
-              const [updatedPromocode] = await tx
-                .update(PromocodeTable)
-                .set({ usages: promocode.usages + 1 })
-                .where(eq(PromocodeTable.id, promocode.id))
-                .returning()
+            const [updatedPromocode] = await tx
+              .update(PromocodeTable)
+              .set({ usages: promocode.usages + 1 })
+              .where(eq(PromocodeTable.id, promocode.id))
+              .returning()
 
-              await tx.insert(PromocodeUsageTable).values({
-                status: PromocodeUsageStatus.Applied,
+            await tx.insert(PromocodeUsageTable).values({
+              status: PromocodeUsageStatus.Applied,
+              userId,
+              promocodeId: promocode.id,
+            })
+
+            const transaction = await balanceService.createTransaction({
+              tx,
+              payload: {
                 userId,
-                promocodeId: promocode.id,
-              })
+                type: TransactionType.Bonus,
+                amount: promocode.bonus.payout,
+              },
+            })
 
-              const [transaction] = await transactionService.createTransaction({
-                tx,
-                payload: transactionService.generateTransaction(
-                  lastTransaction,
-                  {
-                    userId,
-                    type: TransactionType.Bonus,
-                    amount: promocode.bonus.payout,
-                    wageringIncrease: bonusWageringAmount,
-                  },
-                ),
-              })
+            const updatedBalance = await balanceService.updateBalance({
+              tx,
+              balance,
+              transaction,
+              wageringChange,
+            })
 
-              return { transaction, updatedPromocode }
-            },
-          )
+            await gamesCaches.balance.set(userId, updatedBalance)
+            await gamesCaches.promocode.set(code, updatedPromocode)
 
-          await gamesCaches.lastTransaction.set(userId, transaction)
-          await gamesCaches.promocode.set(code, updatedPromocode)
+            return updatedBalance
+          })
 
           return {
             result: PromocodeActivationResult.AppliedPayout,
             payout: promocode.bonus.payout,
-            updatedBalance: transaction.closingBalance,
+            updatedBalance: updatedBalance.available,
             wageringRequired: Math.ceil(
               promocode.bonus.payout * (promocode.wageringMultiplier / 100),
             ),

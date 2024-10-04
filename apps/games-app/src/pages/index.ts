@@ -1,3 +1,4 @@
+import { AffiliatePage } from './affiliate'
 import { BonusesPage } from './bonuses'
 import { PaymentFailureCallbackPage } from './callbacks/payment-failure'
 import { PaymentSuccessCallbackPage } from './callbacks/payment-success'
@@ -18,4 +19,5 @@ export const PAGES = [
   TelegramCallbackPage,
   PaymentSuccessCallbackPage,
   PaymentFailureCallbackPage,
+  AffiliatePage,
 ]

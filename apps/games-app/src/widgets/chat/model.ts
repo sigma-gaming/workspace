@@ -1,10 +1,9 @@
 import { createApiEffect, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { subscriptionFactory } from '@core/io-client'
-import { ChatMessageSelect } from '@dbs/games-schema'
 import { ChatMessageAttachment, ChatMessageType } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { ChatValidation } from '@games/model'
+import { ChatMessageDetailed, ChatValidation } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { v4 as uuid } from 'uuid'
@@ -16,11 +15,14 @@ import { gamesWs } from '../../shared/api/games-ws'
 const initialize = createEvent()
 const reset = createEvent()
 
-const getLastMessagesFx = createApiEffect(gamesApi.chat.getLastMessages.$get)
+const getLastMessagesFx = createApiEffect(
+  'query',
+  gamesApi.chat.getLastMessages.$get,
+)
 
 const sendMessageMutation = createMutation({
   name: 'chat/sendMessage',
-  effect: createApiEffect(gamesApi.chat.sendMessage.$post),
+  effect: createApiEffect('json', gamesApi.chat.sendMessage.$post),
 })
 
 const $loadingMessages = createStore(true)
@@ -47,7 +49,7 @@ export const form = createForm({
 
 handleExceptions(sendMessageMutation, { form })
 
-export type ExtendedMessage = ChatMessageSelect & {
+export type ExtendedMessage = ChatMessageDetailed & {
   temporary?: boolean
 }
 
@@ -138,8 +140,9 @@ sample({
       userId: user!.id,
       text: payload.text,
       temporary: true,
-      isPinned: true,
+      isPinned: false,
       trackingId: payload.trackingId,
+      profileId: profile!.id,
     })
   },
   target: $messages,

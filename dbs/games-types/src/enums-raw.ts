@@ -18,6 +18,7 @@ export enum TransactionType {
   Bet = 'Bet',
   Win = 'Win',
   Loss = 'Loss',
+  Refund = 'Refund',
 }
 
 export enum ReferralAction {

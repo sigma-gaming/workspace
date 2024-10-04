@@ -10,7 +10,7 @@ import { controlApi } from '../../shared/api/control'
 
 const sendNotificationMutation = createMutation({
   name: 'notifications/send',
-  effect: createApiEffect(controlApi.notifications.send.$post),
+  effect: createApiEffect('json', controlApi.notifications.send.$post),
 })
 
 const $submitting = sendNotificationMutation.$pending

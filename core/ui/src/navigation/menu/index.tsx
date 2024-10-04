@@ -57,7 +57,7 @@ export const MenuLink = ({
     <Link
       to={to}
       className="px-4 py-4 md:py-3 flex gap-4 items-center rounded-2xl text-[#B6B7CE] bg-[#221F2C] hover:bg-[#292636] active:translate-y-px transition-colors focus-visible:outline-primary"
-      activeClassName="cursor-default text-white bg-primary-7 hover:bg-primary-7 active:transform-none"
+      activeClassName="cursor-default text-white bg-primary-700 hover:bg-primary-700 active:transform-none"
       onClick={onNavigate}
     >
       <div className="opacity-75">{icon}</div>

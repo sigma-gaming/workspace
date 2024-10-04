@@ -49,7 +49,7 @@ export const Avatar = ({
   return renderRoot({
     className: clsx(
       'block shrink-0 rounded-full overflow-hidden',
-      bordered && 'border-2 p-[2px] border-primary-5',
+      bordered && 'border-2 p-[2px] border-primary-500',
     ),
     style: {
       width: size,

@@ -9,7 +9,7 @@ import {
   UserSelect,
   UserTable,
 } from '@dbs/games-schema'
-import { getUserFullName, ProfileDetailed } from '@games/model'
+import { ProfileDetailed } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
@@ -62,19 +62,8 @@ export class ProfileService {
       throw new InternalServerException()
     }
 
-    const calculateName = () => {
-      if (profile.name) return profile.name
-
-      return getUserFullName(
-        profileAccount.providerUserFirstName,
-        profileAccount.providerUserLastName,
-      )
-    }
-
     const detailedProfile: ProfileDetailed = {
       ...profile,
-      name: calculateName(),
-      image: profileAccount?.providerUserImage ?? null,
       roles: user.roles,
       accounts,
     }

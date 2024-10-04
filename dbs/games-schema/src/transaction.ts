@@ -6,7 +6,6 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { gameEnum, transactionTypeEnum } from './enums'
-import { ReferralCampaignTable } from './referral-campaign'
 import { UserTable } from './user'
 
 export const TransactionTable = pgTable('Transaction', {
@@ -17,32 +16,11 @@ export const TransactionTable = pgTable('Transaction', {
 
   type: transactionTypeEnum('type').notNull(),
   game: gameEnum('game'),
-
-  openingBalance: bigint('openingBalance', { mode: 'number' })
-    .notNull()
-    .default(0),
-  closingBalance: bigint('closingBalance', { mode: 'number' }).notNull(),
   amount: bigint('amount', { mode: 'number' }).notNull(),
-
-  wageringRequired: bigint('wageringRequired', { mode: 'number' })
-    .notNull()
-    .default(0),
-
-  totalBet: bigint('totalBet', { mode: 'number' }).notNull().default(0),
-  totalWon: bigint('totalWin', { mode: 'number' }).notNull().default(0),
-  totalLost: bigint('totalLost', { mode: 'number' }).notNull().default(0),
-  totalRTP: bigint('totalRTP', { mode: 'number' }).notNull().default(0),
 
   userId: uuid('userId').references(() => UserTable.id, {
     onDelete: 'set null',
   }),
-  referrerId: uuid('referrerId').references(() => UserTable.id, {
-    onDelete: 'set null',
-  }),
-  referralCampaignId: uuid('referralCampaignId').references(
-    () => ReferralCampaignTable.id,
-    { onDelete: 'set null' },
-  ),
   gameRecordId: bigint('gameRecordId', { mode: 'number' }),
 })
 

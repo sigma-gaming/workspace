@@ -1,4 +1,5 @@
 import { relations } from 'drizzle-orm'
+import { ReferralCampaignTable } from './referral-campaign'
 import { ReferrerTransactionTable } from './referrer-transaction'
 import { UserTable } from './user'
 
@@ -14,6 +15,10 @@ export const ReferrerTransactionRelations = relations(
       fields: [ReferrerTransactionTable.referralId],
       references: [UserTable.id],
       relationName: 'referral',
+    }),
+    referralCampaign: one(ReferralCampaignTable, {
+      fields: [ReferrerTransactionTable.referralCampaignId],
+      references: [ReferralCampaignTable.id],
     }),
   }),
 )

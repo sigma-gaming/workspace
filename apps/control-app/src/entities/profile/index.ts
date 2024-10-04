@@ -9,7 +9,7 @@ const refresh = createEvent()
 
 const profileQuery = createQuery({
   name: 'profile/get',
-  effect: createApiEffect(gamesApi.me.getDetailedProfile.$get),
+  effect: createApiEffect('query', gamesApi.me.getDetailedProfile.$get),
 })
 
 const loaded = profileQuery.finished.success

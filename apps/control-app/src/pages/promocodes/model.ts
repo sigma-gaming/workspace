@@ -17,12 +17,13 @@ import { routes } from '../../routing'
 import { controlApi } from '../../shared/api/control'
 
 const generatePromocodeFx = createApiEffect(
+  'json',
   controlApi.promocodes.generate.$post,
 )
 
 const createPromocodesMutation = createMutation({
   name: 'promocodes/create',
-  effect: createApiEffect(controlApi.promocodes.create.$post),
+  effect: createApiEffect('json', controlApi.promocodes.create.$post),
 })
 
 const generatePromocode = createEvent()

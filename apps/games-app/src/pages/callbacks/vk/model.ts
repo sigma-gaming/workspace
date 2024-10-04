@@ -5,6 +5,7 @@ import { routes } from '../../../routing'
 import { gamesApi } from '../../../shared/api/games'
 
 const authenticateFx = createApiEffect(
+  'json',
   gamesApi.auth.providers.signInViaVk.$post,
 )
 

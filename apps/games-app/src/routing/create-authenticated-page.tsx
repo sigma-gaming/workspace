@@ -9,14 +9,14 @@ export function createAuthenticatedPage({
   ...rest
 }: RouteRecord): RouteRecord {
   const AuthenticatedView = () => {
-    const expired = useUnit($$user.$expired)
+    const loggedIn = useUnit($$user.$loggedIn)
 
     useLayoutEffect(() => {
-      if (!expired) return
+      if (loggedIn) return
       void games.open()
     })
 
-    if (expired) {
+    if (!loggedIn) {
       return null
     }
 

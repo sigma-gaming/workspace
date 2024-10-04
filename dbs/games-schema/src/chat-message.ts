@@ -4,6 +4,7 @@ import {
   bigserial,
   boolean,
   index,
+  integer,
   json,
   pgTable,
   text,
@@ -11,6 +12,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { chatMessageTypeEnum, userRoleEnum } from './enums'
+import { ProfileTable } from './profile'
 import { UserTable } from './user'
 
 export const ChatMessageTable = pgTable(
@@ -36,6 +38,9 @@ export const ChatMessageTable = pgTable(
     isPinned: boolean('isPinned').default(false).notNull(),
 
     userId: uuid('userId').references(() => UserTable.id, {
+      onDelete: 'cascade',
+    }),
+    profileId: integer('profileId').references(() => ProfileTable.id, {
       onDelete: 'cascade',
     }),
   },

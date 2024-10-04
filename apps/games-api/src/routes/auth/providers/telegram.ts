@@ -9,6 +9,7 @@ import {
   sessionService,
   telegramBotService,
 } from '@games/services'
+import { getCookie } from 'hono/cookie'
 import crypto from 'node:crypto'
 import { z } from 'zod'
 import { createRouter } from '../../../hono'
@@ -34,6 +35,7 @@ export const signInViaTelegramRoute = createRouter().post(
   async (ctx) => {
     const payload = ctx.req.valid('json')
     const session = ctx.get('session')
+    const referralCampaignCode = getCookie(ctx, 'referralCampaign')
 
     const tgAuthResult = TgAuthResultSchema.parse(
       JSON.parse(atob(payload.tgAuthResult)),
@@ -79,6 +81,7 @@ export const signInViaTelegramRoute = createRouter().post(
       providerUserFirstName: tgAuthResult.first_name,
       providerUserLastName: tgAuthResult.last_name,
       providerUserImage: tgAuthResult.photo_url,
+      referralCampaignCode,
     })
 
     if (result.result === AuthResult.ConnectedToAnotherUser) {

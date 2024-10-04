@@ -10,8 +10,12 @@ type LockController = {
 
 @singleton()
 export class LocksService {
-  transaction(userId: string) {
-    return gamesCaches.lastTransaction.lock(userId, 3000)
+  balance(userId: string) {
+    return gamesCaches.balance.lock(userId, 3000)
+  }
+
+  referrerBalance(referrerId: string, time = 3000) {
+    return gamesCaches.referrerBalance.lock(referrerId, time)
   }
 
   promocode(code: string) {

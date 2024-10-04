@@ -1,3 +1,5 @@
+export const PINCODE_RTP = 0.95
+
 /* eslint-disable no-bitwise */
 export enum PincodeMode {
   Easy = 'easy',

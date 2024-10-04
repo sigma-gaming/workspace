@@ -13,7 +13,7 @@ const reset = createEvent()
 
 const getActualQuery = createQuery({
   name: 'notifications/getActual',
-  effect: createApiEffect(gamesApi.notifications.getActual.$get),
+  effect: createApiEffect('query', gamesApi.notifications.getActual.$get),
 })
 
 const { receivedData: notificationReceived } = invoke(() => {

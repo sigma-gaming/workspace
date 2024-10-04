@@ -1,8 +1,8 @@
 import { createSingletonProxy } from '@core/di'
 import { gamesDb } from '@dbs/games-db'
 import {
+  BalanceSelect,
   GameRecordTable,
-  TransactionSelect,
   TransactionTable,
 } from '@dbs/games-schema'
 import {
@@ -14,10 +14,10 @@ import {
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
+import { BalanceService } from './balance'
 import { budgetService } from './budget'
 import { GameHistoryService } from './game-history'
 import { ProfileService } from './profile'
-import { TransactionService } from './transaction'
 
 type SaveGamePayload = {
   userId: string
@@ -26,7 +26,7 @@ type SaveGamePayload = {
   payout: number
   snapshot: GameSnapshot
   outcome: GameOutcome
-  previousTransaction?: TransactionSelect | null
+  balance: BalanceSelect
 }
 
 type GameRunnerResult = {
@@ -45,11 +45,19 @@ export class GameService {
   constructor(
     private readonly gameHistoryService: GameHistoryService,
     private readonly profileService: ProfileService,
-    private readonly transactionService: TransactionService,
+    private readonly transactionService: BalanceService,
   ) {}
 
   lock = async (userId: string, ms = 3000) => {
-    return gamesCaches.lastTransaction.lock(userId, ms)
+    return gamesCaches.balance.lock(userId, ms)
+  }
+
+  getGameRecord = async (gameRecordId: number) => {
+    const record = await gamesDb.query.GameRecordTable.findFirst({
+      where: eq(GameRecordTable.id, gameRecordId),
+    })
+
+    return record ?? null
   }
 
   runGame = async ({
@@ -84,26 +92,23 @@ export class GameService {
     payout,
     snapshot,
     outcome,
-    previousTransaction,
+    balance,
   }: SaveGamePayload) => {
     const profile = await this.profileService.getDetailedProfile(userId)
 
-    const { gameRecord, transaction } = await gamesDb.transaction(
+    const { gameRecord, updatedBalance } = await gamesDb.transaction(
       async (tx) => {
-        const [{ id: transactionId }] =
-          await this.transactionService.createTransaction({
-            tx,
-            payload: this.transactionService.generateGameTransaction(
-              previousTransaction,
-              {
-                userId,
-                type: outcomeToTypeMap[outcome],
-                game,
-                amount: payout,
-                bet,
-              },
-            ),
-          })
+        const transaction = await this.transactionService.createTransaction({
+          tx,
+          payload: {
+            userId,
+            type: outcomeToTypeMap[outcome],
+            game,
+            amount: payout,
+          },
+        })
+
+        const multiplier = Math.floor(Math.max(0, payout / bet) * 100)
 
         const [gameRecord] = await tx
           .insert(GameRecordTable)
@@ -111,31 +116,38 @@ export class GameService {
             game,
             outcome,
             snapshot,
-            multiplier: Math.floor(Math.max(0, payout / bet) * 100),
+            multiplier,
             bet,
             payout,
             userId,
             previewUserName: profile.username ?? profile.name,
-            transactionId,
+            transactionId: transaction.id,
           })
           .returning()
 
-        const [transaction] = await tx
+        const updatedBalance = await this.transactionService.updateBalance({
+          tx,
+          balance,
+          transaction,
+          gameRecord,
+          wageringChange: -bet,
+        })
+
+        await tx
           .update(TransactionTable)
           .set({ gameRecordId: gameRecord.id })
-          .where(eq(TransactionTable.id, transactionId))
-          .returning()
+          .where(eq(TransactionTable.id, transaction.id))
 
-        return { gameRecord, transaction }
+        await gamesCaches.balance.set(userId, updatedBalance)
+
+        return { gameRecord, updatedBalance }
       },
     )
 
     budgetService.changeAvailable(-payout)
     this.gameHistoryService.addGameRecord(gameRecord)
 
-    await gamesCaches.lastTransaction.set(userId, transaction)
-
-    return { gameRecord, transaction }
+    return { gameRecord, updatedBalance }
   }
 }
 

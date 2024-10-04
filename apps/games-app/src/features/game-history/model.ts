@@ -10,7 +10,7 @@ import {
   Event,
   sample,
 } from 'effector'
-import { and, interval, not, status } from 'patronum'
+import { and, interval, status } from 'patronum'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
@@ -24,9 +24,20 @@ const resetMyGames = createEvent()
 const setTab = createEvent<Tab | null>()
 const resetTab = createEvent()
 
-const getLastWinsFx = createApiEffect(gamesApi.gameHistory.getLastWins.$get)
-const getBigWinsFx = createApiEffect(gamesApi.gameHistory.getBigWins.$get)
-const getMyGamesFx = createApiEffect(gamesApi.gameHistory.getMyGames.$get)
+const getLastWinsFx = createApiEffect(
+  'query',
+  gamesApi.gameHistory.getLastWins.$get,
+)
+
+const getBigWinsFx = createApiEffect(
+  'query',
+  gamesApi.gameHistory.getBigWins.$get,
+)
+
+const getMyGamesFx = createApiEffect(
+  'query',
+  gamesApi.gameHistory.getMyGames.$get,
+)
 
 const $lastWinsLoaded = status(getLastWinsFx).map((status) => status === 'done')
 const $bigWinsLoaded = status(getBigWinsFx).map((status) => status === 'done')
@@ -141,7 +152,7 @@ sample({
 
 sample({
   clock: initialize,
-  filter: not($$user.$expired),
+  filter: $$user.$loggedIn,
   target: getMyGamesFx,
 })
 
