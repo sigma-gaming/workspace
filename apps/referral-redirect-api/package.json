@@ -1,5 +1,5 @@
 {
-  "name": "@apis/referral-redirect",
+  "name": "@apis/referral-redirect-api",
   "private": true,
   "version": "0.0.0",
   "main": "./src/client.ts",

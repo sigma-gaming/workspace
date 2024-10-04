@@ -93,6 +93,10 @@ FROM api-base AS control-api
 COPY --from=build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]
 
+FROM api-base AS referral-redirect-api
+COPY --from=build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/referral-redirect-api/dist/main.js" ]
+
 # WS APIs
 
 FROM build AS games-ws-build
