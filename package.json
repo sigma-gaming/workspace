@@ -42,6 +42,7 @@
     "cert:install": "mkcert -install"
   },
   "dependencies": {
+    "@effector/reflect": "^9.2.0",
     "@farfetched/core": "^0.11.2",
     "@fastify/basic-auth": "^5.1.1",
     "@fastify/cors": "^8.4.2",

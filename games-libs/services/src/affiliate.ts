@@ -131,7 +131,7 @@ export class AffiliateService {
 
           await tx
             .update(ReferrerPayoutTable)
-            .set({ nextPayoutAt })
+            .set({ nextPayoutAt, lastPayoutAt: now })
             .where(eq(ReferrerPayoutTable.referrerId, referrerId))
 
           await gamesCaches.referrerBalance.del(referrerId)
@@ -320,8 +320,7 @@ export class AffiliateService {
       return
     }
 
-    const finalAmount =
-      (amount - amount * FEE) * (settings.referralLossShare / 100)
+    const finalAmount = (amount - amount * FEE) * (settings.revShare / 100)
 
     const transaction = await db.insert(ReferrerTransactionTable).values({
       referrerId,

@@ -22,7 +22,7 @@ export const connectRoute = createRouter().post('/', async (ctx) => {
         .insert(ReferrerSettingsTable)
         .values({
           referrerId: user.id,
-          referralLossShare: 25,
+          revShare: 25,
         })
         .returning()
 

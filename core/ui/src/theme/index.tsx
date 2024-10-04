@@ -18,6 +18,7 @@ import {
   MultiSelect,
   Notification,
   NumberInput,
+  Overlay,
   Pill,
   Popover,
   SegmentedControl,
@@ -147,6 +148,9 @@ export const theme = createTheme({
     }),
     LoadingOverlay: LoadingOverlay.extend({
       classNames: loadingOverlayClassNames,
+      defaultProps: { zIndex: 40 },
+    }),
+    Overlay: Overlay.extend({
       defaultProps: { zIndex: 40 },
     }),
     Pill: Pill.extend({

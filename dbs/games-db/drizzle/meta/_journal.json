@@ -435,6 +435,13 @@
       "when": 1727973177002,
       "tag": "0061_useful_maggott",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1728077530350,
+      "tag": "0062_strong_katie_power",
+      "breakpoints": true
     }
   ]
 }

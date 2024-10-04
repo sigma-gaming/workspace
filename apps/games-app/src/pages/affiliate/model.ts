@@ -43,6 +43,7 @@ $$balance.receiveUpdates(
 )
 
 const $settings = getSettingsQuery.$data
+const $revShare = $settings.map((settings) => settings?.revShare ?? 0)
 
 const $balanceDetailed = createStore<ReferrerBalanceSelect | null>(null)
   .on(getBalanceFx.doneData, (_, balance) => balance)
@@ -54,6 +55,14 @@ const $balance = $balanceDetailed.map((balance) => balance?.available ?? 0)
 
 const $campaigns = getCampaignsQuery.$data.map((data) => data?.campaigns ?? [])
 const $primaryCampaign = $campaigns.map((campaigns) => campaigns.at(0) ?? null)
+const $campaignCode = $primaryCampaign.map((campaign) => campaign?.code ?? '')
+
+const $campaignVisits = $primaryCampaign.map(
+  (campaign) => campaign?.totalVisits ?? 0,
+)
+const $campaignSignups = $primaryCampaign.map(
+  (campaign) => campaign?.totalSignups ?? 0,
+)
 
 const $settingsLoaded = getSettingsQuery.$succeeded
 const $campaignsLoaded = getCampaignsQuery.$succeeded
@@ -114,9 +123,13 @@ handleExceptions(withdrawMutation)
 export const $$affiliatePage = {
   withdraw,
   $settings,
+  $revShare,
   $balance,
   $campaigns,
   $primaryCampaign,
+  $campaignCode,
+  $campaignVisits,
+  $campaignSignups,
   $settingsLoaded,
   $balanceLoaded,
   $campaignsLoaded,

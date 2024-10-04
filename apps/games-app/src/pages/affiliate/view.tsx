@@ -1,6 +1,14 @@
 import { Icons } from '@core/ui'
+import { reflect } from '@effector/reflect'
 import { formatGem, gemFloat } from '@games/model'
-import { Button, Card, CopyButton, Skeleton, Tooltip } from '@mantine/core'
+import {
+  Button,
+  Card,
+  CopyButton,
+  Overlay,
+  Skeleton,
+  Tooltip,
+} from '@mantine/core'
 import {
   IconCheck,
   IconCopy,
@@ -9,19 +17,26 @@ import {
 } from '@tabler/icons-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
+import { not } from 'patronum'
 import { ReactNode } from 'react'
 import { $$affiliate } from '../../entities/affiliate'
 import { $$user } from '../../entities/user'
 import { env } from '../../shared/env'
 import { $$affiliatePage } from './model'
 
-const BalanceCard = () => {
-  const balance = useUnit($$affiliatePage.$balance)
-  const balanceLoaded = useUnit($$affiliatePage.$balanceLoaded)
-  const withdrawing = useUnit($$affiliatePage.$withdrawing)
-
+const BalanceCardView = ({
+  balance,
+  loading = false,
+  withdrawing,
+  onWithdraw,
+}: {
+  balance: number
+  loading?: boolean
+  withdrawing?: boolean
+  onWithdraw?: () => void
+}) => {
   return (
-    <Skeleton visible={!balanceLoaded}>
+    <Skeleton visible={loading}>
       <Card className="gap-4 items-start min-h-[192px]">
         <h2 className="text-lg font-medium leading-tight">
           Реферальный баланс
@@ -40,7 +55,8 @@ const BalanceCard = () => {
         <Button
           className="w-full md:w-auto mt-auto min-w-[184px]"
           loading={withdrawing}
-          onClick={() => $$affiliatePage.withdraw()}
+          onClick={onWithdraw}
+          disabled={!onWithdraw}
         >
           Вывести
         </Button>
@@ -66,16 +82,19 @@ const BalanceCard = () => {
   )
 }
 
-const RevShareCard = () => {
-  const settings = useUnit($$affiliatePage.$settings)
-  const settingsLoaded = useUnit($$affiliatePage.$settingsLoaded)
-
+const RevShareCardView = ({
+  revShare,
+  loading = false,
+}: {
+  revShare: number
+  loading?: boolean
+}) => {
   return (
-    <Skeleton visible={!settingsLoaded}>
+    <Skeleton visible={loading}>
       <Card className="gap-4 min-h-[192px]">
         <h2 className="text-lg font-medium leading-tight">Уровень дохода</h2>
         <p className="flex items-center gap-1.5 leading-none font-medium text-green-400 text-xl lg:text-2xl">
-          <span>{settings?.referralLossShare}%</span>
+          <span>{revShare}%</span>
         </p>
         <div className="mt-auto flex gap-2 items-center select-none">
           <p className="text-xs lg:text-sm text-dimmed">
@@ -99,13 +118,17 @@ const RevShareCard = () => {
   )
 }
 
-const LinkCard = () => {
-  const primaryCampaign = useUnit($$affiliatePage.$primaryCampaign)
-  const campaignsLoaded = useUnit($$affiliatePage.$campaignsLoaded)
-  const link = `${env.referralRedirectApi.url}/?r=${primaryCampaign?.code}`
+const LinkCardView = ({
+  code,
+  loading = false,
+}: {
+  code?: string
+  loading?: boolean
+}) => {
+  const link = `${env.referralRedirectApi.url}/?r=${code}`
 
   return (
-    <Skeleton visible={!campaignsLoaded}>
+    <Skeleton visible={loading}>
       <Card className="gap-4 min-h-[112px]">
         <h2 className="text-lg font-medium leading-tight">
           Ваша реферальная ссылка
@@ -140,28 +163,29 @@ const LinkCard = () => {
   )
 }
 
-const Stats = () => {
-  const primaryCampaign = useUnit($$affiliatePage.$primaryCampaign)
-  const campaignsLoaded = useUnit($$affiliatePage.$campaignsLoaded)
-
+const StatsView = ({
+  visits,
+  signups,
+  loading = false,
+}: {
+  visits: number
+  signups: number
+  loading?: boolean
+}) => {
   return (
-    <Skeleton visible={!campaignsLoaded}>
+    <Skeleton visible={loading}>
       <Grid cols={2}>
         <Card className="gap-4">
           <IconLink className="w-8 h-8" />
           <div className="flex flex-col gap-2">
-            <p className="text-xl leading-none font-semibold">
-              {primaryCampaign?.totalVisits}
-            </p>
+            <p className="text-xl leading-none font-semibold">{visits}</p>
             <p className="leading-none text-dimmed">Переходы</p>
           </div>
         </Card>
         <Card className="gap-4">
           <IconUserPlus className="w-8 h-8" />
           <div className="flex flex-col gap-2">
-            <p className="text-xl leading-none font-semibold">
-              {primaryCampaign?.totalSignups}
-            </p>
+            <p className="text-xl leading-none font-semibold">{signups}</p>
             <p className="leading-none text-dimmed">Регистрации</p>
           </div>
         </Card>
@@ -184,20 +208,87 @@ const Grid = ({ cols, children }: { cols: 2 | 3; children: ReactNode }) => {
   )
 }
 
-const ConnectedContent = () => {
+const BalanceCard = reflect({
+  view: BalanceCardView,
+  bind: {
+    balance: $$affiliatePage.$balance,
+    withdrawing: $$affiliatePage.$withdrawing,
+    onWithdraw: $$affiliatePage.withdraw,
+    loading: not($$affiliatePage.$balanceLoaded),
+  },
+})
+
+const RevShareCard = reflect({
+  view: RevShareCardView,
+  bind: {
+    revShare: $$affiliatePage.$revShare,
+    loading: not($$affiliatePage.$settingsLoaded),
+  },
+})
+
+const LinkCard = reflect({
+  view: LinkCardView,
+  bind: {
+    code: $$affiliatePage.$campaignCode,
+    loading: not($$affiliatePage.$campaignsLoaded),
+  },
+})
+
+const Stats = reflect({
+  view: StatsView,
+  bind: {
+    visits: $$affiliatePage.$campaignVisits,
+    signups: $$affiliatePage.$campaignSignups,
+    loading: not($$affiliatePage.$campaignsLoaded),
+  },
+})
+
+const Layout = ({
+  balance,
+  revShare,
+  link,
+  stats,
+}: {
+  balance: ReactNode
+  revShare: ReactNode
+  link: ReactNode
+  stats: ReactNode
+}) => {
   return (
     <div className="flex flex-col gap-4 2xl:gap-6">
       <Grid cols={2}>
-        <BalanceCard />
-        <RevShareCard />
+        {balance}
+        {revShare}
       </Grid>
       <Grid cols={2}>
         <div className="flex flex-col gap-4 2xl:gap-6">
-          <LinkCard />
-          <Stats />
+          {link}
+          {stats}
         </div>
       </Grid>
     </div>
+  )
+}
+
+const LoadingContent = () => {
+  return (
+    <Layout
+      balance={<BalanceCardView balance={0} loading={true} />}
+      revShare={<RevShareCardView revShare={0} loading={true} />}
+      link={<LinkCardView loading={true} />}
+      stats={<StatsView visits={0} signups={0} loading={true} />}
+    />
+  )
+}
+
+const ConnectedContent = () => {
+  return (
+    <Layout
+      balance={<BalanceCard />}
+      revShare={<RevShareCard />}
+      link={<LinkCard />}
+      stats={<Stats />}
+    />
   )
 }
 
@@ -206,20 +297,35 @@ const NotConnectedContent = () => {
   const loggedIn = useUnit($$user.$loggedIn)
 
   return (
-    <>
-      <p>
-        Присоединяйтесь к&nbsp;нашей партнёрской программе и&nbsp;получайте{' '}
-        <b>до&nbsp;50%</b> от&nbsp;нашего дохода
-      </p>
-      <Button
-        className="w-full md:w-56 lg:w-full xl:w-56"
-        onClick={() => $$affiliate.connect()}
-        loading={connecting}
-        disabled={!loggedIn}
+    <div className="relative">
+      <Layout
+        balance={<BalanceCardView balance={100000000} />}
+        revShare={<RevShareCardView revShare={50} />}
+        link={<LinkCardView code="s1gmaX" />}
+        stats={<StatsView visits={999} signups={99} />}
+      />
+      <Overlay
+        blur={3}
+        color="var(--mantine-color-body)"
+        className="flex flex-col items-center md:justify-center px-4 py-24 rounded-lg"
       >
-        Подключиться
-      </Button>
-    </>
+        <div className="text-center">
+          <p className="max-w-[360px]">
+            Присоединяйтесь к&nbsp;нашей партнёрской программе и&nbsp;получайте{' '}
+            <span className="font-semibold">до&nbsp;50%</span> от&nbsp;нашего
+            дохода
+          </p>
+          <Button
+            className="mt-4 w-full max-w-[240px]"
+            onClick={() => $$affiliate.connect()}
+            loading={connecting}
+            disabled={!loggedIn}
+          >
+            Подключиться
+          </Button>
+        </div>
+      </Overlay>
+    </div>
   )
 }
 
@@ -233,7 +339,7 @@ const Content = () => {
   }
 
   if (!loaded) {
-    return <Skeleton height={192} />
+    return <LoadingContent />
   }
 
   return isConnected ? <ConnectedContent /> : <NotConnectedContent />

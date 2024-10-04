@@ -33,9 +33,12 @@ export const MiniProfile = () => {
   const loggingOut = useUnit($$user.$loggingOut)
   const balanceDepositing = useUnit($$balance.$depositing)
   const balanceWithdrawing = useUnit($$balance.$withdrawing)
-  const userLoading = useUnit($$user.$loading)
+  const userLoaded = useUnit($$user.$loaded)
+  const profileLoaded = useUnit($$profile.$loaded)
   const profile = useUnit($$profile.$profile)
   const avatarSize = useAvatarSize()
+
+  const loading = !userLoaded || !profileLoaded
 
   if (!userLoggedIn) {
     return <ExpiredProfile />
@@ -48,7 +51,7 @@ export const MiniProfile = () => {
       width={240}
       position="bottom-end"
       offset={isMobile ? 32 : 16}
-      disabled={userLoading}
+      disabled={loading}
       zIndex={250}
     >
       <Menu.Target>
@@ -71,7 +74,7 @@ export const MiniProfile = () => {
               </button>
             )}
             size={avatarSize}
-            loading={userLoading}
+            loading={loading}
             fallback={initials}
             bordered={true}
           />

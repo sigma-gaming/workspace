@@ -18,10 +18,12 @@ function useAvatarSize() {
 export const MiniProfile = () => {
   const isMobile = useMedia({ to: 'md' })
   const userLoggedIn = useUnit($$user.$loggedIn)
-  const userLoading = useUnit($$user.$loading)
+  const userLoaded = useUnit($$user.$loaded)
   const profile = useUnit($$profile.$profile)
+  const profileLoaded = useUnit($$profile.$loaded)
   const roles = useUnit($$user.$roles)
   const avatarSize = useAvatarSize()
+  const loading = !userLoaded || !profileLoaded
 
   if (!userLoggedIn) {
     return <ExpiredProfile />
@@ -34,7 +36,7 @@ export const MiniProfile = () => {
       width={240}
       position="bottom-end"
       offset={isMobile ? 32 : 16}
-      disabled={userLoading}
+      disabled={loading}
       zIndex={250}
     >
       <Menu.Target>
@@ -55,7 +57,7 @@ export const MiniProfile = () => {
               </button>
             )}
             size={avatarSize}
-            loading={userLoading}
+            loading={loading}
             fallback={initials}
             bordered={true}
           />

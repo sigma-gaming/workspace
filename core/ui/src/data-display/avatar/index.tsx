@@ -59,7 +59,7 @@ export const Avatar = ({
     children: (
       <div
         className={clsx(
-          'flex w-full h-full items-center justify-center rounded-full bg-[#363753] pointer-events-none',
+          'flex w-full h-full items-center justify-center rounded-full bg-[#2A2C45] pointer-events-none',
           'font-medium text-[#b6b7ce] select-none',
         )}
       >

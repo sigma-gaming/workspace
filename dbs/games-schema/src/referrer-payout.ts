@@ -6,6 +6,7 @@ export const ReferrerPayoutTable = pgTable('ReferrerPayout', {
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .primaryKey(),
   nextPayoutAt: timestamp('nextPayoutAt').notNull(),
+  lastPayoutAt: timestamp('lastPayoutAt'),
 })
 
 export type ReferrerPayoutSelect = typeof ReferrerPayoutTable.$inferSelect

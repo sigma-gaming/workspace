@@ -2,6 +2,10 @@
   @apply z-20;
 }
 
+.root[data-visible] {
+  @apply opacity-50;
+}
+
 .root[data-visible]:before {
   background-color: #25273C;
 }

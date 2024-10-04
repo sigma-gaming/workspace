@@ -195,7 +195,6 @@ const FormattedTime = memo(({ date }: { date: string }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (!textRef.current) return
-      console.log(formatTime(date))
       textRef.current.textContent = formatTime(date)
     }, 1000)
 
@@ -259,7 +258,7 @@ const MessageSkeleton = memo(() => {
 
   return (
     <Skeleton
-      className="flex gap-3 p-3 pr-4 rounded-2xl opacity-50"
+      className="flex gap-3 p-3 pr-4 rounded-2xl"
       style={{ minHeight }}
     />
   )

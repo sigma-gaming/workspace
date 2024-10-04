@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@effector/reflect':
+        specifier: ^9.2.0
+        version: 9.2.0(effector-react@23.2.0(effector@23.2.1)(react@18.3.1))(effector@23.2.1)(react@18.3.1)
       '@farfetched/core':
         specifier: ^0.11.2
         version: 0.11.4(effector@23.2.1)
@@ -1641,6 +1644,13 @@ packages:
 
   '@drizzle-team/brocli@0.8.2':
     resolution: {integrity: sha512-zTrFENsqGvOkBOuHDC1pXCkDXNd2UhP4lI3gYGhQ1R1SPeAAfqzPsV1dcpMy4uNU6kB5VpU5NGhvwxVNETR02A==}
+
+  '@effector/reflect@9.2.0':
+    resolution: {integrity: sha512-jumgC1Ztl28gRmhLei2TX3bF0p1sD/LhAWHWggbmiNcZnpX4K6odTITrFLSu4wKkyP+AX9QpF/wiqLi0njDP1A==}
+    peerDependencies:
+      effector: ^23.1.0
+      effector-react: ^23.1.0
+      react: '>=16.8.0 <19.0.0'
 
   '@emnapi/runtime@1.2.0':
     resolution: {integrity: sha512-bV21/9LQmcQeCPEg3BDFtvwL6cwiTMksYNWQQ4KOxCZikEGalWtenoZ0wCiukJINlGCIi2KXx01g4FoH/LxpzQ==}
@@ -8920,6 +8930,12 @@ snapshots:
   '@discoveryjs/json-ext@0.5.7': {}
 
   '@drizzle-team/brocli@0.8.2': {}
+
+  '@effector/reflect@9.2.0(effector-react@23.2.0(effector@23.2.1)(react@18.3.1))(effector@23.2.1)(react@18.3.1)':
+    dependencies:
+      effector: 23.2.1
+      effector-react: 23.2.0(effector@23.2.1)(react@18.3.1)
+      react: 18.3.1
 
   '@emnapi/runtime@1.2.0':
     dependencies:
