@@ -82,6 +82,7 @@ sample({
 
 sample({
   clock: withdraw,
+  fn: () => {},
   target: withdrawMutation.start,
 })
 
