@@ -72,9 +72,12 @@ const $winInfo = createStore<WinInfo | null>(null)
 
 const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
 
+const MIN_BET = gemInt(1)
+const MAX_BET = gemInt(5000)
+
 const fields = {
   bet: createField({
-    emptyValue: 1,
+    emptyValue: MIN_BET,
     persistKey: 'games/pincode/bet',
     resetToPersisted: true,
   }),
@@ -89,9 +92,6 @@ const fields = {
     resetToPersisted: true,
   }),
 }
-
-const MIN_BET = gemInt(1)
-const MAX_BET = gemInt(5000)
 
 export const form = createForm({
   fields,

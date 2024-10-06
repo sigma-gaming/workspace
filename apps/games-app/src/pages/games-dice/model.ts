@@ -83,9 +83,12 @@ const playAnimationFx = attach({
   },
 })
 
+const MIN_BET = gemInt(1)
+const MAX_BET = gemInt(5000)
+
 const fields = {
   bet: createField({
-    emptyValue: 100,
+    emptyValue: MIN_BET,
     persistKey: 'games/dice/bet',
     resetToPersisted: true,
   }),
@@ -95,9 +98,6 @@ const fields = {
     resetToPersisted: true,
   }),
 }
-
-const MIN_BET = gemInt(1)
-const MAX_BET = gemInt(5000)
 
 export const form = createForm({
   fields,

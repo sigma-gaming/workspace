@@ -1,4 +1,5 @@
 export * from './account'
+export * from './affiliate'
 export * from './balance'
 export * from './chat'
 export * from './games'

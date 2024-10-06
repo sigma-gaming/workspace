@@ -1,4 +1,4 @@
-import { Icons } from '@core/ui'
+import { Icons, Table } from '@core/ui'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome, GameSnapshot } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
@@ -165,35 +165,39 @@ const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
   const isFirstRender = useIsFirstRender()
 
   return (
-    <table className={styles.table}>
-      <thead>
-        <tr className={styles.row}>
-          <Cell type="head">Игра</Cell>
-          <Cell type="head" className={cellDesktop}>
+    <Table>
+      <Table.Head>
+        <Table.Row>
+          <Table.Cell as="th">Игра</Table.Cell>
+          <Table.Cell as="th" className={cellDesktop}>
             Игрок
-          </Cell>
-          <Cell type="head" className={cellDesktop} align="center">
+          </Table.Cell>
+          <Table.Cell as="th" className={cellDesktop} align="center">
             Ставка
-          </Cell>
-          <Cell type="head" className={cellDesktop} align="center">
+          </Table.Cell>
+          <Table.Cell as="th" className={cellDesktop} align="center">
             Результат
-          </Cell>
-          <Cell type="head" className={cellLargeDesktop} align="center">
+          </Table.Cell>
+          <Table.Cell as="th" className={cellLargeDesktop} align="center">
             Множитель
-          </Cell>
-          <Cell type="head" align="right">
+          </Table.Cell>
+          <Table.Cell as="th" align="right">
             Выплата
-          </Cell>
-        </tr>
-      </thead>
-      <tbody>
+          </Table.Cell>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
         {records.map((record) => {
           return (
-            <Row key={record.id} record={record} animated={!isFirstRender} />
+            <HistoryRow
+              key={record.id}
+              record={record}
+              animated={!isFirstRender}
+            />
           )
         })}
-      </tbody>
-    </table>
+      </Table.Body>
+    </Table>
   )
 })
 
@@ -217,7 +221,7 @@ const TableEmpty = () => {
   )
 }
 
-const Row = memo(
+const HistoryRow = memo(
   ({ record, animated }: { record: GameRecordSelect; animated: boolean }) => {
     const route = gameToRouteMap[record.game]
     const hasWon = record.outcome === GameOutcome.Win
@@ -228,73 +232,34 @@ const Row = memo(
     const payout = formatGem(gemFloat(record.bet + record.payout))
 
     return (
-      <tr className={styles.row} data-animated={animated}>
-        <Cell className="flex gap-2 items-center">
+      <Table.Row animated={animated}>
+        <Table.Cell className="flex gap-2 items-center">
           {gameToIconMap[record.game]}
           <Link to={route}>{gameToLabelMap[record.game]}</Link>
-        </Cell>
-        <Cell
+        </Table.Cell>
+        <Table.Cell
           className={clsx('max-w-[120px]', cellDesktop)}
           textColor="primary"
         >
           {record.previewUserName}
-        </Cell>
-        <Cell className={cellDesktop} align="center">
+        </Table.Cell>
+        <Table.Cell className={cellDesktop} align="center">
           {formatGem(gemFloat(record.bet))}g
-        </Cell>
-        <Cell className={cellDesktop} align="center">
+        </Table.Cell>
+        <Table.Cell className={cellDesktop} align="center">
           {getGameResult(record.snapshot)}
-        </Cell>
-        <Cell className={cellLargeDesktop} align="center" textColor={highlight}>
+        </Table.Cell>
+        <Table.Cell
+          className={cellLargeDesktop}
+          align="center"
+          textColor={highlight}
+        >
           {multiplier}x
-        </Cell>
-        <Cell align="right" textColor={highlight}>
+        </Table.Cell>
+        <Table.Cell align="right" textColor={highlight}>
           {payout}g
-        </Cell>
-      </tr>
+        </Table.Cell>
+      </Table.Row>
     )
   },
 )
-
-const Cell = ({
-  className: classNameExtra,
-  type = 'row',
-  children,
-  textSize = type === 'head' ? 'xs' : 'sm',
-  textColor = 'default',
-  align = 'left',
-  hidden = false,
-}: {
-  type?: 'head' | 'row'
-  className?: string
-  children?: ReactNode
-  textSize?: 'sm' | 'xs'
-  textColor?: 'default' | 'primary' | 'success' | 'failure'
-  align?: 'left' | 'center' | 'right'
-  hidden?: boolean
-}) => {
-  if (hidden) {
-    return null
-  }
-
-  const className = clsx(
-    classNameExtra,
-    'h-11 px-4 md:px-6 py-2 text-ellipsis',
-    type === 'head' && 'uppercase font-medium',
-    textSize === 'xs' && 'text-xs',
-    textSize === 'sm' && 'text-sm',
-    textColor === 'default' && 'text-[#9494a5]',
-    textColor === 'primary' && 'text-[#fcf8f9]',
-    textColor === 'success' && 'text-green-400',
-    textColor === 'failure' && 'text-red-400',
-    align === 'left' && 'text-left',
-    align === 'center' && 'text-center',
-    align === 'right' && 'text-right',
-  )
-
-  if (type === 'head') {
-    return <th className={className}>{children}</th>
-  }
-
-  return <td className={className}>{children}</td>
-}

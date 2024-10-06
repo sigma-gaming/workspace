@@ -1,4 +1,5 @@
 export * from './clamp-number'
 export * from './defer'
+export * from './noop'
 export * from './sleep'
 export * from './trim-text'

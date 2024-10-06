@@ -1,0 +1,12 @@
+.control {
+  @apply bg-[#25273e] border-[#25273e];
+
+  &:hover:not([data-disabled="true"]):not([data-active="true"]) {
+    @apply bg-[#222338] border-[#222338];
+  }
+
+  &[data-active="true"] {
+    --bg-color: var(--mantine-primary-color-filled);
+    @apply bg-[color:var(--mantine-primary-color-filled)] border-[color:var(--mantine-primary-color-filled)];
+  }
+}

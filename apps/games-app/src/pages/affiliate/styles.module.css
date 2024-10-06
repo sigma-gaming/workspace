@@ -1,0 +1,9 @@
+.table th:first-child,
+.table td:first-child {
+  @apply pl-2;
+}
+
+.table th:last-child,
+.table td:last-child {
+  @apply pr-2;
+}

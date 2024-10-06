@@ -10,7 +10,12 @@ import {
   ReferrerSettingsSelect,
 } from '@dbs/games-schema'
 import { TaskStatus } from '@dbs/games-types'
-import { ChatMessageDetailed, ProfileDetailed, Session } from '@games/model'
+import {
+  ChatMessageDetailed,
+  ProfileDetailed,
+  ReferrerTransactionDetailed,
+  Session,
+} from '@games/model'
 import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe-neo'
 import { GlobalJsonEntityService, KeyJsonEntityService } from './entity-json'
 import { GlobalEntityListService, KeyEntityListService } from './entity-list'
@@ -18,6 +23,11 @@ import { GlobalNumberEntityService } from './entity-number'
 import { GlobalStringEntityService } from './entity-string'
 
 export const CacheVersionToken: InjectionToken<string> = Symbol('CacheVersion')
+
+type LastReferrerTransactions = {
+  transactions: ReferrerTransactionDetailed[]
+  totalAmount: number
+}
 
 @singleton()
 @autoInjectable()
@@ -31,6 +41,7 @@ export class CacheRegistry {
   balance: KeyJsonEntityService<BalanceSelect>
   referrerBalance: KeyJsonEntityService<ReferrerBalanceSelect>
   referrerSettings: KeyJsonEntityService<ReferrerSettingsSelect>
+  lastReferrerTransactions: KeyJsonEntityService<LastReferrerTransactions>
   globalNotifications: GlobalJsonEntityService<NotificationSelect[]>
   personalNotifications: KeyJsonEntityService<NotificationSelect[]>
   lastChatMessages: GlobalEntityListService<ChatMessageDetailed>
@@ -81,6 +92,13 @@ export class CacheRegistry {
       keygen: (referrerId: string) =>
         `${version}:referrerSettings:${referrerId}`,
     })
+
+    this.lastReferrerTransactions =
+      new KeyJsonEntityService<LastReferrerTransactions>({
+        keygen: (referrerId: string) =>
+          `${version}:lastReferrerTransactions:${referrerId}`,
+        ttl: 15 * 60, // 15 minutes
+      })
 
     this.globalNotifications = new GlobalJsonEntityService<
       NotificationSelect[]

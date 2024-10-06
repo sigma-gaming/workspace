@@ -62,84 +62,6 @@ export class AffiliateService {
     return Array.from({ length }, () => randomChar(CODE_ALPHABET)).join('')
   }
 
-  async processReferrerPayouts() {
-    const now = new Date()
-    const nextPayoutAt = this.generateNextPayoutDate()
-
-    /**
-     * Fixate the last transaction id to prevent false-positive `isProcessed` updates
-     */
-    const [lastTransaction] = await gamesDb
-      .select({ id: ReferrerTransactionTable.id })
-      .from(ReferrerTransactionTable)
-      .orderBy(desc(ReferrerTransactionTable.id))
-      .limit(1)
-
-    if (!lastTransaction) {
-      this.logger.info('No transactions to process')
-      return
-    }
-
-    const pendingPayouts = await gamesDb
-      .select({
-        referrerId: ReferrerTransactionTable.referrerId,
-        totalAmount: sum(ReferrerTransactionTable.amount).mapWith(Number),
-      })
-      .from(ReferrerTransactionTable)
-      .innerJoin(
-        ReferrerPayoutTable,
-        eq(ReferrerTransactionTable.referrerId, ReferrerPayoutTable.referrerId),
-      )
-      .where(
-        and(
-          lte(ReferrerTransactionTable.id, lastTransaction.id),
-          eq(ReferrerTransactionTable.isProcessed, false),
-          lte(ReferrerPayoutTable.nextPayoutAt, now),
-        ),
-      )
-      .groupBy(ReferrerTransactionTable.referrerId)
-
-    if (pendingPayouts.length === 0) {
-      this.logger.info('No pending payouts')
-      return
-    }
-
-    for (const { referrerId, totalAmount } of pendingPayouts) {
-      if (totalAmount === 0) {
-        continue
-      }
-
-      await locks.with([locks.referrerBalance(referrerId)], async () => {
-        await gamesDb.transaction(async (tx) => {
-          await tx
-            .update(ReferrerBalanceTable)
-            .set({
-              available: sql`${ReferrerBalanceTable.available} + ${totalAmount}`,
-            })
-            .where(eq(ReferrerBalanceTable.referrerId, referrerId))
-
-          await tx
-            .update(ReferrerTransactionTable)
-            .set({ isProcessed: true })
-            .where(
-              and(
-                lte(ReferrerTransactionTable.id, lastTransaction.id),
-                eq(ReferrerTransactionTable.referrerId, referrerId),
-                eq(ReferrerTransactionTable.isProcessed, false),
-              ),
-            )
-
-          await tx
-            .update(ReferrerPayoutTable)
-            .set({ nextPayoutAt, lastPayoutAt: now })
-            .where(eq(ReferrerPayoutTable.referrerId, referrerId))
-
-          await gamesCaches.referrerBalance.del(referrerId)
-        })
-      })
-    }
-  }
-
   async getCampaign(code: string) {
     const campaign = await gamesDb.query.ReferralCampaignTable.findFirst({
       where: eq(ReferralCampaignTable.code, code),
@@ -331,6 +253,85 @@ export class AffiliateService {
     })
 
     return transaction
+  }
+
+  async processReferrerPayouts() {
+    const now = new Date()
+    const nextPayoutAt = this.generateNextPayoutDate()
+
+    /**
+     * Fixate the last transaction id to prevent false-positive `isProcessed` updates
+     */
+    const [lastTransaction] = await gamesDb
+      .select({ id: ReferrerTransactionTable.id })
+      .from(ReferrerTransactionTable)
+      .orderBy(desc(ReferrerTransactionTable.id))
+      .limit(1)
+
+    if (!lastTransaction) {
+      this.logger.info('No transactions to process')
+      return
+    }
+
+    const pendingPayouts = await gamesDb
+      .select({
+        referrerId: ReferrerTransactionTable.referrerId,
+        totalAmount: sum(ReferrerTransactionTable.amount).mapWith(Number),
+      })
+      .from(ReferrerTransactionTable)
+      .innerJoin(
+        ReferrerPayoutTable,
+        eq(ReferrerTransactionTable.referrerId, ReferrerPayoutTable.referrerId),
+      )
+      .where(
+        and(
+          lte(ReferrerTransactionTable.id, lastTransaction.id),
+          eq(ReferrerTransactionTable.isProcessed, false),
+          lte(ReferrerPayoutTable.nextPayoutAt, now),
+        ),
+      )
+      .groupBy(ReferrerTransactionTable.referrerId)
+
+    if (pendingPayouts.length === 0) {
+      this.logger.info('No pending payouts')
+      return
+    }
+
+    for (const { referrerId, totalAmount } of pendingPayouts) {
+      if (totalAmount === 0) {
+        continue
+      }
+
+      await locks.with([locks.referrerBalance(referrerId)], async () => {
+        await gamesDb.transaction(async (tx) => {
+          await tx
+            .update(ReferrerBalanceTable)
+            .set({
+              available: sql`${ReferrerBalanceTable.available} + ${totalAmount}`,
+            })
+            .where(eq(ReferrerBalanceTable.referrerId, referrerId))
+
+          await tx
+            .update(ReferrerTransactionTable)
+            .set({ isProcessed: true })
+            .where(
+              and(
+                lte(ReferrerTransactionTable.id, lastTransaction.id),
+                eq(ReferrerTransactionTable.referrerId, referrerId),
+                eq(ReferrerTransactionTable.isProcessed, false),
+              ),
+            )
+
+          await tx
+            .update(ReferrerPayoutTable)
+            .set({ nextPayoutAt, lastPayoutAt: now })
+            .where(eq(ReferrerPayoutTable.referrerId, referrerId))
+
+          await gamesCaches.referrerBalance.del(referrerId)
+          await gamesCaches.lastReferrerTransactions.del(referrerId)
+        })
+      })
+    }
   }
 }
 

@@ -30,7 +30,7 @@
     "dev:control-app": "nx run @apps/control-app:dev",
     "dev:control-api": "nx run @apis/control-api:dev",
     "dev": "nx run-many -t dev --parallel 10",
-    "dev:games": "nx run-many -t dev --projects @apps/games-app,@apis/games-api,@apis/games-ws,@apis/games-tasks --parallel 10",
+    "dev:games": "nx run-many -t dev --projects @apps/games-app,@apis/games-api,@apis/games-ws,@apis/games-tasks,@apis/referral-redirect-api --parallel 10",
     "check": "CI=true pnpm nx run-many -t build test lint typecheck --parallel 5",
     "check:affected": "CI=true pnpm nx affected -t build test lint typecheck --parallel 5",
     "typecheck": "pnpm nx run-many -t typecheck",

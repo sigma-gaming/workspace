@@ -19,6 +19,7 @@ import {
   Notification,
   NumberInput,
   Overlay,
+  Pagination,
   Pill,
   Popover,
   SegmentedControl,
@@ -51,6 +52,7 @@ import modalClassNames from './modal.module.css'
 import multiSelectClassNames from './multi-select.module.css'
 import notificationClassNames from './notification.module.css'
 import numberInputClassNames from './number-input.module.css'
+import paginationClassNames from './pagination.module.css'
 import pillClassNames from './pill.module.css'
 import popoverClassNames from './popover.module.css'
 import segmentedControlClassNames from './segmented-control.module.css'
@@ -192,6 +194,9 @@ export const theme = createTheme({
       defaultProps: {
         submitButtonProps: { color: '#393c60', variant: 'filled' },
       },
+    }),
+    Pagination: Pagination.extend({
+      classNames: paginationClassNames,
     }),
   },
 })

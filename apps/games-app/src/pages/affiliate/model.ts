@@ -3,6 +3,7 @@ import {
   createApiEffect,
   handleExceptions,
 } from '@core/client'
+import { noop } from '@core/utils'
 import { ReferrerBalanceSelect } from '@dbs/games-schema'
 import { createMutation, createQuery } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
@@ -32,6 +33,11 @@ const getCampaignsQuery = createQuery({
   effect: createApiEffect('query', gamesApi.affiliate.getCampaigns.$get),
 })
 
+const getLastTransactionsQuery = createQuery({
+  name: 'affiliate/getLastTransactions',
+  effect: createApiEffect('query', gamesApi.affiliate.getLastTransactions.$get),
+})
+
 const withdrawMutation = createMutation({
   name: 'affiliate/withdraw',
   effect: createApiEffect('json', gamesApi.affiliate.withdraw.$post),
@@ -43,6 +49,7 @@ $$balance.receiveUpdates(
 )
 
 const $settings = getSettingsQuery.$data
+const $settingsLoaded = getSettingsQuery.$succeeded
 const $revShare = $settings.map((settings) => settings?.revShare ?? 0)
 
 const $balanceDetailed = createStore<ReferrerBalanceSelect | null>(null)
@@ -54,6 +61,7 @@ const $balanceLoaded = $balanceStatus.map((status) => status === 'done')
 const $balance = $balanceDetailed.map((balance) => balance?.available ?? 0)
 
 const $campaigns = getCampaignsQuery.$data.map((data) => data?.campaigns ?? [])
+const $campaignsLoaded = getCampaignsQuery.$succeeded
 const $primaryCampaign = $campaigns.map((campaigns) => campaigns.at(0) ?? null)
 const $campaignCode = $primaryCampaign.map((campaign) => campaign?.code ?? '')
 
@@ -64,8 +72,13 @@ const $campaignSignups = $primaryCampaign.map(
   (campaign) => campaign?.totalSignups ?? 0,
 )
 
-const $settingsLoaded = getSettingsQuery.$succeeded
-const $campaignsLoaded = getCampaignsQuery.$succeeded
+const $lastTransactionsLoaded = getLastTransactionsQuery.$succeeded
+const $lastTransactions = getLastTransactionsQuery.$data.map(
+  (data) => data?.transactions ?? [],
+)
+const $previewPayout = getLastTransactionsQuery.$data.map(
+  (data) => data?.totalAmount ?? 0,
+)
 
 const $withdrawing = withdrawMutation.$pending
 
@@ -76,13 +89,18 @@ sample({
     $$affiliate.$isConnected,
     $$user.$loggedIn,
   ),
-  fn: () => {},
-  target: [getBalanceFx, getSettingsQuery.start, getCampaignsQuery.start],
+  fn: noop,
+  target: [
+    getBalanceFx,
+    getSettingsQuery.start,
+    getCampaignsQuery.start,
+    getLastTransactionsQuery.start,
+  ],
 })
 
 sample({
   clock: withdraw,
-  fn: () => {},
+  fn: noop,
   target: withdrawMutation.start,
 })
 
@@ -135,4 +153,7 @@ export const $$affiliatePage = {
   $balanceLoaded,
   $campaignsLoaded,
   $withdrawing,
+  $lastTransactions,
+  $lastTransactionsLoaded,
+  $previewPayout,
 }

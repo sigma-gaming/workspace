@@ -1,11 +1,19 @@
-import { Icons } from '@core/ui'
+import { Avatar, Icons, Table, TableCellTextColor } from '@core/ui'
+import { trimText } from '@core/utils'
+import { ReferralAction } from '@dbs/games-types'
 import { reflect } from '@effector/reflect'
-import { formatGem, gemFloat } from '@games/model'
+import {
+  formatGem,
+  gemFloat,
+  gemInt,
+  ReferrerTransactionDetailed,
+} from '@games/model'
 import {
   Button,
   Card,
   CopyButton,
   Overlay,
+  Pagination,
   Skeleton,
   Tooltip,
 } from '@mantine/core'
@@ -18,11 +26,17 @@ import {
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { not } from 'patronum'
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import { $$affiliate } from '../../entities/affiliate'
 import { $$user } from '../../entities/user'
 import { env } from '../../shared/env'
 import { $$affiliatePage } from './model'
+import styles from './styles.module.css'
+
+type ReferrerTransactionDisplay = Pick<
+  ReferrerTransactionDetailed,
+  'id' | 'referralName' | 'referralAvatar' | 'referralAction' | 'amount'
+>
 
 const BalanceCardView = ({
   balance,
@@ -194,6 +208,131 @@ const StatsView = ({
   )
 }
 
+const referralActionLabelMap: Record<ReferralAction, string> = {
+  [ReferralAction.Deposit]: 'Пополнение',
+  [ReferralAction.Withdrawal]: 'Вывод',
+}
+
+const referralActionHighlightMap: Record<ReferralAction, TableCellTextColor> = {
+  [ReferralAction.Deposit]: 'success',
+  [ReferralAction.Withdrawal]: 'failure',
+}
+
+const cellDesktop =
+  'hidden sm:table-cell md:hidden lg:table-cell xl:hidden 2xl:table-cell'
+
+const TransactionsTable = ({
+  transactions,
+}: {
+  transactions: ReferrerTransactionDisplay[]
+}) => {
+  return (
+    <Table className={clsx(styles.table, 'grow')}>
+      <Table.Head>
+        <Table.Cell as="th">Реферал</Table.Cell>
+        <Table.Cell as="th" className={cellDesktop} align="center">
+          Действие
+        </Table.Cell>
+        <Table.Cell as="th" align="right">
+          Сумма
+        </Table.Cell>
+      </Table.Head>
+      <Table.Body className="max-h-[300px] overflow-y-auto">
+        {transactions.map((transaction) => {
+          const highlight =
+            referralActionHighlightMap[transaction.referralAction]
+          const referralName = transaction.referralName ?? 'Неизвестный'
+
+          return (
+            <Table.Row key={transaction.id}>
+              <Table.Cell>
+                <div className="flex items-center gap-2">
+                  {transaction.referralAvatar && (
+                    <Avatar
+                      src={transaction.referralAvatar}
+                      size={20}
+                      alt="Реферал"
+                    />
+                  )}
+                  <span className="leading-tight">
+                    {trimText(referralName, 16)}
+                  </span>
+                </div>
+              </Table.Cell>
+              <Table.Cell
+                className={cellDesktop}
+                align="center"
+                textColor={highlight}
+              >
+                {referralActionLabelMap[transaction.referralAction]}
+              </Table.Cell>
+              <Table.Cell align="right" textColor={highlight}>
+                {formatGem(gemFloat(transaction.amount))}
+              </Table.Cell>
+            </Table.Row>
+          )
+        })}
+      </Table.Body>
+    </Table>
+  )
+}
+
+const LastTransactionsView = ({
+  transactions,
+  totalAmount,
+  loading = false,
+}: {
+  transactions: ReferrerTransactionDisplay[]
+  totalAmount: number
+  loading?: boolean
+}) => {
+  const [page, setPage] = useState(1)
+  const pageCount = Math.ceil(transactions.length / 10)
+
+  return (
+    <Skeleton visible={loading}>
+      <Card className="gap-4 min-h-full">
+        <h2 className="text-lg font-medium leading-tight">
+          Транзакции рефералов
+        </h2>
+
+        {transactions.length > 0 ? (
+          <div className="grow">
+            <TransactionsTable
+              transactions={transactions.slice((page - 1) * 10, page * 10)}
+            />
+            <Pagination
+              className="w-fit mx-auto mt-2"
+              value={page}
+              total={pageCount}
+              onChange={setPage}
+              size="sm"
+              hideWithOnePage
+            />
+          </div>
+        ) : (
+          <div className="grow flex items-center justify-center">
+            <p className="text-dimmed py-4">Здесь пока что нет транзакций</p>
+          </div>
+        )}
+
+        <p className="text-sm text-right px-2">
+          Будет начислено:{' '}
+          <span
+            className={clsx(
+              'ml-1 font-semibold text-lg',
+              totalAmount > 0 && 'text-green-400',
+              totalAmount < 0 && 'text-red-400',
+            )}
+          >
+            {formatGem(gemFloat(totalAmount))}
+          </span>
+        </p>
+      </Card>
+    </Skeleton>
+  )
+}
+
 const Grid = ({ cols, children }: { cols: 2 | 3; children: ReactNode }) => {
   return (
     <div
@@ -243,16 +382,27 @@ const Stats = reflect({
   },
 })
 
+const LastTransactions = reflect({
+  view: LastTransactionsView,
+  bind: {
+    transactions: $$affiliatePage.$lastTransactions,
+    totalAmount: $$affiliatePage.$previewPayout,
+    loading: not($$affiliatePage.$lastTransactionsLoaded),
+  },
+})
+
 const Layout = ({
   balance,
   revShare,
   link,
   stats,
+  lastTransactions,
 }: {
   balance: ReactNode
   revShare: ReactNode
   link: ReactNode
   stats: ReactNode
+  lastTransactions: ReactNode
 }) => {
   return (
     <div className="flex flex-col gap-4 2xl:gap-6">
@@ -265,6 +415,7 @@ const Layout = ({
           {link}
           {stats}
         </div>
+        {lastTransactions}
       </Grid>
     </div>
   )
@@ -277,6 +428,13 @@ const LoadingContent = () => {
       revShare={<RevShareCardView revShare={0} loading={true} />}
       link={<LinkCardView loading={true} />}
       stats={<StatsView visits={0} signups={0} loading={true} />}
+      lastTransactions={
+        <LastTransactionsView
+          transactions={[]}
+          totalAmount={0}
+          loading={true}
+        />
+      }
     />
   )
 }
@@ -288,6 +446,7 @@ const ConnectedContent = () => {
       revShare={<RevShareCard />}
       link={<LinkCard />}
       stats={<Stats />}
+      lastTransactions={<LastTransactions />}
     />
   )
 }
@@ -303,6 +462,27 @@ const NotConnectedContent = () => {
         revShare={<RevShareCardView revShare={50} />}
         link={<LinkCardView code="s1gmaX" />}
         stats={<StatsView visits={999} signups={99} />}
+        lastTransactions={
+          <LastTransactionsView
+            transactions={[
+              {
+                id: 1,
+                referralAction: ReferralAction.Deposit,
+                amount: gemInt(33333),
+                referralAvatar: null,
+                referralName: 'Lydik',
+              },
+              {
+                id: 1,
+                referralAction: ReferralAction.Deposit,
+                amount: gemInt(33333),
+                referralAvatar: null,
+                referralName: 'Admin',
+              },
+            ]}
+            totalAmount={gemInt(66666)}
+          />
+        }
       />
       <Overlay
         blur={3}
@@ -312,8 +492,8 @@ const NotConnectedContent = () => {
         <div className="text-center">
           <p className="max-w-[360px]">
             Присоединяйтесь к&nbsp;нашей партнёрской программе и&nbsp;получайте{' '}
-            <span className="font-semibold">до&nbsp;50%</span> от&nbsp;нашего
-            дохода
+            <span className="font-semibold">до&nbsp;50%</span>{' '}
+            от&nbsp;нашего&nbsp;дохода
           </p>
           <Button
             className="mt-4 w-full max-w-[240px]"
