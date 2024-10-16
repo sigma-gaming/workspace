@@ -31,9 +31,7 @@ type Options = {
 export function loadEnv({ root, files = createDefaultFiles(root) }: Options) {
   for (const { path, condition = () => true } of files) {
     if (!condition()) continue
-    console.log('loading env', path)
     const dotenv = require('dotenv')
     dotenv.config({ path, override: true })
-    console.log('loaded env', process.env)
   }
 }

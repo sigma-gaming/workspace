@@ -23,7 +23,6 @@ const EnvSchema = z
     JWT_SECRET: z.string(),
 
     GAMES_DB_HOST: z.string(),
-    GAMES_DB_PORT: z.string().default('5432'),
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
@@ -45,7 +44,7 @@ const EnvSchema = z
     domain: raw.PUBLIC_DOMAIN,
 
     postgres: {
-      url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:${raw.GAMES_DB_PORT}/${raw.GAMES_DB_DATABASE}`,
+      url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
     },
 
     redis: {

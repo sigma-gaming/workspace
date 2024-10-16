@@ -7,7 +7,7 @@ export default defineConfig({
   dialect: 'postgresql',
   dbCredentials: {
     host: process.env.GAMES_DB_HOST!,
-    port: Number(process.env.GAMES_DB_PORT!),
+    port: 5432,
     user: process.env.GAMES_DB_USER!,
     password: process.env.GAMES_DB_PASSWORD!,
     database: process.env.GAMES_DB_DATABASE!,
