@@ -6,7 +6,7 @@ import { z } from 'zod'
 const EnvSchema = z
   .object({
     GAMES_DB_HOST: z.string(),
-    GAMES_DB_PORT: z.coerce.number().default(5432),
+    GAMES_DB_PORT: z.coerce.number().optional().default(5432),
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
