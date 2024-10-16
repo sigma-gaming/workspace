@@ -2,11 +2,11 @@ import 'reflect-metadata'
 import { migrateGamesDB } from '@dbs/games-db'
 import { loadEnv, parseEnv } from '@tooling/env'
 import { z } from 'zod'
-
+console.log(process.env)
 const EnvSchema = z
   .object({
     GAMES_DB_HOST: z.string(),
-    GAMES_DB_PORT: z.string().default('2345'),
+    GAMES_DB_PORT: z.string().default('5432'),
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
@@ -20,6 +20,7 @@ const EnvSchema = z
   })
 
 loadEnv({ root: process.cwd() })
+console.log(process.env)
 
 const { url } = parseEnv({
   source: process.env,

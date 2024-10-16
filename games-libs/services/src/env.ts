@@ -23,7 +23,7 @@ const EnvSchema = z
     JWT_SECRET: z.string(),
 
     GAMES_DB_HOST: z.string(),
-    GAMES_DB_PORT: z.coerce.number().default(5432),
+    GAMES_DB_PORT: z.string().default('5432'),
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
