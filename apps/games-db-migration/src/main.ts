@@ -11,9 +11,13 @@ const EnvSchema = z
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
   })
-  .transform((raw) => ({
-    url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:${raw.GAMES_DB_PORT}/${raw.GAMES_DB_DATABASE}`,
-  }))
+  .transform((raw) => {
+    console.log(raw)
+
+    return {
+      url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:${raw.GAMES_DB_PORT}/${raw.GAMES_DB_DATABASE}`,
+    }
+  })
 
 loadEnv({ root: process.cwd() })
 
