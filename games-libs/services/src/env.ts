@@ -22,7 +22,11 @@ const EnvSchema = z
     GAMES_TASKS_VERSION: z.string().default('unknown'),
     JWT_SECRET: z.string(),
 
-    POSTGRES_URL: z.string(),
+    GAMES_DB_HOST: z.string(),
+    GAMES_DB_PORT: z.coerce.number().default(5432),
+    GAMES_DB_DATABASE: z.string().default('postgres'),
+    GAMES_DB_USER: z.string(),
+    GAMES_DB_PASSWORD: z.string(),
     REDIS_HOST: z.string(),
     REDIS_PASSWORD: z.string(),
 
@@ -41,7 +45,7 @@ const EnvSchema = z
     domain: raw.PUBLIC_DOMAIN,
 
     postgres: {
-      url: raw.POSTGRES_URL,
+      url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:${raw.GAMES_DB_PORT}/${raw.GAMES_DB_DATABASE}`,
     },
 
     redis: {

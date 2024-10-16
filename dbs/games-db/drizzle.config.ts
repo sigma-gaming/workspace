@@ -6,7 +6,11 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.POSTGRES_URL!,
+    host: process.env.GAMES_DB_HOST!,
+    port: Number(process.env.GAMES_DB_PORT!),
+    user: process.env.GAMES_DB_USER!,
+    password: process.env.GAMES_DB_PASSWORD!,
+    database: process.env.GAMES_DB_DATABASE!,
   },
   verbose: true,
   strict: true,

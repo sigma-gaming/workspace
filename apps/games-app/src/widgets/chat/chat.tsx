@@ -3,11 +3,10 @@ import { ChatMessageType } from '@dbs/games-types'
 import { getUserInitials } from '@games/model'
 import { ActionIcon, Button, Skeleton } from '@mantine/core'
 import clsx from 'clsx'
-import dayjs from 'dayjs'
 import { useUnit } from 'effector-react'
-import plural from 'plural-ru'
 import { memo, UIEventHandler, useCallback, useEffect, useRef } from 'react'
 import { $$user } from '../../entities/user'
+import { useTimeAgo } from '../../shared/time'
 import { $$chatWidget, ExtendedMessage } from './model'
 
 export const Chat = () => {
@@ -178,30 +177,8 @@ const MessageList = () => {
   )
 }
 
-function formatTime(date: string) {
-  const seconds = dayjs().diff(dayjs(date), 'seconds')
-  if (seconds < 5) return 'только что'
-  if (seconds < 45)
-    return plural(seconds, '%d секунда', '%d секунды', '%d секунд') + ' назад'
-  const formatted = dayjs(date, { locale: 'ru' }).fromNow()
-  if (formatted.includes('несколько секунд')) return 'только что'
-  if (formatted === 'день назад') return 'вчера'
-  return formatted
-}
-
 const FormattedTime = memo(({ date }: { date: string }) => {
-  const textRef = useRef<HTMLSpanElement>(null)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!textRef.current) return
-      textRef.current.textContent = formatTime(date)
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [date])
-
-  return <span ref={textRef}>{formatTime(date)}</span>
+  return <span>{useTimeAgo(date)}</span>
 })
 
 const AVATAR_SIZE = 32

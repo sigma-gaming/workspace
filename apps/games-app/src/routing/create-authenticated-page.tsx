@@ -1,4 +1,4 @@
-import { useUnit } from 'effector-react/effector-react.mjs'
+import { useUnit } from 'effector-react'
 import { useLayoutEffect } from 'react'
 import { $$user } from '../entities/user'
 import { games } from './routes.ts'
