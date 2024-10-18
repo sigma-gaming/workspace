@@ -139,7 +139,7 @@ const LinkCardView = ({
   code?: string
   loading?: boolean
 }) => {
-  const link = `${env.referralRedirectApi.url}/?r=${code}`
+  const link = `${env.referralRedirectApi.url}/r/${code}`
 
   return (
     <Skeleton visible={loading}>
