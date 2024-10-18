@@ -69,7 +69,7 @@ app.get('/ready', async (res) => {
   })
 })
 
-app.get('/', async (res, req) => {
+app.get('/r/:code', async (res, req) => {
   let replied = false
 
   res.onAborted(() => {
@@ -88,7 +88,7 @@ app.get('/', async (res, req) => {
     })
   }
 
-  const code = req.getQuery('r')
+  const code = req.getParameter(0)
 
   if (!code) {
     wrapReply(() => {
