@@ -39,7 +39,18 @@ export class SessionService {
     this.env = envService.env
   }
 
-  getSessionVariant(token: string): SessionVariant {
+  getHonoToken(ctx: HonoContext): string | null {
+    const cookie = ctx.req.header('cookie')
+    if (!cookie) return null
+    const { session: token } = parse(cookie)
+    return token ?? null
+  }
+
+  getSessionVariant(token?: string | null): SessionVariant {
+    if (!token) {
+      return { state: SessionState.Empty, session: null }
+    }
+
     try {
       type Verified = SessionPayload & { exp: number; iat: number }
       const verified = jwt.verify(token, this.env.jwt.secret) as Verified
@@ -57,10 +68,6 @@ export class SessionService {
   }
 
   getSession = async (token?: string): Promise<Session> => {
-    if (!token) {
-      throw new NotAuthenticatedException()
-    }
-
     const variant = this.getSessionVariant(token)
 
     if (variant.state === SessionState.Expired)
@@ -77,14 +84,7 @@ export class SessionService {
     const saved = ctx.get('sessionVariant')
     if (saved) return saved
 
-    const cookie = ctx.req.header('cookie')
-
-    if (!cookie) {
-      return { state: SessionState.Empty, session: null }
-    }
-
-    const { session: token } = parse(cookie)
-
+    const token = this.getHonoToken(ctx)
     const variant = this.getSessionVariant(token)
     ctx.set('sessionVariant', variant)
     return variant
@@ -213,10 +213,7 @@ export class SessionService {
     )
   }
 
-  attachSession<E extends HonoEnvWithSession>(
-    ctx: HonoContext<E>,
-    session: Session,
-  ) {
+  attachSession(ctx: HonoContext, session: Session) {
     const expires = new Date(session.expiresAt)
 
     setCookie(ctx, 'session', session.token, {
@@ -245,7 +242,7 @@ export class SessionService {
     })
   }
 
-  detachSession<E extends HonoEnvWithSession>(ctx: HonoContext<E>) {
+  detachSession(ctx: HonoContext) {
     deleteCookie(ctx, 'session', {
       domain: this.env.domain,
       path: '/',
