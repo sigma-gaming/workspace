@@ -34,7 +34,7 @@ export const signInViaTelegramRoute = createRouter().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const session = ctx.get('session')
+    const sessionVariant = sessionService.getHonoSessionVariant(ctx)
     const referralCampaignCode = getCookie(ctx, 'referralCampaign')
 
     const tgAuthResult = TgAuthResultSchema.parse(
@@ -73,8 +73,8 @@ export const signInViaTelegramRoute = createRouter().post(
       throw new Error('tgAuthResult is already expired')
     }
 
-    const result = await authService.authenticate({
-      session,
+    const outcome = await authService.authenticate({
+      sessionVariant,
       provider: AccountProvider.Telegram,
       providerUserId: tgAuthResult.id,
       providerUsername: tgAuthResult.username,
@@ -84,13 +84,13 @@ export const signInViaTelegramRoute = createRouter().post(
       referralCampaignCode,
     })
 
-    if (result.result === AuthResult.ConnectedToAnotherUser) {
+    if (outcome.result === AuthResult.ConnectedToAnotherUser) {
       throw new BadRequestException({
         message: 'Аккаунт Telegram уже привязан к другому пользователю',
       })
     }
 
-    if (result.result === AuthResult.Connected) {
+    if (outcome.result === AuthResult.Connected) {
       void telegramBotService.messageUser(Number(tgAuthResult.id), [
         `Привет, ${tgAuthResult.first_name}!`,
         'Твой Telegram успешно привязан к аккаунту Sigma Games - наслаждайся бонусами =)',
@@ -102,7 +102,7 @@ export const signInViaTelegramRoute = createRouter().post(
       return ctx.json({ status: 'success' })
     }
 
-    if (result.result === AuthResult.SignedUp) {
+    if (outcome.result === AuthResult.SignedUp) {
       void telegramBotService.messageUser(Number(tgAuthResult.id), [
         `Добро пожаловать на Sigma Games, ${tgAuthResult.first_name}!`,
         'Мы автоматически привязали твой Telegram к аккаунту на сайте - наслаждайся бонусами =)',
@@ -112,13 +112,15 @@ export const signInViaTelegramRoute = createRouter().post(
       ])
     }
 
-    const newSession = await sessionService.createSession({
-      userId: result.account.userId,
+    const session = await sessionService.createSession({
+      userId: outcome.account.userId,
+      referrerId: outcome.user.referrerId,
+      referralCampaignId: outcome.user.referralCampaignId,
       provider: AccountProvider.Telegram,
     })
 
-    sessionService.attachSession(ctx, newSession)
-    fraudService.actualizeRisk(newSession.user.id, { ctx })
+    sessionService.attachSession(ctx, session)
+    fraudService.actualizeRisk(session.userId, { ctx })
 
     return ctx.json({ status: 'success' })
   },

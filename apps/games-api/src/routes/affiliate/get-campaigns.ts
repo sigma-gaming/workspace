@@ -14,9 +14,8 @@ export const getCampaingsRoute = createRouter().get(
     z.object({ offset: z.coerce.number().min(0).default(0) }),
   ),
   async (ctx) => {
-    const session = ctx.get('session')
-    const user = sessionService.getUser(session)
-    const settings = await affiliateService.getReferrerSettings(user.id)
+    const { userId } = sessionService.getHonoSession(ctx)
+    const settings = await affiliateService.getReferrerSettings(userId)
     const { offset } = ctx.req.valid('query')
 
     if (!settings) {
@@ -25,7 +24,7 @@ export const getCampaingsRoute = createRouter().get(
       })
     }
 
-    const where = eq(ReferralCampaignTable.referrerId, user.id)
+    const where = eq(ReferralCampaignTable.referrerId, userId)
 
     const campaigns = await gamesDb.query.ReferralCampaignTable.findMany({
       where,

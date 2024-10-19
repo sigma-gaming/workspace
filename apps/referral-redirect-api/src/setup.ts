@@ -10,11 +10,11 @@ container.register(LoggerOptionsToken, {
 })
 
 container.register(DbOptionsToken, {
-  useValue: { url: env.postgres.url, logger: env.isDev },
+  useValue: { url: env.gamesDb.url, logger: env.isDev },
 })
 
 container.register(RedisOptionsToken, {
-  useValue: { host: env.redis.host, password: env.redis.password },
+  useValue: { host: env.gamesRedis.host, password: env.gamesRedis.password },
 })
 
 container.register(CacheVersionToken, {

@@ -31,7 +31,7 @@ export class LocksService {
   }
 
   sessionRefreshed(token: string) {
-    return gamesCaches.sessionRefreshed.lock(token, 3000)
+    return gamesCaches.sessionRefreshing.lock(token, 3000)
   }
 
   globalTaskStatus(taskKey: GlobalTaskKey, userId: string) {

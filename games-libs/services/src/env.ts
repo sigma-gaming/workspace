@@ -26,8 +26,8 @@ const EnvSchema = z
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
-    REDIS_HOST: z.string(),
-    REDIS_PASSWORD: z.string(),
+    GAMES_REDIS_HOST: z.string(),
+    GAMES_REDIS_PASSWORD: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
@@ -43,13 +43,13 @@ const EnvSchema = z
     stage: raw.PUBLIC_STAGE,
     domain: raw.PUBLIC_DOMAIN,
 
-    postgres: {
+    gamesDb: {
       url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
     },
 
-    redis: {
-      host: raw.REDIS_HOST,
-      password: raw.REDIS_PASSWORD,
+    gamesRedis: {
+      host: raw.GAMES_REDIS_HOST,
+      password: raw.GAMES_REDIS_PASSWORD,
     },
 
     gamesApp: {

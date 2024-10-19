@@ -22,15 +22,14 @@ export const updateProfileRoute = createRouter().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const session = ctx.get('session')
-    const user = sessionService.getUser(session)
+    const { userId } = sessionService.getHonoSession(ctx)
 
     if (payload.username) {
       const currentProfile = await gamesDb.query.ProfileTable.findFirst({
         where: eq(ProfileTable.username, payload.username),
       })
 
-      if (currentProfile && currentProfile.userId !== user.id)
+      if (currentProfile && currentProfile.userId !== userId)
         throw new BadRequestException({
           path: ['username'],
           message: 'Пользователь с таким никнеймом уже существует',
@@ -38,7 +37,7 @@ export const updateProfileRoute = createRouter().post(
     }
 
     const accounts = await gamesDb.query.AccountTable.findMany({
-      where: eq(AccountTable.userId, user.id),
+      where: eq(AccountTable.userId, userId),
     })
 
     const selectedProvider = accounts.find(
@@ -73,15 +72,14 @@ export const updateProfileRoute = createRouter().post(
     const [profile] = await gamesDb
       .update(ProfileTable)
       .set(updates)
-      .where(eq(ProfileTable.userId, user.id))
+      .where(eq(ProfileTable.userId, userId))
       .returning()
 
-    await gamesCaches.detailedProfile.del(user.id)
+    await gamesCaches.detailedProfile.del(userId)
 
     return ctx.json({
       status: 'success',
-      detailedProfile: await profileService.getDetailedProfile(user.id, {
-        user,
+      detailedProfile: await profileService.getDetailedProfile(userId, {
         profile,
       }),
     })

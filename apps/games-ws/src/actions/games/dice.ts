@@ -15,11 +15,11 @@ export const GamesDiceAction = createWsAction({
     }
 
     const { record, updatedBalance } = await Engine.playDice({
-      userId: session.user.id,
+      userId: session.userId,
       payload,
     })
 
-    ctx.socket.to(userRoom(session.user.id)).emit('balance/updated', {
+    ctx.socket.to(userRoom(session.userId)).emit('balance/updated', {
       available: updatedBalance,
     })
 

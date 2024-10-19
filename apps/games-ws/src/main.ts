@@ -4,7 +4,7 @@ import { shutdownServices } from '@core/di'
 import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
 import { gamesPubsubs, gamesRedis, maintenanceCache } from '@games/redis'
-import { env, profileService, sessionService } from '@games/services'
+import { env, sessionService } from '@games/services'
 import { parse } from 'cookie'
 import { App, SSLApp } from 'uWebSockets.js'
 import { GamesDiceAction } from './actions/games/dice'
@@ -31,8 +31,7 @@ io.attachApp(app)
 
 io.on('connection', async (socket) => {
   const cookie = parse(socket.handshake.headers.cookie ?? '')
-  const session = await sessionService.getSession(cookie.session)
-  const user = sessionService.getUserSafe(session)
+  const { session } = sessionService.getSessionVariant(cookie.session)
 
   const context: Context = {
     url: new URL(env.gamesWs.url),
@@ -40,16 +39,9 @@ io.on('connection', async (socket) => {
     socket,
   }
 
-  if (user) {
-    const profile = await profileService.getDetailedProfile(user.id)
-
-    context.session = {
-      session,
-      user,
-      profile,
-    }
-
-    socket.join(userRoom(user.id))
+  if (session) {
+    context.session = session
+    socket.join(userRoom(session.userId))
   }
 
   /**

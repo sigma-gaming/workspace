@@ -2,8 +2,7 @@ import { profileService, sessionService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const getDetailedProfileRoute = createRouter().get('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
-  const profile = await profileService.getDetailedProfile(user.id, { user })
+  const { userId } = sessionService.getHonoSession(ctx)
+  const profile = await profileService.getDetailedProfile(userId)
   return ctx.json(profile)
 })

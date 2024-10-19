@@ -4,7 +4,7 @@ import { gamesDb } from '@dbs/games-db'
 import { PromocodeTable } from '@dbs/games-schema'
 import { PromocodeBonus, PromocodeBonusType, UserRole } from '@dbs/games-types'
 import { gemInt } from '@games/model'
-import { promocodeService, roleService } from '@games/services'
+import { promocodeService, roleService, userService } from '@games/services'
 import { count, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 import { createRouter } from '../../hono'
@@ -27,7 +27,8 @@ export const createRoute = createRouter().post(
     }),
   ),
   async (ctx) => {
-    const user = ctx.get('user')
+    const session = ctx.get('session')
+    const user = await userService.getUser(session.userId)
     roleService.assert(user, UserRole.Admin)
 
     const payload = ctx.req.valid('json')

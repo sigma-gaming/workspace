@@ -12,9 +12,8 @@ import { and, desc, eq, getTableColumns } from 'drizzle-orm'
 import { createRouter } from '../../hono'
 
 export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
-  const settings = await affiliateService.getReferrerSettings(user.id)
+  const { userId } = sessionService.getHonoSession(ctx)
+  const settings = await affiliateService.getReferrerSettings(userId)
 
   if (!settings) {
     throw new BadRequestException({
@@ -22,14 +21,14 @@ export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
     })
   }
 
-  const cached = await gamesCaches.lastReferrerTransactions.get(user.id)
+  const cached = await gamesCaches.lastReferrerTransactions.get(userId)
 
   if (cached) {
     return ctx.json(cached)
   }
 
   const payout = await gamesDb.query.ReferrerPayoutTable.findFirst({
-    where: eq(ReferrerPayoutTable.referrerId, user.id),
+    where: eq(ReferrerPayoutTable.referrerId, userId),
   })
 
   if (!payout) {
@@ -51,7 +50,7 @@ export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
     )
     .where(
       and(
-        eq(ReferrerTransactionTable.referrerId, user.id),
+        eq(ReferrerTransactionTable.referrerId, userId),
         eq(ReferrerTransactionTable.isProcessed, false),
       ),
     )
@@ -62,7 +61,7 @@ export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
     0,
   )
 
-  await gamesCaches.lastReferrerTransactions.set(user.id, {
+  await gamesCaches.lastReferrerTransactions.set(userId, {
     transactions,
     totalAmount,
   })

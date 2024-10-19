@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node'
 import { MiddlewareHandler } from 'hono'
-import { GamesApiEnv } from '../../hono'
-import { sentry } from './init'
+import { GamesApiEnv } from '../hono'
+import { sentry } from '../shared/sentry'
 
 type Options = {
   enabled?: boolean
@@ -21,7 +21,7 @@ export const sentryMiddleware =
       return next()
     }
 
-    const user = ctx.get('user')
+    const sessionVariant = ctx.get('sessionVariant')
 
     return Sentry.continueTrace({ sentryTrace: traceId, baggage }, () => {
       const url = new URL(ctx.req.url)
@@ -34,7 +34,7 @@ export const sentryMiddleware =
             'http.query': url.search,
             'http.request.method': ctx.req.method,
             'server.address': url.hostname,
-            'user.id': user?.id,
+            'user.id': sessionVariant.session?.userId,
           },
         },
         async (span) => {

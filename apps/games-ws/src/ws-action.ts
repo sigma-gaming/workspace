@@ -91,8 +91,7 @@ export const withTracing = <TInput, TOutput>(
           op: 'ws.action',
           attributes: {
             'server.address': ctx.url.hostname,
-            'user.id': ctx.session?.user?.id,
-            'user.username': ctx.session?.profile?.username ?? undefined,
+            'user.id': ctx.session?.userId,
           },
         },
         async (span) => {

@@ -4,28 +4,28 @@ import {
   SessionExpiredException,
 } from '@core/exceptions'
 import { gamesDb } from '@dbs/games-db'
-import { SessionTable, UserSelect, UserTable } from '@dbs/games-schema'
-import { AccountProvider } from '@dbs/games-types'
-import { Session, SessionState } from '@games/model'
+import { SessionTable } from '@dbs/games-schema'
+import {
+  Session,
+  SessionPayload,
+  SessionState,
+  SessionVariant,
+} from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { parse } from 'cookie'
 import { and, desc, eq, inArray } from 'drizzle-orm'
 import { Context as HonoContext } from 'hono'
 import { deleteCookie, setCookie } from 'hono/cookie'
-import jwt, { TokenExpiredError, verify } from 'jsonwebtoken'
+import jwt, { TokenExpiredError } from 'jsonwebtoken'
 import { singleton } from 'tsyringe-neo'
 import { Env, EnvService } from './env'
 import { LocksService } from './locks'
+import { userService } from './user'
 
 type HonoEnvWithSession = {
   Variables: {
-    session?: Session
+    sessionVariant?: SessionVariant
   }
-}
-
-type AddSessionOptions = {
-  userId: string
-  provider: AccountProvider
 }
 
 @singleton()
@@ -39,96 +39,74 @@ export class SessionService {
     this.env = envService.env
   }
 
-  getSession = async (token?: string): Promise<Session> => {
-    if (!token) {
-      return { state: SessionState.Empty, user: null }
-    }
-
-    const cached = await gamesCaches.session.get(token)
-
-    if (cached) {
-      return cached
-    }
-
+  getSessionVariant(token: string): SessionVariant {
     try {
-      verify(token, this.env.jwt.secret)
+      type Verified = SessionPayload & { exp: number; iat: number }
+      const verified = jwt.verify(token, this.env.jwt.secret) as Verified
+      const { exp, iat, ...payload } = verified
+      const expiresAt = new Date(exp * 1000).toISOString()
+      const session: Session = { ...payload, token, expiresAt }
+      return { state: SessionState.Authenticated, session }
     } catch (error) {
-      const state =
-        error instanceof TokenExpiredError
-          ? SessionState.Expired
-          : SessionState.Empty
+      if (error instanceof TokenExpiredError) {
+        return { state: SessionState.Expired, session: null }
+      }
 
-      return await gamesCaches.session.set(token, {
-        state,
-        user: null,
-        token,
-      })
+      return { state: SessionState.Empty, session: null }
     }
-
-    const session = await gamesDb.query.SessionTable.findFirst({
-      where: eq(SessionTable.token, token),
-      with: { user: true },
-    })
-
-    if (!session) {
-      return await gamesCaches.session.set(token, {
-        state: SessionState.Empty,
-        user: null,
-      })
-    }
-
-    const created = await gamesCaches.session.set(token, {
-      state: SessionState.Authenticated,
-      user: session.user,
-      token,
-      expiresAt: session.expiresAt,
-      provider: session.provider,
-    })
-
-    return created
   }
 
-  getHonoSession = async <E extends HonoEnvWithSession>(
+  getSession = async (token?: string): Promise<Session> => {
+    if (!token) {
+      throw new NotAuthenticatedException()
+    }
+
+    const variant = this.getSessionVariant(token)
+
+    if (variant.state === SessionState.Expired)
+      throw new SessionExpiredException()
+    if (variant.state === SessionState.Empty)
+      throw new NotAuthenticatedException()
+
+    return variant.session
+  }
+
+  getHonoSessionVariant = <E extends HonoEnvWithSession>(
     ctx: HonoContext<E>,
-  ): Promise<Session> => {
-    const saved = ctx.get('session')
+  ): SessionVariant => {
+    const saved = ctx.get('sessionVariant')
     if (saved) return saved
 
     const cookie = ctx.req.header('cookie')
 
     if (!cookie) {
-      return { state: SessionState.Empty, user: null }
+      return { state: SessionState.Empty, session: null }
     }
 
     const { session: token } = parse(cookie)
 
-    return this.getSession(token)
+    const variant = this.getSessionVariant(token)
+    ctx.set('sessionVariant', variant)
+    return variant
   }
 
-  getUser = (session: Session): UserSelect => {
-    if (session.state === SessionState.Expired)
+  getHonoSession = <E extends HonoEnvWithSession>(ctx: HonoContext<E>) => {
+    const variant = this.getHonoSessionVariant(ctx)
+    if (variant.state === SessionState.Expired)
       throw new SessionExpiredException()
-    if (session.state === SessionState.Empty)
+    if (variant.state === SessionState.Empty)
       throw new NotAuthenticatedException()
-    return session.user
+    return variant.session
   }
 
-  getUserSafe = (session: Session): UserSelect | null => {
-    if (session.state === SessionState.Expired) return null
-    if (session.state === SessionState.Empty) return null
-    return session.user
-  }
-
-  async createSession(options: AddSessionOptions) {
-    const { userId, provider } = options
+  async createSession(payload: SessionPayload): Promise<Session> {
+    const { userId } = payload
 
     const expiresIn = 60 * 60 * 24 * 31
     const expiresAt = new Date(Date.now() + 1000 * expiresIn)
-    const token = jwt.sign({ userId }, this.env.jwt.secret, { expiresIn })
+    const token = jwt.sign(payload, this.env.jwt.secret, { expiresIn })
 
-    const user = await gamesDb.query.UserTable.findFirst({
-      where: eq(UserTable.id, userId),
-    })
+    const user = await userService.getUserSafe(userId)
 
     if (!user) {
       throw new NotAuthenticatedException()
@@ -138,18 +116,14 @@ export class SessionService {
       userId,
       token,
       expiresAt: expiresAt.toISOString(),
-      provider,
+      provider: payload.provider,
     })
 
     const session: Session = {
-      state: SessionState.Authenticated,
-      user,
+      ...payload,
       token,
       expiresAt: expiresAt.toISOString(),
-      provider,
     }
-
-    await gamesCaches.session.set(token, session)
 
     const extraSessions = await gamesDb.query.SessionTable.findMany({
       where: and(
@@ -172,19 +146,34 @@ export class SessionService {
     return session
   }
 
+  async removeSession(session: Session) {
+    if (session.token) {
+      try {
+        await gamesDb
+          .delete(SessionTable)
+          .where(eq(SessionTable.token, session.token))
+      } catch {
+        // Session doesn't exist
+      }
+
+      await gamesCaches.user.del(session.token)
+      await gamesCaches.sessionRefreshing.del(session.token)
+    }
+  }
+
   async refreshSession<E extends HonoEnvWithSession>(
     ctx: HonoContext<E>,
     options: {
-      condition: (
-        session: Session & { state: SessionState.Authenticated },
-      ) => boolean
+      condition: (session: Session) => boolean
     },
   ) {
-    const session = ctx.get('session')
+    const variant = this.getHonoSessionVariant(ctx)
 
-    if (session?.state !== SessionState.Authenticated) {
+    if (variant.state !== SessionState.Authenticated) {
       return
     }
+
+    const session = variant.session
 
     if (!options.condition(session)) {
       return
@@ -193,7 +182,7 @@ export class SessionService {
     await this.locks.with(
       [this.locks.sessionRefreshed(session.token)],
       async () => {
-        const isRefreshed = await gamesCaches.sessionRefreshed.exists(
+        const isRefreshed = await gamesCaches.sessionRefreshing.exists(
           session.token,
         )
 
@@ -207,14 +196,11 @@ export class SessionService {
           .set({ preventAutoDelete: true })
           .where(eq(SessionTable.token, session.token))
 
-        const newSession = await this.createSession({
-          userId: session.user.id,
-          provider: session.provider,
-        })
+        const newSession = await this.createSession(session)
 
         this.attachSession(ctx, newSession)
 
-        await gamesCaches.sessionRefreshed.set(session.token, true)
+        await gamesCaches.sessionRefreshing.set(session.token, true)
 
         /**
          * Remove the old session after 10 seconds to prevent breaking..
@@ -231,10 +217,6 @@ export class SessionService {
     ctx: HonoContext<E>,
     session: Session,
   ) {
-    if (session.state !== SessionState.Authenticated) {
-      return
-    }
-
     const expires = new Date(session.expiresAt)
 
     setCookie(ctx, 'session', session.token, {
@@ -261,21 +243,6 @@ export class SessionService {
       sameSite: 'lax',
       secure: true,
     })
-  }
-
-  async removeSession(session: Session) {
-    if (session.token) {
-      try {
-        await gamesDb
-          .delete(SessionTable)
-          .where(eq(SessionTable.token, session.token))
-      } catch {
-        // Session doesn't exist
-      }
-
-      await gamesCaches.session.del(session.token)
-      await gamesCaches.sessionRefreshed.del(session.token)
-    }
   }
 
   detachSession<E extends HonoEnvWithSession>(ctx: HonoContext<E>) {

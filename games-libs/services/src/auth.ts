@@ -1,4 +1,5 @@
 import { createSingletonProxy } from '@core/di'
+import { InternalServerException } from '@core/exceptions'
 import { gamesDb } from '@dbs/games-db'
 import {
   AccountInsert,
@@ -7,15 +8,17 @@ import {
   BalanceTable,
   ProfileTable,
   UserSecurityTable,
+  UserSelect,
   UserTable,
 } from '@dbs/games-schema'
 import { AccountProvider } from '@dbs/games-types'
-import { getUserFullName, Session } from '@games/model'
+import { getUserFullName, SessionVariant } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { and, eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
 import { affiliateService } from './affiliate'
 import { Env, EnvService } from './env'
+import { userService } from './user'
 
 export enum AuthResult {
   SignedIn = 'signed-in',
@@ -25,7 +28,7 @@ export enum AuthResult {
 }
 
 type AuthenticatePayload = {
-  session: Session
+  sessionVariant: SessionVariant
   provider: AccountProvider
   providerUserId: string
   providerUsername?: string
@@ -35,9 +38,9 @@ type AuthenticatePayload = {
   referralCampaignCode?: string
 }
 
-type AuthenticateOutput =
-  | { result: AuthResult.SignedIn; account: AccountSelect }
-  | { result: AuthResult.SignedUp; account: AccountSelect }
+type AuthenticateOutcome =
+  | { result: AuthResult.SignedIn; user: UserSelect; account: AccountSelect }
+  | { result: AuthResult.SignedUp; user: UserSelect; account: AccountSelect }
   | { result: AuthResult.Connected }
   | { result: AuthResult.ConnectedToAnotherUser }
 
@@ -50,7 +53,7 @@ export class AuthService {
   }
 
   async authenticate({
-    session: currentSession,
+    sessionVariant,
     provider,
     providerUserId,
     providerUsername,
@@ -58,21 +61,13 @@ export class AuthService {
     providerUserLastName,
     providerUserImage,
     referralCampaignCode,
-  }: AuthenticatePayload): Promise<AuthenticateOutput> {
-    let account = await gamesDb.query.AccountTable.findFirst({
+  }: AuthenticatePayload): Promise<AuthenticateOutcome> {
+    const account = await gamesDb.query.AccountTable.findFirst({
       where: and(
         eq(AccountTable.provider, provider),
         eq(AccountTable.providerUserId, providerUserId),
       ),
     })
-
-    if (currentSession.user && account) {
-      if (currentSession.user.id !== account.userId) {
-        return { result: AuthResult.ConnectedToAnotherUser }
-      }
-
-      return { result: AuthResult.SignedIn, account }
-    }
 
     const accountSharedInput: Omit<AccountInsert, 'userId'> = {
       provider,
@@ -90,37 +85,74 @@ export class AuthService {
       }
     }
 
-    /**
-     * If user is logged in and account is not found, create account and connect it to user
-     */
-    if (currentSession.user && !account) {
+    if (sessionVariant.session) {
+      const { userId } = sessionVariant.session
+
+      if (account) {
+        if (userId !== account.userId) {
+          return { result: AuthResult.ConnectedToAnotherUser }
+        }
+
+        const user = await userService.getUserSafe(userId)
+
+        if (!user) {
+          const cause = new Error('User of Account not found')
+          throw new InternalServerException({ cause })
+        }
+
+        return { result: AuthResult.SignedIn, user, account }
+      }
+
+      /**
+       * The account is not found, but the user is logged in
+       * Create account and connect it to current user
+       */
+
       await gamesDb.insert(AccountTable).values({
-        userId: currentSession.user.id,
+        userId,
         ...accountSharedInput,
       })
 
-      await gamesCaches.detailedProfile.del(currentSession.user.id)
+      await gamesCaches.detailedProfile.del(userId)
 
       return { result: AuthResult.Connected }
     }
 
     /**
-     * If user is not logged in and account is not found, perform registration
+     * The user is not logged in, but the account is found
+     * Sign in to the account
      */
-    if (!account) {
-      let referrerId: string | null | undefined
-      let referralCampaignId: number | undefined
 
-      if (referralCampaignCode) {
-        const referralCampaign =
-          await affiliateService.getCampaign(referralCampaignCode)
+    if (account) {
+      const user = await userService.getUserSafe(account.userId)
 
-        referrerId = referralCampaign?.referrerId
-        referralCampaignId = referralCampaign?.id
+      if (!user) {
+        const cause = new Error('User of Account not found')
+        throw new InternalServerException({ cause })
       }
 
-      account = await gamesDb.transaction(async (tx) => {
-        const [{ id: userId }] = await tx
+      return { result: AuthResult.SignedIn, user, account }
+    }
+
+    /**
+     * The user is not logged in and the account is not found
+     * Perform registration
+     */
+
+    let referrerId: string | null | undefined
+    let referralCampaignId: number | undefined
+
+    if (referralCampaignCode) {
+      const referralCampaign =
+        await affiliateService.getCampaign(referralCampaignCode)
+
+      referrerId = referralCampaign?.referrerId
+      referralCampaignId = referralCampaign?.id
+    }
+
+    const { createdUser, createdAccount } = await gamesDb.transaction(
+      async (tx) => {
+        const [createdUser] = await tx
           .insert(UserTable)
           .values({ referrerId, referralCampaignId })
           .returning()
@@ -128,27 +160,27 @@ export class AuthService {
         const [{ id: profileId }] = await tx
           .insert(ProfileTable)
           .values({
-            userId,
+            userId: createdUser.id,
             usedProvider: provider,
             name: getUserFullName(providerUserFirstName, providerUserLastName),
             image: providerUserImage,
           })
           .returning()
 
-        await tx.insert(BalanceTable).values({ userId })
+        await tx.insert(BalanceTable).values({ userId: createdUser.id })
 
         await tx
           .update(UserTable)
           .set({ profileId })
-          .where(eq(UserTable.id, userId))
+          .where(eq(UserTable.id, createdUser.id))
 
-        const [account] = await tx
+        const [createdAccount] = await tx
           .insert(AccountTable)
-          .values({ userId, ...accountSharedInput })
+          .values({ userId: createdUser.id, ...accountSharedInput })
           .returning()
 
         await tx.insert(UserSecurityTable).values({
-          userId,
+          userId: createdUser.id,
         })
 
         if (referralCampaignId) {
@@ -158,13 +190,17 @@ export class AuthService {
           })
         }
 
-        return account
-      })
+        return { createdUser, createdAccount }
+      },
+    )
 
-      return { result: AuthResult.SignedUp, account }
+    await gamesCaches.user.set(createdUser.id, createdUser)
+
+    return {
+      result: AuthResult.SignedUp,
+      user: createdUser,
+      account: createdAccount,
     }
-
-    return { result: AuthResult.SignedIn, account }
   }
 }
 

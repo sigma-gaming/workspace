@@ -5,11 +5,10 @@ import { affiliateService, locks, sessionService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const connectRoute = createRouter().post('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
+  const { userId } = sessionService.getHonoSession(ctx)
 
-  return locks.with([locks.referrerBalance(user.id)], async () => {
-    const existingSettings = await affiliateService.getReferrerSettings(user.id)
+  return locks.with([locks.referrerBalance(userId)], async () => {
+    const existingSettings = await affiliateService.getReferrerSettings(userId)
 
     if (existingSettings) {
       throw new BadRequestException({
@@ -21,7 +20,7 @@ export const connectRoute = createRouter().post('/', async (ctx) => {
       await tx
         .insert(ReferrerSettingsTable)
         .values({
-          referrerId: user.id,
+          referrerId: userId,
           revShare: 25,
         })
         .returning()
@@ -29,7 +28,7 @@ export const connectRoute = createRouter().post('/', async (ctx) => {
       await tx
         .insert(ReferrerBalanceTable)
         .values({
-          referrerId: user.id,
+          referrerId: userId,
           available: 0,
         })
         .returning()
@@ -37,14 +36,14 @@ export const connectRoute = createRouter().post('/', async (ctx) => {
       await affiliateService.createReferralCampaign({
         tx,
         payload: {
-          referrerId: user.id,
+          referrerId: userId,
           name: 'Основная кампания',
         },
       })
 
       await affiliateService.createReferrerPayout({
         tx,
-        referrerId: user.id,
+        referrerId: userId,
       })
     })
 

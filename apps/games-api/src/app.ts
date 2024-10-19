@@ -2,6 +2,7 @@ import { env } from '@games/services'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { createRouter } from './hono'
+import { sentryMiddleware } from './middlewares/sentry'
 import { sessionMiddleware } from './middlewares/session'
 import { affiliateRouter } from './routes/affiliate'
 import { authRouter } from './routes/auth'
@@ -14,7 +15,6 @@ import { notificationsRouter } from './routes/notifications'
 import { promocodesRouter } from './routes/promocodes'
 import { settingsRouter } from './routes/settings'
 import { tasksRouter } from './routes/tasks'
-import { sentryMiddleware } from './shared/sentry'
 
 export const app = createRouter()
   .use(

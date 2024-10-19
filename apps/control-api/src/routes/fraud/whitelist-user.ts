@@ -1,6 +1,6 @@
 import { zValidator } from '@core/server'
 import { UserRole } from '@dbs/games-types'
-import { fraudService, roleService } from '@games/services'
+import { fraudService, roleService, userService } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../../hono'
 
@@ -13,7 +13,8 @@ export const whitelistUserRoute = createRouter().post(
     }),
   ),
   async (ctx) => {
-    const user = ctx.get('user')
+    const session = ctx.get('session')
+    const user = await userService.getUser(session.userId)
     roleService.assert(user, [UserRole.Admin, UserRole.Support])
 
     const payload = ctx.req.valid('json')

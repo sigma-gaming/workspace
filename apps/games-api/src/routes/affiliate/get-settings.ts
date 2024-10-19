@@ -3,9 +3,8 @@ import { affiliateService, sessionService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const getSettingsRoute = createRouter().get('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
-  const settings = await affiliateService.getReferrerSettings(user.id)
+  const { userId } = sessionService.getHonoSession(ctx)
+  const settings = await affiliateService.getReferrerSettings(userId)
 
   if (!settings) {
     throw new BadRequestException({

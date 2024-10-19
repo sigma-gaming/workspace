@@ -11,14 +11,13 @@ import {
 import { createRouter } from '../../hono'
 
 export const withdrawRoute = createRouter().post('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
+  const { userId } = sessionService.getHonoSession(ctx)
 
   const { updatedBalance, updatedReferrerBalance } = await locks.with(
-    [locks.balance(user.id), locks.referrerBalance(user.id)],
+    [locks.balance(userId), locks.referrerBalance(userId)],
     async () => {
-      const balance = await balanceService.getBalance(user.id)
-      const referrerBalance = await affiliateService.getReferrerBalance(user.id)
+      const balance = await balanceService.getBalance(userId)
+      const referrerBalance = await affiliateService.getReferrerBalance(userId)
 
       if (!referrerBalance) {
         throw new BadRequestException({
@@ -37,7 +36,7 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
           const transaction = await balanceService.createTransaction({
             tx,
             payload: {
-              userId: user.id,
+              userId,
               type: TransactionType.Transfer,
               amount: referrerBalance.available,
             },
@@ -51,19 +50,19 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
 
           await affiliateService.createReferrerWithdrawal({
             tx,
-            referrerId: user.id,
+            referrerId: userId,
             amount: referrerBalance.available,
           })
 
           const updatedReferrerBalance =
             await affiliateService.updateReferrerBalance({
               tx,
-              referrerId: user.id,
+              referrerId: userId,
               available: 0,
             })
 
-          await gamesCaches.balance.set(user.id, updatedBalance)
-          await gamesCaches.referrerBalance.set(user.id, updatedReferrerBalance)
+          await gamesCaches.balance.set(userId, updatedBalance)
+          await gamesCaches.referrerBalance.set(userId, updatedReferrerBalance)
 
           return { updatedBalance, updatedReferrerBalance }
         })

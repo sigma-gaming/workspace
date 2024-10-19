@@ -10,7 +10,6 @@ import {
   ReferrerSettingsTable,
   ReferrerTransactionTable,
   ReferrerWithdrawalTable,
-  UserSelect,
 } from '@dbs/games-schema'
 import { ReferralAction } from '@dbs/games-types'
 import { gamesCaches } from '@games/redis'
@@ -220,17 +219,20 @@ export class AffiliateService {
 
   async processReferralTransaction({
     tx,
-    referral,
+    referralId,
+    referrerId,
+    referralCampaignId,
     referralAction,
     amount,
   }: {
     tx?: typeof gamesDb
-    referral: UserSelect
+    referralId: string
+    referrerId: string | null
+    referralCampaignId: number | null
     referralAction: ReferralAction
     amount: number
   }) {
     const db = tx ?? gamesDb
-    const { referrerId, referralCampaignId } = referral
 
     if (!referrerId) {
       return
@@ -248,7 +250,7 @@ export class AffiliateService {
       referrerId,
       referralAction,
       referralCampaignId,
-      referralId: referral.id,
+      referralId,
       amount: finalAmount,
     })
 

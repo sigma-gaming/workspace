@@ -13,13 +13,13 @@ import {
 import { createRouter } from '../../hono'
 
 export const withdrawRoute = createRouter().post('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
+  const { userId, referrerId, referralCampaignId } =
+    sessionService.getHonoSession(ctx)
   const amount = -1000_000
   const positiveAmount = Math.abs(amount)
 
-  return await locks.with([locks.balance(user.id)], async () => {
-    const risk = await fraudService.actualizeRisk(user.id, { ctx })
+  return await locks.with([locks.balance(userId)], async () => {
+    const risk = await fraudService.actualizeRisk(userId, { ctx })
 
     if (risk === FraudRisk.High) {
       throw new BadRequestException({
@@ -27,7 +27,7 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
       })
     }
 
-    const balance = await balanceService.getBalance(user.id)
+    const balance = await balanceService.getBalance(userId)
 
     if (balance.available < positiveAmount) {
       throw new BadRequestException({
@@ -47,7 +47,7 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
         payload: {
           type: TransactionType.Withdrawal,
           amount,
-          userId: user.id,
+          userId,
         },
       })
 
@@ -59,12 +59,14 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
 
       await affiliateService.processReferralTransaction({
         tx,
-        referral: user,
+        referralId: userId,
+        referrerId,
+        referralCampaignId,
         referralAction: ReferralAction.Withdrawal,
         amount,
       })
 
-      await gamesCaches.balance.set(user.id, updatedBalance)
+      await gamesCaches.balance.set(userId, updatedBalance)
 
       return updatedBalance
     })

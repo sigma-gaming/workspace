@@ -10,18 +10,18 @@ import {
 import { createRouter } from '../../hono'
 
 export const depositRoute = createRouter().post('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
+  const { userId, referrerId, referralCampaignId } =
+    sessionService.getHonoSession(ctx)
   const amount = 1000_000
 
-  return locks.with([locks.balance(user.id)], async () => {
-    const balance = await balanceService.getBalance(user.id)
+  return locks.with([locks.balance(userId)], async () => {
+    const balance = await balanceService.getBalance(userId)
 
     const updatedBalance = await gamesDb.transaction(async (tx) => {
       const transaction = await balanceService.createTransaction({
         tx,
         payload: {
-          userId: user.id,
+          userId,
           type: TransactionType.Deposit,
           amount,
         },
@@ -36,12 +36,14 @@ export const depositRoute = createRouter().post('/', async (ctx) => {
 
       await affiliateService.processReferralTransaction({
         tx,
-        referral: user,
+        referralId: userId,
+        referrerId,
+        referralCampaignId,
         referralAction: ReferralAction.Deposit,
         amount,
       })
 
-      await gamesCaches.balance.set(user.id, updatedBalance)
+      await gamesCaches.balance.set(userId, updatedBalance)
 
       return updatedBalance
     })

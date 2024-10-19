@@ -3,11 +3,11 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
 const psql = postgres({
-  host: String(process.env.POSTGRES_HOST),
-  port: Number(process.env.POSTGRES_PORT),
-  user: String(process.env.POSTGRES_USER),
-  password: String(process.env.POSTGRES_PASSWORD),
-  database: String(process.env.POSTGRES_DATABASE),
+  host: String(process.env.GAMES_DB_HOST),
+  port: 5432,
+  user: String(process.env.GAMES_DB_USER),
+  password: String(process.env.GAMES_DB_PASSWORD),
+  database: String(process.env.GAMES_DB_DATABASE),
   max: 1,
 })
 

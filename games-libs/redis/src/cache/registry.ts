@@ -8,13 +8,13 @@ import {
   PromocodeSelect,
   ReferrerBalanceSelect,
   ReferrerSettingsSelect,
+  UserSelect,
 } from '@dbs/games-schema'
 import { TaskStatus } from '@dbs/games-types'
 import {
   ChatMessageDetailed,
   ProfileDetailed,
   ReferrerTransactionDetailed,
-  Session,
 } from '@games/model'
 import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe-neo'
 import { GlobalJsonEntityService, KeyJsonEntityService } from './entity-json'
@@ -36,8 +36,8 @@ export class CacheRegistry {
   budgetAvailable: GlobalNumberEntityService
   budgetSyncedAt: GlobalStringEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
-  session: KeyJsonEntityService<Session>
-  sessionRefreshed: KeyJsonEntityService<true>
+  user: KeyJsonEntityService<UserSelect>
+  sessionRefreshing: KeyJsonEntityService<true>
   balance: KeyJsonEntityService<BalanceSelect>
   referrerBalance: KeyJsonEntityService<ReferrerBalanceSelect>
   referrerSettings: KeyJsonEntityService<ReferrerSettingsSelect>
@@ -72,11 +72,11 @@ export class CacheRegistry {
       keygen: (token: string) => `${version}:detailedProfile:${token}`,
     })
 
-    this.session = new KeyJsonEntityService<Session>({
-      keygen: (token: string) => `${version}:session:${token}`,
+    this.user = new KeyJsonEntityService<UserSelect>({
+      keygen: (userId: string) => `${version}:user:${userId}`,
     })
 
-    this.sessionRefreshed = new KeyJsonEntityService<true>({
+    this.sessionRefreshing = new KeyJsonEntityService<true>({
       keygen: (token: string) => `${version}:refreshedSession:${token}`,
     })
 

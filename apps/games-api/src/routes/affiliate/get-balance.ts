@@ -3,9 +3,8 @@ import { affiliateService, sessionService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const getBalanceRoute = createRouter().get('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
-  const balance = await affiliateService.getReferrerBalance(user.id)
+  const { userId } = sessionService.getHonoSession(ctx)
+  const balance = await affiliateService.getReferrerBalance(userId)
 
   if (!balance) {
     throw new BadRequestException({

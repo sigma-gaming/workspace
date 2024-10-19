@@ -1,7 +1,7 @@
 import { zValidator } from '@core/server'
 import { UserRole } from '@dbs/games-types'
 import { gamesPubsubs, maintenanceCache } from '@games/redis'
-import { roleService } from '@games/services'
+import { roleService, userService } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../../hono'
 
@@ -14,7 +14,8 @@ export const updateMaintenanceRoute = createRouter().post(
     }),
   ),
   async (ctx) => {
-    const user = ctx.get('user')
+    const session = ctx.get('session')
+    const user = await userService.getUser(session.userId)
     roleService.assert(user, UserRole.Admin)
 
     const payload = ctx.req.valid('json')

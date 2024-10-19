@@ -7,12 +7,12 @@ import {
   ProfileSelect,
   ProfileTable,
   UserSelect,
-  UserTable,
 } from '@dbs/games-schema'
 import { ProfileDetailed } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
+import { userService } from './user'
 
 type Reused = {
   user?: UserSelect
@@ -32,11 +32,7 @@ export class ProfileService {
       return cached
     }
 
-    const user =
-      reused?.user ??
-      (await gamesDb.query.UserTable.findFirst({
-        where: eq(UserTable.id, userId),
-      }))
+    const user = reused?.user ?? (await userService.getUserSafe(userId))
 
     const profile =
       reused?.profile ??

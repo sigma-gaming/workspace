@@ -35,8 +35,6 @@ export const GlobalTasksCompleteAction = createWsAction({
       throw new NotAuthenticatedException()
     }
 
-    const user = session.user
-
     const checkers: Record<GlobalTaskKey, GlobalTaskChecker> = {
       [GlobalTaskKey.TelegramGroupSubscribe]: async ({ requirements }) => {
         if (requirements.type !== GlobalTaskKey.TelegramGroupSubscribe)
@@ -50,7 +48,7 @@ export const GlobalTasksCompleteAction = createWsAction({
         const account = await gamesDb.query.AccountTable.findFirst({
           where: and(
             eq(AccountTable.provider, AccountProvider.Telegram),
-            eq(AccountTable.userId, user.id),
+            eq(AccountTable.userId, session.userId),
           ),
         })
 
@@ -81,7 +79,7 @@ export const GlobalTasksCompleteAction = createWsAction({
         const account = await gamesDb.query.AccountTable.findFirst({
           where: and(
             eq(AccountTable.provider, AccountProvider.VK),
-            eq(AccountTable.userId, user.id),
+            eq(AccountTable.userId, session.userId),
           ),
         })
 
@@ -112,7 +110,7 @@ export const GlobalTasksCompleteAction = createWsAction({
         const account = await gamesDb.query.AccountTable.findFirst({
           where: and(
             eq(AccountTable.provider, AccountProvider.VK),
-            eq(AccountTable.userId, user.id),
+            eq(AccountTable.userId, session.userId),
           ),
         })
 
@@ -169,14 +167,14 @@ export const GlobalTasksCompleteAction = createWsAction({
     }
 
     const completion = await globalTaskService.completeTask({
-      userId: user.id,
+      userId: session.userId,
       taskKey: payload.taskKey,
       checker: checkers[payload.taskKey],
     })
 
     if (completion.result === GlobalTaskCompleteResult.Completed) {
       ctx.socket
-        .to(userRoom(session.user.id))
+        .to(userRoom(session.userId))
         .emit('global-tasks/status-updated', {
           taskKey: payload.taskKey,
           status: TaskStatus.Completed,

@@ -60,7 +60,7 @@ export const signInViaVkRoute = createRouter().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const session = ctx.get('session')
+    const sessionVariant = sessionService.getHonoSessionVariant(ctx)
     const referralCampaignCode = getCookie(ctx, 'referralCampaign')
 
     const authResult = VkAuthResultSchema.parse(JSON.parse(payload.payload))
@@ -89,8 +89,8 @@ export const signInViaVkRoute = createRouter().post(
       return VkGetProfileSchema.parse(response.data)
     })
 
-    const result = await authService.authenticate({
-      session,
+    const outcome = await authService.authenticate({
+      sessionVariant,
       provider: AccountProvider.VK,
       providerUserId: vkProfile.id.toString(),
       providerUsername: vkProfile.screen_name,
@@ -100,23 +100,25 @@ export const signInViaVkRoute = createRouter().post(
       referralCampaignCode,
     })
 
-    if (result.result === AuthResult.ConnectedToAnotherUser) {
+    if (outcome.result === AuthResult.ConnectedToAnotherUser) {
       throw new BadRequestException({
         message: 'Аккаунт VK уже привязан к другому пользователю',
       })
     }
 
-    if (result.result === AuthResult.Connected) {
+    if (outcome.result === AuthResult.Connected) {
       return ctx.json({ status: 'success' })
     }
 
-    const newSession = await sessionService.createSession({
-      userId: result.account.userId,
+    const session = await sessionService.createSession({
+      userId: outcome.user.id,
+      referrerId: outcome.user.referrerId,
+      referralCampaignId: outcome.user.referralCampaignId,
       provider: AccountProvider.VK,
     })
 
-    sessionService.attachSession(ctx, newSession)
-    fraudService.actualizeRisk(newSession.user.id, { ctx })
+    sessionService.attachSession(ctx, session)
+    fraudService.actualizeRisk(session.userId, { ctx })
 
     return ctx.json({ status: 'success' })
   },

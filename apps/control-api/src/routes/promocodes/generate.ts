@@ -1,9 +1,10 @@
 import { UserRole } from '@dbs/games-types'
-import { promocodeService, roleService } from '@games/services'
+import { promocodeService, roleService, userService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const generateRoute = createRouter().post('/', async (ctx) => {
-  const user = ctx.get('user')
+  const session = ctx.get('session')
+  const user = await userService.getUser(session.userId)
   roleService.assert(user, UserRole.Admin)
 
   const promocode = promocodeService.generateOne()

@@ -26,7 +26,7 @@ export const GlobalTasksClaimRewardAction = createWsAction({
     }
 
     const completion = await globalTaskService.claimReward({
-      userId: session.user.id,
+      userId: session.userId,
       taskKey: payload.taskKey,
     })
 
@@ -34,11 +34,11 @@ export const GlobalTasksClaimRewardAction = createWsAction({
       const { updatedBalance, payout } = completion
 
       ctx.socket
-        .to(userRoom(session.user.id))
+        .to(userRoom(session.userId))
         .emit('balance/updated', { available: updatedBalance })
 
       ctx.socket
-        .to(userRoom(session.user.id))
+        .to(userRoom(session.userId))
         .emit('global-tasks/status-updated', {
           taskKey: payload.taskKey,
           status: TaskStatus.Claimed,

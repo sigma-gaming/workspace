@@ -5,14 +5,13 @@ import { createRouter } from '../../../hono'
 type Statuses = Record<GlobalTaskKey, TaskStatus>
 
 export const getStatusesRoute = createRouter().get('/', async (ctx) => {
-  const session = ctx.get('session')
-  const user = sessionService.getUser(session)
+  const { userId } = sessionService.getHonoSession(ctx)
   const promises: Promise<{ key: GlobalTaskKey; status: TaskStatus }>[] = []
 
   for (const key of Object.values(GlobalTaskKey)) {
     promises.push(
       globalTaskService
-        .getStatus(key, user.id)
+        .getStatus(key, userId)
         .then(([status]) => ({ key, status })),
     )
   }

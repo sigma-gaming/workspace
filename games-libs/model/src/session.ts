@@ -7,7 +7,24 @@ export enum SessionState {
   Authenticated,
 }
 
-export type Session =
+export type SessionPayload = {
+  userId: string
+  referrerId: string | null
+  referralCampaignId: number | null
+  provider: AccountProvider
+}
+
+export type Session = SessionPayload & {
+  token: string
+  expiresAt: string
+}
+
+export type SessionVariant =
+  | { state: SessionState.Authenticated; session: Session }
+  | { state: SessionState.Empty; session: null }
+  | { state: SessionState.Expired; session: null }
+
+export type SessionDetailed =
   | {
       state: SessionState.Authenticated
       user: UserSelect
