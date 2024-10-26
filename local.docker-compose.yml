@@ -16,21 +16,8 @@ services:
       - 6379:6379
     volumes:
       - redis:/data
-    networks:
-      - redis
     environment:
       REDIS_ARGS: --requirepass SECRET_REMOVED
-
-  redis-commander:
-    image: ghcr.io/joeferner/redis-commander:latest
-    depends_on:
-      - redis
-    environment:
-      REDIS_HOSTS: local:redis:6379
-    ports:
-      - "8081:8081"
-    networks:
-      redis:
 
   auth-proxy:
     image: traefik:v3.2
@@ -48,7 +35,3 @@ volumes:
   pgdata:
   redis:
   rabbitmq-data:
-
-
-networks:
-  redis:
