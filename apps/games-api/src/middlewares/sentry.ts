@@ -21,8 +21,6 @@ export const sentryMiddleware =
       return next()
     }
 
-    const sessionVariant = ctx.get('sessionVariant')
-
     return Sentry.continueTrace({ sentryTrace: traceId, baggage }, () => {
       const url = new URL(ctx.req.url)
 
@@ -34,7 +32,6 @@ export const sentryMiddleware =
             'http.query': url.search,
             'http.request.method': ctx.req.method,
             'server.address': url.hostname,
-            'user.id': sessionVariant.session?.userId,
           },
         },
         async (span) => {
