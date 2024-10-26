@@ -20,7 +20,10 @@ import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe-neo'
 import { GlobalJsonEntityService, KeyJsonEntityService } from './entity-json'
 import { GlobalEntityListService, KeyEntityListService } from './entity-list'
 import { GlobalNumberEntityService } from './entity-number'
-import { GlobalStringEntityService } from './entity-string'
+import {
+  GlobalStringEntityService,
+  KeyStringEntityService,
+} from './entity-string'
 
 export const CacheVersionToken: InjectionToken<string> = Symbol('CacheVersion')
 
@@ -37,6 +40,7 @@ export class CacheRegistry {
   budgetSyncedAt: GlobalStringEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
   user: KeyJsonEntityService<UserSelect>
+  accessToken: KeyStringEntityService
   sessionRefreshing: KeyJsonEntityService<true>
   balance: KeyJsonEntityService<BalanceSelect>
   referrerBalance: KeyJsonEntityService<ReferrerBalanceSelect>
@@ -74,6 +78,12 @@ export class CacheRegistry {
 
     this.user = new KeyJsonEntityService<UserSelect>({
       keygen: (userId: string) => `${version}:user:${userId}`,
+    })
+
+    this.accessToken = new KeyStringEntityService({
+      keygen: (refreshToken: string) =>
+        `${version}:accessToken:${refreshToken}`,
+      ttl: 60 * 5, // 5 minutes
     })
 
     this.sessionRefreshing = new KeyJsonEntityService<true>({

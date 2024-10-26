@@ -14,6 +14,7 @@ import {
   RefreshTokenPayload,
   SessionState,
 } from '@games/model'
+import { gamesCaches, gamesRedis } from '@games/redis'
 import {
   AuthenticatePayload,
   AuthResult,
@@ -154,8 +155,25 @@ export const api = new Hono()
       provider,
     }
 
-    const expiresIn = 60 * 15
-    const accessToken = jwt.sign(payload, serverEnv.jwt.secret, { expiresIn })
+    const generateAccessToken = () => {
+      const expiresIn = 60 * 15
+      return jwt.sign(payload, serverEnv.jwt.secret, { expiresIn })
+    }
+
+    let accessToken: string
+
+    if (gamesRedis.status === 'ready' && refreshToken) {
+      const cached = await gamesCaches.accessToken.get(refreshToken)
+
+      if (cached) {
+        accessToken = cached
+      } else {
+        accessToken = generateAccessToken()
+        await gamesCaches.accessToken.set(refreshToken, accessToken)
+      }
+    } else {
+      accessToken = generateAccessToken()
+    }
 
     return ctx.json<AccessTokenResponse>({ accessToken, sessionExpiresAt })
   })
