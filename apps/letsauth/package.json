@@ -24,7 +24,8 @@
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",
     "@tooling/env": "workspace:*",
-    "@core/io-client": "workspace:*"
+    "@core/io-client": "workspace:*",
+    "@itsmatteomanf/astro-early-hints": "0.3.3"
   },
   "devDependencies": {
     "@dbs/games-schema": "workspace:*"
