@@ -4,6 +4,7 @@ import { HTTPException } from 'hono/http-exception'
 import { StatusCode } from 'hono/utils/http-status'
 
 export function createErrorHandler<E extends Env>(options: {
+  showOriginalError?: boolean
   onInternalError?: (error: Error, ctx: Context<E>) => void
 }): ErrorHandler<E> {
   return (error, ctx) => {
@@ -15,8 +16,10 @@ export function createErrorHandler<E extends Env>(options: {
 
     if (error instanceof RouteException) {
       exception = error
-    } else {
+    } else if (options.showOriginalError) {
       exception = new InternalServerException({ cause: error })
+    } else {
+      exception = new InternalServerException()
     }
 
     if (exception instanceof InternalServerException) {

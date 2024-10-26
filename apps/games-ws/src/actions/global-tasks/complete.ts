@@ -14,7 +14,6 @@ import {
   vkService,
 } from '@games/services'
 import { and, eq } from 'drizzle-orm'
-import { Context } from '../../context'
 import { userRoom } from '../../shared/rooms/user'
 import { createWsAction } from '../../ws-action'
 import {
@@ -25,10 +24,7 @@ import {
 export const GlobalTasksCompleteAction = createWsAction({
   name: 'global-tasks/complete',
   schema: GlobalTasksCompletePayloadSchema,
-  handler: async (
-    ctx: Context,
-    payload,
-  ): Promise<GlobalTasksCompleteOutput> => {
+  handler: async (ctx, payload): Promise<GlobalTasksCompleteOutput> => {
     const { session } = ctx
 
     if (!session) {

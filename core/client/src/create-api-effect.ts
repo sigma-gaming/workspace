@@ -7,13 +7,19 @@ import { createEffect, Effect } from 'effector'
 import { ClientResponse } from 'hono/client'
 import { StatusCode } from 'hono/utils/http-status'
 
-type HonoRpcRouteJson<P, R> = (args: {
-  json: P
-}) => Promise<ClientResponse<R, StatusCode, 'json'>>
+type Options = {
+  headers?: Record<string, string>
+}
 
-type HonoRpcRouteQuery<P, R> = (args: {
-  query: P
-}) => Promise<ClientResponse<R, StatusCode, 'json'>>
+type HonoRpcRouteJson<P, R> = (
+  args: { json: P },
+  options?: Options,
+) => Promise<ClientResponse<R, StatusCode, 'json'>>
+
+type HonoRpcRouteQuery<P, R> = (
+  args: { query: P },
+  options?: Options,
+) => Promise<ClientResponse<R, StatusCode, 'json'>>
 
 export function createApiEffect<F extends 'query' | 'json', P, R>(
   format: F,

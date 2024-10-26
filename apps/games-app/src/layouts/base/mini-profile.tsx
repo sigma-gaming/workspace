@@ -16,7 +16,7 @@ import { $$balance } from '../../entities/balance'
 import { $$profile } from '../../entities/profile/index.ts'
 import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
-import { router, routes } from '../../routing'
+import { routes } from '../../routing'
 import { Balance } from './balance.tsx'
 
 function useAvatarSize() {
@@ -163,9 +163,7 @@ export const MiniProfile = () => {
 }
 
 export const ExpiredProfile = () => {
-  const { view } = useUnit(router.$query)
-  const initialOpened = view === 'sign-in'
-  const [opened, { open, close }] = useDisclosure(initialOpened)
+  const [opened, { open, close }] = useDisclosure(false)
 
   return (
     <>
@@ -181,10 +179,10 @@ export const ExpiredProfile = () => {
         centered
       >
         <div className="flex flex-col gap-2">
-          <VkButton flow="sign-in" size="md" fullWidth>
+          <VkButton size="md" fullWidth>
             Войти через VK ID
           </VkButton>
-          <TelegramButton flow="sign-in" size="md" fullWidth>
+          <TelegramButton size="md" fullWidth>
             Войти через Telegram
           </TelegramButton>
         </div>

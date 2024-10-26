@@ -1,5 +1,5 @@
 import { createSingletonProxy } from '@core/di'
-import { Logger, LoggerService } from '@core/logger'
+import { Logger, loggerService } from '@core/logger'
 import { gamesDb } from '@dbs/games-db'
 import { GlobalTaskSelect, GlobalTaskStatusTable } from '@dbs/games-schema'
 import { GlobalTaskKey, TaskStatus, TransactionType } from '@dbs/games-types'
@@ -63,10 +63,7 @@ export type GlobalTaskChecker = (task: GlobalTaskSelect) => Promise<
 export class GlobalTaskService {
   logger: Logger
 
-  constructor(
-    private transactionService: BalanceService,
-    loggerService: LoggerService,
-  ) {
+  constructor(private transactionService: BalanceService) {
     this.logger = loggerService.logger.child('GlobalTask')
   }
 

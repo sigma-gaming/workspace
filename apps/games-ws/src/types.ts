@@ -12,6 +12,7 @@ import {
   PlayPincodeOutput,
 } from '@games/engine'
 import { BalanceDetailed } from '@games/model'
+import { SignInPayload } from './actions/auth/contracts'
 import {
   GlobalTasksClaimRewardOutput,
   GlobalTasksClaimRewardPayload,
@@ -35,6 +36,8 @@ export type ServerToClientEvents = {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export type ClientToServerEvents = {
   'ping': WsActionHandler<void, 'pong'>
+  'auth/sign-in': WsActionHandler<SignInPayload, void>
+  'auth/logout': WsActionHandler<void, void>
   'games/pincode': WsActionHandler<PincodePayload, PlayPincodeOutput>
   'games/dice': WsActionHandler<DicePayload, PlayDiceOutput>
   'global-tasks/complete': WsActionHandler<

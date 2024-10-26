@@ -1,8 +1,4 @@
-import {
-  $$notifications,
-  createApiEffect,
-  handleExceptions,
-} from '@core/client'
+import { $$notifications, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { AccountProvider } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
@@ -13,12 +9,16 @@ import { z } from 'zod'
 import { $$profile } from '../../entities/profile'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 
 const reset = createEvent()
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
-  effect: createApiEffect('json', gamesApi.settings.updateProfile.$post),
+  effect: createProtectedApiEffect(
+    'json',
+    gamesApi.settings.updateProfile.$post,
+  ),
 })
 
 const $updatingProfile = updateProfileMutation.$pending

@@ -12,12 +12,11 @@ import {
   UserTable,
 } from '@dbs/games-schema'
 import { AccountProvider } from '@dbs/games-types'
-import { getUserFullName, SessionVariant } from '@games/model'
+import { getUserFullName } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { and, eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
 import { affiliateService } from './affiliate'
-import { Env, EnvService } from './env'
 import { userService } from './user'
 
 export enum AuthResult {
@@ -27,8 +26,8 @@ export enum AuthResult {
   ConnectedToAnotherUser = 'connected-to-another-user',
 }
 
-type AuthenticatePayload = {
-  sessionVariant: SessionVariant
+export type AuthenticatePayload = {
+  userId?: string | null
   provider: AccountProvider
   providerUserId: string
   providerUsername?: string
@@ -46,14 +45,8 @@ type AuthenticateOutcome =
 
 @singleton()
 export class AuthService {
-  env: Env
-
-  constructor(envService: EnvService) {
-    this.env = envService.env
-  }
-
   async authenticate({
-    sessionVariant,
+    userId,
     provider,
     providerUserId,
     providerUsername,
@@ -85,9 +78,7 @@ export class AuthService {
       }
     }
 
-    if (sessionVariant.session) {
-      const { userId } = sessionVariant.session
-
+    if (userId) {
       if (account) {
         if (userId !== account.userId) {
           return { result: AuthResult.ConnectedToAnotherUser }

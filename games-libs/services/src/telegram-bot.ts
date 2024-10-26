@@ -1,7 +1,6 @@
 import { createSingletonProxy } from '@core/di'
 import { Bot } from 'grammy'
-import { singleton } from 'tsyringe-neo'
-import { EnvService } from './env'
+import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 
 type ChatMemberPayload = {
   chatId: number
@@ -9,12 +8,19 @@ type ChatMemberPayload = {
   subscribed: boolean
 }
 
+export type TelegramBotOptions = {
+  token: string
+}
+
+export const TelegramBotOptionsToken: InjectionToken<TelegramBotOptions> =
+  Symbol('TelegramBotOptionsToken')
+
 @singleton()
 export class TelegramBotService {
   bot: Bot
 
-  constructor({ env }: EnvService) {
-    this.bot = new Bot(env.telegram.butFullToken)
+  constructor(@inject(TelegramBotOptionsToken) options: TelegramBotOptions) {
+    this.bot = new Bot(options.token)
   }
 
   messageUser(userId: number, text: string | string[]) {

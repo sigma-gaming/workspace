@@ -1,21 +1,22 @@
-import { createApiEffect, handleExceptions } from '@core/client'
+import { handleExceptions } from '@core/client'
 import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
 import { status } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 
 const request = createEvent()
 const connect = createEvent()
 const reset = createEvent()
 
-const isConnectedFx = createApiEffect(
+const isConnectedFx = createProtectedApiEffect(
   'query',
   gamesApi.affiliate.isConnected.$get,
 )
 
 const connectMutation = createMutation({
   name: 'affiliate/connect',
-  effect: createApiEffect('json', gamesApi.affiliate.connect.$post),
+  effect: createProtectedApiEffect('json', gamesApi.affiliate.connect.$post),
 })
 
 const $isConnected = createStore(false)

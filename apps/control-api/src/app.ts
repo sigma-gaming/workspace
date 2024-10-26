@@ -1,7 +1,7 @@
-import { env } from '@games/services'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
+import { env } from './env'
 import { healthyRoute, readyRoute } from './health'
 import { ControlApiEnv } from './hono'
 import { sessionMiddleware } from './middlewares/session'
@@ -17,7 +17,12 @@ export const app = new Hono<ControlApiEnv>()
     cors({
       origin: env.controlApp.url,
       credentials: true,
-      allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
+      allowHeaders: [
+        'content-type',
+        'sentry-trace',
+        'baggage',
+        'authorization',
+      ],
     }),
   )
   .route('/healthy', healthyRoute)

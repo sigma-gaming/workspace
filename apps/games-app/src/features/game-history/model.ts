@@ -1,4 +1,3 @@
-import { createApiEffect } from '@core/client'
 import { subscriptionFactory } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { createFactory, invoke } from '@withease/factories'
@@ -14,6 +13,7 @@ import { and, interval, status } from 'patronum'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 
 export type Tab = 'last-wins' | 'big-wins' | 'my-games'
 
@@ -24,17 +24,17 @@ const resetMyGames = createEvent()
 const setTab = createEvent<Tab | null>()
 const resetTab = createEvent()
 
-const getLastWinsFx = createApiEffect(
+const getLastWinsFx = createProtectedApiEffect(
   'query',
   gamesApi.gameHistory.getLastWins.$get,
 )
 
-const getBigWinsFx = createApiEffect(
+const getBigWinsFx = createProtectedApiEffect(
   'query',
   gamesApi.gameHistory.getBigWins.$get,
 )
 
-const getMyGamesFx = createApiEffect(
+const getMyGamesFx = createProtectedApiEffect(
   'query',
   gamesApi.gameHistory.getMyGames.$get,
 )

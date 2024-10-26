@@ -1,10 +1,7 @@
-import {
-  $$notifications,
-  createApiEffect,
-  handleExceptions,
-} from '@core/client'
+import { $$notifications, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { createWsEffect, subscriptionFactory } from '@core/io-client'
+import { noop } from '@core/utils'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { createMutation, createQuery } from '@farfetched/core'
 import { formatGem, gemFloat } from '@games/model'
@@ -17,6 +14,7 @@ import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 
 const completeGlobalTask = createEvent<GlobalTaskKey>()
 const claimGlobalTaskReward = createEvent<GlobalTaskKey>()
@@ -24,15 +22,18 @@ const reset = createEvent()
 
 const applyPromocodeMutation = createMutation({
   name: 'bonuses/applyPromocode',
-  effect: createApiEffect('json', gamesApi.promocodes.apply.$post),
+  effect: createProtectedApiEffect('json', gamesApi.promocodes.apply.$post),
 })
 
 const getGlobalTasksQuery = createQuery({
   name: 'bonuses/getGlobalTasks',
-  effect: createApiEffect('query', gamesApi.tasks.global.getTasks.$get),
+  effect: createProtectedApiEffect(
+    'query',
+    gamesApi.tasks.global.getTasks.$get,
+  ),
 })
 
-const getGlobalTaskStatusesFx = createApiEffect(
+const getGlobalTaskStatusesFx = createProtectedApiEffect(
   'query',
   gamesApi.tasks.global.getStatuses.$get,
 )
@@ -200,12 +201,14 @@ sample({
 
 sample({
   clock: routes.bonuses.opened,
+  fn: noop,
   target: [getGlobalTasksQuery.refresh],
 })
 
 sample({
   clock: routes.bonuses.opened,
   filter: $$user.$loggedIn,
+  fn: noop,
   target: [getGlobalTaskStatusesFx],
 })
 

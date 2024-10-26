@@ -32,6 +32,17 @@ services:
     networks:
       redis:
 
+  auth-proxy:
+    image: traefik:v3.2
+    command:
+      - "--entrypoints.web.address=:443"
+      - "--providers.file.directory=/etc/traefik/config"
+      - "--providers.file.watch=true"
+    ports:
+      - "443:443"
+    volumes:
+      - "./ssl:/ssl"
+      - "./auth-proxy.traefik.yaml:/etc/traefik/config/auth-proxy.traefik.yaml"
 
 volumes:
   pgdata:

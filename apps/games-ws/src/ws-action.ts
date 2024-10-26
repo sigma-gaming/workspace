@@ -6,10 +6,10 @@ import {
 import { WsAction, WsActionHandler } from '@core/io-client'
 import { logger } from '@core/logger'
 import { createDefer } from '@core/utils'
-import { env } from '@games/services'
 import * as Sentry from '@sentry/node'
 import { Schema } from 'zod'
 import { Context } from './context'
+import { env } from './env'
 import { sentry } from './shared/sentry'
 
 export type WsActionGenerator<TName extends string, TInput, TOutput> = (

@@ -1,11 +1,15 @@
 import { createApiEffect } from '@core/client'
 import { NotAuthenticatedException } from '@core/exceptions'
+import { createWsEffect } from '@core/io-client'
 import { createQuery } from '@farfetched/core'
-import { createEffect, createEvent, createStore, sample } from 'effector'
+import { createEffect, createEvent, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
+import { letsauthApi } from '../../shared/api/letsauth'
+import { createProtectedApiEffect } from '../../shared/api/protected'
+import { $$session } from '../../shared/api/session'
 import { env } from '../../shared/env'
 
 const request = createEvent()
@@ -20,12 +24,17 @@ const clientLogoutFx = createEffect(() => {
 
 const userQuery = createQuery({
   name: 'user/get',
-  effect: createApiEffect('query', gamesApi.me.getUser.$get),
+  effect: createProtectedApiEffect('query', gamesApi.me.getUser.$get),
 })
 
 const logoutMutation = createQuery({
   name: 'user/logout',
-  effect: createApiEffect('json', gamesApi.auth.logout.$post),
+  effect: createApiEffect('json', letsauthApi.logout.$post),
+})
+
+const socketLogoutMutation = createQuery({
+  name: 'user/logout',
+  effect: createWsEffect(gamesWs, 'auth/logout'),
 })
 
 const loaded = userQuery.finished.success
@@ -35,9 +44,7 @@ const $loading = userQuery.$pending
 const $loaded = and($user)
 const $loggingOut = logoutMutation.$pending
 
-const expiresAt = Cookies.get('sessionExpiresAt') ?? null
-const initialLoggedIn = expiresAt !== null && new Date() < new Date(expiresAt)
-const $loggedIn = createStore(initialLoggedIn)
+const $loggedIn = $$session.$sessionActive.map(Boolean)
 
 sample({
   clock: request,
@@ -58,16 +65,13 @@ sample({
 
 sample({
   clock: logout,
-  fn: () => false,
-  target: [clientLogoutFx, userQuery.reset, logoutMutation.start, $loggedIn],
-})
-
-sample({
-  clock: logoutMutation.finished.success,
-  target: createEffect(() => {
-    gamesWs.disconnect()
-    gamesWs.connect()
-  }),
+  target: [
+    clientLogoutFx,
+    userQuery.reset,
+    logoutMutation.start,
+    socketLogoutMutation.start,
+    $$session.clear,
+  ],
 })
 
 sample({

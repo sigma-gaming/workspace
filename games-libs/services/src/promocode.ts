@@ -1,5 +1,5 @@
 import { createSingletonProxy } from '@core/di'
-import { Logger, LoggerService } from '@core/logger'
+import { Logger, loggerService } from '@core/logger'
 import { gamesDb } from '@dbs/games-db'
 import { PromocodeTable, PromocodeUsageTable } from '@dbs/games-schema'
 import {
@@ -13,7 +13,7 @@ import { and, eq } from 'drizzle-orm'
 import crypto from 'node:crypto'
 import { singleton } from 'tsyringe-neo'
 import { balanceService } from './balance'
-import { FraudService } from './fraud'
+import { fraudService } from './fraud'
 import { locks } from './locks'
 
 const DEFAULT_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -64,10 +64,7 @@ type ActivationOutput =
 export class PromocodeService {
   private logger: Logger
 
-  constructor(
-    loggerService: LoggerService,
-    private fraudService: FraudService,
-  ) {
+  constructor() {
     this.logger = loggerService.logger.child('Promocode')
   }
 
@@ -173,7 +170,7 @@ export class PromocodeService {
             return { result: PromocodeActivationResult.UsageExceeded }
           }
 
-          const risk = await this.fraudService.actualizeRisk(userId)
+          const risk = await fraudService.actualizeRisk(userId)
 
           if (risk === FraudRisk.High || risk === FraudRisk.Medium) {
             return { result: PromocodeActivationResult.Blocked }

@@ -1,8 +1,4 @@
-import {
-  $$notifications,
-  createApiEffect,
-  handleExceptions,
-} from '@core/client'
+import { $$notifications, handleExceptions } from '@core/client'
 import { subscriptionFactory } from '@core/io-client'
 import { createMutation, Mutation } from '@farfetched/core'
 import { BalanceDetailed } from '@games/model'
@@ -11,21 +7,22 @@ import { createEvent, createStore, sample } from 'effector'
 import { previous, status } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 import { $$audio, Sound } from '../audio'
 
-const getDetailedBalanceFx = createApiEffect(
+const getDetailedBalanceFx = createProtectedApiEffect(
   'query',
   gamesApi.me.getDetailedBalance.$get,
 )
 
 const depositMutation = createMutation({
   name: 'balance/deposit',
-  effect: createApiEffect('json', gamesApi.balance.deposit.$post),
+  effect: createProtectedApiEffect('json', gamesApi.balance.deposit.$post),
 })
 
 const withdrawMutation = createMutation({
   name: 'balance/withdraw',
-  effect: createApiEffect('json', gamesApi.balance.withdraw.$post),
+  effect: createProtectedApiEffect('json', gamesApi.balance.withdraw.$post),
 })
 
 const { receivedData: balanceUpdated } = invoke(() =>

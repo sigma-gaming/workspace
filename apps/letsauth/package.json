@@ -1,0 +1,32 @@
+{
+  "name": "@apps/letsauth",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/client.ts",
+  "module": "./src/client.ts",
+  "types": "./src/client.ts",
+  "scripts": {
+    "copy-env": "copy-env",
+    "dev": "dotenv -e .env.development astro dev",
+    "build": "astro build",
+    "start": "NODE_ENV=production astro dev",
+    "preview": "NODE_ENV=development dotenv -e .env.development astro preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint:fix": "pnpm lint --fix"
+  },
+  "dependencies": {
+    "astro": "^4.16.6",
+    "@games/model": "workspace:*",
+    "@core/client": "workspace:*",
+    "@core/exceptions": "workspace:*",
+    "@core/forms": "workspace:*",
+    "@core/ui": "workspace:*",
+    "@tooling/env": "workspace:*",
+    "@core/io-client": "workspace:*"
+  },
+  "devDependencies": {
+    "@dbs/games-schema": "workspace:*"
+  }
+}

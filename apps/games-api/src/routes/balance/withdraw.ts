@@ -19,7 +19,7 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
   const positiveAmount = Math.abs(amount)
 
   return await locks.with([locks.balance(userId)], async () => {
-    const risk = await fraudService.actualizeRisk(userId, { ctx })
+    const risk = await fraudService.actualizeRisk(userId, { ip: ctx.env.ip })
 
     if (risk === FraudRisk.High) {
       throw new BadRequestException({

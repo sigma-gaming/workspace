@@ -17,21 +17,17 @@ import { ChatMessageDetailed, ProfileDetailed } from '@games/model'
 import { gamesCaches, gamesPubsubs } from '@games/redis'
 import { desc } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
-import { GameService } from './game'
+import { gameService } from './game'
 import { locks } from './locks'
 import { profileService } from './profile'
 
 @singleton()
 export class ChatService {
-  constructor(private readonly gameService: GameService) {}
-
   private async validateUserGameAttachment(
     userId: string,
     attachment: ChatMessageAttachmentGame,
   ) {
-    const gameRecord = await this.gameService.getGameRecord(
-      attachment.gameRecordId,
-    )
+    const gameRecord = await gameService.getGameRecord(attachment.gameRecordId)
 
     if (!gameRecord) {
       throw new InternalServerException()

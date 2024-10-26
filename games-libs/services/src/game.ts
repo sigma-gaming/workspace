@@ -14,10 +14,10 @@ import {
 import { gamesCaches } from '@games/redis'
 import { eq } from 'drizzle-orm'
 import { singleton } from 'tsyringe-neo'
-import { BalanceService } from './balance'
+import { balanceService } from './balance'
 import { budgetService } from './budget'
-import { GameHistoryService } from './game-history'
-import { ProfileService } from './profile'
+import { gameHistoryService } from './game-history'
+import { profileService } from './profile'
 
 type SaveGamePayload = {
   userId: string
@@ -42,12 +42,6 @@ const outcomeToTypeMap: Record<GameOutcome, TransactionType> = {
 
 @singleton()
 export class GameService {
-  constructor(
-    private readonly gameHistoryService: GameHistoryService,
-    private readonly profileService: ProfileService,
-    private readonly transactionService: BalanceService,
-  ) {}
-
   lock = async (userId: string, ms = 3000) => {
     return gamesCaches.balance.lock(userId, ms)
   }
@@ -94,11 +88,11 @@ export class GameService {
     outcome,
     balance,
   }: SaveGamePayload) => {
-    const profile = await this.profileService.getDetailedProfile(userId)
+    const profile = await profileService.getDetailedProfile(userId)
 
     const { gameRecord, updatedBalance } = await gamesDb.transaction(
       async (tx) => {
-        const transaction = await this.transactionService.createTransaction({
+        const transaction = await balanceService.createTransaction({
           tx,
           payload: {
             userId,
@@ -125,7 +119,7 @@ export class GameService {
           })
           .returning()
 
-        const updatedBalance = await this.transactionService.updateBalance({
+        const updatedBalance = await balanceService.updateBalance({
           tx,
           balance,
           transaction,
@@ -145,7 +139,7 @@ export class GameService {
     )
 
     budgetService.changeAvailable(-payout)
-    this.gameHistoryService.addGameRecord(gameRecord)
+    gameHistoryService.addGameRecord(gameRecord)
 
     return { gameRecord, updatedBalance }
   }

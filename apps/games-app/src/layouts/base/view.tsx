@@ -82,7 +82,7 @@ const Header = () => {
           className="flex items-center gap-2 p-2 focus-visible:outline-primary rounded-xl"
         >
           <Icons.Sigma />
-          <h1 className="hidden lg:block text-4xl leading-none font-text font-bold">
+          <h1 className="hidden lg:block text-4xl leading-none font-medium">
             Sigma
           </h1>
         </Link>

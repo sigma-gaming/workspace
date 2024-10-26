@@ -2,8 +2,8 @@ import 'reflect-metadata'
 import { LoggerOptionsToken } from '@core/logger'
 import { DbOptionsToken } from '@dbs/games-db'
 import { CacheVersionToken, RedisOptionsToken } from '@games/redis'
-import { env } from '@games/services'
 import { container } from 'tsyringe-neo'
+import { env } from './env'
 
 container.register(LoggerOptionsToken, {
   useValue: { pretty: env.isDev },

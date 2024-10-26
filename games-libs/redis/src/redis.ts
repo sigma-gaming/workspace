@@ -1,5 +1,5 @@
 import { createSingletonProxy, OnApplicationShutdown } from '@core/di'
-import { Logger, LoggerService } from '@core/logger'
+import { Logger, loggerService } from '@core/logger'
 import { Redis } from 'ioredis'
 import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 
@@ -16,10 +16,7 @@ export class RedisService implements OnApplicationShutdown {
   redis: Redis
   logger: Logger
 
-  constructor(
-    @inject(RedisOptionsToken) options: RedisOptions,
-    loggerService: LoggerService,
-  ) {
+  constructor(@inject(RedisOptionsToken) options: RedisOptions) {
     this.redis = new Redis({
       host: options.host,
       password: options.password,
@@ -45,10 +42,7 @@ export class SubRedisService implements OnApplicationShutdown {
   redis: Redis
   logger: Logger
 
-  constructor(
-    @inject(RedisOptionsToken) options: RedisOptions,
-    loggerService: LoggerService,
-  ) {
+  constructor(@inject(RedisOptionsToken) options: RedisOptions) {
     this.redis = new Redis({
       host: options.host,
       password: options.password,

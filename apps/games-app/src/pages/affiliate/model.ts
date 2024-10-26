@@ -1,8 +1,4 @@
-import {
-  $$notifications,
-  createApiEffect,
-  handleExceptions,
-} from '@core/client'
+import { $$notifications, handleExceptions } from '@core/client'
 import { noop } from '@core/utils'
 import { ReferrerBalanceSelect } from '@dbs/games-schema'
 import { createMutation, createQuery } from '@farfetched/core'
@@ -14,33 +10,43 @@ import { $$balance } from '../../entities/balance'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 
 const withdraw = createEvent()
 const reset = createEvent()
 
-const getBalanceFx = createApiEffect(
+const getBalanceFx = createProtectedApiEffect(
   'query',
   gamesApi.affiliate.getBalance.$get,
 )
 
 const getSettingsQuery = createQuery({
   name: 'affiliate/getSettings',
-  effect: createApiEffect('query', gamesApi.affiliate.getSettings.$get),
+  effect: createProtectedApiEffect(
+    'query',
+    gamesApi.affiliate.getSettings.$get,
+  ),
 })
 
 const getCampaignsQuery = createQuery({
   name: 'affiliate/getCampaigns',
-  effect: createApiEffect('query', gamesApi.affiliate.getCampaigns.$get),
+  effect: createProtectedApiEffect(
+    'query',
+    gamesApi.affiliate.getCampaigns.$get,
+  ),
 })
 
 const getLastTransactionsQuery = createQuery({
   name: 'affiliate/getLastTransactions',
-  effect: createApiEffect('query', gamesApi.affiliate.getLastTransactions.$get),
+  effect: createProtectedApiEffect(
+    'query',
+    gamesApi.affiliate.getLastTransactions.$get,
+  ),
 })
 
 const withdrawMutation = createMutation({
   name: 'affiliate/withdraw',
-  effect: createApiEffect('json', gamesApi.affiliate.withdraw.$post),
+  effect: createProtectedApiEffect('json', gamesApi.affiliate.withdraw.$post),
 })
 
 $$balance.receiveUpdates(

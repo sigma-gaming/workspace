@@ -1,0 +1,60 @@
+---
+import BaseLayout from './base-layout.astro'
+
+interface Props {
+  loaderColor: string
+}
+
+const { loaderColor } = Astro.props as Props
+---
+
+<style define:vars={{ loaderColor }}>
+  .loader {
+    width: 80px;
+    height: 80px;
+    color: var(--loaderColor);
+    position: relative;
+    background: radial-gradient(20px, currentColor 94%, #0000);
+  }
+
+  .loader:before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(20px at bottom right, #0000 94%, currentColor) top left,
+      radial-gradient(20px at bottom left, #0000 94%, currentColor) top right,
+      radial-gradient(20px at top right, #0000 94%, currentColor) bottom left,
+      radial-gradient(20px at top left, #0000 94%, currentColor) bottom right;
+    background-size: 41px 41px;
+    background-repeat: no-repeat;
+    animation: loader 1.5s infinite cubic-bezier(0.3, 1, 0, 1);
+  }
+
+  @keyframes loader {
+    33% {
+      inset: -20px;
+      transform: rotate(0deg);
+    }
+
+    66% {
+      inset: -20px;
+      transform: rotate(90deg);
+    }
+
+    100% {
+      inset: 0;
+      transform: rotate(90deg);
+    }
+  }
+</style>
+
+<BaseLayout pageTitle="Вход">
+  <div class="p-5">
+    <div class="loader"></div>
+  </div>
+  <div class="mt-6">
+    <slot />
+  </div>
+</BaseLayout>

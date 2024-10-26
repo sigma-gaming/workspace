@@ -4,18 +4,18 @@ import { shutdownServices } from '@core/di'
 import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
 import { gamesPubsubs, gamesRedis, maintenanceCache } from '@games/redis'
-import { env, sessionService } from '@games/services'
-import { parse } from 'cookie'
 import { App, SSLApp } from 'uWebSockets.js'
+import { LogoutAction } from './actions/auth/logout'
+import { SignInAction } from './actions/auth/sign-in'
 import { GamesDiceAction } from './actions/games/dice'
 import { GamesPincodeAction } from './actions/games/pincode'
 import { GlobalTasksClaimRewardAction } from './actions/global-tasks/claim-reward'
 import { GlobalTasksCompleteAction } from './actions/global-tasks/complete'
 import { PingAction } from './actions/ping'
 import { Context } from './context'
+import { env } from './env'
 import { io } from './io'
 import { startLastWinsBroadcast } from './processes/last-wins'
-import { userRoom } from './shared/rooms/user'
 import { sendToAllLocal, sendToUser } from './shared/send'
 import { ClientToServerEvents } from './types'
 import { WsActionGenerator } from './ws-action'
@@ -30,18 +30,11 @@ const app = env.isDev
 io.attachApp(app)
 
 io.on('connection', async (socket) => {
-  const cookie = parse(socket.handshake.headers.cookie ?? '')
-  const { session } = sessionService.getSessionVariant(cookie.session)
-
   const context: Context = {
     url: new URL(env.gamesWs.url),
     headers: socket.handshake.headers,
     socket,
-  }
-
-  if (session) {
-    context.session = session
-    socket.join(userRoom(session.userId))
+    session: null,
   }
 
   /**
@@ -59,6 +52,8 @@ io.on('connection', async (socket) => {
     socket.on(action.name, action.handler as any)
   }
 
+  registerAction(SignInAction)
+  registerAction(LogoutAction)
   registerAction(PingAction)
   registerAction(GamesPincodeAction)
   registerAction(GamesDiceAction)

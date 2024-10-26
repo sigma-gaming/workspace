@@ -1,15 +1,13 @@
 import { createSingletonProxy } from '@core/di'
-import { Logger, LoggerService } from '@core/logger'
-import { HonoUwsEnv } from '@core/server'
+import { Logger, loggerService } from '@core/logger'
 import { gamesDb } from '@dbs/games-db'
 import { UserSecuritySelect, UserSecurityTable } from '@dbs/games-schema'
 import { FraudRisk } from '@dbs/games-types'
 import { and, count, eq, lt } from 'drizzle-orm'
-import { Context as HonoContext } from 'hono'
 import { singleton } from 'tsyringe-neo'
 
-type ActualizeRiskOptions<E extends HonoUwsEnv> = {
-  ctx?: HonoContext<E>
+type ActualizeRiskOptions = {
+  ip?: string
   updateIP?: boolean
 }
 
@@ -45,7 +43,7 @@ const SCORE_RELATIONS: ScoreRelation[] = [
 export class FraudService {
   private logger: Logger
 
-  constructor(loggerService: LoggerService) {
+  constructor() {
     this.logger = loggerService.logger.child('Fraud')
   }
 
@@ -63,9 +61,9 @@ export class FraudService {
       .where(eq(UserSecurityTable.userId, userId))
   }
 
-  actualizeRisk = async <E extends HonoUwsEnv>(
+  actualizeRisk = async (
     userId: string,
-    { ctx, updateIP = true }: ActualizeRiskOptions<E> = {},
+    { ip, updateIP = true }: ActualizeRiskOptions = {},
   ): Promise<FraudRisk> => {
     try {
       const security = await gamesDb.query.UserSecurityTable.findFirst({
@@ -85,7 +83,7 @@ export class FraudService {
 
       if (!lastIP || updateIP) {
         this.logger.info(`Updating IP for user ${userId}`)
-        lastIP = ctx?.env.ip ?? null
+        lastIP = ip ?? null
 
         if (lastIP) {
           await gamesDb

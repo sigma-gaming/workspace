@@ -1,9 +1,9 @@
-import { Logger, LoggerService } from '@core/logger'
+import { Logger, loggerService } from '@core/logger'
 import { Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
 import { autoInjectable } from 'tsyringe-neo'
-import { RedisService } from '../redis'
-import { RedlockService } from '../redlock'
+import { gamesRedis } from '../redis'
+import { gamesRedlock } from '../redlock'
 
 type Parser<TValue> = (value: string) => TValue
 type Stringifier<TValue> = (value: TValue) => string
@@ -18,15 +18,10 @@ export class GlobalEntityBaseService<TValue> {
   protected readonly parse: Parser<TValue> = JSON.parse
   protected readonly stringify: Stringifier<TValue> = JSON.stringify
 
-  constructor(
-    options: { key: string; ttl?: number },
-    redisService?: RedisService,
-    redlockService?: RedlockService,
-    loggerService?: LoggerService,
-  ) {
-    this.redis = redisService!.redis
-    this.redlock = redlockService!.redlock
-    this.logger = loggerService!.logger.child('Cache').child(options.key)
+  constructor(options: { key: string; ttl?: number }) {
+    this.redis = gamesRedis
+    this.redlock = gamesRedlock
+    this.logger = loggerService.logger.child('Cache').child(options.key)
     this.key = options.key
     this.ttl = options.ttl ?? 60 * 60
   }
@@ -73,15 +68,10 @@ export class KeyEntityBaseService<TValue> {
   protected readonly parse: Parser<TValue> = JSON.parse
   protected readonly stringify: Stringifier<TValue> = JSON.stringify
 
-  constructor(
-    options: { keygen: (key: string) => string; ttl?: number },
-    redisService?: RedisService,
-    redlockService?: RedlockService,
-    loggerService?: LoggerService,
-  ) {
-    this.redis = redisService!.redis
-    this.redlock = redlockService!.redlock
-    this.parentLogger = loggerService!.logger.child('Cache')
+  constructor(options: { keygen: (key: string) => string; ttl?: number }) {
+    this.redis = gamesRedis
+    this.redlock = gamesRedlock
+    this.parentLogger = loggerService.logger.child('Cache')
     this.keygen = options.keygen
     this.ttl = options.ttl ?? 60 * 60
   }

@@ -1,0 +1,29 @@
+tls:
+  certificates:
+    - certFile: /ssl/local.crt
+      keyFile: /ssl/local.key
+
+entryPoints:
+  web:
+    address: ":443"
+    http:
+      tls:
+        certResolver: default
+        domains:
+          - main: auth.local
+
+http:
+  routers:
+    myapp:
+      rule: "Host(`auth.local`)"
+      entryPoints:
+        - web
+      service: auth-app
+      tls:
+        certResolver: myresolver
+
+  services:
+    auth-app:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:4321"

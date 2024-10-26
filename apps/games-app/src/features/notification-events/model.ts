@@ -1,4 +1,4 @@
-import { $$notifications, createApiEffect } from '@core/client'
+import { $$notifications } from '@core/client'
 import { subscriptionFactory } from '@core/io-client'
 import { NotificationSelect } from '@dbs/games-schema'
 import { createQuery } from '@farfetched/core'
@@ -7,13 +7,17 @@ import { invoke } from '@withease/factories'
 import { createEffect, createEvent, sample } from 'effector'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 
 const initialize = createEvent()
 const reset = createEvent()
 
 const getActualQuery = createQuery({
   name: 'notifications/getActual',
-  effect: createApiEffect('query', gamesApi.notifications.getActual.$get),
+  effect: createProtectedApiEffect(
+    'query',
+    gamesApi.notifications.getActual.$get,
+  ),
 })
 
 const { receivedData: notificationReceived } = invoke(() => {

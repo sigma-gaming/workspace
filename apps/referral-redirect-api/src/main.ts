@@ -2,8 +2,9 @@ import './setup'
 import { shutdownServices } from '@core/di'
 import { logger } from '@core/logger'
 import { gamesRedis, maintenanceCache } from '@games/redis'
-import { affiliateService, env } from '@games/services'
+import { affiliateService } from '@games/services'
 import { App, SSLApp } from 'uWebSockets.js'
+import { env } from './env'
 
 const app = env.isDev
   ? SSLApp({

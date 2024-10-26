@@ -1,7 +1,6 @@
 import {
   $$notifications,
   confirmationFactory,
-  createApiEffect,
   handleExceptions,
 } from '@core/client'
 import { createField, createForm } from '@core/forms'
@@ -15,15 +14,16 @@ import { condition, reset } from 'patronum'
 import { z } from 'zod'
 import { routes } from '../../routing'
 import { controlApi } from '../../shared/api/control'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 
-const generatePromocodeFx = createApiEffect(
+const generatePromocodeFx = createProtectedApiEffect(
   'json',
   controlApi.promocodes.generate.$post,
 )
 
 const createPromocodesMutation = createMutation({
   name: 'promocodes/create',
-  effect: createApiEffect('json', controlApi.promocodes.create.$post),
+  effect: createProtectedApiEffect('json', controlApi.promocodes.create.$post),
 })
 
 const generatePromocode = createEvent()

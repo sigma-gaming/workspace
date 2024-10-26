@@ -1,5 +1,6 @@
 import { Config } from 'tailwindcss'
 import plugin from 'tailwindcss/plugin'
+import { CustomThemeConfig } from 'tailwindcss/types/config'
 import { tailwindColors } from './colors'
 import { fontSizes } from './font-sizes'
 import { screens } from './screens'
@@ -22,7 +23,7 @@ const patchPlugin = plugin(({ addUtilities }) => {
   })
 })
 
-const utilsPlugin = plugin(({ addUtilities }) => {
+const mantineUtilsPlugin = plugin(({ addUtilities }) => {
   addUtilities({
     '.shadow-border': {
       boxShadow: '0 0 0 1px var(--mantine-color-borders)',
@@ -66,36 +67,72 @@ const scrollbarPlugin = plugin(({ addUtilities }) => {
   })
 })
 
-export function createConfig(config: { content: string[] }): Config {
-  return {
-    content: ['../../core/ui/**/*.{ts,tsx}', ...config.content],
-    plugins: [basePlugin, patchPlugin, utilsPlugin, scrollbarPlugin],
+export function createConfig(options: {
+  content: string[]
+  features?: {
+    mantine?: boolean
+    screens?: boolean
+    fonts?: boolean
+    colors?: boolean
+  }
+}): Config {
+  const defaultFeatures = {
+    mantine: true,
+    screens: true,
+    fonts: true,
+    colors: true,
+  }
 
-    theme: {
-      screens: Object.fromEntries(
-        screens.map(({ name, width }) => [name, `${width}px`]),
-      ),
-      fontSize: fontSizes.reduce(
-        (acc, fontSize) => {
-          acc[fontSize.name] = [
-            `${fontSize.size}px`,
-            `${fontSize.lineHeight}px`,
-          ]
+  const features = {
+    ...defaultFeatures,
+    ...options.features,
+  }
 
-          return acc
-        },
-        {} as Record<string, [string, string]>,
-      ),
-      extend: {
-        fontFamily: {
-          text: `DM Sans, sans-serif`,
-          interface: `Rubik, sans-serif`,
-        },
-        colors: {
-          ...tailwindColors,
-          dimmed: 'var(--mantine-color-dimmed)',
-        },
+  const plugins = [basePlugin, patchPlugin, scrollbarPlugin]
+
+  if (features.mantine) {
+    plugins.push(mantineUtilsPlugin)
+  }
+
+  const theme: Config['theme'] = {}
+  const extend: Partial<CustomThemeConfig> = {}
+  theme.extend = extend
+
+  if (features.screens) {
+    theme.screens = Object.fromEntries(
+      screens.map(({ name, width }) => [name, `${width}px`]),
+    )
+  }
+
+  if (features.fonts) {
+    theme.fontSize = fontSizes.reduce(
+      (acc, fontSize) => {
+        acc[fontSize.name] = [`${fontSize.size}px`, `${fontSize.lineHeight}px`]
+
+        return acc
       },
-    },
+      {} as Record<string, [string, string]>,
+    )
+  }
+
+  if (features.fonts) {
+    extend.fontFamily = {
+      text: `DM Sans, sans-serif`,
+      interface: `Rubik, sans-serif`,
+    }
+  }
+
+  if (features.colors) {
+    extend.colors = { ...tailwindColors }
+
+    if (features.mantine) {
+      extend.colors!.dimmed = 'var(--mantine-color-dimmed)'
+    }
+  }
+
+  return {
+    content: ['../../core/ui/**/*.{ts,tsx}', ...options.content],
+    plugins,
+    theme,
   }
 }

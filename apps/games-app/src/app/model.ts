@@ -9,7 +9,6 @@ import { $$user } from '../entities/user'
 import { $$maintenance } from '../features/maintenance'
 import { $$notificationEvents } from '../features/notification-events'
 import { router } from '../routing'
-import { gamesWs } from '../shared/api/games-ws'
 import { env } from '../shared/env'
 import { $$chatWidget } from '../widgets/chat'
 
@@ -46,13 +45,7 @@ sample({
 
 sample({
   clock: $$user.loggedIn,
-  target: [
-    ...loggedInEvents,
-    createEffect(() => {
-      gamesWs.disconnect()
-      gamesWs.connect()
-    }),
-  ],
+  target: loggedInEvents,
 })
 
 sample({
@@ -63,7 +56,7 @@ sample({
 sample({
   clock: router.$query,
   fn: (query) => query.r,
-  filter: Boolean,
+  filter: (query) => Boolean(query.r),
   target: createEffect((code: string) => {
     Cookies.set('referralCampaign', code, {
       domain: env.domain,

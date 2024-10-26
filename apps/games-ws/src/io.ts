@@ -1,7 +1,7 @@
 import { gamesPubSub } from '@games/redis'
-import { env } from '@games/services'
 import { createAdapter } from '@socket.io/redis-adapter'
 import { Server } from 'socket.io'
+import { env } from './env'
 import { ClientToServerEvents, ServerToClientEvents } from './types'
 
 const allowedOrigins = [env.gamesApp.url]

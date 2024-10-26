@@ -226,12 +226,12 @@ const SocialNetworks = () => {
       {loaded && !hasAllAccounts && (
         <div className="flex flex-col sm:flex-row gap-4">
           {!vkAccount && (
-            <VkButton flow="connect" size="sm" fullWidth={true}>
+            <VkButton size="sm" fullWidth={true}>
               Привязать VK ID
             </VkButton>
           )}
           {!telegramAccount && (
-            <TelegramButton flow="connect" size="sm" fullWidth={true}>
+            <TelegramButton size="sm" fullWidth={true}>
               Привязать Telegram
             </TelegramButton>
           )}

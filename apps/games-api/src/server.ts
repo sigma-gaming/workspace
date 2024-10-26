@@ -3,8 +3,8 @@ import './shared/sentry/init'
 import { shutdownServices } from '@core/di'
 import { logger, loggerService } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
-import { env } from '@games/services'
 import { app } from './app'
+import { env } from './env'
 import { sentry } from './shared/sentry'
 
 app.onError(

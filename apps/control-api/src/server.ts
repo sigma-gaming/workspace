@@ -2,11 +2,12 @@ import './setup'
 import { shutdownServices } from '@core/di'
 import { logger, loggerService } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
-import { env } from '@games/services'
 import { app } from './app'
+import { env } from './env'
 
 app.onError(
   createErrorHandler({
+    showOriginalError: env.isDev,
     onInternalError: (error, ctx) => {
       loggerService.forRequest(ctx.req).error(error)
     },

@@ -1,0 +1,52 @@
+---
+import SocialCallbackLayout from '../../../layouts/social-callback-layout.astro'
+
+export const prerender = false
+
+const payload = Astro.url.searchParams.get('payload')
+const returnUrl = Astro.cookies.get('sigma_returnUrl')?.value
+---
+
+<SocialCallbackLayout loaderColor="#0277FF">
+  <vk-integration data-payload={payload} data-return-url={returnUrl}>
+    <p class="mx-auto text-center">Выполняется&nbsp;вход через&nbsp;VK</p>
+  </vk-integration>
+</SocialCallbackLayout>
+
+<script>
+  import { AuthenticateResult } from '../../../api/types'
+  import { authApi } from '../../../shared/api/auth'
+
+  class VkIntegration extends HTMLElement {
+    connectedCallback() {
+      const payload = this.dataset.payload
+      const returnUrl = this.dataset.returnUrl
+      if (!payload || !returnUrl) return
+
+      authApi.authenticate
+        .$post({
+          json: { integration: 'vk', payload },
+        })
+        .then((res) => res.json())
+        .then((authentication) => {
+          const url = new URL(returnUrl)
+
+          url.searchParams.set('auth', authentication.result)
+
+          if (
+            authentication.result === AuthenticateResult.SignedIn ||
+            authentication.result === AuthenticateResult.SignedUp
+          ) {
+            url.searchParams.set(
+              'sessionExpiresAt',
+              authentication.sessionExpiresAt,
+            )
+          }
+
+          window.location.replace(url)
+        })
+    }
+  }
+
+  customElements.define('vk-integration', VkIntegration)
+</script>

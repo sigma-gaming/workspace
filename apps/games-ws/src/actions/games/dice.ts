@@ -1,13 +1,12 @@
 import { NotAuthenticatedException } from '@core/exceptions'
 import { DicePayloadSchema, Engine } from '@games/engine'
-import { Context } from '../../context'
 import { userRoom } from '../../shared/rooms/user'
 import { createWsAction } from '../../ws-action'
 
 export const GamesDiceAction = createWsAction({
   name: 'games/dice',
   schema: DicePayloadSchema,
-  async handler(ctx: Context, payload) {
+  async handler(ctx, payload) {
     const { session } = ctx
 
     if (!session) {

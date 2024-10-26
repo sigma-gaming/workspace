@@ -1,4 +1,4 @@
-import { $$notifications, createApiEffect } from '@core/client'
+import { $$notifications } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { NotificationInsert } from '@dbs/games-schema'
 import { NotificationKind } from '@dbs/games-types'
@@ -7,10 +7,11 @@ import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
 import { z } from 'zod'
 import { controlApi } from '../../shared/api/control'
+import { createProtectedApiEffect } from '../../shared/api/protected'
 
 const sendNotificationMutation = createMutation({
   name: 'notifications/send',
-  effect: createApiEffect('json', controlApi.notifications.send.$post),
+  effect: createProtectedApiEffect('json', controlApi.notifications.send.$post),
 })
 
 const $submitting = sendNotificationMutation.$pending

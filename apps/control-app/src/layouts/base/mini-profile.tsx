@@ -1,11 +1,12 @@
-import { Avatar, LinkButton, useMedia } from '@core/ui'
+import { Avatar, useMedia } from '@core/ui'
 import { getUserInitials } from '@games/model'
-import { Menu, Text } from '@mantine/core'
+import { Button, Menu, Modal, Text } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { $$profile } from '../../entities/profile'
+import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$user } from '../../entities/user'
-import { env } from '../../shared/env'
 
 function useAvatarSize() {
   const fromLg = useMedia({ from: 'lg' })
@@ -88,13 +89,30 @@ export const MiniProfile = () => {
 }
 
 export const ExpiredProfile = () => {
-  const query = new URLSearchParams()
-  query.set('view', 'sign-in')
-  query.set('returnUrl', env.controlApp.url)
+  const [opened, { open, close }] = useDisclosure(false)
 
   return (
-    <LinkButton size="md" to={`${env.gamesApp.url}?${query.toString()}`}>
-      Войти в аккаунт
-    </LinkButton>
+    <>
+      <Button size="md" onClick={open}>
+        Войти в аккаунт
+      </Button>
+
+      <Modal
+        title="Авторизация"
+        opened={opened}
+        onClose={close}
+        size="xs"
+        centered
+      >
+        <div className="flex flex-col gap-2">
+          <VkButton size="md" fullWidth>
+            Войти через VK ID
+          </VkButton>
+          <TelegramButton size="md" fullWidth>
+            Войти через Telegram
+          </TelegramButton>
+        </div>
+      </Modal>
+    </>
   )
 }

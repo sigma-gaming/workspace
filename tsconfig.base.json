@@ -41,6 +41,9 @@
       "@apis/control-api": [
         "apps/control-api/src/client.ts"
       ],
+      "@apis/letsauth": [
+        "apps/letsauth/src/client.ts"
+      ],
       "@core/server": [
         "core/server/src/index.ts"
       ],

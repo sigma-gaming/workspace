@@ -4,7 +4,6 @@ import {
 } from '@core/exceptions'
 import { TaskStatus } from '@dbs/games-types'
 import { GlobalTaskClaimRewardResult, globalTaskService } from '@games/services'
-import { Context } from '../../context'
 import { userRoom } from '../../shared/rooms/user'
 import { createWsAction } from '../../ws-action'
 import {
@@ -15,10 +14,7 @@ import {
 export const GlobalTasksClaimRewardAction = createWsAction({
   name: 'global-tasks/claim-reward',
   schema: GlobalTasksClaimRewardPayloadSchema,
-  handler: async (
-    ctx: Context,
-    payload,
-  ): Promise<GlobalTasksClaimRewardOutput> => {
+  handler: async (ctx, payload): Promise<GlobalTasksClaimRewardOutput> => {
     const { session } = ctx
 
     if (!session) {

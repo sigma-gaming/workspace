@@ -1,7 +1,6 @@
 import { createSingletonProxy } from '@core/di'
-import { singleton } from 'tsyringe-neo'
+import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 import { APIError, VK } from 'vk-io'
-import { EnvService } from './env'
 
 type GroupMemberPayload = {
   groupId: number
@@ -18,18 +17,26 @@ export enum RepostStatus {
   Unknown = 'Unknown',
 }
 
+export type VkOptions = {
+  groupToken: string
+  serviceToken: string
+}
+
+export const VkOptionsToken: InjectionToken<VkOptions> =
+  Symbol('VkOptionsToken')
+
 @singleton()
 export class VkService {
   group: VK
   service: VK
 
-  constructor({ env }: EnvService) {
+  constructor(@inject(VkOptionsToken) options: VkOptions) {
     this.group = new VK({
-      token: env.vk.groupToken,
+      token: options.groupToken,
     })
 
     this.service = new VK({
-      token: env.vk.serviceToken,
+      token: options.serviceToken,
     })
   }
 

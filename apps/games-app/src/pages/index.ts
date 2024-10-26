@@ -2,8 +2,6 @@ import { AffiliatePage } from './affiliate'
 import { BonusesPage } from './bonuses'
 import { PaymentFailureCallbackPage } from './callbacks/payment-failure'
 import { PaymentSuccessCallbackPage } from './callbacks/payment-success'
-import { TelegramCallbackPage } from './callbacks/telegram'
-import { VkCallbackPage } from './callbacks/vk'
 import { GamesPage } from './games'
 import { DiceGamePage } from './games-dice'
 import { PincodeGamePage } from './games-pincode'
@@ -15,8 +13,6 @@ export const PAGES = [
   PincodeGamePage,
   BonusesPage,
   SettingsPage,
-  VkCallbackPage,
-  TelegramCallbackPage,
   PaymentSuccessCallbackPage,
   PaymentFailureCallbackPage,
   AffiliatePage,

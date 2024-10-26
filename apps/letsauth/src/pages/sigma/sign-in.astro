@@ -1,0 +1,82 @@
+---
+import { v4 } from 'uuid'
+import { z } from 'zod'
+import BaseLayout from '../../layouts/base-layout.astro'
+import { serverEnv } from '../../shared/env/server'
+
+export const prerender = false
+
+export function createTelegramUrl() {
+  const params = new URLSearchParams()
+  params.set('bot_id', serverEnv.telegram.botId)
+  params.set('origin', serverEnv.authApi.url)
+  params.set('embed', '0')
+  params.set('request_access', 'write')
+  params.set(
+    'return_to',
+    `${serverEnv.authApi.url}/sigma/integrations/telegram`,
+  )
+  return `https://oauth.telegram.org/auth?${params.toString()}`
+}
+
+export function createVkUrl() {
+  const params = new URLSearchParams()
+  params.set('uuid', v4())
+  params.set('app_id', serverEnv.vk.appId)
+  params.set('response_type', 'silent_token')
+  params.set('redirect_uri', `${serverEnv.authApi.url}/sigma/integrations/vk`)
+  return `https://id.vk.com/auth?${params.toString()}`
+}
+
+class InvalidQueryException extends Error {}
+
+const QuerySchema = z.strictObject({
+  integration: z.enum(['vk', 'telegram']),
+  returnUrl: z.string(),
+  referralCampaign: z.string().optional(),
+})
+
+function getQuery() {
+  const queryRaw = Object.fromEntries(Astro.url.searchParams.entries())
+  const parsed = QuerySchema.safeParse(queryRaw)
+  if (!parsed.success) throw new InvalidQueryException()
+  return parsed.data
+}
+
+try {
+  const query = getQuery()
+
+  for (const [key, value] of Object.entries(query)) {
+    if (!value) continue
+
+    Astro.cookies.set(`sigma_${key}`, value, {
+      path: '/',
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 60 * 60 * 3,
+    })
+  }
+
+  if (query.integration === 'telegram') {
+    return Astro.redirect(createTelegramUrl())
+  }
+
+  if (query.integration === 'vk') {
+    return Astro.redirect(createVkUrl())
+  }
+} catch (error) {
+  console.info(error)
+}
+---
+
+<BaseLayout>
+  <section class="text-center">
+    <h2 class="text-xl md:text-2xl font-medium mb-4 mx-auto max-w-[480px]">
+      Что-то пошло не&nbsp;так
+    </h2>
+    <p class="text-sm md:text-base text-gray-300 mb-8 mx-auto max-w-[540px]">
+      Попробуйте снова через&nbsp;пару&nbsp;минут
+    </p>
+  </section>
+</BaseLayout>

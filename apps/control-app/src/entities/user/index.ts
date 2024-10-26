@@ -1,11 +1,13 @@
-import { createApiEffect } from '@core/client'
 import { NotAuthenticatedException } from '@core/exceptions'
 import { UserRole } from '@dbs/games-types'
 import { createQuery } from '@farfetched/core'
-import { createEffect, createEvent, createStore, sample } from 'effector'
+import { createEffect, createEvent, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
+import { letsauthApi } from '../../shared/api/letsauth'
+import { createProtectedApiEffect } from '../../shared/api/protected'
+import { $$session } from '../../shared/api/session'
 import { env } from '../../shared/env'
 
 const request = createEvent()
@@ -18,12 +20,12 @@ const clientLogoutFx = createEffect(() => {
 
 const userQuery = createQuery({
   name: 'user/get',
-  effect: createApiEffect('query', gamesApi.me.getUser.$get),
+  effect: createProtectedApiEffect('query', gamesApi.me.getUser.$get),
 })
 
 const logoutMutation = createQuery({
   name: 'user/logout',
-  effect: createApiEffect('json', gamesApi.auth.logout.$post),
+  effect: createProtectedApiEffect('json', letsauthApi.logout.$post),
 })
 
 const loaded = userQuery.finished.success
@@ -32,15 +34,12 @@ const $user = userQuery.$data
 const $loading = userQuery.$pending
 const $loaded = and($user)
 const $loggingOut = logoutMutation.$pending
+const $loggedIn = $$session.$sessionActive.map(Boolean)
 
 const $roles = $user.map((user) => user?.roles ?? [UserRole.User])
 const $isAdmin = $roles.map((roles) => roles.includes(UserRole.Admin))
 const $isModerator = $roles.map((roles) => roles.includes(UserRole.Moderator))
 const $isSupport = $roles.map((roles) => roles.includes(UserRole.Support))
-
-const expiresAt = Cookies.get('sessionExpiresAt') ?? null
-const initialLoggedIn = expiresAt !== null && new Date() < new Date(expiresAt)
-const $loggedIn = createStore(initialLoggedIn)
 
 sample({
   clock: request,
@@ -62,7 +61,12 @@ sample({
 sample({
   clock: logout,
   fn: () => false,
-  target: [clientLogoutFx, userQuery.reset, logoutMutation.start, $loggedIn],
+  target: [
+    clientLogoutFx,
+    userQuery.reset,
+    logoutMutation.start,
+    $$session.clear,
+  ],
 })
 
 export const $$user = {

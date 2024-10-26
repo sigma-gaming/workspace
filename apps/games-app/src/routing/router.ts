@@ -8,8 +8,6 @@ import {
   paymentSuccessCallback,
   pincodeGame,
   settings,
-  telegramCallback,
-  vkCallback,
 } from './routes'
 
 const routes = [
@@ -19,8 +17,6 @@ const routes = [
   { path: '/settings', route: settings },
   { path: '/bonuses', route: bonuses },
   { path: '/affiliate', route: affiliate },
-  { path: '/callbacks/vk', route: vkCallback },
-  { path: '/callbacks/telegram', route: telegramCallback },
   { path: '/callbacks/payment/success', route: paymentSuccessCallback },
   { path: '/callbacks/payment/failure', route: paymentFailureCallback },
 ]

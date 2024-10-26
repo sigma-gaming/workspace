@@ -7,5 +7,5 @@ export type Context = {
   url: URL
   headers: IncomingHttpHeaders
   socket: Socket<ClientToServerEvents, ServerToClientEvents>
-  session?: Session
+  session: Session | null
 }
