@@ -62,7 +62,7 @@ jobs:
         run: echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
 
   publish:
-    name: Publish to Google Cloud Registry
+    name: Publish
     needs: [affected, copy-repository]
     runs-on: [self-hosted, build, ARM64]
     defaults:
@@ -115,7 +115,7 @@ jobs:
         run: |-
           docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest
           docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
-  
+
   cleanup:
     name: Cleanup
     needs: [copy-repository, publish]
