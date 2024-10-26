@@ -1,6 +1,5 @@
 export * from './create-api-effect'
 export * from './create-exception-events'
-export * from './create-protected-api-effect'
 export * from './handle-exceptions'
 export * from './modals'
 export * from './notifications'

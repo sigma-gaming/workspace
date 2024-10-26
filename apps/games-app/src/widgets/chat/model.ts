@@ -11,19 +11,19 @@ import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 
 const initialize = createEvent()
 const reset = createEvent()
 
-const getLastMessagesFx = createProtectedApiEffect(
+const getLastMessagesFx = createApiEffect(
   'query',
   gamesApi.chat.getLastMessages.$get,
 )
 
 const sendMessageMutation = createMutation({
   name: 'chat/sendMessage',
-  effect: createProtectedApiEffect('json', gamesApi.chat.sendMessage.$post),
+  effect: createApiEffect('json', gamesApi.chat.sendMessage.$post),
 })
 
 const $loadingMessages = createStore(true)

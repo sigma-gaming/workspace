@@ -1,4 +1,3 @@
-import { createApiEffect } from '@core/client'
 import { NotAuthenticatedException } from '@core/exceptions'
 import { createWsEffect } from '@core/io-client'
 import { createQuery } from '@farfetched/core'
@@ -8,7 +7,7 @@ import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
 import { letsauthApi } from '../../shared/api/letsauth'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 import { $$session } from '../../shared/api/session'
 import { env } from '../../shared/env'
 
@@ -24,7 +23,7 @@ const clientLogoutFx = createEffect(() => {
 
 const userQuery = createQuery({
   name: 'user/get',
-  effect: createProtectedApiEffect('query', gamesApi.me.getUser.$get),
+  effect: createApiEffect('query', gamesApi.me.getUser.$get),
 })
 
 const logoutMutation = createQuery({

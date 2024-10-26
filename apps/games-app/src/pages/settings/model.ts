@@ -9,16 +9,13 @@ import { z } from 'zod'
 import { $$profile } from '../../entities/profile'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 
 const reset = createEvent()
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
-  effect: createProtectedApiEffect(
-    'json',
-    gamesApi.settings.updateProfile.$post,
-  ),
+  effect: createApiEffect('json', gamesApi.settings.updateProfile.$post),
 })
 
 const $updatingProfile = updateProfileMutation.$pending

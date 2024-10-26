@@ -14,7 +14,7 @@ import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 
 const completeGlobalTask = createEvent<GlobalTaskKey>()
 const claimGlobalTaskReward = createEvent<GlobalTaskKey>()
@@ -22,18 +22,15 @@ const reset = createEvent()
 
 const applyPromocodeMutation = createMutation({
   name: 'bonuses/applyPromocode',
-  effect: createProtectedApiEffect('json', gamesApi.promocodes.apply.$post),
+  effect: createApiEffect('json', gamesApi.promocodes.apply.$post),
 })
 
 const getGlobalTasksQuery = createQuery({
   name: 'bonuses/getGlobalTasks',
-  effect: createProtectedApiEffect(
-    'query',
-    gamesApi.tasks.global.getTasks.$get,
-  ),
+  effect: createApiEffect('query', gamesApi.tasks.global.getTasks.$get),
 })
 
-const getGlobalTaskStatusesFx = createProtectedApiEffect(
+const getGlobalTaskStatusesFx = createApiEffect(
   'query',
   gamesApi.tasks.global.getStatuses.$get,
 )

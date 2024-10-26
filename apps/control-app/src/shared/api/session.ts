@@ -9,6 +9,13 @@ import { letsauthApi } from './letsauth'
 
 type TokenDecoded = AccessTokenPayload & { exp: number }
 
+function saveSessionExpiresAt(expiresAt: string) {
+  Cookies.set('sessionExpiresAt', expiresAt, {
+    domain: env.domain,
+    expires: new Date(expiresAt),
+  })
+}
+
 if (typeof window !== 'undefined') {
   const url = new URL(window.location.href)
   const query = new URLSearchParams(url.search)
@@ -19,13 +26,7 @@ if (typeof window !== 'undefined') {
     flow === AuthenticateResult.SignedUp
   ) {
     const expiresAt = query.get('sessionExpiresAt')
-
-    if (expiresAt) {
-      Cookies.set('sessionExpiresAt', expiresAt, {
-        domain: env.domain,
-        expires: new Date(expiresAt),
-      })
-    }
+    if (expiresAt) saveSessionExpiresAt(expiresAt)
 
     query.delete('auth')
     query.delete('sessionExpiresAt')
@@ -38,7 +39,7 @@ if (typeof window !== 'undefined') {
 
 function getSessionExpiresAt() {
   const expiresAt = Cookies.get('sessionExpiresAt')
-  return expiresAt ? new Date(expiresAt) : null
+  return expiresAt ?? null
 }
 
 let refreshTokenPromise: Promise<AccessTokenResponse> | null = null
@@ -57,6 +58,8 @@ const refreshTokenFx = createEffect(async () => {
   return refreshTokenPromise
 })
 
+const saveSessionExpiresAtFx = createEffect(saveSessionExpiresAt)
+
 const initialize = createEvent()
 const clear = createEvent()
 
@@ -73,14 +76,21 @@ const $accessTokenExpiresAt = $accessTokenDecoded.map((decoded) => {
   return new Date(decoded.exp * 1000)
 })
 
-const $sessionActive = $sessionExpiresAt.map(
-  (expiresAt) => expiresAt && new Date() < expiresAt,
-)
+const $sessionActive = $sessionExpiresAt.map((expiresAt) => {
+  if (!expiresAt) return false
+  return new Date() < new Date(expiresAt)
+})
 
 sample({
   clock: refreshTokenFx.doneData,
   fn: ({ accessToken }) => accessToken,
   target: $accessToken,
+})
+
+sample({
+  source: refreshTokenFx.doneData,
+  fn: ({ sessionExpiresAt }) => sessionExpiresAt,
+  target: [$sessionExpiresAt, saveSessionExpiresAtFx],
 })
 
 sample({

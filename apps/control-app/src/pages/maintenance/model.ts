@@ -6,19 +6,16 @@ import { sample } from 'effector'
 import { z } from 'zod'
 import { routes } from '../../routing'
 import { controlApi } from '../../shared/api/control'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 
 const getMaintenanceQuery = createQuery({
   name: 'maintenance/get',
-  effect: createProtectedApiEffect('query', controlApi.maintenance.get.$get),
+  effect: createApiEffect('query', controlApi.maintenance.get.$get),
 })
 
 const updateMaintenanceMutation = createMutation({
   name: 'maintenance/update',
-  handler: createProtectedApiEffect(
-    'json',
-    controlApi.maintenance.update.$post,
-  ),
+  handler: createApiEffect('json', controlApi.maintenance.update.$post),
 })
 
 const $loading = getMaintenanceQuery.$pending

@@ -7,22 +7,22 @@ import { createEvent, createStore, sample } from 'effector'
 import { previous, status } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 import { $$audio, Sound } from '../audio'
 
-const getDetailedBalanceFx = createProtectedApiEffect(
+const getDetailedBalanceFx = createApiEffect(
   'query',
   gamesApi.me.getDetailedBalance.$get,
 )
 
 const depositMutation = createMutation({
   name: 'balance/deposit',
-  effect: createProtectedApiEffect('json', gamesApi.balance.deposit.$post),
+  effect: createApiEffect('json', gamesApi.balance.deposit.$post),
 })
 
 const withdrawMutation = createMutation({
   name: 'balance/withdraw',
-  effect: createProtectedApiEffect('json', gamesApi.balance.withdraw.$post),
+  effect: createApiEffect('json', gamesApi.balance.withdraw.$post),
 })
 
 const { receivedData: balanceUpdated } = invoke(() =>

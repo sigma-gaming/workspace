@@ -14,16 +14,16 @@ import { condition, reset } from 'patronum'
 import { z } from 'zod'
 import { routes } from '../../routing'
 import { controlApi } from '../../shared/api/control'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 
-const generatePromocodeFx = createProtectedApiEffect(
+const generatePromocodeFx = createApiEffect(
   'json',
   controlApi.promocodes.generate.$post,
 )
 
 const createPromocodesMutation = createMutation({
   name: 'promocodes/create',
-  effect: createProtectedApiEffect('json', controlApi.promocodes.create.$post),
+  effect: createApiEffect('json', controlApi.promocodes.create.$post),
 })
 
 const generatePromocode = createEvent()

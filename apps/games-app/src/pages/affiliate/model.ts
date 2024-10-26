@@ -10,43 +10,34 @@ import { $$balance } from '../../entities/balance'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 
 const withdraw = createEvent()
 const reset = createEvent()
 
-const getBalanceFx = createProtectedApiEffect(
+const getBalanceFx = createApiEffect(
   'query',
   gamesApi.affiliate.getBalance.$get,
 )
 
 const getSettingsQuery = createQuery({
   name: 'affiliate/getSettings',
-  effect: createProtectedApiEffect(
-    'query',
-    gamesApi.affiliate.getSettings.$get,
-  ),
+  effect: createApiEffect('query', gamesApi.affiliate.getSettings.$get),
 })
 
 const getCampaignsQuery = createQuery({
   name: 'affiliate/getCampaigns',
-  effect: createProtectedApiEffect(
-    'query',
-    gamesApi.affiliate.getCampaigns.$get,
-  ),
+  effect: createApiEffect('query', gamesApi.affiliate.getCampaigns.$get),
 })
 
 const getLastTransactionsQuery = createQuery({
   name: 'affiliate/getLastTransactions',
-  effect: createProtectedApiEffect(
-    'query',
-    gamesApi.affiliate.getLastTransactions.$get,
-  ),
+  effect: createApiEffect('query', gamesApi.affiliate.getLastTransactions.$get),
 })
 
 const withdrawMutation = createMutation({
   name: 'affiliate/withdraw',
-  effect: createProtectedApiEffect('json', gamesApi.affiliate.withdraw.$post),
+  effect: createApiEffect('json', gamesApi.affiliate.withdraw.$post),
 })
 
 $$balance.receiveUpdates(

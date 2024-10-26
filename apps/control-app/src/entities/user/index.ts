@@ -6,7 +6,7 @@ import Cookies from 'js-cookie'
 import { and } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { letsauthApi } from '../../shared/api/letsauth'
-import { createProtectedApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/protected'
 import { $$session } from '../../shared/api/session'
 import { env } from '../../shared/env'
 
@@ -20,12 +20,12 @@ const clientLogoutFx = createEffect(() => {
 
 const userQuery = createQuery({
   name: 'user/get',
-  effect: createProtectedApiEffect('query', gamesApi.me.getUser.$get),
+  effect: createApiEffect('query', gamesApi.me.getUser.$get),
 })
 
 const logoutMutation = createQuery({
   name: 'user/logout',
-  effect: createProtectedApiEffect('json', letsauthApi.logout.$post),
+  effect: createApiEffect('json', letsauthApi.logout.$post),
 })
 
 const loaded = userQuery.finished.success
