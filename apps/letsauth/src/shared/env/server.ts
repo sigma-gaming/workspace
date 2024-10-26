@@ -5,7 +5,6 @@ const ServerEnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
 
-    PUBLIC_DOMAIN: z.string(),
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_CONTROL_APP_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
