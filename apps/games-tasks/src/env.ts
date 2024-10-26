@@ -10,9 +10,6 @@ const EnvSchema = z
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-    PUBLIC_AUTH_API_DOMAIN: z.string(),
-    PUBLIC_AUTH_API_URL: z.string(),
-    PUBLIC_AUTH_API_VERSION: z.string().default('unknown'),
     PUBLIC_CONTROL_APP_URL: z.string(),
     PUBLIC_CONTROL_API_URL: z.string(),
     PUBLIC_CONTROL_API_VERSION: z.string().default('unknown'),
@@ -60,12 +57,6 @@ const EnvSchema = z
     gamesApi: {
       url: raw.PUBLIC_GAMES_API_URL,
       version: raw.PUBLIC_GAMES_API_VERSION,
-    },
-
-    authApi: {
-      domain: raw.PUBLIC_AUTH_API_DOMAIN,
-      url: raw.PUBLIC_AUTH_API_URL,
-      version: raw.PUBLIC_AUTH_API_VERSION,
     },
 
     gamesWs: {
