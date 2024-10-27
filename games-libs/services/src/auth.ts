@@ -24,6 +24,7 @@ export enum AuthResult {
   SignedUp = 'signed-up',
   Connected = 'connected',
   ConnectedToAnotherUser = 'connected-to-another-user',
+  AnotherAccountConnected = 'another-account-connected',
 }
 
 export type AuthenticatePayload = {
@@ -42,6 +43,7 @@ type AuthenticateOutcome =
   | { result: AuthResult.SignedUp; user: UserSelect; account: AccountSelect }
   | { result: AuthResult.Connected }
   | { result: AuthResult.ConnectedToAnotherUser }
+  | { result: AuthResult.AnotherAccountConnected }
 
 @singleton()
 export class AuthService {
@@ -79,6 +81,20 @@ export class AuthService {
     }
 
     if (userId) {
+      const connectedAccount = await gamesDb.query.AccountTable.findFirst({
+        where: and(
+          eq(AccountTable.userId, userId),
+          eq(AccountTable.provider, provider),
+        ),
+      })
+
+      if (
+        connectedAccount &&
+        connectedAccount.providerUserId !== providerUserId
+      ) {
+        return { result: AuthResult.AnotherAccountConnected }
+      }
+
       if (account) {
         if (userId !== account.userId) {
           return { result: AuthResult.ConnectedToAnotherUser }

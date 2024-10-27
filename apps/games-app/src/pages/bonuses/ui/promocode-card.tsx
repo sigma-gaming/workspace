@@ -2,13 +2,13 @@ import { Icons, useMedia, WithError } from '@core/ui'
 import { Button, Card, TextInput, Tooltip } from '@mantine/core'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
-import { $$user } from '../../../entities/user/index.ts'
+import { $$session } from '../../../entities/session/index.ts'
 import bonusChestSrc from '../assets/bonus-chest-512.webp'
 import { $$bonusesPage } from '../model.ts'
 import promocodeInputStyles from './promocode-input.module.css'
 
 export const PromocodeCard = () => {
-  const loggedIn = useUnit($$user.$loggedIn)
+  const loggedIn = useUnit($$session.$loggedIn)
 
   const code = useUnit($$bonusesPage.promocodeFields.code.$value)
   const updateCode = useUnit($$bonusesPage.promocodeFields.code.update)

@@ -3,7 +3,7 @@ import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
 import { status } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 
 const request = createEvent()
 const connect = createEvent()

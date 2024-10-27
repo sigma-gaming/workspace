@@ -97,6 +97,10 @@ FROM api-base AS referral-redirect-api
 COPY --from=build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/referral-redirect-api/dist/main.js" ]
 
+FROM api-base AS access-api
+COPY --from=build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/access-api/dist/main.js" ]
+
 FROM api-base AS letsauth
 COPY --from=build /build ./
 ENV HOST=0.0.0.0

@@ -1,31 +1,18 @@
-import { NotAuthenticatedException } from '@core/exceptions'
+import { RouteException } from '@core/exceptions'
 import { UserRole } from '@dbs/games-types'
 import { createQuery } from '@farfetched/core'
-import { createEffect, createEvent, sample } from 'effector'
-import Cookies from 'js-cookie'
+import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
+import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
-import { letsauthApi } from '../../shared/api/letsauth'
-import { createApiEffect } from '../../shared/api/protected'
-import { $$session } from '../../shared/api/session'
-import { env } from '../../shared/env'
 
 const request = createEvent()
 const refresh = createEvent()
-const logout = createEvent()
-
-const clientLogoutFx = createEffect(() => {
-  Cookies.remove('sessionExpiresAt', { domain: env.domain })
-})
+const failed = createEvent<RouteException<unknown>>()
 
 const userQuery = createQuery({
   name: 'user/get',
   effect: createApiEffect('query', gamesApi.me.getUser.$get),
-})
-
-const logoutMutation = createQuery({
-  name: 'user/logout',
-  effect: createApiEffect('json', letsauthApi.logout.$post),
 })
 
 const loaded = userQuery.finished.success
@@ -33,8 +20,6 @@ const loaded = userQuery.finished.success
 const $user = userQuery.$data
 const $loading = userQuery.$pending
 const $loaded = and($user)
-const $loggingOut = logoutMutation.$pending
-const $loggedIn = $$session.$sessionActive.map(Boolean)
 
 const $roles = $user.map((user) => user?.roles ?? [UserRole.User])
 const $isAdmin = $roles.map((roles) => roles.includes(UserRole.Admin))
@@ -54,31 +39,18 @@ sample({
 
 sample({
   source: userQuery.finished.failure,
-  filter: ({ error }) => error instanceof NotAuthenticatedException,
-  target: logout,
-})
-
-sample({
-  clock: logout,
-  fn: () => false,
-  target: [
-    clientLogoutFx,
-    userQuery.reset,
-    logoutMutation.start,
-    $$session.clear,
-  ],
+  fn: ({ error }) => error,
+  target: failed,
 })
 
 export const $$user = {
   request,
   refresh,
-  logout,
   loaded,
+  failed,
   $user,
   $loading,
   $loaded,
-  $loggedIn,
-  $loggingOut,
   $roles,
   $isAdmin,
   $isModerator,

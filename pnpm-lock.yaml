@@ -361,6 +361,39 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
 
+  apps/access-api:
+    dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../../core/exceptions
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
+      '@core/server':
+        specifier: workspace:*
+        version: link:../../core/server
+      '@dbs/games-db':
+        specifier: workspace:*
+        version: link:../../dbs/games-db
+      '@dbs/games-schema':
+        specifier: workspace:*
+        version: link:../../dbs/games-schema
+      '@games/model':
+        specifier: workspace:*
+        version: link:../../games-libs/model
+      '@games/redis':
+        specifier: workspace:*
+        version: link:../../games-libs/redis
+      '@games/services':
+        specifier: workspace:*
+        version: link:../../games-libs/services
+      '@tooling/env':
+        specifier: workspace:*
+        version: link:../../tooling/env
+
   apps/control-api:
     dependencies:
       '@core/di':

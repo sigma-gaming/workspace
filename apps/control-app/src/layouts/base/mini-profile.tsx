@@ -6,6 +6,7 @@ import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { $$profile } from '../../entities/profile'
 import { TelegramButton, VkButton } from '../../entities/provider'
+import { $$session } from '../../entities/session'
 import { $$user } from '../../entities/user'
 
 function useAvatarSize() {
@@ -18,7 +19,7 @@ function useAvatarSize() {
 
 export const MiniProfile = () => {
   const isMobile = useMedia({ to: 'md' })
-  const userLoggedIn = useUnit($$user.$loggedIn)
+  const userLoggedIn = useUnit($$session.$loggedIn)
   const userLoaded = useUnit($$user.$loaded)
   const profile = useUnit($$profile.$profile)
   const profileLoaded = useUnit($$profile.$loaded)

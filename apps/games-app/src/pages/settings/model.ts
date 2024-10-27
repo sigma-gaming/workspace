@@ -9,7 +9,7 @@ import { z } from 'zod'
 import { $$profile } from '../../entities/profile'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 
 const reset = createEvent()
 

@@ -15,6 +15,7 @@ import { useUnit } from 'effector-react'
 import { $$balance } from '../../entities/balance'
 import { $$profile } from '../../entities/profile/index.ts'
 import { TelegramButton, VkButton } from '../../entities/provider'
+import { $$session } from '../../entities/session/index.ts'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { Balance } from './balance.tsx'
@@ -29,8 +30,7 @@ function useAvatarSize() {
 
 export const MiniProfile = () => {
   const isMobile = useMedia({ to: 'md' })
-  const userLoggedIn = useUnit($$user.$loggedIn)
-  const loggingOut = useUnit($$user.$loggingOut)
+  const userLoggedIn = useUnit($$session.$loggedIn)
   const balanceDepositing = useUnit($$balance.$depositing)
   const balanceWithdrawing = useUnit($$balance.$withdrawing)
   const userLoaded = useUnit($$user.$loaded)
@@ -149,8 +149,7 @@ export const MiniProfile = () => {
         </Menu.Item>
         <Menu.Item
           className="text-red-400"
-          onClick={() => $$user.logout()}
-          disabled={loggingOut}
+          onClick={() => $$session.logout()}
           leftSection={
             <IconLogout style={{ width: rem(16), height: rem(16) }} />
           }

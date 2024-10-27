@@ -1,4 +1,4 @@
-import { ApiType } from './api'
+import { ApiType } from './api/api'
 
 export {
   type AccessTokenResponse,

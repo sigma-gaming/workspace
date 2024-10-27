@@ -10,10 +10,10 @@ import {
   sample,
 } from 'effector'
 import { and, interval, status } from 'patronum'
-import { $$user } from '../../entities/user'
+import { $$session } from '../../entities/session'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 
 export type Tab = 'last-wins' | 'big-wins' | 'my-games'
 
@@ -152,7 +152,7 @@ sample({
 
 sample({
   clock: initialize,
-  filter: $$user.$loggedIn,
+  filter: $$session.$loggedIn,
   target: getMyGamesFx,
 })
 
@@ -162,11 +162,6 @@ sample({
   filter: $myGamesLoaded,
   fn: (myGames, newGame) => [newGame].concat(myGames).slice(0, 10),
   target: $myGames,
-})
-
-sample({
-  clock: $$user.logout,
-  target: [resetMyGames, resetTab],
 })
 
 export const $$gameHistory = {

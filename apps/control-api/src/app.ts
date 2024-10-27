@@ -5,6 +5,7 @@ import { env } from './env'
 import { healthyRoute, readyRoute } from './health'
 import { ControlApiEnv } from './hono'
 import { sessionMiddleware } from './middlewares/session'
+import { accessRoute } from './routes/access'
 import { fraudServiceRouter } from './routes/fraud'
 import { maintenanceRouter } from './routes/maintenance'
 import { notificationsRouter } from './routes/notifications'
@@ -29,6 +30,7 @@ export const app = new Hono<ControlApiEnv>()
   .route('/ready', readyRoute)
   .use('*', logger())
   .use('*', sessionMiddleware)
+  .route('/access', accessRoute)
   .route('/notifications', notificationsRouter)
   .route('/maintenance', maintenanceRouter)
   .route('/fraud', fraudServiceRouter)

@@ -32,6 +32,7 @@ class InvalidQueryException extends Error {}
 
 const QuerySchema = z.strictObject({
   integration: z.enum(['vk', 'telegram']),
+  accessUrl: z.string(),
   returnUrl: z.string(),
   referralCampaign: z.string().optional(),
 })

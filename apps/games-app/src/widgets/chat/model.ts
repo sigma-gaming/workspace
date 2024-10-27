@@ -11,7 +11,7 @@ import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 
 const initialize = createEvent()
 const reset = createEvent()

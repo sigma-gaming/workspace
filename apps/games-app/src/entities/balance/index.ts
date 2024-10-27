@@ -7,7 +7,7 @@ import { createEvent, createStore, sample } from 'effector'
 import { previous, status } from 'patronum'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 import { $$audio, Sound } from '../audio'
 
 const getDetailedBalanceFx = createApiEffect(

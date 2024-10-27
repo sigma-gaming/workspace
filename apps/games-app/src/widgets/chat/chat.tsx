@@ -5,12 +5,12 @@ import { ActionIcon, Button, Skeleton } from '@mantine/core'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { memo, UIEventHandler, useCallback, useEffect, useRef } from 'react'
-import { $$user } from '../../entities/user'
+import { $$session } from '../../entities/session'
 import { useTimeAgo } from '../../shared/time'
 import { $$chatWidget, ExtendedMessage } from './model'
 
 export const Chat = () => {
-  const loggedIn = useUnit($$user.$loggedIn)
+  const loggedIn = useUnit($$session.$loggedIn)
   const text = useUnit($$chatWidget.fields.text.$value)
   const updateText = useUnit($$chatWidget.fields.text.update)
   const submit = useUnit($$chatWidget.form.submit)

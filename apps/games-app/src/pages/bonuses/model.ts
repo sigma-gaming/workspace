@@ -10,11 +10,11 @@ import { createEvent, createStore, EffectResult, sample } from 'effector'
 import { z } from 'zod'
 import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
-import { $$user } from '../../entities/user'
+import { $$session } from '../../entities/session'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 
 const completeGlobalTask = createEvent<GlobalTaskKey>()
 const claimGlobalTaskReward = createEvent<GlobalTaskKey>()
@@ -204,13 +204,13 @@ sample({
 
 sample({
   clock: routes.bonuses.opened,
-  filter: $$user.$loggedIn,
+  filter: $$session.$loggedIn,
   fn: noop,
   target: [getGlobalTaskStatusesFx],
 })
 
 sample({
-  clock: [routes.bonuses.closed, $$user.loggedOut],
+  clock: routes.bonuses.closed,
   target: reset,
 })
 

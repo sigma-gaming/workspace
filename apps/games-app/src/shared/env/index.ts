@@ -10,6 +10,7 @@ const PublicEnvSchema = z
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_GAMES_WS_URL: z.string(),
     PUBLIC_AUTH_API_URL: z.string(),
+    PUBLIC_ACCESS_API_URL: z.string(),
     PUBLIC_REFERRAL_REDIRECT_API_URL: z.string(),
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     PUBLIC_VK_APP_ID: z.string(),
@@ -26,6 +27,9 @@ const PublicEnvSchema = z
     },
     authApi: {
       url: raw.PUBLIC_AUTH_API_URL,
+    },
+    accessApi: {
+      url: raw.PUBLIC_ACCESS_API_URL,
     },
     gamesWs: {
       url: raw.PUBLIC_GAMES_WS_URL,

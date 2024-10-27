@@ -11,7 +11,7 @@ import { UserTable } from './user'
 
 export const SessionTable = pgTable('Session', {
   id: bigserial('id', { mode: 'number' }).primaryKey(),
-  refreshToken: text('refreshToken').unique().notNull(),
+  token: text('token').unique().notNull(),
   expiresAt: timestamp('expiresAt', {
     withTimezone: true,
     mode: 'string',

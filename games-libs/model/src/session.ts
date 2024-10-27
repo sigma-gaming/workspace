@@ -14,7 +14,7 @@ export type AccessTokenPayload = {
   provider: AccountProvider
 }
 
-export type RefreshTokenPayload = {
+export type SessionTokenPayload = {
   userId: string
   referrerId: string | null
   referralCampaignId: number | null

@@ -1,0 +1,63 @@
+---
+import { SessionState } from '@games/model'
+import { sessionService } from '@games/services'
+import { z } from 'zod'
+import { getSessionVariant } from '../../api/session'
+import BaseLayout from '../../layouts/base-layout.astro'
+import { serverEnv } from '../../shared/env/server'
+
+export const prerender = false
+
+class InvalidQueryException extends Error {}
+
+const QuerySchema = z.strictObject({
+  accessUrl: z.string(),
+  returnUrl: z.string(),
+})
+
+function getQuery() {
+  const queryRaw = Object.fromEntries(Astro.url.searchParams.entries())
+  const parsed = QuerySchema.safeParse(queryRaw)
+  if (!parsed.success) throw new InvalidQueryException()
+  return parsed.data
+}
+
+try {
+  const query = getQuery()
+
+  const sessionToken = Astro.cookies.get('session_token')?.value
+
+  if (sessionToken) {
+    const sessionVariant = getSessionVariant(sessionToken)
+
+    if (sessionVariant.state === SessionState.Authenticated) {
+      Astro.cookies.delete('session_token', {
+        domain: serverEnv.authApi.domain,
+        path: '/',
+        sameSite: 'none',
+        httpOnly: true,
+        secure: true,
+      })
+
+      await sessionService.removeSession(sessionToken)
+    }
+  }
+
+  const params = new URLSearchParams()
+  params.set('returnUrl', query.returnUrl)
+  return Astro.redirect(`${query.accessUrl}/logout?${params.toString()}`)
+} catch (error) {
+  console.info(error)
+}
+---
+
+<BaseLayout>
+  <section class="text-center">
+    <h2 class="text-xl md:text-2xl font-medium mb-4 mx-auto max-w-[480px]">
+      Что-то пошло не&nbsp;так
+    </h2>
+    <p class="text-sm md:text-base text-gray-300 mb-8 mx-auto max-w-[540px]">
+      Попробуйте снова через&nbsp;пару&nbsp;минут
+    </p>
+  </section>
+</BaseLayout>

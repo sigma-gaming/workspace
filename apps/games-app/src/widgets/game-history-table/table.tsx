@@ -9,7 +9,7 @@ import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { memo, ReactNode, useEffect, useRef } from 'react'
-import { $$user } from '../../entities/user'
+import { $$session } from '../../entities/session'
 import { $$gameHistory, Tab } from '../../features/game-history'
 import { routes } from '../../routing'
 import styles from './table.module.css'
@@ -38,7 +38,7 @@ function getGameResult(snapshot: GameSnapshot): string {
 
 export const GameHistoryTable = () => {
   const tab = useUnit($$gameHistory.$tab)
-  const loggedIn = useUnit($$user.$loggedIn)
+  const loggedIn = useUnit($$session.$loggedIn)
   const tabListRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

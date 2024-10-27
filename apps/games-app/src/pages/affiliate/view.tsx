@@ -28,7 +28,7 @@ import { useUnit } from 'effector-react'
 import { not } from 'patronum'
 import { ReactNode, useState } from 'react'
 import { $$affiliate } from '../../entities/affiliate'
-import { $$user } from '../../entities/user'
+import { $$session } from '../../entities/session'
 import { env } from '../../shared/env'
 import { $$affiliatePage } from './model'
 import styles from './styles.module.css'
@@ -453,7 +453,7 @@ const ConnectedContent = () => {
 
 const NotConnectedContent = () => {
   const connecting = useUnit($$affiliate.$connecting)
-  const loggedIn = useUnit($$user.$loggedIn)
+  const loggedIn = useUnit($$session.$loggedIn)
 
   return (
     <div className="relative">
@@ -512,7 +512,7 @@ const NotConnectedContent = () => {
 const Content = () => {
   const isConnected = useUnit($$affiliate.$isConnected)
   const loaded = useUnit($$affiliate.$loaded)
-  const loggedIn = useUnit($$user.$loggedIn)
+  const loggedIn = useUnit($$session.$loggedIn)
 
   if (!loggedIn) {
     return <NotConnectedContent />

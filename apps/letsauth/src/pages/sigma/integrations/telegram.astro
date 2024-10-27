@@ -4,10 +4,11 @@ import SocialCallbackLayout from '../../../layouts/social-callback-layout.astro'
 export const prerender = false
 
 const returnUrl = Astro.cookies.get('sigma_returnUrl')?.value
+const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 ---
 
 <SocialCallbackLayout loaderColor="#1893DF">
-  <telegram-integration data-return-url={returnUrl}>
+  <telegram-integration data-return-url={returnUrl} data-access-url={accessUrl}>
     <p class="mx-auto text-center">Выполняется&nbsp;вход через&nbsp;Telegram</p>
   </telegram-integration>
 </SocialCallbackLayout>
@@ -20,7 +21,8 @@ const returnUrl = Astro.cookies.get('sigma_returnUrl')?.value
     connectedCallback() {
       const payload = window.location.hash.split('tgAuthResult=')[1]
       const returnUrl = this.dataset.returnUrl
-      if (!payload || !returnUrl) return
+      const accessUrl = this.dataset.accessUrl
+      if (!payload || !returnUrl || !accessUrl) return
 
       authApi.authenticate
         .$post({
@@ -28,21 +30,15 @@ const returnUrl = Astro.cookies.get('sigma_returnUrl')?.value
         })
         .then((res) => res.json())
         .then((authentication) => {
-          const url = new URL(returnUrl)
-
-          url.searchParams.set('auth', authentication.result)
-
-          if (
-            authentication.result === AuthenticateResult.SignedIn ||
-            authentication.result === AuthenticateResult.SignedUp
-          ) {
-            url.searchParams.set(
-              'sessionExpiresAt',
-              authentication.sessionExpiresAt,
-            )
+          if (authentication.result === AuthenticateResult.Connected) {
+            window.location.replace(returnUrl)
+            return
           }
 
-          window.location.replace(url)
+          const params = new URLSearchParams()
+          params.set('code', authentication.code)
+          params.set('returnUrl', returnUrl)
+          window.location.replace(`${accessUrl}/exchange?${params.toString()}`)
         })
     }
   }

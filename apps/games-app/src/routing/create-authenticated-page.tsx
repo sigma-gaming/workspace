@@ -1,6 +1,6 @@
 import { useUnit } from 'effector-react'
 import { useLayoutEffect } from 'react'
-import { $$user } from '../entities/user'
+import { $$session } from '../entities/session/index.ts'
 import { games } from './routes.ts'
 import { RouteRecord } from './types.ts'
 
@@ -9,7 +9,7 @@ export function createAuthenticatedPage({
   ...rest
 }: RouteRecord): RouteRecord {
   const AuthenticatedView = () => {
-    const loggedIn = useUnit($$user.$loggedIn)
+    const loggedIn = useUnit($$session.$loggedIn)
 
     useLayoutEffect(() => {
       if (loggedIn) return

@@ -1,6 +1,7 @@
 import { createEvent, sample } from 'effector'
 import { createBrowserHistory } from 'history'
 import { $$profile } from '../entities/profile'
+import { $$session } from '../entities/session'
 import { $$user } from '../entities/user'
 import { router } from '../routing'
 
@@ -14,7 +15,7 @@ sample({
 
 sample({
   clock: started,
-  filter: $$user.$loggedIn,
+  filter: $$session.$loggedIn,
   target: [$$user.request, $$profile.request],
 })
 

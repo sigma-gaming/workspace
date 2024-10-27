@@ -7,7 +7,7 @@ import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
 import { z } from 'zod'
 import { controlApi } from '../../shared/api/control'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 
 const sendNotificationMutation = createMutation({
   name: 'notifications/send',

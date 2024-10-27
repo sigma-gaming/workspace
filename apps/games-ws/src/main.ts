@@ -4,6 +4,8 @@ import { shutdownServices } from '@core/di'
 import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
 import { gamesPubsubs, gamesRedis, maintenanceCache } from '@games/redis'
+import { sessionService } from '@games/services'
+import { parse } from 'cookie'
 import { App, SSLApp } from 'uWebSockets.js'
 import { LogoutAction } from './actions/auth/logout'
 import { SignInAction } from './actions/auth/sign-in'
@@ -30,11 +32,14 @@ const app = env.isDev
 io.attachApp(app)
 
 io.on('connection', async (socket) => {
+  const cookie = parse(socket.handshake.headers.cookie ?? '')
+  const { session } = sessionService.getSessionVariant(cookie.session_token)
+
   const context: Context = {
     url: new URL(env.gamesWs.url),
     headers: socket.handshake.headers,
     socket,
-    session: null,
+    session,
   }
 
   /**

@@ -8,7 +8,7 @@ export type AuthenticateResponse =
   | { result: AuthenticateResult.Connected }
   | {
       result: AuthenticateResult.SignedIn | AuthenticateResult.SignedUp
-      sessionExpiresAt: string
+      code: string
     }
 
 export type AccessTokenResponse = {

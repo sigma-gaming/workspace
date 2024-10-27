@@ -14,7 +14,7 @@ import { condition, reset } from 'patronum'
 import { z } from 'zod'
 import { routes } from '../../routing'
 import { controlApi } from '../../shared/api/control'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 
 const generatePromocodeFx = createApiEffect(
   'json',

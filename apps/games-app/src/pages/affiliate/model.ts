@@ -7,10 +7,9 @@ import { and, status } from 'patronum'
 import { $$affiliate } from '../../entities/affiliate'
 import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
-import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { gamesApi } from '../../shared/api/games'
-import { createApiEffect } from '../../shared/api/protected'
+import { createApiEffect } from '../../shared/api/effects'
 
 const withdraw = createEvent()
 const reset = createEvent()
@@ -80,12 +79,8 @@ const $previewPayout = getLastTransactionsQuery.$data.map(
 const $withdrawing = withdrawMutation.$pending
 
 sample({
-  clock: [routes.affiliate.opened, $$affiliate.$isConnected, $$user.loggedIn],
-  filter: and(
-    routes.affiliate.$isOpened,
-    $$affiliate.$isConnected,
-    $$user.$loggedIn,
-  ),
+  clock: [routes.affiliate.opened, $$affiliate.$isConnected],
+  filter: and(routes.affiliate.$isOpened, $$affiliate.$isConnected),
   fn: noop,
   target: [
     getBalanceFx,
@@ -125,7 +120,7 @@ sample({
 })
 
 sample({
-  clock: [routes.affiliate.closed, $$user.loggedOut],
+  clock: routes.affiliate.closed,
   target: reset,
 })
 

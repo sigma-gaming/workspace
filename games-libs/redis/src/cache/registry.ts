@@ -40,7 +40,7 @@ export class CacheRegistry {
   budgetSyncedAt: GlobalStringEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
   user: KeyJsonEntityService<UserSelect>
-  accessToken: KeyStringEntityService
+  sessionCodeToToken: KeyStringEntityService
   sessionRefreshing: KeyJsonEntityService<true>
   balance: KeyJsonEntityService<BalanceSelect>
   referrerBalance: KeyJsonEntityService<ReferrerBalanceSelect>
@@ -80,9 +80,8 @@ export class CacheRegistry {
       keygen: (userId: string) => `${version}:user:${userId}`,
     })
 
-    this.accessToken = new KeyStringEntityService({
-      keygen: (refreshToken: string) =>
-        `${version}:accessToken:${refreshToken}`,
+    this.sessionCodeToToken = new KeyStringEntityService({
+      keygen: (code: string) => `sessionCodeToToken:${code}`,
       ttl: 60 * 5, // 5 minutes
     })
 

@@ -1,6 +1,6 @@
 import { Button, Checkbox } from '@mantine/core'
 import { useUnit } from 'effector-react'
-import { $$user } from '../../../entities/user'
+import { $$session } from '../../../entities/session'
 import { $$pincodePage } from '../model'
 
 export const FormActions = () => {
@@ -8,7 +8,7 @@ export const FormActions = () => {
   const autoplaying = useUnit($$pincodePage.$autoplaying)
   const animationPlaying = useUnit($$pincodePage.$animationPlaying)
   const stopOnBigWin = useUnit($$pincodePage.fields.stopOnBigWin.$value)
-  const loggedIn = useUnit($$user.$loggedIn)
+  const loggedIn = useUnit($$session.$loggedIn)
 
   return (
     <div className="flex flex-col gap-3 mt-auto">

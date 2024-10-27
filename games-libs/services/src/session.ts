@@ -7,12 +7,13 @@ import { gamesDb } from '@dbs/games-db'
 import { SessionTable } from '@dbs/games-schema'
 import {
   AccessTokenPayload,
-  RefreshTokenPayload,
   Session,
   SessionState,
+  SessionTokenPayload,
   SessionVariant,
 } from '@games/model'
 import { gamesCaches } from '@games/redis'
+import { parse } from 'cookie'
 import { and, desc, eq, inArray } from 'drizzle-orm'
 import { Context as HonoContext } from 'hono'
 import { deleteCookie, setCookie } from 'hono/cookie'
@@ -40,11 +41,10 @@ export class SessionService {
   constructor(@inject(SessionOptionsToken) private options: SessionOptions) {}
 
   getHonoToken(ctx: HonoContext): string | null {
-    const authorization = ctx.req.header('authorization')
-    if (!authorization) return null
-    const [type, token] = authorization.split(' ')
-    if (type !== 'Bearer') return null
-    return token ?? null
+    const cookie = ctx.req.header('cookie')
+    if (!cookie) return null
+    const parsed = parse(cookie)
+    return parsed.session_token ?? null
   }
 
   getSessionVariant(token?: string | null): SessionVariant {
@@ -100,13 +100,13 @@ export class SessionService {
     return variant.session
   }
 
-  async createSession(payload: RefreshTokenPayload) {
+  async createSession(payload: SessionTokenPayload) {
     const { userId } = payload
 
     const expiresIn = 60 * 60 * 24 * 31
     const expiresAt = new Date(Date.now() + 1000 * expiresIn).toISOString()
 
-    const refreshToken = jwt.sign(payload, this.options.jwt.secret, {
+    const token = jwt.sign(payload, this.options.jwt.secret, {
       expiresIn,
     })
 
@@ -118,7 +118,7 @@ export class SessionService {
 
     await gamesDb.insert(SessionTable).values({
       userId,
-      refreshToken,
+      token,
       expiresAt,
       provider: payload.provider,
     })
@@ -141,22 +141,12 @@ export class SessionService {
       )
     }
 
-    return { refreshToken, expiresAt }
+    return { token, expiresAt }
   }
 
-  async removeSession(refreshToken: string) {
-    if (refreshToken) {
-      try {
-        await gamesDb
-          .delete(SessionTable)
-          .where(eq(SessionTable.refreshToken, refreshToken))
-      } catch {
-        // Session doesn't exist
-      }
-
-      await gamesCaches.user.del(refreshToken)
-      await gamesCaches.sessionRefreshing.del(refreshToken)
-    }
+  async removeSession(token: string) {
+    await gamesDb.delete(SessionTable).where(eq(SessionTable.token, token))
+    await gamesCaches.sessionRefreshing.del(token)
   }
 
   // async refreshSession<E extends HonoEnvWithSession>(

@@ -1,3 +1,4 @@
+import { NotAuthenticatedException } from '@core/exceptions'
 import { createEffect, createEvent, sample } from 'effector'
 import { createBrowserHistory } from 'history'
 import Cookies from 'js-cookie'
@@ -5,6 +6,7 @@ import { $$affiliate } from '../entities/affiliate'
 import { $$audio } from '../entities/audio'
 import { $$balance } from '../entities/balance'
 import { $$profile } from '../entities/profile'
+import { $$session } from '../entities/session'
 import { $$user } from '../entities/user'
 import { $$maintenance } from '../features/maintenance'
 import { $$notificationEvents } from '../features/notification-events'
@@ -30,27 +32,21 @@ sample({
   ],
 })
 
-const loggedInEvents = [
-  $$user.request,
-  $$profile.request,
-  $$balance.request,
-  $$affiliate.request,
-]
-
 sample({
   clock: started,
-  filter: $$user.$loggedIn,
-  target: loggedInEvents,
+  filter: $$session.$loggedIn,
+  target: [
+    $$user.request,
+    $$profile.request,
+    $$balance.request,
+    $$affiliate.request,
+  ],
 })
 
 sample({
-  clock: $$user.loggedIn,
-  target: loggedInEvents,
-})
-
-sample({
-  clock: $$user.loggedOut,
-  target: [$$balance.reset, $$profile.reset, $$affiliate.reset],
+  clock: $$user.failed,
+  filter: (exception) => exception instanceof NotAuthenticatedException,
+  target: $$session.clientLogout,
 })
 
 sample({

@@ -7,7 +7,7 @@ import { IconCircleCheck, IconRefresh } from '@tabler/icons-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { ReactNode } from 'react'
-import { $$user } from '../../../entities/user'
+import { $$session } from '../../../entities/session'
 import bonusTelegramSrc from '../assets/bonus-telegram-400.webp'
 import bonusVkSrc from '../assets/bonus-vk-400.webp'
 import { $$bonusesPage } from '../model'
@@ -146,7 +146,7 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
   const action = actionMap[taskKey]
   const boxShadow = boxShadowMap[taskKey]
   const tooltip = tooltipMap[taskKey]
-  const loggedIn = useUnit($$user.$loggedIn)
+  const loggedIn = useUnit($$session.$loggedIn)
   const tasks = useUnit($$bonusesPage.$globalTasks)
   const statuses = useUnit($$bonusesPage.$globalTaskStatuses)
   const task = tasks?.find((task) => task.key === taskKey)
