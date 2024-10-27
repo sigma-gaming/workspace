@@ -12,7 +12,7 @@ export const api = new Hono()
   .basePath('/api')
   .use(
     cors({
-      origin: [serverEnv.gamesApp.url, serverEnv.controlApp.url],
+      origin: [serverEnv.authApi.url],
       credentials: true,
       allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
     }),

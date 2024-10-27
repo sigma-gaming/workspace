@@ -17,6 +17,7 @@ const EnvSchema = z
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
+
     GAMES_REDIS_HOST: z.string(),
     GAMES_REDIS_PASSWORD: z.string(),
   })

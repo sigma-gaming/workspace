@@ -5,8 +5,6 @@ const ServerEnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
 
-    PUBLIC_GAMES_APP_URL: z.string(),
-    PUBLIC_CONTROL_APP_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
 
     PUBLIC_AUTH_API_DOMAIN: z.string(),
@@ -40,14 +38,6 @@ const ServerEnvSchema = z
     gamesRedis: {
       host: raw.GAMES_REDIS_HOST,
       password: raw.GAMES_REDIS_PASSWORD,
-    },
-
-    gamesApp: {
-      url: raw.PUBLIC_GAMES_APP_URL,
-    },
-
-    controlApp: {
-      url: raw.PUBLIC_CONTROL_APP_URL,
     },
 
     gamesApi: {
