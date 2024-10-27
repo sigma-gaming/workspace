@@ -2,8 +2,8 @@ import { handleExceptions } from '@core/client'
 import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
 import { status } from 'patronum'
-import { gamesApi } from '../../shared/api/games'
 import { createApiEffect } from '../../shared/api/effects'
+import { gamesApi } from '../../shared/api/games'
 
 const request = createEvent()
 const connect = createEvent()

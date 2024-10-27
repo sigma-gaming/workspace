@@ -9,9 +9,9 @@ import { createEvent, createStore, sample } from 'effector'
 import { v4 as uuid } from 'uuid'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
+import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/effects'
 
 const initialize = createEvent()
 const reset = createEvent()

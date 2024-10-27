@@ -5,9 +5,9 @@ import { createQuery } from '@farfetched/core'
 import { mapColor } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEffect, createEvent, sample } from 'effector'
+import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/effects'
 
 const initialize = createEvent()
 const reset = createEvent()

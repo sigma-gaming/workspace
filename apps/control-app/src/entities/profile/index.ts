@@ -1,7 +1,7 @@
 import { createQuery } from '@farfetched/core'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
-import { gamesApi } from '../../shared/api/games'
+import { controlApi } from '../../shared/api/control'
 import { createApiEffect } from '../../shared/api/effects'
 
 const request = createEvent()
@@ -9,7 +9,7 @@ const refresh = createEvent()
 
 const profileQuery = createQuery({
   name: 'profile/get',
-  effect: createApiEffect('query', gamesApi.me.getDetailedProfile.$get),
+  effect: createApiEffect('query', controlApi.me.getDetailedProfile.$get),
 })
 
 const loaded = profileQuery.finished.success

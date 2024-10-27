@@ -2,8 +2,8 @@ import { createQuery, Mutation, update } from '@farfetched/core'
 import { ProfileDetailed } from '@games/model'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
-import { gamesApi } from '../../shared/api/games'
 import { createApiEffect } from '../../shared/api/effects'
+import { gamesApi } from '../../shared/api/games'
 
 const request = createEvent()
 const refresh = createEvent()

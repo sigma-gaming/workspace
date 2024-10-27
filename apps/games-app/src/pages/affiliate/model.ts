@@ -8,8 +8,8 @@ import { $$affiliate } from '../../entities/affiliate'
 import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { routes } from '../../routing'
-import { gamesApi } from '../../shared/api/games'
 import { createApiEffect } from '../../shared/api/effects'
+import { gamesApi } from '../../shared/api/games'
 
 const withdraw = createEvent()
 const reset = createEvent()

@@ -5,9 +5,9 @@ import { BalanceDetailed } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { previous, status } from 'patronum'
+import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/effects'
 import { $$audio, Sound } from '../audio'
 
 const getDetailedBalanceFx = createApiEffect(

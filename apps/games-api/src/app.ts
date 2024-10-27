@@ -3,7 +3,6 @@ import { logger } from 'hono/logger'
 import { env } from './env'
 import { createRouter } from './hono'
 import { sentryMiddleware } from './middlewares/sentry'
-import { accessRoute } from './routes/access'
 import { affiliateRouter } from './routes/affiliate'
 import { balanceRouter } from './routes/balance'
 import { chatRouter } from './routes/chat'
@@ -19,7 +18,7 @@ export const app = createRouter()
   .use(
     '*',
     cors({
-      origin: [env.gamesApp.url, env.controlApp.url],
+      origin: env.gamesApp.url,
       credentials: true,
       allowHeaders: [
         'content-type',
@@ -33,7 +32,6 @@ export const app = createRouter()
   .route('/ready', readyRoute)
   .use('*', sentryMiddleware({ enabled: env.isProd }))
   .use('*', logger())
-  .route('/access', accessRoute)
   .route('/notifications', notificationsRouter)
   .route('/chat', chatRouter)
   .route('/me', meRouter)

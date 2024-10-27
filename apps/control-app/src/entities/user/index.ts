@@ -3,8 +3,8 @@ import { UserRole } from '@dbs/games-types'
 import { createQuery } from '@farfetched/core'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
+import { controlApi } from '../../shared/api/control'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
 
 const request = createEvent()
 const refresh = createEvent()
@@ -12,7 +12,7 @@ const failed = createEvent<RouteException<unknown>>()
 
 const userQuery = createQuery({
   name: 'user/get',
-  effect: createApiEffect('query', gamesApi.me.getUser.$get),
+  effect: createApiEffect('query', controlApi.me.getUser.$get),
 })
 
 const loaded = userQuery.finished.success

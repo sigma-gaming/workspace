@@ -11,9 +11,9 @@ import {
 } from 'effector'
 import { and, interval, status } from 'patronum'
 import { $$session } from '../../entities/session'
+import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/effects'
 
 export type Tab = 'last-wins' | 'big-wins' | 'my-games'
 

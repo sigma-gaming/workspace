@@ -12,9 +12,9 @@ import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { $$session } from '../../entities/session'
 import { routes } from '../../routing'
+import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { createApiEffect } from '../../shared/api/effects'
 
 const completeGlobalTask = createEvent<GlobalTaskKey>()
 const claimGlobalTaskReward = createEvent<GlobalTaskKey>()

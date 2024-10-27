@@ -8,8 +8,8 @@ import { not } from 'patronum'
 import { z } from 'zod'
 import { $$profile } from '../../entities/profile'
 import { routes } from '../../routing'
-import { gamesApi } from '../../shared/api/games'
 import { createApiEffect } from '../../shared/api/effects'
+import { gamesApi } from '../../shared/api/games'
 
 const reset = createEvent()
 

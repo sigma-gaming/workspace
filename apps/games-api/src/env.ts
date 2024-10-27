@@ -10,9 +10,6 @@ const EnvSchema = z
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-    PUBLIC_CONTROL_APP_URL: z.string(),
-    PUBLIC_CONTROL_API_URL: z.string(),
-    PUBLIC_CONTROL_API_VERSION: z.string().default('unknown'),
     PUBLIC_GAMES_WS_URL: z.string(),
     PUBLIC_GAMES_WS_VERSION: z.string().default('unknown'),
     PUBLIC_REFERRAL_REDIRECT_API_URL: z.string(),
@@ -71,15 +68,6 @@ const EnvSchema = z
 
     gamesTasks: {
       version: raw.GAMES_TASKS_VERSION,
-    },
-
-    controlApp: {
-      url: raw.PUBLIC_CONTROL_APP_URL,
-    },
-
-    controlApi: {
-      url: raw.PUBLIC_CONTROL_API_URL,
-      version: raw.PUBLIC_CONTROL_API_VERSION,
     },
 
     jwt: {
