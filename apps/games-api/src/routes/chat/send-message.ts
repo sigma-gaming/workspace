@@ -8,7 +8,7 @@ export const sendMessageRoute = createRouter().post(
   zValidator('json', ChatValidation.MessagePayloadSchema),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const { userId } = sessionService.getHonoSession(ctx)
+    const { userId } = await sessionService.getHonoSession(ctx)
 
     const chatMessage = await chatService.sendMessage({
       userId,

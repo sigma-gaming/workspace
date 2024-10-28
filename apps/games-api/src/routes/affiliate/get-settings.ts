@@ -3,7 +3,7 @@ import { affiliateService, sessionService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const getSettingsRoute = createRouter().get('/', async (ctx) => {
-  const { userId } = sessionService.getHonoSession(ctx)
+  const { userId } = await sessionService.getHonoSession(ctx)
   const settings = await affiliateService.getReferrerSettings(userId)
 
   if (!settings) {

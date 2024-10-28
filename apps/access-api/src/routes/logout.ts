@@ -1,5 +1,5 @@
 import { zValidator } from '@core/server'
-import { deleteCookie } from 'hono/cookie'
+import { sessionService } from '@games/services'
 import { z } from 'zod'
 import { env } from '../env'
 import { createRouter } from '../hono'
@@ -8,6 +8,9 @@ export const logoutRoute = createRouter().get(
   '/',
   zValidator('query', z.object({ returnUrl: z.string().url() })),
   async (ctx) => {
+    const sessionId = sessionService.getHonoSessionId(ctx)
+    const { session } = await sessionService.getSessionSafe(sessionId)
+
     const { returnUrl } = ctx.req.valid('query')
     const { hostname } = new URL(returnUrl)
 
@@ -19,21 +22,11 @@ export const logoutRoute = createRouter().get(
       return ctx.text('Invalid return URL')
     }
 
-    deleteCookie(ctx, 'session_token', {
-      domain: env.access.domain,
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: true,
-    })
+    if (session) {
+      await sessionService.removeSession(session.id)
+    }
 
-    deleteCookie(ctx, 'session_expires_at', {
-      domain: env.access.domain,
-      path: '/',
-      sameSite: 'lax',
-      secure: true,
-    })
-
+    sessionService.detachHonoSession(ctx)
     return ctx.redirect(returnUrl)
   },
 )

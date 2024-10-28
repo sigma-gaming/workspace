@@ -2,7 +2,6 @@
 import { SessionState } from '@games/model'
 import { sessionService } from '@games/services'
 import { z } from 'zod'
-import { getSessionVariant } from '../../api/session'
 import BaseLayout from '../../layouts/base-layout.astro'
 import { serverEnv } from '../../shared/env/server'
 
@@ -25,21 +24,29 @@ function getQuery() {
 try {
   const query = getQuery()
 
-  const sessionToken = Astro.cookies.get('session_token')?.value
+  const sessionId = Astro.cookies.get('session_id')?.value
 
-  if (sessionToken) {
-    const sessionVariant = getSessionVariant(sessionToken)
+  if (sessionId) {
+    const sessionVariant = await sessionService.getSessionSafe(sessionId)
+
+    Astro.cookies.delete('session_id', {
+      domain: serverEnv.authApi.domain,
+      path: '/',
+      sameSite: 'none',
+      httpOnly: true,
+      secure: true,
+    })
+
+    Astro.cookies.delete('session_expires_at', {
+      domain: serverEnv.authApi.domain,
+      path: '/',
+      sameSite: 'none',
+      httpOnly: true,
+      secure: true,
+    })
 
     if (sessionVariant.state === SessionState.Authenticated) {
-      Astro.cookies.delete('session_token', {
-        domain: serverEnv.authApi.domain,
-        path: '/',
-        sameSite: 'none',
-        httpOnly: true,
-        secure: true,
-      })
-
-      await sessionService.removeSession(sessionToken)
+      await sessionService.removeSession(sessionId)
     }
   }
 

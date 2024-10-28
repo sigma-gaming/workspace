@@ -14,7 +14,7 @@ import { createRouter } from '../../hono'
 
 export const withdrawRoute = createRouter().post('/', async (ctx) => {
   const { userId, referrerId, referralCampaignId } =
-    sessionService.getHonoSession(ctx)
+    await sessionService.getHonoSession(ctx)
   const amount = -1000_000
   const positiveAmount = Math.abs(amount)
 

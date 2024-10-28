@@ -8,6 +8,7 @@ import {
   PromocodeSelect,
   ReferrerBalanceSelect,
   ReferrerSettingsSelect,
+  SessionSelect,
   UserSelect,
 } from '@dbs/games-schema'
 import { TaskStatus } from '@dbs/games-types'
@@ -40,7 +41,8 @@ export class CacheRegistry {
   budgetSyncedAt: GlobalStringEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
   user: KeyJsonEntityService<UserSelect>
-  sessionCodeToToken: KeyStringEntityService
+  session: KeyJsonEntityService<SessionSelect>
+  sessionCodeToSessionId: KeyStringEntityService
   sessionRefreshing: KeyJsonEntityService<true>
   balance: KeyJsonEntityService<BalanceSelect>
   referrerBalance: KeyJsonEntityService<ReferrerBalanceSelect>
@@ -80,13 +82,18 @@ export class CacheRegistry {
       keygen: (userId: string) => `${version}:user:${userId}`,
     })
 
-    this.sessionCodeToToken = new KeyStringEntityService({
+    this.session = new KeyJsonEntityService<SessionSelect>({
+      keygen: (sessionId: string) => `${version}:session:${sessionId}`,
+      ttl: 60 * 60, // 1 hour
+    })
+
+    this.sessionCodeToSessionId = new KeyStringEntityService({
       keygen: (code: string) => `sessionCodeToToken:${code}`,
       ttl: 60 * 5, // 5 minutes
     })
 
     this.sessionRefreshing = new KeyJsonEntityService<true>({
-      keygen: (token: string) => `${version}:refreshedSession:${token}`,
+      keygen: (sessionId: string) => `${version}:refreshedSession:${sessionId}`,
     })
 
     this.balance = new KeyJsonEntityService<BalanceSelect>({

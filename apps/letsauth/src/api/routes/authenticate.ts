@@ -12,10 +12,9 @@ import {
 } from '@games/services'
 import axios from 'axios'
 import { Hono } from 'hono'
-import { getCookie, setCookie } from 'hono/cookie'
+import { getCookie } from 'hono/cookie'
 import { z } from 'zod'
 import { serverEnv } from '../../shared/env/server'
-import { getSessionToken, getSessionVariant } from '../session'
 import { AuthenticateResponse, AuthenticateResult } from '../types'
 
 const LATIN_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -88,9 +87,9 @@ export const authenticateRoute = new Hono().post(
   async (ctx) => {
     const { integration, payload } = ctx.req.valid('json')
 
-    const currentSessionToken = getSessionToken(ctx)
-    const sessionVariant = getSessionVariant(currentSessionToken)
-    let userId = sessionVariant.payload?.userId
+    const sessionId = sessionService.getHonoSessionId(ctx)
+    const sessionVariant = await sessionService.getSessionSafe(sessionId)
+    let userId = sessionVariant.session?.userId
     const referralCampaignCode = getCookie(ctx, 'referralCampaign')
 
     let authenticatePayload: AuthenticatePayload
@@ -208,7 +207,7 @@ export const authenticateRoute = new Hono().post(
 
     userId = outcome.user.id
 
-    const { token, expiresAt } = await sessionService.createSession({
+    const session = await sessionService.createSession({
       userId,
       referrerId: outcome.user.referrerId,
       referralCampaignId: outcome.user.referralCampaignId,
@@ -217,18 +216,8 @@ export const authenticateRoute = new Hono().post(
 
     const code = generateCode()
 
-    await gamesCaches.sessionCodeToToken.set(code, token)
-
-    const expires = new Date(expiresAt)
-
-    setCookie(ctx, 'session_token', token, {
-      domain: serverEnv.authApi.domain,
-      path: '/',
-      expires,
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    })
+    await gamesCaches.sessionCodeToSessionId.set(code, session.id)
+    sessionService.attachHonoSession(ctx, session)
 
     fraudService.actualizeRisk(userId)
 

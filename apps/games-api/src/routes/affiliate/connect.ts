@@ -5,7 +5,7 @@ import { affiliateService, locks, sessionService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const connectRoute = createRouter().post('/', async (ctx) => {
-  const { userId } = sessionService.getHonoSession(ctx)
+  const { userId } = await sessionService.getHonoSession(ctx)
 
   return locks.with([locks.referrerBalance(userId)], async () => {
     const existingSettings = await affiliateService.getReferrerSettings(userId)

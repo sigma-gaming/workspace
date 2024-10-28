@@ -3,7 +3,7 @@ import { affiliateService, sessionService } from '@games/services'
 import { createRouter } from '../../hono'
 
 export const getBalanceRoute = createRouter().get('/', async (ctx) => {
-  const { userId } = sessionService.getHonoSession(ctx)
+  const { userId } = await sessionService.getHonoSession(ctx)
   const balance = await affiliateService.getReferrerBalance(userId)
 
   if (!balance) {

@@ -11,7 +11,7 @@ import {
 import { createRouter } from '../../hono'
 
 export const withdrawRoute = createRouter().post('/', async (ctx) => {
-  const { userId } = sessionService.getHonoSession(ctx)
+  const { userId } = await sessionService.getHonoSession(ctx)
 
   const { updatedBalance, updatedReferrerBalance } = await locks.with(
     [locks.balance(userId), locks.referrerBalance(userId)],

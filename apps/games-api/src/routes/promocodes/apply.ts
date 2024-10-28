@@ -39,7 +39,7 @@ export const applyRoute = createRouter().post(
   ),
   async (ctx) => {
     const payload = ctx.req.valid('json')
-    const { userId } = sessionService.getHonoSession(ctx)
+    const { userId } = await sessionService.getHonoSession(ctx)
 
     const application = await promocodeService.applyPayout({
       userId,

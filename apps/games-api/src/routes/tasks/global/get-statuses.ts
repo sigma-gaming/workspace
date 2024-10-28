@@ -5,7 +5,7 @@ import { createRouter } from '../../../hono'
 type Statuses = Record<GlobalTaskKey, TaskStatus>
 
 export const getStatusesRoute = createRouter().get('/', async (ctx) => {
-  const { userId } = sessionService.getHonoSession(ctx)
+  const { userId } = await sessionService.getHonoSession(ctx)
   const promises: Promise<{ key: GlobalTaskKey; status: TaskStatus }>[] = []
 
   for (const key of Object.values(GlobalTaskKey)) {

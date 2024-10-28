@@ -14,7 +14,7 @@ export const getCampaingsRoute = createRouter().get(
     z.object({ offset: z.coerce.number().min(0).default(0) }),
   ),
   async (ctx) => {
-    const { userId } = sessionService.getHonoSession(ctx)
+    const { userId } = await sessionService.getHonoSession(ctx)
     const settings = await affiliateService.getReferrerSettings(userId)
     const { offset } = ctx.req.valid('query')
 

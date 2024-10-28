@@ -3,7 +3,6 @@ import { zValidator } from '@core/server'
 import { SessionState } from '@games/model'
 import { gamesCaches } from '@games/redis'
 import { sessionService } from '@games/services'
-import { setCookie } from 'hono/cookie'
 import { z } from 'zod'
 import { env } from '../env'
 import { createRouter } from '../hono'
@@ -19,15 +18,15 @@ export const exchangeRoute = createRouter().get(
   ),
   async (ctx) => {
     const { code, returnUrl } = ctx.req.valid('query')
-    const token = await gamesCaches.sessionCodeToToken.get(code)
+    const sessionId = await gamesCaches.sessionCodeToSessionId.get(code)
 
-    if (!token) {
+    if (!sessionId) {
       throw new BadRequestException({
         message: 'Код авторизации истёк или не существует, повторите вход',
       })
     }
 
-    const variant = sessionService.getSessionVariant(token)
+    const variant = await sessionService.getSessionSafe(sessionId)
 
     if (variant.state !== SessionState.Authenticated) {
       throw new BadRequestException({
@@ -45,25 +44,7 @@ export const exchangeRoute = createRouter().get(
       return ctx.text('Invalid return URL')
     }
 
-    const { expiresAt } = variant.session
-
-    setCookie(ctx, 'session_token', token, {
-      domain: env.access.domain,
-      path: '/',
-      expires: new Date(expiresAt),
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: true,
-    })
-
-    setCookie(ctx, 'session_expires_at', expiresAt, {
-      domain: env.access.domain,
-      path: '/',
-      expires: new Date(expiresAt),
-      sameSite: 'lax',
-      secure: true,
-    })
-
+    sessionService.attachHonoSession(ctx, variant.session)
     return ctx.redirect(returnUrl)
   },
 )

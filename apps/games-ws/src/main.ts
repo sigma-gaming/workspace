@@ -7,8 +7,6 @@ import { gamesPubsubs, gamesRedis, maintenanceCache } from '@games/redis'
 import { sessionService } from '@games/services'
 import { parse } from 'cookie'
 import { App, SSLApp } from 'uWebSockets.js'
-import { LogoutAction } from './actions/auth/logout'
-import { SignInAction } from './actions/auth/sign-in'
 import { GamesDiceAction } from './actions/games/dice'
 import { GamesPincodeAction } from './actions/games/pincode'
 import { GlobalTasksClaimRewardAction } from './actions/global-tasks/claim-reward'
@@ -33,7 +31,7 @@ io.attachApp(app)
 
 io.on('connection', async (socket) => {
   const cookie = parse(socket.handshake.headers.cookie ?? '')
-  const { session } = sessionService.getSessionVariant(cookie.session_token)
+  const { session } = await sessionService.getSessionSafe(cookie.session_id)
 
   const context: Context = {
     url: new URL(env.gamesWs.url),
@@ -57,8 +55,6 @@ io.on('connection', async (socket) => {
     socket.on(action.name, action.handler as any)
   }
 
-  registerAction(SignInAction)
-  registerAction(LogoutAction)
   registerAction(PingAction)
   registerAction(GamesPincodeAction)
   registerAction(GamesDiceAction)

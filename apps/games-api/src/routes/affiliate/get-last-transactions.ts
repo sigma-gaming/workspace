@@ -12,7 +12,7 @@ import { and, desc, eq, getTableColumns } from 'drizzle-orm'
 import { createRouter } from '../../hono'
 
 export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
-  const { userId } = sessionService.getHonoSession(ctx)
+  const { userId } = await sessionService.getHonoSession(ctx)
   const settings = await affiliateService.getReferrerSettings(userId)
 
   if (!settings) {

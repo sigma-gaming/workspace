@@ -1,10 +1,10 @@
 import { HonoUwsEnv } from '@core/server'
-import { Session } from '@games/model'
+import { SessionSelect } from '@dbs/games-schema'
 import { Hono } from 'hono'
 
 export type ControlApiEnv = HonoUwsEnv & {
   Variables: {
-    session: Session
+    session: SessionSelect
   }
 }
 
