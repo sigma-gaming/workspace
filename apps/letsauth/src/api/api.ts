@@ -1,4 +1,3 @@
-import 'reflect-metadata'
 import './setup'
 import { loggerService } from '@core/logger'
 import { createErrorHandler } from '@core/server'
@@ -6,7 +5,6 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serverEnv } from '../shared/env/server'
 import { authenticateRoute } from './routes/authenticate'
-import { logoutRoute } from './routes/logout'
 
 export const api = new Hono()
   .basePath('/api')
@@ -18,7 +16,6 @@ export const api = new Hono()
     }),
   )
   .route('/authenticate', authenticateRoute)
-  .route('/logout', logoutRoute)
 
 api.onError(
   createErrorHandler({

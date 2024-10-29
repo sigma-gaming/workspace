@@ -31,9 +31,8 @@ export function createSignInUrl(integration: 'vk' | 'telegram') {
 
 export function createLogoutUrl() {
   const params = new URLSearchParams()
-  params.set('accessUrl', env.accessApi.url)
   params.set('returnUrl', location.href)
-  return `${env.authApi.url}/sigma/logout?${params.toString()}`
+  return `${env.accessApi.url}/logout?${params.toString()}`
 }
 
 export const VkButton = ({

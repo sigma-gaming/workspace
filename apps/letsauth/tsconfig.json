@@ -11,8 +11,5 @@
     "**.js",
     "**.mjs",
     "**.cjs"
-  ],
-  "exclude": [
-    ".astro"
   ]
 }

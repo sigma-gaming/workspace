@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { LoggerOptionsToken } from '@core/logger'
 import { DbOptionsToken } from '@dbs/games-db'
 import { CacheVersionToken, RedisOptionsToken } from '@games/redis'
