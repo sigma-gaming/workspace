@@ -32,6 +32,9 @@
       "@tooling/env": [
         "tooling/env/src/index.ts"
       ],
+      "@apis/access-api": [
+        "apps/access-api/src/client.ts"
+      ],
       "@apis/games-api": [
         "apps/games-api/src/client.ts"
       ],

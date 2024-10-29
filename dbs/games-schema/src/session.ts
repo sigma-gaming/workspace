@@ -1,4 +1,4 @@
-import { boolean, integer, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { integer, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { accountProviderEnum } from './enums'
 import { ReferralCampaignTable } from './referral-campaign'
 import { UserTable } from './user'
@@ -9,7 +9,6 @@ export const SessionTable = pgTable('Session', {
     withTimezone: true,
     mode: 'string',
   }).notNull(),
-  preventAutoDelete: boolean('preventAutoDelete').default(false).notNull(),
   provider: accountProviderEnum('provider').notNull(),
   userId: uuid('userId')
     .references(() => UserTable.id, { onDelete: 'cascade' })

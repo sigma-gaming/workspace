@@ -1,5 +1,7 @@
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
+import { accessApi } from '../../shared/api/access'
+import { createApiEffect } from '../../shared/api/effects'
 import { env } from '../../shared/env'
 import { createLogoutUrl } from '../provider'
 
@@ -13,6 +15,14 @@ function isSessionActive(expiresAt: string | null) {
   return new Date(expiresAt) > new Date()
 }
 
+function isExpiringSoon(expiresAt: string | null) {
+  if (!expiresAt) return false
+  const threshold = 1000 * 60 * 60 * 24 * 7 // 7 days
+  return new Date(expiresAt) < new Date(Date.now() + threshold)
+}
+
+const refreshSessionFx = createApiEffect('json', accessApi.refresh.$post)
+
 const redirectToLogoutFx = createEffect(() => {
   window.location.replace(createLogoutUrl())
 })
@@ -21,10 +31,26 @@ const clientLogoutFx = createEffect(() => {
   Cookies.remove('session_expires_at', { domain: env.domain })
 })
 
+const refreshIfExpiringSoon = createEvent()
 const logout = createEvent()
 const clientLogout = createEvent()
 
-const $loggedIn = createStore(isSessionActive(getSessionExpiresAt()))
+const expiresAt = getSessionExpiresAt()
+const $expiresAt = createStore(expiresAt)
+const $loggedIn = createStore(isSessionActive(expiresAt))
+
+sample({
+  clock: refreshIfExpiringSoon,
+  source: $expiresAt,
+  filter: isExpiringSoon,
+  target: refreshSessionFx,
+})
+
+sample({
+  clock: refreshSessionFx.doneData,
+  fn: ({ expiresAt }) => expiresAt,
+  target: $expiresAt,
+})
 
 sample({
   clock: logout,
@@ -37,6 +63,7 @@ sample({
 })
 
 export const $$session = {
+  refreshIfExpiringSoon,
   logout,
   clientLogout,
   $loggedIn,

@@ -30,10 +30,6 @@ export class LocksService {
     return gamesCaches.lastChatMessages.lock(3000)
   }
 
-  sessionRefreshed(token: string) {
-    return gamesCaches.sessionRefreshing.lock(token, 3000)
-  }
-
   globalTaskStatus(taskKey: GlobalTaskKey, userId: string) {
     const cacheKey = `${userId}:${taskKey}`
     return gamesCaches.globalTaskStatus.lock(cacheKey, 3000)

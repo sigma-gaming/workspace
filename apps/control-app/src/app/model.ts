@@ -16,7 +16,7 @@ sample({
 sample({
   clock: started,
   filter: $$session.$loggedIn,
-  target: [$$user.request, $$profile.request],
+  target: [$$user.request, $$profile.request, $$session.refreshIfExpiringSoon],
 })
 
 export const $$app = {

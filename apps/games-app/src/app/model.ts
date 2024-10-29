@@ -40,6 +40,7 @@ sample({
     $$profile.request,
     $$balance.request,
     $$affiliate.request,
+    $$session.refreshIfExpiringSoon,
   ],
 })
 

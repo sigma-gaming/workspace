@@ -181,7 +181,7 @@ const SocialNetworks = () => {
                   <Card
                     key={provider}
                     classNames={{
-                      root: '!bg-[#25273E] rounded-xl',
+                      root: 'justify-center !bg-[#25273E] rounded-xl',
                     }}
                   >
                     <div className="flex flex-row items-center gap-4">

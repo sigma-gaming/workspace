@@ -43,7 +43,6 @@ export class CacheRegistry {
   user: KeyJsonEntityService<UserSelect>
   session: KeyJsonEntityService<SessionSelect>
   sessionCodeToSessionId: KeyStringEntityService
-  sessionRefreshing: KeyJsonEntityService<true>
   balance: KeyJsonEntityService<BalanceSelect>
   referrerBalance: KeyJsonEntityService<ReferrerBalanceSelect>
   referrerSettings: KeyJsonEntityService<ReferrerSettingsSelect>
@@ -90,10 +89,6 @@ export class CacheRegistry {
     this.sessionCodeToSessionId = new KeyStringEntityService({
       keygen: (code: string) => `sessionCodeToToken:${code}`,
       ttl: 60 * 5, // 5 minutes
-    })
-
-    this.sessionRefreshing = new KeyJsonEntityService<true>({
-      keygen: (sessionId: string) => `${version}:refreshedSession:${sessionId}`,
     })
 
     this.balance = new KeyJsonEntityService<BalanceSelect>({

@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "license": "UNLICENSED",
+  "main": "./src/client.ts",
+  "module": "./src/client.ts",
+  "types": "./src/client.ts",
   "scripts": {
     "copy-env": "copy-env",
     "dev": "pnpm build:dev && concurrently 'pnpm:dev:*' -c auto -k",

@@ -44,6 +44,7 @@ export const exchangeRoute = createRouter().get(
       return ctx.text('Invalid return URL')
     }
 
+    await gamesCaches.sessionCodeToSessionId.del(code)
     sessionService.attachHonoSession(ctx, variant.session)
     return ctx.redirect(returnUrl)
   },

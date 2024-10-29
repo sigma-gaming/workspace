@@ -10,7 +10,7 @@ export const GlobalTaskStatusTable = pgTable(
       .references(() => GlobalTaskTable.key)
       .notNull(),
     userId: uuid('userId')
-      .references(() => UserTable.id)
+      .references(() => UserTable.id, { onDelete: 'cascade' })
       .notNull(),
 
     status: taskStatusEnum('status').notNull(),
