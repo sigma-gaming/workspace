@@ -4,6 +4,7 @@ import SocialCallbackLayout from '../../../layouts/social-callback-layout.astro'
 export const prerender = false
 
 const payload = Astro.url.searchParams.get('payload')
+const action = Astro.cookies.get('sigma_action')?.value
 const returnUrl = Astro.cookies.get('sigma_returnUrl')?.value
 const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 ---
@@ -11,10 +12,15 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 <SocialCallbackLayout loaderColor="#0277FF">
   <vk-integration
     data-payload={payload}
+    data-action={action}
     data-return-url={returnUrl}
     data-access-url={accessUrl}
   >
-    <p class="mx-auto text-center">Выполняется&nbsp;вход через&nbsp;VK</p>
+    <p class="mx-auto text-center">
+      Выполняется&nbsp;{
+        action === 'sign-in' ? 'вход через' : 'привязка'
+      }&nbsp;VK
+    </p>
   </vk-integration>
 </SocialCallbackLayout>
 
@@ -25,13 +31,16 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
   class VkIntegration extends HTMLElement {
     connectedCallback() {
       const payload = this.dataset.payload
+      const integration = 'vk'
+      const action = this.dataset.action as 'sign-in' | 'connect' | undefined
       const returnUrl = this.dataset.returnUrl
       const accessUrl = this.dataset.accessUrl
-      if (!payload || !returnUrl || !accessUrl) return
+
+      if (!action || !payload || !returnUrl || !accessUrl) return
 
       authApi.authenticate
         .$post({
-          json: { integration: 'vk', payload },
+          json: { action, integration, payload },
         })
         .then((res) => res.json())
         .then((authentication) => {
@@ -40,10 +49,20 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
             return
           }
 
+          if (authentication.result === AuthenticateResult.NotAuthenticated) {
+            const url = `/sigma/errors/not-authenticated?returnUrl=${returnUrl}`
+            window.location.replace(url)
+            return
+          }
+
           const params = new URLSearchParams()
           params.set('code', authentication.code)
           params.set('returnUrl', returnUrl)
           window.location.replace(`${accessUrl}/exchange?${params.toString()}`)
+        })
+        .catch(() => {
+          const url = `/sigma/errors/unknown?returnUrl=${returnUrl}`
+          window.location.replace(url)
         })
     }
   }

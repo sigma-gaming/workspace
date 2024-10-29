@@ -80,16 +80,28 @@ export const authenticateRoute = new Hono().post(
   zValidator(
     'json',
     z.object({
+      action: z.enum(['sign-in', 'connect']),
       integration: z.enum(['vk', 'telegram']),
       payload: z.string(),
     }),
   ),
   async (ctx) => {
-    const { integration, payload } = ctx.req.valid('json')
+    const { action, integration, payload } = ctx.req.valid('json')
 
-    const sessionId = sessionService.getHonoSessionId(ctx)
-    const sessionVariant = await sessionService.getSessionSafe(sessionId)
-    let userId = sessionVariant.session?.userId
+    let userId: string | undefined
+
+    if (action === 'connect') {
+      const sessionId = sessionService.getHonoSessionId(ctx)
+      const sessionVariant = await sessionService.getSessionSafe(sessionId)
+      userId = sessionVariant.session?.userId
+
+      if (!userId) {
+        return ctx.json<AuthenticateResponse>({
+          result: AuthenticateResult.NotAuthenticated,
+        })
+      }
+    }
+
     const referralCampaignCode = getCookie(ctx, 'referralCampaign')
 
     let authenticatePayload: AuthenticatePayload

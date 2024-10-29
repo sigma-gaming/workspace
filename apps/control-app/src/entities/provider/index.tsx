@@ -21,12 +21,13 @@ export const ProviderInfoMap: Record<AccountProvider, ProviderInfo> = {
 
 export function createSignInUrl(integration: 'vk' | 'telegram') {
   const params = new URLSearchParams()
+  params.set('action', 'sign-in')
   params.set('integration', integration)
   params.set('accessUrl', env.accessApi.url)
   params.set('returnUrl', location.href)
   const referralCampaign = Cookies.get('referralCampaign')
   if (referralCampaign) params.set('referralCampaign', referralCampaign)
-  return `${env.authApi.url}/sigma/sign-in?${params.toString()}`
+  return `${env.authApi.url}/sigma/gateway?${params.toString()}`
 }
 
 export function createLogoutUrl() {

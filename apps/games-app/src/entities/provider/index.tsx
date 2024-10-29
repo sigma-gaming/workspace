@@ -19,14 +19,18 @@ export const ProviderInfoMap: Record<AccountProvider, ProviderInfo> = {
   },
 }
 
-export function createSignInUrl(integration: 'vk' | 'telegram') {
+export function createSignInUrl(
+  integration: 'vk' | 'telegram',
+  action: 'sign-in' | 'connect',
+) {
   const params = new URLSearchParams()
+  params.set('action', action)
   params.set('integration', integration)
   params.set('accessUrl', env.accessApi.url)
   params.set('returnUrl', location.href)
   const referralCampaign = Cookies.get('referralCampaign')
   if (referralCampaign) params.set('referralCampaign', referralCampaign)
-  return `${env.authApi.url}/sigma/sign-in?${params.toString()}`
+  return `${env.authApi.url}/sigma/gateway?${params.toString()}`
 }
 
 export function createLogoutUrl() {
@@ -35,13 +39,18 @@ export function createLogoutUrl() {
   return `${env.accessApi.url}/logout?${params.toString()}`
 }
 
+type SocialButtonProps = Partial<LinkButtonProps> & {
+  action: 'sign-in' | 'connect'
+}
+
 export const VkButton = ({
+  action,
   children = 'Войти через VK ID',
   ...rest
-}: Partial<LinkButtonProps>) => {
+}: SocialButtonProps) => {
   return (
     <LinkButton
-      to={createSignInUrl('vk')}
+      to={createSignInUrl('vk', action)}
       color="#3375F6"
       className="!outline-[#3375F6]"
       leftSection={<Icons.Vk />}
@@ -55,12 +64,13 @@ export const VkButton = ({
 }
 
 export const TelegramButton = ({
+  action,
   children = 'Войти через Telegram',
   ...rest
-}: Partial<LinkButtonProps>) => {
+}: SocialButtonProps) => {
   return (
     <LinkButton
-      to={createSignInUrl('telegram')}
+      to={createSignInUrl('telegram', action)}
       color="#51A2DD"
       className="!outline-[#51A2DD]"
       leftSection={<Icons.Telegram />}

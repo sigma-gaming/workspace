@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../../layouts/base-layout.astro'
+---
+
+<BaseLayout>
+  <section class="text-center">
+    <h2 class="text-xl md:text-2xl font-medium mb-4 mx-auto max-w-[480px]">
+      Не удалось привязать социальную сеть
+    </h2>
+    <p class="text-sm md:text-base text-gray-300 mb-8 mx-auto max-w-[540px]">
+      Перезайдите в&nbsp;аккаунт Sigma&nbsp;Games и&nbsp;попробуйте снова
+    </p>
+    <a
+      href="/#"
+      class="bg-purple-600 hover:bg-purple-700 transition-colors hover:cursor-pointer text-white font-medium py-2 px-4 rounded-md"
+      data-element="return-link"
+    >
+      Вернуться на Sigma Games
+    </a>
+  </section>
+</BaseLayout>
+
+<script>
+  const url = new URL(location.href)
+  const returnUrl = url.searchParams.get('returnUrl')
+  const returnLink = document.querySelector<HTMLAnchorElement>(
+    '[data-element="return-link"]',
+  )
+  if (returnLink && returnUrl) returnLink.href = returnUrl
+</script>
