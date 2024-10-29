@@ -12,10 +12,8 @@ export function createTelegramUrl() {
   params.set('origin', serverEnv.authApi.url)
   params.set('embed', '0')
   params.set('request_access', 'write')
-  params.set(
-    'return_to',
-    `${serverEnv.authApi.url}/sigma/integrations/telegram`,
-  )
+  const returnTo = `${serverEnv.authApi.url}/sigma/integrations/telegram`
+  params.set('return_to', returnTo)
   return `https://oauth.telegram.org/auth?${params.toString()}`
 }
 
