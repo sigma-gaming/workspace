@@ -1,7 +1,6 @@
 import { retry } from '@core/flow'
 import { logger as coreLogger } from '@core/logger'
-import { maintenanceCache } from '@games/redis'
-import { budgetService } from '@games/services'
+import { budgetService, maintenanceService } from '@games/services'
 import { CronJob } from 'cron'
 
 const logger = coreLogger.child('SyncBudgetJob')
@@ -10,7 +9,7 @@ export const syncBudgetJob = CronJob.from({
   cronTime: '*/5 * * * *', // every 5 minutes
   runOnInit: true,
   onTick: async () => {
-    if (await maintenanceCache.isMaintenanceMode()) {
+    if (await maintenanceService.isMaintenanceMode()) {
       logger.info('Skipped due to maintenance')
       return
     }

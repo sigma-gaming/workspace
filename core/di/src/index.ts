@@ -1,3 +1,2 @@
-export * from './hooks'
-export * from './shutdown'
-export * from './singleton'
+export * from './lazy-instance'
+export * from './options'

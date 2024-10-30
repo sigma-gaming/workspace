@@ -1,5 +1,5 @@
 import { logger } from '@core/logger'
-import { gamesCaches } from '@games/redis'
+import { gamesCache } from '@games/services'
 import { sendToAllLocal } from '../../shared/send'
 
 let lastWinSent = -1
@@ -12,7 +12,7 @@ async function sendLastWins() {
   }
 
   try {
-    const lastWins = await gamesCaches.lastWinHistory.get()
+    const lastWins = await gamesCache.lastWinHistory.get()
 
     // Send only new records
     const newWins = lastWins.filter((gameRecord) => gameRecord.id > lastWinSent)
@@ -45,7 +45,7 @@ async function sendBigWins() {
   }
 
   try {
-    const bigWins = await gamesCaches.bigWinHistory.get()
+    const bigWins = await gamesCache.bigWinHistory.get()
 
     // Send only new records
     const newWins = bigWins.filter(

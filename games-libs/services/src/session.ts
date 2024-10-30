@@ -1,18 +1,18 @@
-import { createSingletonProxy } from '@core/di'
+import { createLazyInstance, resolveOptions } from '@core/di'
 import {
   InternalServerException,
   NotAuthenticatedException,
   SessionExpiredException,
 } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
 import { SessionSelect, SessionTable } from '@dbs/games-schema'
 import { SessionState, SessionTokenPayload, SessionVariant } from '@games/model'
-import { gamesCaches } from '@games/redis'
+import { SessionOptionsToken } from '@games/options'
+import { gamesDb } from '@games/services'
 import { parse } from 'cookie'
 import { desc, eq, inArray } from 'drizzle-orm'
 import { Context as HonoContext } from 'hono'
 import { deleteCookie, setCookie } from 'hono/cookie'
-import { inject, InjectionToken, singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
 import { userService } from './user'
 
 type HonoEnvWithSession = {
@@ -30,24 +30,23 @@ export type SessionOptions = {
   }
 }
 
-export const SessionOptionsToken: InjectionToken<SessionOptions> = Symbol(
-  'SessionOptionsToken',
-)
-
-@singleton()
 export class SessionService {
   private cookieIdKey: string
   private cookieExpiresKey: string
+  private domain: string
 
-  constructor(@inject(SessionOptionsToken) private options: SessionOptions) {
-    this.cookieIdKey = options.cookie?.idKey ?? 'session_id'
-    this.cookieExpiresKey = options.cookie?.expiresKey ?? 'session_expires_at'
+  constructor() {
+    const { domain, cookie } = resolveOptions(SessionOptionsToken)
+
+    this.domain = domain
+    this.cookieIdKey = cookie?.idKey ?? 'session_id'
+    this.cookieExpiresKey = cookie?.expiresKey ?? 'session_expires_at'
   }
 
   private async getSessionById(
     sessionId: string,
   ): Promise<SessionSelect | null> {
-    const cached = await gamesCaches.session.get(sessionId)
+    const cached = await gamesCache.session.get(sessionId)
     if (cached) return cached
 
     const session = await gamesDb.query.SessionTable.findFirst({
@@ -55,7 +54,7 @@ export class SessionService {
     })
 
     if (!session) return null
-    await gamesCaches.session.set(sessionId, session)
+    await gamesCache.session.set(sessionId, session)
     return session
   }
 
@@ -133,7 +132,7 @@ export class SessionService {
       .values({ ...payload, expiresAt })
       .returning()
 
-    await gamesCaches.session.set(session.id, session)
+    await gamesCache.session.set(session.id, session)
 
     const extraSessions = await gamesDb.query.SessionTable.findMany({
       where: eq(SessionTable.userId, payload.userId),
@@ -155,7 +154,7 @@ export class SessionService {
 
   async removeSession(sessionId: string) {
     await gamesDb.delete(SessionTable).where(eq(SessionTable.id, sessionId))
-    await gamesCaches.session.del(sessionId)
+    await gamesCache.session.del(sessionId)
   }
 
   async refreshSession(sessionId: string) {
@@ -168,7 +167,7 @@ export class SessionService {
       .where(eq(SessionTable.id, sessionId))
       .returning()
 
-    await gamesCaches.session.set(sessionId, session)
+    await gamesCache.session.set(sessionId, session)
 
     return session
   }
@@ -177,7 +176,7 @@ export class SessionService {
     const expires = new Date(session.expiresAt)
 
     setCookie(ctx, this.cookieIdKey, session.id, {
-      domain: this.options.domain,
+      domain: this.domain,
       path: '/',
       expires,
       httpOnly: true,
@@ -186,7 +185,7 @@ export class SessionService {
     })
 
     setCookie(ctx, this.cookieExpiresKey, session.expiresAt, {
-      domain: this.options.domain,
+      domain: this.domain,
       path: '/',
       expires,
       sameSite: 'lax',
@@ -196,18 +195,18 @@ export class SessionService {
 
   detachHonoSession(ctx: HonoContext) {
     deleteCookie(ctx, this.cookieIdKey, {
-      domain: this.options.domain,
+      domain: this.domain,
       path: '/',
       sameSite: 'lax',
       httpOnly: true,
     })
 
     deleteCookie(ctx, this.cookieExpiresKey, {
-      domain: this.options.domain,
+      domain: this.domain,
       path: '/',
       sameSite: 'lax',
     })
   }
 }
 
-export const sessionService = createSingletonProxy(SessionService)
+export const sessionService = createLazyInstance(SessionService)

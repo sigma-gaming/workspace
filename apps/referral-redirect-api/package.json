@@ -23,6 +23,7 @@
     "@dbs/games-schema": "workspace:*",
     "@games/redis": "workspace:*",
     "@games/services": "workspace:*",
+    "@games/options": "workspace:*",
     "@core/di": "workspace:*",
     "@core/logger": "workspace:*",
     "@tooling/env": "workspace:*"

@@ -1,6 +1,4 @@
-import { createSingletonProxy } from '@core/di'
 import { InternalServerException, NotFoundException } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
 import {
   AccountSelect,
   AccountTable,
@@ -9,9 +7,9 @@ import {
   UserSelect,
 } from '@dbs/games-schema'
 import { ProfileDetailed } from '@games/model'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { eq } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
 import { userService } from './user'
 
 type Reused = {
@@ -20,13 +18,12 @@ type Reused = {
   accounts?: AccountSelect[]
 }
 
-@singleton()
 export class ProfileService {
   async getDetailedProfile(
     userId: UserSelect['id'],
     reused?: Reused,
   ): Promise<ProfileDetailed> {
-    const cached = await gamesCaches.detailedProfile.get(userId)
+    const cached = await gamesCache.detailedProfile.get(userId)
 
     if (cached) {
       return cached
@@ -64,10 +61,10 @@ export class ProfileService {
       accounts,
     }
 
-    await gamesCaches.detailedProfile.set(userId, detailedProfile)
+    await gamesCache.detailedProfile.set(userId, detailedProfile)
 
     return detailedProfile
   }
 }
 
-export const profileService = createSingletonProxy(ProfileService)
+export const profileService = new ProfileService()

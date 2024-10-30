@@ -1,9 +1,9 @@
-import { gamesDb } from '@dbs/games-db'
 import { ReferralAction, TransactionType } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
 import {
   affiliateService,
   balanceService,
+  gamesCache,
+  gamesDb,
   locks,
   sessionService,
 } from '@games/services'
@@ -43,7 +43,7 @@ export const depositRoute = createRouter().post('/', async (ctx) => {
         amount,
       })
 
-      await gamesCaches.balance.set(userId, updatedBalance)
+      await gamesCache.balance.set(userId, updatedBalance)
 
       return updatedBalance
     })

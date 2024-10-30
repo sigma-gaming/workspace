@@ -1,14 +1,10 @@
 import { Logger, loggerService } from '@core/logger'
 import { Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
-import { autoInjectable } from 'tsyringe-neo'
-import { gamesRedis } from '../redis'
-import { gamesRedlock } from '../redlock'
 
 type Parser<TValue> = (value: string) => TValue
 type Stringifier<TValue> = (value: TValue) => string
 
-@autoInjectable()
 export class GlobalEntityListService<TValue> {
   protected readonly key: string
   protected readonly ttl: number
@@ -19,13 +15,19 @@ export class GlobalEntityListService<TValue> {
   protected readonly parse: Parser<TValue> = JSON.parse
   protected readonly stringify: Stringifier<TValue> = JSON.stringify
 
-  constructor(options: { key: string; max?: number; ttl?: number }) {
-    this.redis = gamesRedis
-    this.redlock = gamesRedlock
-    this.logger = loggerService.logger.child('Cache').child(options.key)
+  constructor(options: {
+    redis: Redis
+    redlock: Redlock
+    key: string
+    max?: number
+    ttl?: number
+  }) {
+    this.redis = options.redis
+    this.redlock = options.redlock
     this.key = options.key
     this.ttl = options.ttl ?? 60 * 60
     this.max = options.max ?? 100
+    this.logger = loggerService.logger.child('Cache').child(options.key)
   }
 
   async exists() {
@@ -120,7 +122,6 @@ export class GlobalEntityListService<TValue> {
   }
 }
 
-@autoInjectable()
 export class KeyEntityListService<TValue> {
   protected readonly keygen: (key: string) => string
   protected readonly ttl: number
@@ -132,16 +133,18 @@ export class KeyEntityListService<TValue> {
   protected readonly stringify: Stringifier<TValue> = JSON.stringify
 
   constructor(options: {
+    redis: Redis
+    redlock: Redlock
     keygen: (key: string) => string
     max?: number
     ttl?: number
   }) {
-    this.redis = gamesRedis
-    this.redlock = gamesRedlock
-    this.parentLogger = loggerService.logger.child('Cache')
+    this.redis = options.redis
+    this.redlock = options.redlock
     this.keygen = options.keygen
     this.ttl = options.ttl ?? 60 * 60
     this.max = options.max ?? 100
+    this.parentLogger = loggerService.logger.child('Cache')
   }
 
   async exists(key: string) {

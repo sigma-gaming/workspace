@@ -1,16 +1,13 @@
-import { createSingletonProxy } from '@core/di'
 import { logger } from '@core/logger'
-import { gamesDb } from '@dbs/games-db'
 import { BudgetTable } from '@dbs/games-schema'
-import { gamesCaches } from '@games/redis'
-import { singleton } from 'tsyringe-neo'
+import { gamesDb } from '@games/services'
+import { gamesCache } from './cache'
 import { locks } from './locks'
 
-@singleton()
 export class BudgetService {
   getBudget = async () => {
     return await locks.with([locks.budget()], async () => {
-      const cached = await gamesCaches.budget.get()
+      const cached = await gamesCache.budget.get()
 
       if (cached) {
         return cached
@@ -25,16 +22,16 @@ export class BudgetService {
         budget = created[0]
       }
 
-      await gamesCaches.budget.set(budget)
+      await gamesCache.budget.set(budget)
       return budget
     })
   }
 
   getAvailable = async (): Promise<number> => {
-    const cached = await gamesCaches.budgetAvailable.get()
+    const cached = await gamesCache.budgetAvailable.get()
     if (cached) return cached
     const budget = await this.getBudget()
-    await gamesCaches.budgetAvailable.set(budget.available)
+    await gamesCache.budgetAvailable.set(budget.available)
     return budget.available
   }
 
@@ -48,17 +45,17 @@ export class BudgetService {
   }
 
   getSyncedAt = async (): Promise<Date> => {
-    const cached = await gamesCaches.budgetSyncedAt.get()
+    const cached = await gamesCache.budgetSyncedAt.get()
     if (cached) return new Date(cached)
     const budget = await this.getBudget()
     if (!budget) return new Date()
-    await gamesCaches.budgetSyncedAt.set(budget.lastSyncAt)
+    await gamesCache.budgetSyncedAt.set(budget.lastSyncAt)
     return new Date(budget.lastSyncAt)
   }
 
   increaseAvailable = async (amount: number) => {
     try {
-      await gamesCaches.budgetAvailable.incrBy(amount)
+      await gamesCache.budgetAvailable.incrBy(amount)
     } catch (error) {
       logger.error('Failed to increase budget')
     }
@@ -66,7 +63,7 @@ export class BudgetService {
 
   decreaseAvailable = async (amount: number) => {
     try {
-      await gamesCaches.budgetAvailable.decrBy(amount)
+      await gamesCache.budgetAvailable.decrBy(amount)
     } catch (error) {
       logger.error('Failed to decrease budget')
     }
@@ -81,4 +78,4 @@ export class BudgetService {
   }
 }
 
-export const budgetService = createSingletonProxy(BudgetService)
+export const budgetService = new BudgetService()

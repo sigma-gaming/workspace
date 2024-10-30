@@ -1,4 +1,3 @@
-import 'reflect-metadata'
 import { migrateGamesDB } from '@dbs/games-db'
 import { loadEnv, parseEnv } from '@tooling/env'
 import { z } from 'zod'

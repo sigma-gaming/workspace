@@ -1,14 +1,11 @@
-import { createSingletonProxy } from '@core/di'
 import { Redlock } from '@sesamecare-oss/redlock'
-import { singleton } from 'tsyringe-neo'
-import { RedisService } from './redis'
+import { Redis } from 'ioredis'
 
-@singleton()
 export class RedlockService {
   redlock: Redlock
 
-  constructor(redisService: RedisService) {
-    this.redlock = new Redlock([redisService.redis], {
+  constructor(redis: Redis) {
+    this.redlock = new Redlock([redis], {
       // http://redis.io/topics/distlock
       driftFactor: 0.01,
       retryCount: 10,
@@ -18,8 +15,3 @@ export class RedlockService {
     })
   }
 }
-
-export const gamesRedlock = createSingletonProxy(
-  RedlockService,
-  (service) => service.redlock,
-)

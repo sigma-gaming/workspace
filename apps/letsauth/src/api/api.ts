@@ -1,5 +1,5 @@
 import './setup'
-import { loggerService } from '@core/logger'
+import { logger } from '@core/logger'
 import { createErrorHandler } from '@core/server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -20,8 +20,8 @@ export const api = new Hono()
 api.onError(
   createErrorHandler({
     showOriginalError: serverEnv.isDev,
-    onInternalError: (error, ctx) => {
-      loggerService.forRequest(ctx.req).error(error)
+    onInternalError: (error) => {
+      logger.child('Request').error(error)
     },
   }),
 )

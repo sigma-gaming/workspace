@@ -1,19 +1,20 @@
-import { container } from 'tsyringe-neo'
-
 type RecordLike = {
   [key: string | number | symbol]: any
 }
 
-export const createSingletonProxy = <
+export const createLazyInstance = <
   T extends RecordLike,
   V extends RecordLike = T,
 >(
-  factory: new (...options: any[]) => T,
+  Factory: new () => T,
   selector?: (instance: T) => V,
 ) => {
+  let cached: T | null = null
+
   return new Proxy({} as V, {
     get(_, prop: keyof V) {
-      const service = container.resolve(factory)
+      const service = cached ?? new Factory()
+      if (!cached) cached = service
       if (!selector) return service[prop]
       return selector(service)[prop]
     },

@@ -1,6 +1,4 @@
-import { createSingletonProxy } from '@core/di'
 import { Logger, loggerService } from '@core/logger'
-import { gamesDb } from '@dbs/games-db'
 import { PromocodeTable, PromocodeUsageTable } from '@dbs/games-schema'
 import {
   FraudRisk,
@@ -8,11 +6,11 @@ import {
   PromocodeUsageStatus,
   TransactionType,
 } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { and, eq } from 'drizzle-orm'
 import crypto from 'node:crypto'
-import { singleton } from 'tsyringe-neo'
 import { balanceService } from './balance'
+import { gamesCache } from './cache'
 import { fraudService } from './fraud'
 import { locks } from './locks'
 
@@ -60,7 +58,6 @@ type ActivationOutput =
       >
     }
 
-@singleton()
 export class PromocodeService {
   private logger: Logger
 
@@ -93,7 +90,7 @@ export class PromocodeService {
   }
 
   async getPromocode(code: string) {
-    const cached = await gamesCaches.promocode.get(code)
+    const cached = await gamesCache.promocode.get(code)
     if (cached) return cached
 
     const promocode = await gamesDb.query.PromocodeTable.findFirst({
@@ -101,7 +98,7 @@ export class PromocodeService {
     })
 
     if (!promocode) return null
-    await gamesCaches.promocode.set(code, promocode)
+    await gamesCache.promocode.set(code, promocode)
     return promocode
   }
 
@@ -217,8 +214,8 @@ export class PromocodeService {
               wageringChange,
             })
 
-            await gamesCaches.balance.set(userId, updatedBalance)
-            await gamesCaches.promocode.set(code, updatedPromocode)
+            await gamesCache.balance.set(userId, updatedBalance)
+            await gamesCache.promocode.set(code, updatedPromocode)
 
             return updatedBalance
           })
@@ -241,4 +238,4 @@ export class PromocodeService {
   }
 }
 
-export const promocodeService = createSingletonProxy(PromocodeService)
+export const promocodeService = new PromocodeService()

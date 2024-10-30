@@ -1,5 +1,4 @@
-import { gamesDb } from '@dbs/games-db'
-import { gamesRedis } from '@games/redis'
+import { gamesDb, gamesRedis } from '@games/services'
 import { sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
@@ -9,7 +8,7 @@ export const healthyRoute = new Hono().get('/', async (ctx) => {
 })
 
 export const readyRoute = new Hono().get('/', async (ctx) => {
-  const redisReady = await gamesRedis
+  const redisReady = await gamesRedis.redis
     .ping()
     .then(() => true)
     .catch(() => false)

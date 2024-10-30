@@ -2,12 +2,12 @@ import crypto from 'crypto'
 import { BadRequestException } from '@core/exceptions'
 import { zValidator } from '@core/server'
 import { AccountProvider } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
 import {
   AuthenticatePayload,
   AuthResult,
   authService,
   fraudService,
+  gamesCache,
   sessionService,
 } from '@games/services'
 import axios from 'axios'
@@ -228,7 +228,7 @@ export const authenticateRoute = new Hono().post(
 
     const code = generateCode()
 
-    await gamesCaches.sessionCodeToSessionId.set(code, session.id)
+    await gamesCache.sessionCodeToSessionId.set(code, session.id)
     sessionService.attachHonoSession(ctx, session)
 
     fraudService.actualizeRisk(userId)

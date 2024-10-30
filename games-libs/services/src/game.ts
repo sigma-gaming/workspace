@@ -1,5 +1,3 @@
-import { createSingletonProxy } from '@core/di'
-import { gamesDb } from '@dbs/games-db'
 import {
   BalanceSelect,
   GameRecordTable,
@@ -11,11 +9,11 @@ import {
   GameSnapshot,
   TransactionType,
 } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { eq } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
 import { balanceService } from './balance'
 import { budgetService } from './budget'
+import { gamesCache } from './cache'
 import { gameHistoryService } from './game-history'
 import { profileService } from './profile'
 
@@ -40,10 +38,9 @@ const outcomeToTypeMap: Record<GameOutcome, TransactionType> = {
   [GameOutcome.Loss]: TransactionType.Loss,
 }
 
-@singleton()
 export class GameService {
   lock = async (userId: string, ms = 3000) => {
-    return gamesCaches.balance.lock(userId, ms)
+    return gamesCache.balance.lock(userId, ms)
   }
 
   getGameRecord = async (gameRecordId: number) => {
@@ -132,7 +129,7 @@ export class GameService {
           .set({ gameRecordId: gameRecord.id })
           .where(eq(TransactionTable.id, transaction.id))
 
-        await gamesCaches.balance.set(userId, updatedBalance)
+        await gamesCache.balance.set(userId, updatedBalance)
 
         return { gameRecord, updatedBalance }
       },
@@ -145,4 +142,4 @@ export class GameService {
   }
 }
 
-export const gameService = createSingletonProxy(GameService)
+export const gameService = new GameService()

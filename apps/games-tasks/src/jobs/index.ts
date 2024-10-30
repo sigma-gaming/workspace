@@ -1,11 +1,13 @@
-import { cronJobRegistry } from '@core/cron-jobs'
+import { CronJobRegistry } from '@core/cron-jobs'
 import { initializeChatMessagesJob } from './initialize-chat-messages'
 import { processReferrerPayoutsJob } from './process-referrer-payouts'
 import { syncBudgetJob } from './sync-budget'
 
+const registry = new CronJobRegistry()
+
 export function initializeCronJobs() {
-  cronJobRegistry.register('initializeChatMessages', initializeChatMessagesJob)
-  cronJobRegistry.register('syncBudget', syncBudgetJob)
-  cronJobRegistry.register('processReferrerPayouts', processReferrerPayoutsJob)
-  cronJobRegistry.start()
+  registry.register('initializeChatMessages', initializeChatMessagesJob)
+  registry.register('syncBudget', syncBudgetJob)
+  registry.register('processReferrerPayouts', processReferrerPayoutsJob)
+  registry.start()
 }

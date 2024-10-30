@@ -1,12 +1,12 @@
 import { BadRequestException } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
 import { FraudRisk, ReferralAction, TransactionType } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
-import { gamesCaches } from '@games/redis'
 import {
   affiliateService,
   balanceService,
   fraudService,
+  gamesCache,
+  gamesDb,
   locks,
   sessionService,
 } from '@games/services'
@@ -66,7 +66,7 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
         amount,
       })
 
-      await gamesCaches.balance.set(userId, updatedBalance)
+      await gamesCache.balance.set(userId, updatedBalance)
 
       return updatedBalance
     })

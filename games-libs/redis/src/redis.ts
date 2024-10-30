@@ -1,22 +1,16 @@
-import { createSingletonProxy, OnApplicationShutdown } from '@core/di'
 import { Logger, loggerService } from '@core/logger'
 import { Redis } from 'ioredis'
-import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 
 export type RedisOptions = {
   host: string
   password: string
 }
 
-export const RedisOptionsToken: InjectionToken<RedisOptions> =
-  Symbol('RedisOptions')
-
-@singleton()
-export class RedisService implements OnApplicationShutdown {
+export class RedisService {
   redis: Redis
   logger: Logger
 
-  constructor(@inject(RedisOptionsToken) options: RedisOptions) {
+  constructor(options: RedisOptions) {
     this.redis = new Redis({
       host: options.host,
       password: options.password,
@@ -32,17 +26,11 @@ export class RedisService implements OnApplicationShutdown {
   }
 }
 
-export const gamesRedis = createSingletonProxy(
-  RedisService,
-  (service) => service.redis,
-)
-
-@singleton()
-export class SubRedisService implements OnApplicationShutdown {
+export class SubRedisService {
   redis: Redis
   logger: Logger
 
-  constructor(@inject(RedisOptionsToken) options: RedisOptions) {
+  constructor(options: RedisOptions) {
     this.redis = new Redis({
       host: options.host,
       password: options.password,

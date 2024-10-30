@@ -1,22 +1,20 @@
-import { createSingletonProxy } from '@core/di'
-import { gamesDb } from '@dbs/games-db'
 import {
   NotificationInsert,
   NotificationSelect,
   NotificationTable,
 } from '@dbs/games-schema'
-import { gamesCaches, gamesPubsubs } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { and, asc, eq, gte, isNull } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
+import { gamesPubsubs } from './pubsubs'
 
-@singleton()
 export class NotificationService {
   getActual = async (userId?: string): Promise<NotificationSelect[]> => {
     const actual: NotificationSelect[] = []
     const now = new Date().toISOString()
 
     if (userId) {
-      let personal = await gamesCaches.personalNotifications.get(userId)
+      let personal = await gamesCache.personalNotifications.get(userId)
 
       if (!personal) {
         personal = await gamesDb.query.NotificationTable.findMany({
@@ -27,13 +25,13 @@ export class NotificationService {
           orderBy: asc(NotificationTable.createdAt),
         })
 
-        await gamesCaches.personalNotifications.set(userId, personal)
+        await gamesCache.personalNotifications.set(userId, personal)
       }
 
       actual.push(...personal)
     }
 
-    let global = await gamesCaches.globalNotifications.get()
+    let global = await gamesCache.globalNotifications.get()
 
     if (!global) {
       global = await gamesDb.query.NotificationTable.findMany({
@@ -44,7 +42,7 @@ export class NotificationService {
         orderBy: asc(NotificationTable.createdAt),
       })
 
-      await gamesCaches.globalNotifications.set(global)
+      await gamesCache.globalNotifications.set(global)
     }
 
     actual.push(...global)
@@ -58,13 +56,13 @@ export class NotificationService {
       .returning()
 
     if (notification.userId) {
-      await gamesCaches.personalNotifications.del(notification.userId)
+      await gamesCache.personalNotifications.del(notification.userId)
     } else {
-      await gamesCaches.globalNotifications.del()
+      await gamesCache.globalNotifications.del()
     }
 
     await gamesPubsubs.notifications.publish(notification)
   }
 }
 
-export const notificationService = createSingletonProxy(NotificationService)
+export const notificationService = new NotificationService()

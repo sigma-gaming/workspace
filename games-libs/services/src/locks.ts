@@ -1,38 +1,35 @@
-import { createSingletonProxy } from '@core/di'
 import { GlobalTaskKey } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
 import { Lock } from '@sesamecare-oss/redlock'
-import { singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
 
 type LockController = {
   add: (lockPromise: Promise<Lock>) => Promise<void>
 }
 
-@singleton()
 export class LocksService {
   balance(userId: string) {
-    return gamesCaches.balance.lock(userId, 3000)
+    return gamesCache.balance.lock(userId, 3000)
   }
 
   referrerBalance(referrerId: string, time = 3000) {
-    return gamesCaches.referrerBalance.lock(referrerId, time)
+    return gamesCache.referrerBalance.lock(referrerId, time)
   }
 
   promocode(code: string) {
-    return gamesCaches.promocode.lock(code, 3000)
+    return gamesCache.promocode.lock(code, 3000)
   }
 
   budget() {
-    return gamesCaches.budget.lock(3000)
+    return gamesCache.budget.lock(3000)
   }
 
   chat() {
-    return gamesCaches.lastChatMessages.lock(3000)
+    return gamesCache.lastChatMessages.lock(3000)
   }
 
   globalTaskStatus(taskKey: GlobalTaskKey, userId: string) {
     const cacheKey = `${userId}:${taskKey}`
-    return gamesCaches.globalTaskStatus.lock(cacheKey, 3000)
+    return gamesCache.globalTaskStatus.lock(cacheKey, 3000)
   }
 
   async with<T>(
@@ -55,4 +52,4 @@ export class LocksService {
   }
 }
 
-export const locks = createSingletonProxy(LocksService)
+export const locks = new LocksService()

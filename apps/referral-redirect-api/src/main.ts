@@ -1,8 +1,10 @@
 import './setup'
-import { shutdownServices } from '@core/di'
 import { logger } from '@core/logger'
-import { gamesRedis, maintenanceCache } from '@games/redis'
-import { affiliateService } from '@games/services'
+import {
+  affiliateService,
+  gamesRedis,
+  maintenanceService,
+} from '@games/services'
 import { App, SSLApp } from 'uWebSockets.js'
 import { env } from './env'
 
@@ -42,7 +44,7 @@ app.get('/ready', async (res) => {
     })
   }
 
-  const redisReady = await gamesRedis
+  const redisReady = await gamesRedis.redis
     .ping()
     .then(() => true)
     .catch(() => false)
@@ -55,7 +57,7 @@ app.get('/ready', async (res) => {
     return
   }
 
-  const maintenanceMode = await maintenanceCache.isMaintenanceMode()
+  const maintenanceMode = await maintenanceService.isMaintenanceMode()
 
   if (maintenanceMode) {
     wrapReply(() => {
@@ -140,9 +142,6 @@ async function handleExit() {
   exited = true
 
   logger.info('Exit signal received')
-
-  logger.info('Cleaning up..')
-  await shutdownServices()
 
   console.info('Exiting..')
   process.exit(0)

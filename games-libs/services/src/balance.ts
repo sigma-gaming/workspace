@@ -1,5 +1,3 @@
-import { createSingletonProxy } from '@core/di'
-import { gamesDb } from '@dbs/games-db'
 import {
   BalanceSelect,
   BalanceTable,
@@ -10,22 +8,21 @@ import {
   UserSelect,
 } from '@dbs/games-schema'
 import { TransactionType } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { eq } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
 
 type TransactionInsertWithUserId = TransactionInsert & {
   userId: UserSelect['id']
 }
 
-@singleton()
 export class BalanceService {
   lock = async (userId: string, ms = 3000) => {
-    return gamesCaches.balance.lock(userId, ms)
+    return gamesCache.balance.lock(userId, ms)
   }
 
   getBalance = async (userId: string): Promise<BalanceSelect> => {
-    const cached = await gamesCaches.balance.get(userId)
+    const cached = await gamesCache.balance.get(userId)
 
     if (cached) {
       return cached
@@ -39,7 +36,7 @@ export class BalanceService {
       throw new Error('Balance not found (should not happen)')
     }
 
-    await gamesCaches.balance.set(userId, balance)
+    await gamesCache.balance.set(userId, balance)
 
     return balance
   }
@@ -150,4 +147,4 @@ export class BalanceService {
   }
 }
 
-export const balanceService = createSingletonProxy(BalanceService)
+export const balanceService = new BalanceService()

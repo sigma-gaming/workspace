@@ -1,17 +1,14 @@
-import { createSingletonProxy } from '@core/di'
-import { gamesDb } from '@dbs/games-db'
 import { GameRecordSelect, GameRecordTable } from '@dbs/games-schema'
 import { GameOutcome } from '@dbs/games-types'
 import { gemFloat, gemInt } from '@games/model'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { and, desc, eq, gte, sql } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
 
-@singleton()
 export class GameHistoryService {
   getLastWinHistory = async () => {
-    if (await gamesCaches.lastWinHistory.exists()) {
-      return gamesCaches.lastWinHistory.get()
+    if (await gamesCache.lastWinHistory.exists()) {
+      return gamesCache.lastWinHistory.get()
     }
 
     const records = await gamesDb.query.GameRecordTable.findMany({
@@ -20,13 +17,13 @@ export class GameHistoryService {
       limit: 10,
     })
 
-    await gamesCaches.lastWinHistory.set(records)
+    await gamesCache.lastWinHistory.set(records)
     return records
   }
 
   getBigWinHistory = async () => {
-    if (await gamesCaches.bigWinHistory.exists()) {
-      return gamesCaches.bigWinHistory.get()
+    if (await gamesCache.bigWinHistory.exists()) {
+      return gamesCache.bigWinHistory.get()
     }
 
     const records = await gamesDb.query.GameRecordTable.findMany({
@@ -41,13 +38,13 @@ export class GameHistoryService {
       limit: 10,
     })
 
-    await gamesCaches.bigWinHistory.set(records)
+    await gamesCache.bigWinHistory.set(records)
     return records
   }
 
   getUserGameHistory = async (userId: string) => {
-    if (await gamesCaches.userGameHistory.exists(userId)) {
-      return gamesCaches.userGameHistory.get(userId)
+    if (await gamesCache.userGameHistory.exists(userId)) {
+      return gamesCache.userGameHistory.get(userId)
     }
 
     const records = await gamesDb.query.GameRecordTable.findMany({
@@ -56,28 +53,28 @@ export class GameHistoryService {
       limit: 10,
     })
 
-    await gamesCaches.userGameHistory.set(userId, records)
+    await gamesCache.userGameHistory.set(userId, records)
     return records
   }
 
   addGameRecord = async (record: GameRecordSelect) => {
     const promises: Promise<unknown>[] = []
 
-    promises.push(gamesCaches.userGameHistory.unshift(record.userId, record))
+    promises.push(gamesCache.userGameHistory.unshift(record.userId, record))
 
     if (
       gemFloat(record.bet + record.payout) >= 3000 &&
       record.multiplier >= 150
     ) {
-      promises.push(gamesCaches.bigWinHistory.unshift(record))
+      promises.push(gamesCache.bigWinHistory.unshift(record))
     }
 
     if (record.outcome === GameOutcome.Win) {
-      promises.push(gamesCaches.lastWinHistory.unshift(record))
+      promises.push(gamesCache.lastWinHistory.unshift(record))
     }
 
     await Promise.all(promises)
   }
 }
 
-export const gameHistoryService = createSingletonProxy(GameHistoryService)
+export const gameHistoryService = new GameHistoryService()

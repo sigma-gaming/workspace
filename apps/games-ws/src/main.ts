@@ -1,10 +1,13 @@
 import './setup'
 import './shared/sentry/init'
-import { shutdownServices } from '@core/di'
 import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
-import { gamesPubsubs, gamesRedis, maintenanceCache } from '@games/redis'
-import { sessionService } from '@games/services'
+import {
+  gamesPubsubs,
+  gamesRedis,
+  maintenanceService,
+  sessionService,
+} from '@games/services'
 import { parse } from 'cookie'
 import { App, SSLApp } from 'uWebSockets.js'
 import { GamesDiceAction } from './actions/games/dice'
@@ -113,7 +116,7 @@ app.get('/ready', async (res) => {
     })
   }
 
-  const redisReady = await gamesRedis
+  const redisReady = await gamesRedis.redis
     .ping()
     .then(() => true)
     .catch(() => false)
@@ -126,7 +129,7 @@ app.get('/ready', async (res) => {
     return
   }
 
-  const maintenanceMode = await maintenanceCache.isMaintenanceMode()
+  const maintenanceMode = await maintenanceService.isMaintenanceMode()
 
   if (maintenanceMode) {
     wrapReply(() => {
@@ -170,9 +173,6 @@ async function handleExit() {
 
   logger.info('Closing WebSocket server server..')
   io.close(() => app.close())
-
-  logger.info('Cleaning up..')
-  await shutdownServices()
 
   console.info('Exiting..')
   process.exit(0)

@@ -1,7 +1,5 @@
-import { autoInjectable } from 'tsyringe-neo'
 import { GlobalEntityBaseService, KeyEntityBaseService } from './entity-base'
 
-@autoInjectable()
 export class GlobalNumberEntityService extends GlobalEntityBaseService<number> {
   parse = Number
   stringify = String
@@ -25,7 +23,6 @@ export class GlobalNumberEntityService extends GlobalEntityBaseService<number> {
   }
 }
 
-@autoInjectable()
 export class KeyNumberEntityService extends KeyEntityBaseService<number> {
   parse = Number
   stringify = String

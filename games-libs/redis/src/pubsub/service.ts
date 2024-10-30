@@ -1,7 +1,5 @@
-import { createSingletonProxy, OnApplicationShutdown } from '@core/di'
-import { Logger, LoggerService } from '@core/logger'
+import { Logger, loggerService } from '@core/logger'
 import { Callback, Redis } from 'ioredis'
-import { singleton } from 'tsyringe-neo'
 import { RedisService, SubRedisService } from '../redis'
 
 type RedisMessageHandler = (channel: string, message: string) => void
@@ -16,19 +14,14 @@ export type PubSub<TPayload> = {
   unsubscribeAll: () => void
 }
 
-@singleton()
-export class PubSubService implements OnApplicationShutdown {
+export class PubSubService {
   private readonly logger: Logger
   private readonly redis: Redis
   private readonly subRedis: Redis
 
-  constructor(
-    redisService: RedisService,
-    subRedisService: SubRedisService,
-    loggerService: LoggerService,
-  ) {
-    this.redis = redisService.redis
-    this.subRedis = subRedisService.redis
+  constructor(options: { redis: Redis; subRedis: Redis }) {
+    this.redis = options.redis
+    this.subRedis = options.subRedis
     this.logger = loggerService.logger.child('GamesPubSub')
   }
 
@@ -136,5 +129,3 @@ export class PubSubService implements OnApplicationShutdown {
     this.logger.info('Successfully unsubscribed from all channels')
   }
 }
-
-export const gamesPubSub = createSingletonProxy(PubSubService)

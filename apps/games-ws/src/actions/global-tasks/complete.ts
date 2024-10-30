@@ -2,10 +2,10 @@ import {
   BadRequestException,
   NotAuthenticatedException,
 } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
 import { AccountTable } from '@dbs/games-schema'
 import { AccountProvider, GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import {
+  gamesDb,
   GlobalTaskChecker,
   GlobalTaskCompleteResult,
   globalTaskService,

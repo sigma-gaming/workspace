@@ -1,7 +1,11 @@
 import { zValidator } from '@core/server'
 import { UserRole } from '@dbs/games-types'
-import { gamesPubsubs, maintenanceCache } from '@games/redis'
-import { roleService, userService } from '@games/services'
+import {
+  gamesPubsubs,
+  maintenanceService,
+  roleService,
+  userService,
+} from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../../hono'
 
@@ -19,7 +23,7 @@ export const updateMaintenanceRoute = createRouter().post(
     roleService.assert(user, UserRole.Admin)
 
     const payload = ctx.req.valid('json')
-    await maintenanceCache.setMaintenanceMode(payload.value)
+    await maintenanceService.setMaintenanceMode(payload.value)
 
     if (payload.value) {
       await gamesPubsubs.maintenanceStarted.publish()

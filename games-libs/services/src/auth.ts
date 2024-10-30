@@ -1,6 +1,4 @@
-import { createSingletonProxy } from '@core/di'
 import { InternalServerException } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
 import {
   AccountInsert,
   AccountSelect,
@@ -13,10 +11,10 @@ import {
 } from '@dbs/games-schema'
 import { AccountProvider } from '@dbs/games-types'
 import { getUserFullName } from '@games/model'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { and, eq } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
 import { affiliateService } from './affiliate'
+import { gamesCache } from './cache'
 import { userService } from './user'
 
 export enum AuthResult {
@@ -45,7 +43,6 @@ type AuthenticateOutcome =
   | { result: AuthResult.ConnectedToAnotherUser }
   | { result: AuthResult.AnotherAccountConnected }
 
-@singleton()
 export class AuthService {
   async authenticate({
     userId,
@@ -128,7 +125,7 @@ export class AuthService {
         ...accountSharedInput,
       })
 
-      await gamesCaches.detailedProfile.del(userId)
+      await gamesCache.detailedProfile.del(userId)
 
       return { result: AuthResult.Connected }
     }
@@ -209,7 +206,7 @@ export class AuthService {
       },
     )
 
-    await gamesCaches.user.set(createdUser.id, createdUser)
+    await gamesCache.user.set(createdUser.id, createdUser)
 
     return {
       result: AuthResult.SignedUp,
@@ -219,4 +216,4 @@ export class AuthService {
   }
 }
 
-export const authService = createSingletonProxy(AuthService)
+export const authService = new AuthService()

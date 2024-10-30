@@ -1,12 +1,10 @@
-import { createSingletonProxy } from '@core/di'
 import { Logger, loggerService } from '@core/logger'
-import { gamesDb } from '@dbs/games-db'
 import { GlobalTaskSelect, GlobalTaskStatusTable } from '@dbs/games-schema'
 import { GlobalTaskKey, TaskStatus, TransactionType } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { and, eq } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
-import { BalanceService } from './balance'
+import { balanceService } from './balance'
+import { gamesCache } from './cache'
 import { locks } from './locks'
 
 export enum GlobalTaskCompleteResult {
@@ -59,20 +57,19 @@ export type GlobalTaskChecker = (task: GlobalTaskSelect) => Promise<
     }
 >
 
-@singleton()
 export class GlobalTaskService {
   logger: Logger
 
-  constructor(private transactionService: BalanceService) {
+  constructor() {
     this.logger = loggerService.logger.child('GlobalTask')
   }
 
   async getTasks() {
-    const cached = await gamesCaches.globalTasks.get()
+    const cached = await gamesCache.globalTasks.get()
     if (cached) return cached
 
     const tasks = await gamesDb.query.GlobalTaskTable.findMany()
-    await gamesCaches.globalTasks.set(tasks)
+    await gamesCache.globalTasks.set(tasks)
     return tasks
   }
 
@@ -83,7 +80,7 @@ export class GlobalTaskService {
 
   async getStatus(taskKey: GlobalTaskKey, userId: string) {
     const cacheKey = `${userId}:${taskKey}`
-    const cached = await gamesCaches.globalTaskStatus.get(cacheKey)
+    const cached = await gamesCache.globalTaskStatus.get(cacheKey)
     if (cached) return cached
 
     const entity = await gamesDb.query.GlobalTaskStatusTable.findFirst({
@@ -95,7 +92,7 @@ export class GlobalTaskService {
 
     const status = entity?.status ?? TaskStatus.Pending
     const inserted = Boolean(entity)
-    await gamesCaches.globalTaskStatus.set(cacheKey, [status, inserted])
+    await gamesCache.globalTaskStatus.set(cacheKey, [status, inserted])
     return [status, inserted] as const
   }
 
@@ -125,7 +122,7 @@ export class GlobalTaskService {
     }
 
     const cacheKey = `${userId}:${taskKey}`
-    await gamesCaches.globalTaskStatus.set(cacheKey, [status, true])
+    await gamesCache.globalTaskStatus.set(cacheKey, [status, true])
   }
 
   async completeTask(payload: {
@@ -200,14 +197,14 @@ export class GlobalTaskService {
 
         await controller.add(locks.balance(userId))
 
-        const balance = await this.transactionService.getBalance(userId)
+        const balance = await balanceService.getBalance(userId)
 
         const wageringChange = Math.ceil(
           task.payout * (task.wageringMultiplier / 100),
         )
 
         const updatedBalance = await gamesDb.transaction(async (tx) => {
-          const transaction = await this.transactionService.createTransaction({
+          const transaction = await balanceService.createTransaction({
             tx,
             payload: {
               userId,
@@ -216,7 +213,7 @@ export class GlobalTaskService {
             },
           })
 
-          const updatedBalance = await this.transactionService.updateBalance({
+          const updatedBalance = await balanceService.updateBalance({
             tx,
             balance,
             transaction,
@@ -238,4 +235,4 @@ export class GlobalTaskService {
   }
 }
 
-export const globalTaskService = createSingletonProxy(GlobalTaskService)
+export const globalTaskService = new GlobalTaskService()

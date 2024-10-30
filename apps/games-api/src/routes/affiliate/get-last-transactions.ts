@@ -1,13 +1,16 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
 import {
   ProfileTable,
   ReferrerPayoutTable,
   ReferrerTransactionTable,
 } from '@dbs/games-schema'
 import { ReferrerTransactionDetailed } from '@games/model'
-import { gamesCaches } from '@games/redis'
-import { affiliateService, sessionService } from '@games/services'
+import {
+  affiliateService,
+  gamesCache,
+  gamesDb,
+  sessionService,
+} from '@games/services'
 import { and, desc, eq, getTableColumns } from 'drizzle-orm'
 import { createRouter } from '../../hono'
 
@@ -21,7 +24,7 @@ export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
     })
   }
 
-  const cached = await gamesCaches.lastReferrerTransactions.get(userId)
+  const cached = await gamesCache.lastReferrerTransactions.get(userId)
 
   if (cached) {
     return ctx.json(cached)
@@ -61,7 +64,7 @@ export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
     0,
   )
 
-  await gamesCaches.lastReferrerTransactions.set(userId, {
+  await gamesCache.lastReferrerTransactions.set(userId, {
     transactions,
     totalAmount,
   })

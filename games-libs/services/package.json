@@ -12,6 +12,7 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
+    "@games/options": "workspace:*",
     "@dbs/games-db": "workspace:*",
     "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",

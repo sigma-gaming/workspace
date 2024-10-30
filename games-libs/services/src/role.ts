@@ -1,10 +1,7 @@
-import { createSingletonProxy } from '@core/di'
 import { UnauthorizedException } from '@core/exceptions'
 import { UserSelect } from '@dbs/games-schema'
 import { UserRole } from '@dbs/games-types'
-import { singleton } from 'tsyringe-neo'
 
-@singleton()
 export class RoleService {
   hasRole(user: UserSelect, role: UserRole | UserRole[]) {
     if (Array.isArray(role)) {
@@ -20,4 +17,4 @@ export class RoleService {
   }
 }
 
-export const roleService = createSingletonProxy(RoleService)
+export const roleService = new RoleService()

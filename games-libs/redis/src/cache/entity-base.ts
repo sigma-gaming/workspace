@@ -1,14 +1,10 @@
 import { Logger, loggerService } from '@core/logger'
 import { Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
-import { autoInjectable } from 'tsyringe-neo'
-import { gamesRedis } from '../redis'
-import { gamesRedlock } from '../redlock'
 
 type Parser<TValue> = (value: string) => TValue
 type Stringifier<TValue> = (value: TValue) => string
 
-@autoInjectable()
 export class GlobalEntityBaseService<TValue> {
   protected readonly key: string
   protected readonly ttl: number
@@ -18,12 +14,17 @@ export class GlobalEntityBaseService<TValue> {
   protected readonly parse: Parser<TValue> = JSON.parse
   protected readonly stringify: Stringifier<TValue> = JSON.stringify
 
-  constructor(options: { key: string; ttl?: number }) {
-    this.redis = gamesRedis
-    this.redlock = gamesRedlock
-    this.logger = loggerService.logger.child('Cache').child(options.key)
+  constructor(options: {
+    redis: Redis
+    redlock: Redlock
+    key: string
+    ttl?: number
+  }) {
+    this.redis = options.redis
+    this.redlock = options.redlock
     this.key = options.key
     this.ttl = options.ttl ?? 60 * 60
+    this.logger = loggerService.logger.child('Cache').child(options.key)
   }
 
   async exists() {
@@ -58,7 +59,6 @@ export class GlobalEntityBaseService<TValue> {
   }
 }
 
-@autoInjectable()
 export class KeyEntityBaseService<TValue> {
   protected readonly keygen: (key: string) => string
   protected readonly ttl: number
@@ -68,12 +68,17 @@ export class KeyEntityBaseService<TValue> {
   protected readonly parse: Parser<TValue> = JSON.parse
   protected readonly stringify: Stringifier<TValue> = JSON.stringify
 
-  constructor(options: { keygen: (key: string) => string; ttl?: number }) {
-    this.redis = gamesRedis
-    this.redlock = gamesRedlock
-    this.parentLogger = loggerService.logger.child('Cache')
+  constructor(options: {
+    redis: Redis
+    redlock: Redlock
+    keygen: (key: string) => string
+    ttl?: number
+  }) {
+    this.redis = options.redis
+    this.redlock = options.redlock
     this.keygen = options.keygen
     this.ttl = options.ttl ?? 60 * 60
+    this.parentLogger = loggerService.logger.child('Cache')
   }
 
   protected logger(key: string): Logger {

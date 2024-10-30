@@ -1,11 +1,11 @@
 import { BadRequestException } from '@core/exceptions'
 import { zValidator } from '@core/server'
-import { gamesDb } from '@dbs/games-db'
 import { AccountTable, ProfileTable, ProfileUpdate } from '@dbs/games-schema'
 import { AccountProvider, UserRole } from '@dbs/games-types'
 import { getUserFullName, ProfileValidation } from '@games/model'
-import { gamesCaches } from '@games/redis'
 import {
+  gamesCache,
+  gamesDb,
   profileService,
   roleService,
   sessionService,
@@ -17,7 +17,12 @@ import { createRouter } from '../../hono'
 
 const reservedUsernames = [
   'sigma',
+  'sigmadm',
+  'sigmaadm',
   'sigmadmin',
+  'sigmaadmin',
+  'sigmagames',
+  'sigmagaming',
   'sigma_admin',
   'sigma_support',
   'sigma_moderator',
@@ -28,9 +33,9 @@ const reservedUsernames = [
   'sigma_service',
   'sigma_team',
   'sigma_staff',
-  'sigmaadmin',
   'sigma_helpdesk',
   'sigma_system',
+  'sigmadev',
   'admin',
   'administrator',
   'moderator',
@@ -174,7 +179,7 @@ export const updateProfileRoute = createRouter().post(
       .where(eq(ProfileTable.userId, userId))
       .returning()
 
-    await gamesCaches.detailedProfile.del(userId)
+    await gamesCache.detailedProfile.del(userId)
 
     return ctx.json({
       status: 'success',

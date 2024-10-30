@@ -1,4 +1,4 @@
-import { createSingletonProxy } from '@core/di'
+import { createLazyInstance, resolveOptions } from '@core/di'
 import {
   BalanceSelect,
   BudgetSelect,
@@ -17,25 +17,26 @@ import {
   ProfileDetailed,
   ReferrerTransactionDetailed,
 } from '@games/model'
-import { autoInjectable, inject, InjectionToken, singleton } from 'tsyringe-neo'
-import { GlobalJsonEntityService, KeyJsonEntityService } from './entity-json'
-import { GlobalEntityListService, KeyEntityListService } from './entity-list'
-import { GlobalNumberEntityService } from './entity-number'
+import { GamesCacheOptionsToken } from '@games/options'
 import {
+  GlobalBooleanEntityService,
+  GlobalEntityListService,
+  GlobalJsonEntityService,
+  GlobalNumberEntityService,
   GlobalStringEntityService,
+  KeyEntityListService,
+  KeyJsonEntityService,
   KeyStringEntityService,
-} from './entity-string'
-
-export const CacheVersionToken: InjectionToken<string> = Symbol('CacheVersion')
+} from '@games/redis'
+import { gamesRedis } from './redis'
 
 type LastReferrerTransactions = {
   transactions: ReferrerTransactionDetailed[]
   totalAmount: number
 }
 
-@singleton()
-@autoInjectable()
-export class CacheRegistry {
+export class GamesCacheRegistry {
+  maintenance: GlobalBooleanEntityService
   budget: GlobalJsonEntityService<BudgetSelect>
   budgetAvailable: GlobalNumberEntityService
   budgetSyncedAt: GlobalStringEntityService
@@ -57,55 +58,86 @@ export class CacheRegistry {
   globalTasks: GlobalJsonEntityService<GlobalTaskSelect[]>
   globalTaskStatus: KeyJsonEntityService<[TaskStatus, boolean]>
 
-  constructor(@inject(CacheVersionToken) version: string) {
+  constructor() {
+    const { version } = resolveOptions(GamesCacheOptionsToken)
+    const { redis, redlock } = gamesRedis
+
+    this.maintenance = new GlobalBooleanEntityService({
+      redis,
+      redlock,
+      key: `global:maintenance`,
+    })
+
     this.budget = new GlobalJsonEntityService<BudgetSelect>({
+      redis,
+      redlock,
       key: `${version}:global:budget`,
       ttl: 60 * 15, // 15 minutes
     })
 
     this.budgetAvailable = new GlobalNumberEntityService({
+      redis,
+      redlock,
       key: `global:budgetAvailable`,
       ttl: 60 * 60 * 24, // 1 day
     })
 
     this.budgetSyncedAt = new GlobalStringEntityService({
+      redis,
+      redlock,
       key: `global:budgetSyncedAt`,
       ttl: 60 * 60 * 24, // 1 day
     })
 
     this.detailedProfile = new KeyJsonEntityService<ProfileDetailed>({
+      redis,
+      redlock,
       keygen: (token: string) => `${version}:detailedProfile:${token}`,
     })
 
     this.user = new KeyJsonEntityService<UserSelect>({
+      redis,
+      redlock,
       keygen: (userId: string) => `${version}:user:${userId}`,
     })
 
     this.session = new KeyJsonEntityService<SessionSelect>({
+      redis,
+      redlock,
       keygen: (sessionId: string) => `${version}:session:${sessionId}`,
       ttl: 60 * 60, // 1 hour
     })
 
     this.sessionCodeToSessionId = new KeyStringEntityService({
+      redis,
+      redlock,
       keygen: (code: string) => `sessionCodeToToken:${code}`,
       ttl: 60 * 5, // 5 minutes
     })
 
     this.balance = new KeyJsonEntityService<BalanceSelect>({
+      redis,
+      redlock,
       keygen: (userId: string) => `${version}:balance:${userId}`,
     })
 
     this.referrerBalance = new KeyJsonEntityService<ReferrerBalanceSelect>({
+      redis,
+      redlock,
       keygen: (userId: string) => `${version}:referrerBalance:${userId}`,
     })
 
     this.referrerSettings = new KeyJsonEntityService<ReferrerSettingsSelect>({
+      redis,
+      redlock,
       keygen: (referrerId: string) =>
         `${version}:referrerSettings:${referrerId}`,
     })
 
     this.lastReferrerTransactions =
       new KeyJsonEntityService<LastReferrerTransactions>({
+        redis,
+        redlock,
         keygen: (referrerId: string) =>
           `${version}:lastReferrerTransactions:${referrerId}`,
         ttl: 15 * 60, // 15 minutes
@@ -114,55 +146,77 @@ export class CacheRegistry {
     this.globalNotifications = new GlobalJsonEntityService<
       NotificationSelect[]
     >({
+      redis,
+      redlock,
       key: `${version}:global:notifications`,
     })
 
     this.personalNotifications = new KeyJsonEntityService<NotificationSelect[]>(
       {
+        redis,
+        redlock,
         keygen: (userId: string) => `${version}:notifications:${userId}`,
       },
     )
 
     this.lastChatMessages = new GlobalEntityListService<ChatMessageDetailed>({
+      redis,
+      redlock,
       key: `${version}:global:lastChatMessages`,
       max: 50,
       ttl: 60 * 60 * 24 * 1, // 1 day
     })
 
     this.lastWinHistory = new GlobalEntityListService<GameRecordSelect>({
+      redis,
+      redlock,
       key: `${version}:global:lastWinHistory`,
       max: 10,
       ttl: 60 * 60 * 1, // 6 hours
     })
 
     this.bigWinHistory = new GlobalEntityListService<GameRecordSelect>({
+      redis,
+      redlock,
       key: `${version}:global:bigWinHistory`,
       max: 10,
       ttl: 60 * 60 * 6, // 6 hours
     })
 
     this.userGameHistory = new KeyEntityListService<GameRecordSelect>({
+      redis,
+      redlock,
       keygen: (userId: string) => `${version}:userGameHistory:${userId}`,
       max: 10,
       ttl: 60 * 15, // 15 minutes
     })
 
     this.promocode = new KeyJsonEntityService<PromocodeSelect>({
+      redis,
+      redlock,
       keygen: (code: string) => `${version}:promocode:${code}`,
       ttl: 60 * 60, // 1 hour
     })
 
     this.globalTasks = new GlobalJsonEntityService<GlobalTaskSelect[]>({
+      redis,
+      redlock,
       key: `${version}:global:globalTasks`,
       ttl: 60 * 60, // 1 hour
     })
 
     this.globalTaskStatus = new KeyJsonEntityService<[TaskStatus, boolean]>({
+      redis,
+      redlock,
       keygen: (keyAndUserId: string) =>
         `${version}:globalTaskStatus:${keyAndUserId}`,
       ttl: 60 * 60, // 1 hour
     })
   }
+
+  get ready() {
+    return gamesRedis.ready
+  }
 }
 
-export const gamesCaches = createSingletonProxy(CacheRegistry)
+export const gamesCache = createLazyInstance(GamesCacheRegistry)

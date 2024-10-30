@@ -1,5 +1,5 @@
-import { createSingletonProxy } from '@core/di'
-import { inject, InjectionToken, singleton } from 'tsyringe-neo'
+import { createLazyInstance, resolveOptions } from '@core/di'
+import { VkOptionsToken } from '@games/options'
 import { APIError, VK } from 'vk-io'
 
 type GroupMemberPayload = {
@@ -17,26 +17,19 @@ export enum RepostStatus {
   Unknown = 'Unknown',
 }
 
-export type VkOptions = {
-  groupToken: string
-  serviceToken: string
-}
-
-export const VkOptionsToken: InjectionToken<VkOptions> =
-  Symbol('VkOptionsToken')
-
-@singleton()
 export class VkService {
   group: VK
   service: VK
 
-  constructor(@inject(VkOptionsToken) options: VkOptions) {
+  constructor() {
+    const { groupToken, serviceToken } = resolveOptions(VkOptionsToken)
+
     this.group = new VK({
-      token: options.groupToken,
+      token: groupToken,
     })
 
     this.service = new VK({
-      token: options.serviceToken,
+      token: serviceToken,
     })
   }
 
@@ -104,4 +97,4 @@ export class VkService {
   }
 }
 
-export const vkService = createSingletonProxy(VkService)
+export const vkService = createLazyInstance(VkService)

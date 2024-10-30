@@ -1,6 +1,4 @@
-import { createSingletonProxy } from '@core/di'
 import { BadRequestException, InternalServerException } from '@core/exceptions'
-import { gamesDb } from '@dbs/games-db'
 import {
   ChatMessageInsert,
   ChatMessageSelect,
@@ -14,14 +12,14 @@ import {
   UserRole,
 } from '@dbs/games-types'
 import { ChatMessageDetailed, ProfileDetailed } from '@games/model'
-import { gamesCaches, gamesPubsubs } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { desc } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
 import { gameService } from './game'
 import { locks } from './locks'
 import { profileService } from './profile'
+import { gamesPubsubs } from './pubsubs'
 
-@singleton()
 export class ChatService {
   private async validateUserGameAttachment(
     userId: string,
@@ -43,10 +41,10 @@ export class ChatService {
 
   async initializeMessages() {
     return await locks.with([locks.chat()], async () => {
-      const exists = await gamesCaches.lastChatMessages.exists()
+      const exists = await gamesCache.lastChatMessages.exists()
 
       if (exists) {
-        await gamesCaches.lastChatMessages.extend()
+        await gamesCache.lastChatMessages.extend()
         return
       }
 
@@ -71,12 +69,12 @@ export class ChatService {
         },
       )
 
-      await gamesCaches.lastChatMessages.set(detailedMessages.reverse())
+      await gamesCache.lastChatMessages.set(detailedMessages.reverse())
     })
   }
 
   async getLastMessages(): Promise<ChatMessageSelect[]> {
-    return gamesCaches.lastChatMessages.get()
+    return gamesCache.lastChatMessages.get()
   }
 
   async sendMessage(options: {
@@ -151,11 +149,11 @@ export class ChatService {
       detailedMessage.senderRoles = [UserRole.Admin]
     }
 
-    await gamesCaches.lastChatMessages.push(detailedMessage)
+    await gamesCache.lastChatMessages.push(detailedMessage)
     await gamesPubsubs.chatMessages.publish(detailedMessage)
 
     return message
   }
 }
 
-export const chatService = createSingletonProxy(ChatService)
+export const chatService = new ChatService()

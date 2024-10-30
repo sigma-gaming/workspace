@@ -1,10 +1,8 @@
-import { createSingletonProxy } from '@core/di'
 import { Logger, loggerService } from '@core/logger'
-import { gamesDb } from '@dbs/games-db'
 import { UserSecuritySelect, UserSecurityTable } from '@dbs/games-schema'
 import { FraudRisk } from '@dbs/games-types'
+import { gamesDb } from '@games/services'
 import { and, count, eq, lt } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
 
 type ActualizeRiskOptions = {
   ip?: string
@@ -39,7 +37,6 @@ const SCORE_RELATIONS: ScoreRelation[] = [
   { field: 'addressSol', scoreField: 'addressSolScore', multiplier: 10 },
 ]
 
-@singleton()
 export class FraudService {
   private logger: Logger
 
@@ -150,4 +147,4 @@ export class FraudService {
   }
 }
 
-export const fraudService = createSingletonProxy(FraudService)
+export const fraudService = new FraudService()

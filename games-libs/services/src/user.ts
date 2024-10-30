@@ -1,14 +1,11 @@
-import { createSingletonProxy } from '@core/di'
-import { gamesDb } from '@dbs/games-db'
 import { UserSelect, UserTable } from '@dbs/games-schema'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { eq } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
 
-@singleton()
 export class UserService {
   async getUserSafe(userId: string): Promise<UserSelect | null> {
-    const cached = await gamesCaches.user.get(userId)
+    const cached = await gamesCache.user.get(userId)
     if (cached) return cached
 
     const user = await gamesDb.query.UserTable.findFirst({
@@ -16,7 +13,7 @@ export class UserService {
     })
 
     if (!user) return null
-    await gamesCaches.user.set(userId, user)
+    await gamesCache.user.set(userId, user)
     return user
   }
 
@@ -27,4 +24,4 @@ export class UserService {
   }
 }
 
-export const userService = createSingletonProxy(UserService)
+export const userService = new UserService()

@@ -1,8 +1,7 @@
 import { BadRequestException } from '@core/exceptions'
 import { zValidator } from '@core/server'
 import { SessionState } from '@games/model'
-import { gamesCaches } from '@games/redis'
-import { sessionService } from '@games/services'
+import { gamesCache, sessionService } from '@games/services'
 import { z } from 'zod'
 import { env } from '../env'
 import { createRouter } from '../hono'
@@ -18,7 +17,7 @@ export const exchangeRoute = createRouter().get(
   ),
   async (ctx) => {
     const { code, returnUrl } = ctx.req.valid('query')
-    const sessionId = await gamesCaches.sessionCodeToSessionId.get(code)
+    const sessionId = await gamesCache.sessionCodeToSessionId.get(code)
 
     if (!sessionId) {
       throw new BadRequestException({
@@ -44,7 +43,7 @@ export const exchangeRoute = createRouter().get(
       return ctx.text('Invalid return URL')
     }
 
-    await gamesCaches.sessionCodeToSessionId.del(code)
+    await gamesCache.sessionCodeToSessionId.del(code)
     sessionService.attachHonoSession(ctx, variant.session)
     return ctx.redirect(returnUrl)
   },

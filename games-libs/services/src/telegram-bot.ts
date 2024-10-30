@@ -1,6 +1,6 @@
-import { createSingletonProxy } from '@core/di'
+import { createLazyInstance, resolveOptions } from '@core/di'
+import { TelegramBotOptionsToken } from '@games/options'
 import { Bot } from 'grammy'
-import { inject, InjectionToken, singleton } from 'tsyringe-neo'
 
 type ChatMemberPayload = {
   chatId: number
@@ -8,19 +8,12 @@ type ChatMemberPayload = {
   subscribed: boolean
 }
 
-export type TelegramBotOptions = {
-  token: string
-}
-
-export const TelegramBotOptionsToken: InjectionToken<TelegramBotOptions> =
-  Symbol('TelegramBotOptionsToken')
-
-@singleton()
 export class TelegramBotService {
   bot: Bot
 
-  constructor(@inject(TelegramBotOptionsToken) options: TelegramBotOptions) {
-    this.bot = new Bot(options.token)
+  constructor() {
+    const { token } = resolveOptions(TelegramBotOptionsToken)
+    this.bot = new Bot(token)
   }
 
   messageUser(userId: number, text: string | string[]) {
@@ -61,4 +54,4 @@ export class TelegramBotService {
   }
 }
 
-export const telegramBotService = createSingletonProxy(TelegramBotService)
+export const telegramBotService = createLazyInstance(TelegramBotService)

@@ -29,6 +29,7 @@
     "@games/model": "workspace:*",
     "@games/redis": "workspace:*",
     "@games/services": "workspace:*",
+    "@games/options": "workspace:*",
     "@core/server": "workspace:*",
     "@tooling/env": "workspace:*"
   }

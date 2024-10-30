@@ -1,14 +1,11 @@
-import { createSingletonProxy } from '@core/di'
 import { logger } from '@core/logger'
 import { CronJob } from 'cron'
-import { singleton } from 'tsyringe-neo'
 
 type Job = {
   name: string
   instance: CronJob
 }
 
-@singleton()
 export class CronJobRegistry {
   jobs: Job[] = []
 
@@ -36,5 +33,3 @@ export class CronJobRegistry {
     logger.info('Cron jobs stopped')
   }
 }
-
-export const cronJobRegistry = createSingletonProxy(CronJobRegistry)

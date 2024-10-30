@@ -21,8 +21,6 @@
     "resolveJsonModule": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
@@ -64,6 +62,9 @@
       ],
       "@games/model": [
         "games-libs/model/src/index.ts"
+      ],
+      "@games/options": [
+        "games-libs/options/src/index.ts"
       ],
       "@games/services": [
         "games-libs/services/src/index.ts"

@@ -1,7 +1,5 @@
 import crypto from 'crypto'
-import { createSingletonProxy } from '@core/di'
-import { Logger, LoggerService } from '@core/logger'
-import { gamesDb } from '@dbs/games-db'
+import { Logger, loggerService } from '@core/logger'
 import {
   ReferralCampaignInsert,
   ReferralCampaignTable,
@@ -12,9 +10,9 @@ import {
   ReferrerWithdrawalTable,
 } from '@dbs/games-schema'
 import { ReferralAction } from '@dbs/games-types'
-import { gamesCaches } from '@games/redis'
+import { gamesDb } from '@games/services'
 import { and, desc, eq, lte, sql, sum } from 'drizzle-orm'
-import { singleton } from 'tsyringe-neo'
+import { gamesCache } from './cache'
 import { locks } from './locks'
 import { dayjs } from './shared/dayjs'
 
@@ -33,11 +31,10 @@ const RTP_FEE = 0.05
 const PAYMENT_FEE = 0.05
 const FEE = RTP_FEE + PAYMENT_FEE
 
-@singleton()
 export class AffiliateService {
   logger: Logger
 
-  constructor(loggerService: LoggerService) {
+  constructor() {
     this.logger = loggerService.logger.child('Affiliate')
   }
 
@@ -100,7 +97,7 @@ export class AffiliateService {
   }
 
   async getReferrerSettings(referrerId: string) {
-    const cached = await gamesCaches.referrerSettings.get(referrerId)
+    const cached = await gamesCache.referrerSettings.get(referrerId)
 
     if (cached) {
       return cached
@@ -114,12 +111,12 @@ export class AffiliateService {
       return null
     }
 
-    await gamesCaches.referrerSettings.set(referrerId, settings)
+    await gamesCache.referrerSettings.set(referrerId, settings)
     return settings
   }
 
   async getReferrerBalance(referrerId: string) {
-    const cached = await gamesCaches.referrerBalance.get(referrerId)
+    const cached = await gamesCache.referrerBalance.get(referrerId)
 
     if (cached) {
       return cached
@@ -133,7 +130,7 @@ export class AffiliateService {
       return null
     }
 
-    await gamesCaches.referrerBalance.set(referrerId, balance)
+    await gamesCache.referrerBalance.set(referrerId, balance)
     return balance
   }
 
@@ -329,12 +326,12 @@ export class AffiliateService {
             .set({ nextPayoutAt, lastPayoutAt: now })
             .where(eq(ReferrerPayoutTable.referrerId, referrerId))
 
-          await gamesCaches.referrerBalance.del(referrerId)
-          await gamesCaches.lastReferrerTransactions.del(referrerId)
+          await gamesCache.referrerBalance.del(referrerId)
+          await gamesCache.lastReferrerTransactions.del(referrerId)
         })
       })
     }
   }
 }
 
-export const affiliateService = createSingletonProxy(AffiliateService)
+export const affiliateService = new AffiliateService()
