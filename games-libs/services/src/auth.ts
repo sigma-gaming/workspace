@@ -96,9 +96,17 @@ export class AuthService {
       }
 
       if (account) {
+        /**
+         * Account is already connected, but to another user
+         */
         if (userId !== account.userId) {
           return { result: AuthResult.ConnectedToAnotherUser }
         }
+
+        /**
+         * Account is already connected to current user
+         * Just do sign in
+         */
 
         const user = await userService.getUserSafe(userId)
 
@@ -111,7 +119,7 @@ export class AuthService {
       }
 
       /**
-       * The account is not found, but the user is logged in
+       * The account is not found, and the user is logged in
        * Create account and connect it to current user
        */
 
@@ -143,7 +151,7 @@ export class AuthService {
 
     /**
      * The user is not logged in and the account is not found
-     * Perform registration
+     * Perform sign up
      */
 
     let referrerId: string | null | undefined

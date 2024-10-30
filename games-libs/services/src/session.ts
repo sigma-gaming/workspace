@@ -24,6 +24,10 @@ type HonoEnvWithSession = {
 export type SessionOptions = {
   domain: string
   jwt: { secret: string }
+  cookie?: {
+    idKey?: string
+    expiresKey?: string
+  }
 }
 
 export const SessionOptionsToken: InjectionToken<SessionOptions> = Symbol(
@@ -32,7 +36,13 @@ export const SessionOptionsToken: InjectionToken<SessionOptions> = Symbol(
 
 @singleton()
 export class SessionService {
-  constructor(@inject(SessionOptionsToken) private options: SessionOptions) {}
+  private cookieIdKey: string
+  private cookieExpiresKey: string
+
+  constructor(@inject(SessionOptionsToken) private options: SessionOptions) {
+    this.cookieIdKey = options.cookie?.idKey ?? 'session_id'
+    this.cookieExpiresKey = options.cookie?.expiresKey ?? 'session_expires_at'
+  }
 
   private async getSessionById(
     sessionId: string,
@@ -53,7 +63,7 @@ export class SessionService {
     const cookie = ctx.req.header('cookie')
     if (!cookie) return null
     const parsed = parse(cookie)
-    return parsed.session_id ?? null
+    return parsed[this.cookieIdKey] ?? null
   }
 
   async getSessionSafe(sessionId?: string | null): Promise<SessionVariant> {
@@ -166,7 +176,7 @@ export class SessionService {
   attachHonoSession(ctx: HonoContext, session: SessionSelect) {
     const expires = new Date(session.expiresAt)
 
-    setCookie(ctx, 'session_id', session.id, {
+    setCookie(ctx, this.cookieIdKey, session.id, {
       domain: this.options.domain,
       path: '/',
       expires,
@@ -175,7 +185,7 @@ export class SessionService {
       secure: true,
     })
 
-    setCookie(ctx, 'session_expires_at', session.expiresAt, {
+    setCookie(ctx, this.cookieExpiresKey, session.expiresAt, {
       domain: this.options.domain,
       path: '/',
       expires,
@@ -185,14 +195,14 @@ export class SessionService {
   }
 
   detachHonoSession(ctx: HonoContext) {
-    deleteCookie(ctx, 'session_id', {
+    deleteCookie(ctx, this.cookieIdKey, {
       domain: this.options.domain,
       path: '/',
       sameSite: 'lax',
       httpOnly: true,
     })
 
-    deleteCookie(ctx, 'session_expires_at', {
+    deleteCookie(ctx, this.cookieExpiresKey, {
       domain: this.options.domain,
       path: '/',
       sameSite: 'lax',

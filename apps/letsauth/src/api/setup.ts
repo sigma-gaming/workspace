@@ -29,5 +29,9 @@ container.register(SessionOptionsToken, {
   useValue: {
     domain: serverEnv.authApi.domain,
     jwt: { secret: serverEnv.jwt.secret },
+    cookie: {
+      idKey: 'sigma_sessionId',
+      expiresKey: 'sigma_sessionExpiresAt',
+    },
   },
 })
