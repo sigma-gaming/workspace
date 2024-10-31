@@ -173,19 +173,18 @@ export const updateProfileRoute = createRouter().post(
       updates.hasCustomName = false
     }
 
-    const [profile] = await gamesDb
+    await gamesDb
       .update(ProfileTable)
       .set(updates)
       .where(eq(ProfileTable.userId, userId))
-      .returning()
 
-    await gamesCache.detailedProfile.del(userId)
+    if (gamesCache.ready) {
+      await gamesCache.detailedProfile.del(userId)
+    }
 
     return ctx.json({
       status: 'success',
-      detailedProfile: await profileService.getDetailedProfile(userId, {
-        profile,
-      }),
+      detailedProfile: await profileService.getDetailedProfile(userId),
     })
   },
 )

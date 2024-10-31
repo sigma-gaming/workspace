@@ -6,20 +6,20 @@ type Statuses = Record<GlobalTaskKey, TaskStatus>
 
 export const getStatusesRoute = createRouter().get('/', async (ctx) => {
   const { userId } = await sessionService.getHonoSession(ctx)
-  const promises: Promise<{ key: GlobalTaskKey; status: TaskStatus }>[] = []
+  const promises: Promise<{ taskKey: GlobalTaskKey; status: TaskStatus }>[] = []
 
-  for (const key of Object.values(GlobalTaskKey)) {
+  for (const taskKey of Object.values(GlobalTaskKey)) {
     promises.push(
       globalTaskService
-        .getStatus(key, userId)
-        .then(([status]) => ({ key, status })),
+        .getStatus({ taskKey, userId })
+        .then(([status]) => ({ taskKey, status })),
     )
   }
 
   const results = await Promise.all(promises)
 
-  const statuses = results.reduce((acc, { key, status }) => {
-    acc[key] = status
+  const statuses = results.reduce((acc, { taskKey, status }) => {
+    acc[taskKey] = status
     return acc
   }, {} as Statuses)
 

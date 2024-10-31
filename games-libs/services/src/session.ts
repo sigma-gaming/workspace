@@ -43,17 +43,27 @@ export class SessionService {
     this.cookieExpiresKey = cookie?.expiresKey ?? 'session_expires_at'
   }
 
-  private async getSessionById(
-    sessionId: string,
-  ): Promise<SessionSelect | null> {
-    const cached = await gamesCache.session.get(sessionId)
-    if (cached) return cached
-
+  private async querySession(sessionId: string) {
     const session = await gamesDb.query.SessionTable.findFirst({
       where: eq(SessionTable.id, sessionId),
     })
 
+    return session ?? null
+  }
+
+  private async getSessionById(
+    sessionId: string,
+  ): Promise<SessionSelect | null> {
+    if (!gamesCache.ready) {
+      return this.querySession(sessionId)
+    }
+
+    const cached = await gamesCache.session.get(sessionId)
+    if (cached) return cached
+
+    const session = await this.querySession(sessionId)
     if (!session) return null
+
     await gamesCache.session.set(sessionId, session)
     return session
   }
@@ -132,7 +142,9 @@ export class SessionService {
       .values({ ...payload, expiresAt })
       .returning()
 
-    await gamesCache.session.set(session.id, session)
+    if (gamesCache.ready) {
+      await gamesCache.session.set(session.id, session)
+    }
 
     const extraSessions = await gamesDb.query.SessionTable.findMany({
       where: eq(SessionTable.userId, payload.userId),
@@ -154,7 +166,10 @@ export class SessionService {
 
   async removeSession(sessionId: string) {
     await gamesDb.delete(SessionTable).where(eq(SessionTable.id, sessionId))
-    await gamesCache.session.del(sessionId)
+
+    if (gamesCache.ready) {
+      await gamesCache.session.del(sessionId)
+    }
   }
 
   async refreshSession(sessionId: string) {
@@ -167,7 +182,9 @@ export class SessionService {
       .where(eq(SessionTable.id, sessionId))
       .returning()
 
-    await gamesCache.session.set(sessionId, session)
+    if (gamesCache.ready) {
+      await gamesCache.session.set(sessionId, session)
+    }
 
     return session
   }

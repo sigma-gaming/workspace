@@ -1,6 +1,9 @@
 import { createLazyInstance } from '@core/di'
 import { Logger, loggerService } from '@core/logger'
+import { sleep } from '@core/utils'
+import { ConfigTable } from '@dbs/games-schema'
 import { gamesCache } from './cache'
+import { gamesDb } from './db'
 
 export class MaintenanceService {
   private readonly logger: Logger
@@ -9,30 +12,41 @@ export class MaintenanceService {
     this.logger = loggerService.logger.child('MaintenanceCache')
   }
 
-  async isMaintenanceMode() {
-    if (!gamesCache.ready) {
-      return true
-    }
+  private async queryMaintenance() {
+    const [config] = await gamesDb.query.ConfigTable.findMany()
+    if (!config) throw new Error('Config not found')
+    return config.maintenanceEnabled
+  }
 
+  private async getMaintenance() {
+    if (!gamesCache.ready) return this.queryMaintenance()
+    const cached = await gamesCache.maintenance.get()
+    if (cached !== null) return cached
+    const maintenance = await this.queryMaintenance()
+    await gamesCache.maintenance.set(maintenance)
+    return maintenance
+  }
+
+  async isMaintenanceMode() {
     for (let i = 0; i < 3; i++) {
       try {
-        const value = await gamesCache.maintenance.get()
-        return value ?? false
+        return await this.getMaintenance()
       } catch (error) {
         this.logger.info('Failed to get maintenance mode:')
         this.logger.error(error)
-        await new Promise((resolve) => setTimeout(resolve, 1000))
         this.logger.info('Retrying in 1 second...')
+        await sleep(1000)
       }
     }
 
     return true
   }
 
-  async setMaintenanceMode(value: boolean) {
-    if (!gamesCache.ready) return null
-    await gamesCache.maintenance.set(value)
-    return value
+  async setMaintenanceMode(state: boolean) {
+    await gamesDb.update(ConfigTable).set({ maintenanceEnabled: state })
+    if (!gamesCache.ready) return state
+    await gamesCache.maintenance.set(state)
+    return state
   }
 }
 

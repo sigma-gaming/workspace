@@ -1,4 +1,5 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
+import { logger } from '@core/logger'
 import {
   ChatMessageInsert,
   ChatMessageSelect,
@@ -16,7 +17,6 @@ import { gamesDb } from '@games/services'
 import { desc } from 'drizzle-orm'
 import { gamesCache } from './cache'
 import { gameService } from './game'
-import { locks } from './locks'
 import { profileService } from './profile'
 import { gamesPubsubs } from './pubsubs'
 
@@ -40,7 +40,14 @@ export class ChatService {
   }
 
   async initializeMessages() {
-    return await locks.with([locks.chat()], async () => {
+    if (!gamesCache.ready) {
+      logger.warn('Cannot initialize chat messages, cache is not ready')
+      return
+    }
+
+    const lock = await gamesCache.lastChatMessages.lock(3000)
+
+    try {
       const exists = await gamesCache.lastChatMessages.exists()
 
       if (exists) {
@@ -70,7 +77,9 @@ export class ChatService {
       )
 
       await gamesCache.lastChatMessages.set(detailedMessages.reverse())
-    })
+    } finally {
+      await lock.release()
+    }
   }
 
   async getLastMessages(): Promise<ChatMessageSelect[]> {

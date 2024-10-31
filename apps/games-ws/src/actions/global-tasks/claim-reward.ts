@@ -28,10 +28,11 @@ export const GlobalTasksClaimRewardAction = createWsAction({
 
     if (completion.result === GlobalTaskClaimRewardResult.Claimed) {
       const { updatedBalance, payout } = completion
+      const { available } = updatedBalance
 
       ctx.socket
         .to(userRoom(session.userId))
-        .emit('balance/updated', { available: updatedBalance })
+        .emit('balance/updated', { available })
 
       ctx.socket
         .to(userRoom(session.userId))
@@ -40,7 +41,7 @@ export const GlobalTasksClaimRewardAction = createWsAction({
           status: TaskStatus.Claimed,
         })
 
-      return { updatedBalance, payout }
+      return { updatedBalance: available, payout }
     }
 
     if (completion.result === GlobalTaskClaimRewardResult.AlreadyClaimed) {

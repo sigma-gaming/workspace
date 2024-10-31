@@ -17,6 +17,11 @@ export class RedisService {
     })
 
     this.logger = loggerService.logger.child('GamesRedis')
+
+    this.redis.on('error', (error) => {
+      this.logger.info('Redis failure')
+      this.logger.error(error)
+    })
   }
 
   async onApplicationShutdown() {
@@ -38,6 +43,11 @@ export class SubRedisService {
     })
 
     this.logger = loggerService.logger.child('GamesSubRedis')
+
+    this.redis.on('error', (error) => {
+      this.logger.info('SubRedis failure')
+      this.logger.error(error)
+    })
   }
 
   async onApplicationShutdown() {

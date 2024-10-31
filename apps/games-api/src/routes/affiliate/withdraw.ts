@@ -1,23 +1,26 @@
 import { BadRequestException } from '@core/exceptions'
+import { BalanceTable, ReferrerBalanceTable } from '@dbs/games-schema'
 import { TransactionType } from '@dbs/games-types'
 import {
   affiliateService,
   balanceService,
   gamesCache,
   gamesDb,
-  locks,
   sessionService,
 } from '@games/services'
+import { eq } from 'drizzle-orm'
 import { createRouter } from '../../hono'
 
 export const withdrawRoute = createRouter().post('/', async (ctx) => {
   const { userId } = await sessionService.getHonoSession(ctx)
 
-  const { updatedBalance, updatedReferrerBalance } = await locks.with(
-    [locks.balance(userId), locks.referrerBalance(userId)],
-    async () => {
-      const balance = await balanceService.getBalance(userId)
-      const referrerBalance = await affiliateService.getReferrerBalance(userId)
+  const { updatedBalance, updatedReferrerBalance } = await gamesDb.transaction(
+    async (tx) => {
+      const [referrerBalance] = await tx
+        .select()
+        .from(ReferrerBalanceTable)
+        .where(eq(ReferrerBalanceTable.referrerId, userId))
+        .for('update')
 
       if (!referrerBalance) {
         throw new BadRequestException({
@@ -31,41 +34,42 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
         })
       }
 
-      const { updatedBalance, updatedReferrerBalance } =
-        await gamesDb.transaction(async (tx) => {
-          const transaction = await balanceService.createTransaction({
-            tx,
-            payload: {
-              userId,
-              type: TransactionType.Transfer,
-              amount: referrerBalance.available,
-            },
-          })
+      const [balance] = await tx
+        .select()
+        .from(BalanceTable)
+        .where(eq(BalanceTable.userId, userId))
+        .for('update')
 
-          const updatedBalance = await balanceService.updateBalance({
-            tx,
-            balance,
-            transaction,
-          })
+      const transaction = await balanceService.createTransaction({
+        tx,
+        payload: {
+          userId,
+          type: TransactionType.Transfer,
+          amount: referrerBalance.available,
+        },
+      })
 
-          await affiliateService.createReferrerWithdrawal({
-            tx,
-            referrerId: userId,
-            amount: referrerBalance.available,
-          })
+      const updatedBalance = await balanceService.updateBalance({
+        tx,
+        balance,
+        transaction,
+      })
 
-          const updatedReferrerBalance =
-            await affiliateService.updateReferrerBalance({
-              tx,
-              referrerId: userId,
-              available: 0,
-            })
+      await affiliateService.createReferrerWithdrawal({
+        tx,
+        referrerId: userId,
+        amount: referrerBalance.available,
+      })
 
-          await gamesCache.balance.set(userId, updatedBalance)
-          await gamesCache.referrerBalance.set(userId, updatedReferrerBalance)
-
-          return { updatedBalance, updatedReferrerBalance }
+      const updatedReferrerBalance =
+        await affiliateService.updateReferrerBalance({
+          tx,
+          referrerId: userId,
+          available: 0,
         })
+
+      await gamesCache.balance.set(userId, updatedBalance)
+      await gamesCache.referrerBalance.set(userId, updatedReferrerBalance)
 
       return { updatedBalance, updatedReferrerBalance }
     },

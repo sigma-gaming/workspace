@@ -4,15 +4,25 @@ import { eq } from 'drizzle-orm'
 import { gamesCache } from './cache'
 
 export class UserService {
-  async getUserSafe(userId: string): Promise<UserSelect | null> {
-    const cached = await gamesCache.user.get(userId)
-    if (cached) return cached
-
+  private async queryUser(userId: string) {
     const user = await gamesDb.query.UserTable.findFirst({
       where: eq(UserTable.id, userId),
     })
 
+    return user ?? null
+  }
+
+  async getUserSafe(userId: string) {
+    if (!gamesCache.ready) {
+      return this.queryUser(userId)
+    }
+
+    const cached = await gamesCache.user.get(userId)
+    if (cached) return cached
+
+    const user = await this.queryUser(userId)
     if (!user) return null
+
     await gamesCache.user.set(userId, user)
     return user
   }

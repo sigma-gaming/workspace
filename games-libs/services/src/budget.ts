@@ -2,32 +2,42 @@ import { logger } from '@core/logger'
 import { BudgetTable } from '@dbs/games-schema'
 import { gamesDb } from '@games/services'
 import { gamesCache } from './cache'
-import { locks } from './locks'
 
 export class BudgetService {
+  private async queryBudget() {
+    const budget = await gamesDb.query.BudgetTable.findFirst()
+    if (budget) return budget
+
+    logger.info('Budget not found in db, creating a new one')
+
+    const [created] = await gamesDb
+      .insert(BudgetTable)
+      .values({ id: 1 })
+      .returning()
+
+    return created
+  }
+
   getBudget = async () => {
-    return await locks.with([locks.budget()], async () => {
-      const cached = await gamesCache.budget.get()
+    if (!gamesCache.ready) {
+      return await this.queryBudget()
+    }
 
-      if (cached) {
-        return cached
-      }
+    const cached = await gamesCache.budget.get()
+    if (cached) return cached
 
-      let budget = await gamesDb.query.BudgetTable.findFirst()
+    const budget = await this.queryBudget()
+    await gamesCache.budget.set(budget)
 
-      if (!budget) {
-        logger.info('Budget not found in db, creating a new one')
-
-        const created = await gamesDb.insert(BudgetTable).values({}).returning()
-        budget = created[0]
-      }
-
-      await gamesCache.budget.set(budget)
-      return budget
-    })
+    return budget
   }
 
   getAvailable = async (): Promise<number> => {
+    if (!gamesCache.ready) {
+      const budget = await this.getBudget()
+      return budget.available
+    }
+
     const cached = await gamesCache.budgetAvailable.get()
     if (cached) return cached
     const budget = await this.getBudget()
@@ -45,12 +55,8 @@ export class BudgetService {
   }
 
   getSyncedAt = async (): Promise<Date> => {
-    const cached = await gamesCache.budgetSyncedAt.get()
-    if (cached) return new Date(cached)
-    const budget = await this.getBudget()
-    if (!budget) return new Date()
-    await gamesCache.budgetSyncedAt.set(budget.lastSyncAt)
-    return new Date(budget.lastSyncAt)
+    const { lastSyncAt } = await this.queryBudget()
+    return new Date(lastSyncAt)
   }
 
   increaseAvailable = async (amount: number) => {

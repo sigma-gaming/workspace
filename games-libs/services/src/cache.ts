@@ -20,10 +20,11 @@ import {
 import { GamesCacheOptionsToken } from '@games/options'
 import {
   GlobalBooleanEntityService,
+  GlobalEntityBaseService,
   GlobalEntityListService,
   GlobalJsonEntityService,
   GlobalNumberEntityService,
-  GlobalStringEntityService,
+  KeyEntityBaseService,
   KeyEntityListService,
   KeyJsonEntityService,
   KeyStringEntityService,
@@ -39,7 +40,6 @@ export class GamesCacheRegistry {
   maintenance: GlobalBooleanEntityService
   budget: GlobalJsonEntityService<BudgetSelect>
   budgetAvailable: GlobalNumberEntityService
-  budgetSyncedAt: GlobalStringEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
   user: KeyJsonEntityService<UserSelect>
   session: KeyJsonEntityService<SessionSelect>
@@ -79,13 +79,6 @@ export class GamesCacheRegistry {
       redis,
       redlock,
       key: `global:budgetAvailable`,
-      ttl: 60 * 60 * 24, // 1 day
-    })
-
-    this.budgetSyncedAt = new GlobalStringEntityService({
-      redis,
-      redlock,
-      key: `global:budgetSyncedAt`,
       ttl: 60 * 60 * 24, // 1 day
     })
 
@@ -216,6 +209,104 @@ export class GamesCacheRegistry {
 
   get ready() {
     return gamesRedis.ready
+  }
+
+  async with<T>(options: {
+    entity: KeyEntityBaseService<T>
+    key: string
+    fn: () => T | null | Promise<T | null>
+  }): Promise<T | null>
+
+  async with<T>(options: {
+    entity: GlobalEntityBaseService<T>
+    fn: () => T | null | Promise<T | null>
+  }): Promise<T | null>
+
+  async with<T>(options: {
+    key?: string
+    entity: GlobalEntityBaseService<T> | KeyEntityBaseService<T>
+    fn: () => T | null | Promise<T | null>
+  }): Promise<T | null> {
+    const { entity, key, fn } = options
+
+    if (!this.ready) {
+      return fn()
+    }
+
+    let cached: T | null = null
+
+    if (entity instanceof GlobalEntityBaseService) {
+      cached = await entity.get()
+    } else if (entity instanceof KeyEntityBaseService) {
+      if (!key) throw new Error('Key is required')
+      cached = await entity.get(key)
+    }
+
+    if (cached) {
+      return cached
+    }
+
+    const result = await fn()
+
+    if (result === null) {
+      return null
+    }
+
+    if (entity instanceof GlobalEntityBaseService) {
+      await entity.set(result)
+    } else if (entity instanceof KeyEntityBaseService) {
+      if (!key) throw new Error('Key is required')
+      await entity.set(key, result)
+    }
+
+    return result
+  }
+
+  async withList<T>(options: {
+    entity: KeyEntityListService<T>
+    key: string
+    fn: () => T[] | Promise<T[]>
+  }): Promise<T[]>
+
+  async withList<T>(options: {
+    entity: GlobalEntityListService<T>
+    fn: () => T[] | Promise<T[]>
+  }): Promise<T[]>
+
+  async withList<T>(options: {
+    key?: string
+    entity: GlobalEntityListService<T> | KeyEntityListService<T>
+    fn: () => T[] | Promise<T[]>
+  }): Promise<T[]> {
+    const { entity, key, fn } = options
+
+    if (!this.ready) {
+      return fn()
+    }
+
+    let cached: T[] | null = null
+
+    if (entity instanceof GlobalEntityListService) {
+      cached = await entity.get()
+    } else if (entity instanceof KeyEntityListService) {
+      if (!key) throw new Error('Key is required')
+      cached = await entity.get(key)
+    }
+
+    if (cached) {
+      return cached
+    }
+
+    const result = await fn()
+
+    if (entity instanceof GlobalEntityListService) {
+      await entity.set(result)
+    } else if (entity instanceof KeyEntityListService) {
+      if (!key) throw new Error('Key is required')
+      await entity.set(key, result)
+    }
+
+    return result
   }
 }
 
