@@ -11,7 +11,12 @@ import { UserTable } from './user'
 export const UserSecurityTable = pgTable(
   'UserSecurity',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('userId')
+      .references(() => UserTable.id, { onDelete: 'cascade' })
+      .primaryKey(),
+
+    whitelisted: boolean('whitelisted').notNull().default(false),
+
     lastIP: text('lastIP'),
     addressTon: text('addressTon'),
     addressUsdt: text('addressUsdt'),
@@ -36,13 +41,6 @@ export const UserSecurityTable = pgTable(
     addressBnbScore: integer('addressBnbScore').notNull().default(0),
     addressXmrScore: integer('addressXmrScore').notNull().default(0),
     addressSolScore: integer('addressSolScore').notNull().default(0),
-
-    whitelisted: boolean('whitelisted').notNull().default(false),
-
-    userId: uuid('userId')
-      .references(() => UserTable.id, { onDelete: 'cascade' })
-      .notNull()
-      .unique(),
   },
   (table) => ({
     lastIpIdx: index().on(table.lastIP),
