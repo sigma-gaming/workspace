@@ -1,5 +1,4 @@
 import {
-  AnyPgColumn,
   bigint,
   bigserial,
   pgTable,
@@ -7,7 +6,6 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { gameEnum, transactionTypeEnum } from './enums'
-import { GameRecordTable } from './game-record'
 import { UserTable } from './user'
 
 export const TransactionTable = pgTable('Transaction', {
@@ -23,10 +21,7 @@ export const TransactionTable = pgTable('Transaction', {
   userId: uuid('userId').references(() => UserTable.id, {
     onDelete: 'set null',
   }),
-  gameRecordId: bigint('gameRecordId', { mode: 'number' }).references(
-    (): AnyPgColumn => GameRecordTable.id,
-    { onDelete: 'set null' },
-  ),
+  gameRecordId: bigint('gameRecordId', { mode: 'number' }),
 })
 
 export type TransactionSelect = typeof TransactionTable.$inferSelect
