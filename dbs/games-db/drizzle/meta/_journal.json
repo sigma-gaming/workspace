@@ -498,6 +498,13 @@
       "when": 1730382381971,
       "tag": "0070_secret_katie_power",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1730388588914,
+      "tag": "0071_wonderful_white_tiger",
+      "breakpoints": true
     }
   ]
 }

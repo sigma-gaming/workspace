@@ -161,7 +161,7 @@ const GlobalTaskActions = ({ taskKey }: Props) => {
   const actionUrl = action.createUrl(task)
   const status = statuses[taskKey]
 
-  if (loggedIn &&!statusesLoaded)
+  if (loggedIn && !statusesLoaded)
     return (
       <CardActions>
         <Skeleton width={160} height={36} />
@@ -206,17 +206,19 @@ const GlobalTaskActions = ({ taskKey }: Props) => {
     )
 
   if (status === TaskStatus.Completed)
-    <CardActions>
-      <Button
-        className={actionClassName}
-        color="green"
-        size={buttonSize}
-        onClick={() => $$bonusesPage.claimGlobalTaskReward(taskKey)}
-        loading={claimingReward}
-      >
-        Забрать награду
-      </Button>
-    </CardActions>
+    return (
+      <CardActions>
+        <Button
+          className={actionClassName}
+          color="green"
+          size={buttonSize}
+          onClick={() => $$bonusesPage.claimGlobalTaskReward(taskKey)}
+          loading={claimingReward}
+        >
+          Забрать награду
+        </Button>
+      </CardActions>
+    )
 
   if (status === TaskStatus.Claimed)
     return (

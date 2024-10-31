@@ -1,6 +1,6 @@
 import { Logger, loggerService } from '@core/logger'
 import { Callback, Redis } from 'ioredis'
-import { RedisService, SubRedisService } from '../redis'
+import { RedisService } from '../redis'
 
 type RedisMessageHandler = (channel: string, message: string) => void
 
@@ -121,7 +121,7 @@ export class PubSubService {
     })
   }
 
-  shutdownBefore = [RedisService, SubRedisService]
+  shutdownBefore = [RedisService]
 
   async onApplicationShutdown() {
     this.logger.info('Unsubscribing from all channels...')

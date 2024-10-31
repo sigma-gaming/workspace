@@ -206,6 +206,13 @@ export class GlobalTaskService {
             status: TaskStatus.Completed,
           })
 
+          const cacheKey = `${userId}:${taskKey}`
+
+          await gamesCache.globalTaskStatus.set(cacheKey, [
+            TaskStatus.Completed,
+            true,
+          ])
+
           return {
             result: GlobalTaskCompleteResult.Completed,
             updatedStatus: TaskStatus.Completed,
@@ -299,6 +306,13 @@ export class GlobalTaskService {
           userId,
           status: TaskStatus.Claimed,
         })
+
+        const cacheKey = `${userId}:${taskKey}`
+
+        await gamesCache.globalTaskStatus.set(cacheKey, [
+          TaskStatus.Claimed,
+          true,
+        ])
 
         return {
           result: GlobalTaskClaimRewardResult.Claimed,
