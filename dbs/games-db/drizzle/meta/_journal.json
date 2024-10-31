@@ -547,6 +547,13 @@
       "when": 1730403620828,
       "tag": "0077_cold_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1730403820801,
+      "tag": "0078_slippery_hobgoblin",
+      "breakpoints": true
     }
   ]
 }
