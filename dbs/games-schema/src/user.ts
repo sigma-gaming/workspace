@@ -8,7 +8,9 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { userRoleEnum } from './enums'
+import { ProfileTable } from './profile'
 import { ReferralCampaignTable } from './referral-campaign'
+import { UserSecurityTable } from './user-security'
 
 export const UserTable = pgTable(
   'User',
@@ -30,8 +32,14 @@ export const UserTable = pgTable(
       (): AnyPgColumn => ReferralCampaignTable.id,
       { onDelete: 'set null' },
     ),
-    profileId: integer('profileId'),
-    securityId: uuid('securityId'),
+    profileId: integer('profileId').references(
+      (): AnyPgColumn => ProfileTable.id,
+      { onDelete: 'set null' },
+    ),
+    securityId: uuid('securityId').references(
+      (): AnyPgColumn => UserSecurityTable.id,
+      { onDelete: 'set null' },
+    ),
   },
   (table) => ({
     referrerIdKey: foreignKey({
