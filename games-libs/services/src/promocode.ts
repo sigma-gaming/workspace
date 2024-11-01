@@ -128,6 +128,12 @@ export class PromocodeService {
     try {
       const apply = await gamesDb.transaction(
         async (tx): Promise<ActivationOutput> => {
+          const [balance] = await tx
+            .select()
+            .from(BalanceTable)
+            .where(eq(BalanceTable.userId, userId))
+            .for('update')
+
           const [promocode] = await tx
             .select()
             .from(PromocodeTable)
@@ -181,12 +187,6 @@ export class PromocodeService {
           if (risk === FraudRisk.High || risk === FraudRisk.Medium) {
             return { result: PromocodeActivationResult.Blocked }
           }
-
-          const [balance] = await tx
-            .select()
-            .from(BalanceTable)
-            .where(eq(BalanceTable.userId, userId))
-            .for('update')
 
           const wageringChange = Math.ceil(
             promocode.bonus.payout * (promocode.wageringMultiplier / 100),
