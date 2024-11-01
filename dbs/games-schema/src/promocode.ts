@@ -3,7 +3,7 @@ import {
   boolean,
   index,
   integer,
-  json,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -31,7 +31,7 @@ export const PromocodeTable = pgTable(
     maxUsages: integer('maxUsages').notNull(),
     isActive: boolean('isActive').notNull(),
     bonusType: promocodeBonusTypeEnum('bonusType').notNull(),
-    bonus: json('bonus').$type<PromocodeBonus>().notNull(),
+    bonus: jsonb('bonus').$type<PromocodeBonus>().notNull(),
 
     userId: uuid('userId').references(() => UserTable.id, {
       onDelete: 'cascade',

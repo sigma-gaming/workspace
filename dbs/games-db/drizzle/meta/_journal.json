@@ -561,6 +561,13 @@
       "when": 1730440553078,
       "tag": "0079_vengeful_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1730440647657,
+      "tag": "0080_mysterious_gateway",
+      "breakpoints": true
     }
   ]
 }

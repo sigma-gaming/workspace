@@ -3,7 +3,7 @@ import {
   bigint,
   boolean,
   integer,
-  json,
+  jsonb,
   pgTable,
   timestamp,
 } from 'drizzle-orm/pg-core'
@@ -17,7 +17,7 @@ export const GlobalTaskTable = pgTable('GlobalTask', {
     .defaultNow(),
 
   isActive: boolean('isActive').default(true).notNull(),
-  requirements: json('requirements').$type<GlobalTaskRequirements>().notNull(),
+  requirements: jsonb('requirements').$type<GlobalTaskRequirements>().notNull(),
   payout: bigint('payout', { mode: 'number' }).notNull(),
   wageringMultiplier: integer('wageringMultiplier').notNull(),
 })
