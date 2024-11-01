@@ -1,5 +1,6 @@
 import './setup'
 import './shared/sentry/init'
+import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
 import { app } from './app'
@@ -53,6 +54,9 @@ async function handleExit() {
 
   logger.info('Exit signal received')
 
+  logger.info('Shutting down services..')
+  await shutdownAll()
+
   if (env.isDev) {
     logger.info('Exiting..')
     process.exit(0)
@@ -63,8 +67,8 @@ async function handleExit() {
     process.exit(0)
   }, 5000)
 
+  logger.info('Closing server..')
   server.close()
-  logger.info('Server closed')
 
   await sentry?.close(3000)
 

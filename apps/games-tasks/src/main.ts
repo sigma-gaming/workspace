@@ -1,5 +1,6 @@
 import './setup'
 import './shared/sentry/init'
+import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
 import { gamesRedis } from '@games/services'
@@ -57,6 +58,9 @@ async function handleExit() {
   exited = true
 
   logger.info('Exit signal received')
+
+  logger.info('Shutting down services..')
+  await shutdownAll()
 
   if (env.isDev) {
     logger.info('Exiting..')

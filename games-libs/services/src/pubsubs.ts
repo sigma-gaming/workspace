@@ -1,20 +1,24 @@
-import { createLazyInstance, resolveOptions } from '@core/di'
+import { createLazyInstance, resolveOptions, Shutdownable } from '@core/di'
+import { logger } from '@core/logger'
 import { NotificationSelect } from '@dbs/games-schema'
 import { ChatMessageDetailed } from '@games/model'
 import { GamesRedisOptionsToken } from '@games/options'
 import { PubSub, PubSubService, RedisService } from '@games/redis'
 import { Redis } from 'ioredis'
-import { gamesRedis } from './redis'
+import { GamesRedis, gamesRedis } from './redis'
 
-export class GamesPubSubRegistry {
+export class GamesPubSubRegistry extends Shutdownable {
   pub: Redis
   sub: Redis
+  service: PubSubService
 
   notifications: PubSub<NotificationSelect>
   chatMessages: PubSub<ChatMessageDetailed>
   maintenanceStarted: PubSub<void>
 
   constructor() {
+    super()
+
     const { host, password } = resolveOptions(GamesRedisOptionsToken)
 
     const { redis: subRedis } = new RedisService({
@@ -27,23 +31,31 @@ export class GamesPubSubRegistry {
     this.pub = redis
     this.sub = subRedis
 
-    const pubsubService = new PubSubService({ redis, subRedis })
+    this.service = new PubSubService({ redis, subRedis })
 
-    this.notifications = pubsubService.create<NotificationSelect>({
+    this.notifications = this.service.create<NotificationSelect>({
       channelName: 'notifications',
     })
 
-    this.chatMessages = pubsubService.create<ChatMessageDetailed>({
+    this.chatMessages = this.service.create<ChatMessageDetailed>({
       channelName: 'chat-messages',
     })
 
-    this.maintenanceStarted = pubsubService.create<void>({
+    this.maintenanceStarted = this.service.create<void>({
       channelName: 'maintenance-started',
     })
   }
 
   get ready() {
     return this.pub.status === 'ready'
+  }
+
+  shutdownBefore = [GamesRedis]
+
+  async shutdown() {
+    logger.info('Unsubscribing from all channels...')
+    await this.service.unsubscribeAll()
+    logger.info('Successfully unsubscribed from all channels')
   }
 }
 

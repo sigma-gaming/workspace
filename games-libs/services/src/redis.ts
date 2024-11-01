@@ -1,14 +1,16 @@
-import { createLazyInstance, resolveOptions } from '@core/di'
+import { createLazyInstance, resolveOptions, Shutdownable } from '@core/di'
 import { GamesRedisOptionsToken } from '@games/options'
 import { RedisService, RedlockService } from '@games/redis'
 import { Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
 
-export class GamesRedis {
+export class GamesRedis extends Shutdownable {
   readonly redis: Redis
   readonly redlock: Redlock
 
   constructor() {
+    super()
+
     const { host, password } = resolveOptions(GamesRedisOptionsToken)
 
     const { redis } = new RedisService({ host, password })
@@ -20,6 +22,10 @@ export class GamesRedis {
 
   get ready() {
     return this.redis.status === 'ready'
+  }
+
+  async shutdown() {
+    await this.redis.quit()
   }
 }
 

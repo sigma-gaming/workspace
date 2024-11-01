@@ -1,4 +1,5 @@
 import './setup'
+import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
 import { app } from './app'
@@ -51,6 +52,9 @@ async function handleExit() {
   exited = true
 
   logger.info('Exit signal received')
+
+  logger.info('Shutting down services..')
+  await shutdownAll()
 
   if (env.isDev) {
     logger.info('Exiting..')

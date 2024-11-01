@@ -1,4 +1,5 @@
 import './setup'
+import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { affiliateService, maintenanceService } from '@games/services'
 import { App, SSLApp } from 'uWebSockets.js'
@@ -125,6 +126,9 @@ async function handleExit() {
   exited = true
 
   logger.info('Exit signal received')
+
+  logger.info('Shutting down services..')
+  await shutdownAll()
 
   console.info('Exiting..')
   process.exit(0)
