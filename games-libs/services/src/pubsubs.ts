@@ -20,7 +20,6 @@ export class GamesPubSubRegistry {
     const { redis: subRedis } = new RedisService({
       host,
       password,
-      lazyConnect: true,
     })
 
     const { redis } = gamesRedis
