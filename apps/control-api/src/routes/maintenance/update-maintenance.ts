@@ -25,7 +25,7 @@ export const updateMaintenanceRoute = createRouter().post(
     const payload = ctx.req.valid('json')
     await maintenanceService.setMaintenanceMode(payload.value)
 
-    if (payload.value) {
+    if (gamesPubsubs.ready && payload.value) {
       await gamesPubsubs.maintenanceStarted.publish()
     }
 

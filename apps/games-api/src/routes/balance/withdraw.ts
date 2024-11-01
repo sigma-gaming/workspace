@@ -70,10 +70,12 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
       amount,
     })
 
-    await gamesCache.balance.set(userId, updatedBalance)
-
     return updatedBalance
   })
+
+  if (gamesCache.ready) {
+    await gamesCache.balance.set(userId, updatedBalance)
+  }
 
   return ctx.json({
     status: 'success',

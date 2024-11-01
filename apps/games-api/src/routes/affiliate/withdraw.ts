@@ -68,12 +68,14 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
           available: 0,
         })
 
-      await gamesCache.balance.set(userId, updatedBalance)
-      await gamesCache.referrerBalance.set(userId, updatedReferrerBalance)
-
       return { updatedBalance, updatedReferrerBalance }
     },
   )
+
+  if (gamesCache.ready) {
+    await gamesCache.balance.set(userId, updatedBalance)
+    await gamesCache.referrerBalance.set(userId, updatedReferrerBalance)
+  }
 
   return ctx.json({
     updatedBalance: updatedBalance.available,

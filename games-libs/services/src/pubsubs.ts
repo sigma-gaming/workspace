@@ -41,6 +41,10 @@ export class GamesPubSubRegistry {
       channelName: 'maintenance-started',
     })
   }
+
+  get ready() {
+    return this.pub.status === 'ready'
+  }
 }
 
 export const gamesPubsubs = createLazyInstance(GamesPubSubRegistry)

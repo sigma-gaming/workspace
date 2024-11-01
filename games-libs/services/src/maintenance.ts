@@ -13,7 +13,7 @@ export class MaintenanceService {
   }
 
   private async queryMaintenance() {
-    const [config] = await gamesDb.query.ConfigTable.findMany()
+    const config = await gamesDb.query.ConfigTable.findFirst()
     if (!config) throw new Error('Config not found')
     return config.maintenanceEnabled
   }

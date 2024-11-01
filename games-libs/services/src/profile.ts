@@ -23,8 +23,6 @@ export class ProfileService {
       .leftJoin(AccountTable, eq(UserTable.id, AccountTable.userId))
       .where(eq(UserTable.id, userId))
 
-    console.log(joins)
-
     if (joins.length === 0) {
       throw new NotFoundException()
     }

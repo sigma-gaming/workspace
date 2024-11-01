@@ -1,5 +1,6 @@
 import { $$notifications } from '@core/client'
 import { createField, createForm } from '@core/forms'
+import { noop } from '@core/utils'
 import { createMutation, createQuery } from '@farfetched/core'
 import { NotificationData } from '@mantine/notifications'
 import { sample } from 'effector'
@@ -48,6 +49,7 @@ sample({
 
 sample({
   clock: routes.maintenance.opened,
+  fn: noop,
   target: getMaintenanceQuery.start,
 })
 
