@@ -2,4 +2,4 @@ language: "en-US"
 early_access: true
 reviews:
   path_filters:
-    - "!dbs/games-db/drizzle/**"
+    - "!dbs/**/drizzle/**"
