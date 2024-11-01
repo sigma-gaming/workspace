@@ -1,7 +1,9 @@
 import { BadRequestException } from '@core/exceptions'
+import { BalanceTable } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { getPincodeMultiplier } from '@games/model'
-import { balanceService, gameService, locks } from '@games/services'
+import { gamesDb, gameService } from '@games/services'
+import { eq } from 'drizzle-orm'
 import crypto from 'node:crypto'
 import { PlayPincodeInput, PlayPincodeOutput } from './pincode.contract'
 
@@ -11,8 +13,12 @@ export async function playPincode({
 }: PlayPincodeInput): Promise<PlayPincodeOutput> {
   const { bet, mode } = payload
 
-  return locks.with([locks.balance(userId)], async () => {
-    const balance = await balanceService.getBalance(userId)
+  return gamesDb.transaction(async (tx) => {
+    const [balance] = await tx
+      .select()
+      .from(BalanceTable)
+      .where(eq(BalanceTable.userId, userId))
+      .for('update')
 
     if (balance.available < bet) {
       throw new BadRequestException({
@@ -41,6 +47,7 @@ export async function playPincode({
     })
 
     const { gameRecord, updatedBalance } = await gameService.saveGame({
+      tx,
       userId,
       game: Game.Pincode,
       bet,

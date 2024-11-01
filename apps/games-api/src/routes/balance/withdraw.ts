@@ -1,4 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
+import { BalanceTable } from '@dbs/games-schema'
 import { FraudRisk, ReferralAction, TransactionType } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
 import {
@@ -7,9 +8,9 @@ import {
   fraudService,
   gamesCache,
   gamesDb,
-  locks,
   sessionService,
 } from '@games/services'
+import { eq } from 'drizzle-orm'
 import { createRouter } from '../../hono'
 
 export const withdrawRoute = createRouter().post('/', async (ctx) => {
@@ -18,16 +19,20 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
   const amount = -1000_000
   const positiveAmount = Math.abs(amount)
 
-  return await locks.with([locks.balance(userId)], async () => {
-    const risk = await fraudService.actualizeRisk(userId, { ip: ctx.env.ip })
+  const risk = await fraudService.actualizeRisk(userId, { ip: ctx.env.ip })
 
-    if (risk === FraudRisk.High) {
-      throw new BadRequestException({
-        message: 'Не удалось произвести вывод. Попробуйте позже',
-      })
-    }
+  if (risk === FraudRisk.High) {
+    throw new BadRequestException({
+      message: 'Не удалось произвести вывод. Попробуйте позже',
+    })
+  }
 
-    const balance = await balanceService.getBalance(userId)
+  const updatedBalance = await gamesDb.transaction(async (tx) => {
+    const [balance] = await tx
+      .select()
+      .from(BalanceTable)
+      .where(eq(BalanceTable.userId, userId))
+      .for('update')
 
     if (balance.available < positiveAmount) {
       throw new BadRequestException({
@@ -41,39 +46,39 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
       })
     }
 
-    const updatedBalance = await gamesDb.transaction(async (tx) => {
-      const transaction = await balanceService.createTransaction({
-        tx,
-        payload: {
-          type: TransactionType.Withdrawal,
-          amount,
-          userId,
-        },
-      })
-
-      const updatedBalance = await balanceService.updateBalance({
-        tx,
-        balance,
-        transaction,
-      })
-
-      await affiliateService.processReferralTransaction({
-        tx,
-        referralId: userId,
-        referrerId,
-        referralCampaignId,
-        referralAction: ReferralAction.Withdrawal,
+    const transaction = await balanceService.createTransaction({
+      tx,
+      payload: {
+        type: TransactionType.Withdrawal,
         amount,
-      })
-
-      await gamesCache.balance.set(userId, updatedBalance)
-
-      return updatedBalance
+        userId,
+      },
     })
 
-    return ctx.json({
-      status: 'success',
-      updatedBalance: updatedBalance.available,
+    const updatedBalance = await balanceService.updateBalance({
+      tx,
+      balance,
+      transaction,
     })
+
+    await affiliateService.processReferralTransaction({
+      tx,
+      referralId: userId,
+      referrerId,
+      referralCampaignId,
+      referralAction: ReferralAction.Withdrawal,
+      amount,
+    })
+
+    return updatedBalance
+  })
+
+  if (gamesCache.ready) {
+    await gamesCache.balance.set(userId, updatedBalance)
+  }
+
+  return ctx.json({
+    status: 'success',
+    updatedBalance: updatedBalance.available,
   })
 })

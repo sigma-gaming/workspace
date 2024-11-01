@@ -1,5 +1,11 @@
 import { Logger, loggerService } from '@core/logger'
-import { PromocodeTable, PromocodeUsageTable } from '@dbs/games-schema'
+import {
+  BalanceSelect,
+  BalanceTable,
+  PromocodeSelect,
+  PromocodeTable,
+  PromocodeUsageTable,
+} from '@dbs/games-schema'
 import {
   FraudRisk,
   PromocodeBonusType,
@@ -12,7 +18,6 @@ import crypto from 'node:crypto'
 import { balanceService } from './balance'
 import { gamesCache } from './cache'
 import { fraudService } from './fraud'
-import { locks } from './locks'
 
 const DEFAULT_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
@@ -37,7 +42,8 @@ type ActivationOutput =
   | {
       result: PromocodeActivationResult.AppliedPayout
       payout: number
-      updatedBalance: number
+      updatedBalance: BalanceSelect
+      updatedPromocode: PromocodeSelect
       wageringRequired: number
     }
   | {
@@ -120,10 +126,19 @@ export class PromocodeService {
     const { userId, code } = payload
 
     try {
-      return await locks.with(
-        [locks.promocode(code)],
-        async (controller): Promise<ActivationOutput> => {
-          const promocode = await this.getPromocode(code)
+      const apply = await gamesDb.transaction(
+        async (tx): Promise<ActivationOutput> => {
+          const [balance] = await tx
+            .select()
+            .from(BalanceTable)
+            .where(eq(BalanceTable.userId, userId))
+            .for('update')
+
+          const [promocode] = await tx
+            .select()
+            .from(PromocodeTable)
+            .where(eq(PromocodeTable.code, code))
+            .for('update')
 
           if (!promocode) {
             return { result: PromocodeActivationResult.NotFound }
@@ -173,63 +188,59 @@ export class PromocodeService {
             return { result: PromocodeActivationResult.Blocked }
           }
 
-          await controller.add(locks.balance(userId))
-
-          const balance = await balanceService.getBalance(userId)
-
           const wageringChange = Math.ceil(
             promocode.bonus.payout * (promocode.wageringMultiplier / 100),
           )
 
-          const updatedBalance = await gamesDb.transaction(async (tx) => {
-            if (promocode.bonus.type !== PromocodeBonusType.Payout) {
-              return tx.rollback()
-            }
+          const [updatedPromocode] = await tx
+            .update(PromocodeTable)
+            .set({ usages: promocode.usages + 1 })
+            .where(eq(PromocodeTable.id, promocode.id))
+            .returning()
 
-            const [updatedPromocode] = await tx
-              .update(PromocodeTable)
-              .set({ usages: promocode.usages + 1 })
-              .where(eq(PromocodeTable.id, promocode.id))
-              .returning()
+          await tx.insert(PromocodeUsageTable).values({
+            status: PromocodeUsageStatus.Applied,
+            userId,
+            promocodeId: promocode.id,
+          })
 
-            await tx.insert(PromocodeUsageTable).values({
-              status: PromocodeUsageStatus.Applied,
+          const transaction = await balanceService.createTransaction({
+            tx,
+            payload: {
               userId,
-              promocodeId: promocode.id,
-            })
+              type: TransactionType.Bonus,
+              amount: promocode.bonus.payout,
+            },
+          })
 
-            const transaction = await balanceService.createTransaction({
-              tx,
-              payload: {
-                userId,
-                type: TransactionType.Bonus,
-                amount: promocode.bonus.payout,
-              },
-            })
-
-            const updatedBalance = await balanceService.updateBalance({
-              tx,
-              balance,
-              transaction,
-              wageringChange,
-            })
-
-            await gamesCache.balance.set(userId, updatedBalance)
-            await gamesCache.promocode.set(code, updatedPromocode)
-
-            return updatedBalance
+          const updatedBalance = await balanceService.updateBalance({
+            tx,
+            balance,
+            transaction,
+            wageringChange,
           })
 
           return {
             result: PromocodeActivationResult.AppliedPayout,
             payout: promocode.bonus.payout,
-            updatedBalance: updatedBalance.available,
+            updatedBalance,
+            updatedPromocode,
             wageringRequired: Math.ceil(
               promocode.bonus.payout * (promocode.wageringMultiplier / 100),
             ),
           }
         },
       )
+
+      if (
+        gamesCache.ready &&
+        apply.result === PromocodeActivationResult.AppliedPayout
+      ) {
+        await gamesCache.balance.set(userId, apply.updatedBalance)
+        await gamesCache.promocode.set(code, apply.updatedPromocode)
+      }
+
+      return apply
     } catch (error) {
       console.error(error)
       this.logger.error('Failed to apply Payout', error)

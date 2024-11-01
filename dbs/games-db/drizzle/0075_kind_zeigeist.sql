@@ -1,0 +1,1 @@
+ALTER TABLE "UserSecurity" DROP COLUMN IF EXISTS "id";

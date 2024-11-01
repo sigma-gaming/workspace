@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "Promocode_expiresAt_index" ON "Promocode" USING btree ("expiresAt");

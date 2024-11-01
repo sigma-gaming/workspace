@@ -18,6 +18,7 @@ import { gameHistoryService } from './game-history'
 import { profileService } from './profile'
 
 type SaveGamePayload = {
+  tx?: typeof gamesDb
   userId: string
   game: Game
   bet: number
@@ -39,10 +40,6 @@ const outcomeToTypeMap: Record<GameOutcome, TransactionType> = {
 }
 
 export class GameService {
-  lock = async (userId: string, ms = 3000) => {
-    return gamesCache.balance.lock(userId, ms)
-  }
-
   getGameRecord = async (gameRecordId: number) => {
     const record = await gamesDb.query.GameRecordTable.findFirst({
       where: eq(GameRecordTable.id, gameRecordId),
@@ -77,6 +74,7 @@ export class GameService {
   }
 
   saveGame = async ({
+    tx = gamesDb,
     userId,
     game,
     bet,
@@ -87,56 +85,59 @@ export class GameService {
   }: SaveGamePayload) => {
     const profile = await profileService.getDetailedProfile(userId)
 
-    const { gameRecord, updatedBalance } = await gamesDb.transaction(
-      async (tx) => {
-        const transaction = await balanceService.createTransaction({
-          tx,
-          payload: {
-            userId,
-            type: outcomeToTypeMap[outcome],
-            game,
-            amount: payout,
-          },
+    const saveGame = async (tx: typeof gamesDb) => {
+      const transaction = await balanceService.createTransaction({
+        tx,
+        payload: {
+          userId,
+          type: outcomeToTypeMap[outcome],
+          game,
+          amount: payout,
+        },
+      })
+
+      const multiplier = Math.floor(Math.max(0, payout / bet) * 100)
+
+      const [gameRecord] = await tx
+        .insert(GameRecordTable)
+        .values({
+          game,
+          outcome,
+          snapshot,
+          multiplier,
+          bet,
+          payout,
+          userId,
+          previewUserName: profile.username ?? profile.name,
+          transactionId: transaction.id,
         })
+        .returning()
 
-        const multiplier = Math.floor(Math.max(0, payout / bet) * 100)
+      const updatedBalance = await balanceService.updateBalance({
+        tx,
+        balance,
+        transaction,
+        gameRecord,
+        wageringChange: -bet,
+      })
 
-        const [gameRecord] = await tx
-          .insert(GameRecordTable)
-          .values({
-            game,
-            outcome,
-            snapshot,
-            multiplier,
-            bet,
-            payout,
-            userId,
-            previewUserName: profile.username ?? profile.name,
-            transactionId: transaction.id,
-          })
-          .returning()
+      await tx
+        .update(TransactionTable)
+        .set({ gameRecordId: gameRecord.id })
+        .where(eq(TransactionTable.id, transaction.id))
 
-        const updatedBalance = await balanceService.updateBalance({
-          tx,
-          balance,
-          transaction,
-          gameRecord,
-          wageringChange: -bet,
-        })
+      return { gameRecord, updatedBalance }
+    }
 
-        await tx
-          .update(TransactionTable)
-          .set({ gameRecordId: gameRecord.id })
-          .where(eq(TransactionTable.id, transaction.id))
+    const { gameRecord, updatedBalance } = tx
+      ? await saveGame(tx)
+      : await gamesDb.transaction(saveGame)
 
-        await gamesCache.balance.set(userId, updatedBalance)
-
-        return { gameRecord, updatedBalance }
-      },
-    )
-
-    budgetService.changeAvailable(-payout)
-    gameHistoryService.addGameRecord(gameRecord)
+    if (gamesCache.ready) {
+      await gamesCache.balance.set(userId, updatedBalance)
+      budgetService.changeAvailable(-payout)
+      gameHistoryService.addGameRecord(gameRecord)
+    }
 
     return { gameRecord, updatedBalance }
   }

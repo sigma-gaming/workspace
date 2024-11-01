@@ -13,7 +13,6 @@ import { ReferralAction } from '@dbs/games-types'
 import { gamesDb } from '@games/services'
 import { and, desc, eq, lte, sql, sum } from 'drizzle-orm'
 import { gamesCache } from './cache'
-import { locks } from './locks'
 import { dayjs } from './shared/dayjs'
 
 type CreateReferralCampaignPayload = Omit<ReferralCampaignInsert, 'code'> & {
@@ -96,39 +95,47 @@ export class AffiliateService {
       .where(eq(ReferralCampaignTable.id, campaignId))
   }
 
-  async getReferrerSettings(referrerId: string) {
-    const cached = await gamesCache.referrerSettings.get(referrerId)
-
-    if (cached) {
-      return cached
-    }
-
+  private async queryReferrerSettings(referrerId: string) {
     const settings = await gamesDb.query.ReferrerSettingsTable.findFirst({
       where: eq(ReferrerSettingsTable.referrerId, referrerId),
     })
 
-    if (!settings) {
-      return null
+    return settings ?? null
+  }
+
+  async getReferrerSettings(referrerId: string) {
+    if (!gamesCache.ready) {
+      return this.queryReferrerSettings(referrerId)
     }
+
+    const cached = await gamesCache.referrerSettings.get(referrerId)
+    if (cached) return cached
+
+    const settings = await this.queryReferrerSettings(referrerId)
+    if (!settings) return null
 
     await gamesCache.referrerSettings.set(referrerId, settings)
     return settings
   }
 
-  async getReferrerBalance(referrerId: string) {
-    const cached = await gamesCache.referrerBalance.get(referrerId)
-
-    if (cached) {
-      return cached
-    }
-
+  private async queryReferrerBalance(referrerId: string) {
     const balance = await gamesDb.query.ReferrerBalanceTable.findFirst({
       where: eq(ReferrerBalanceTable.referrerId, referrerId),
     })
 
-    if (!balance) {
-      return null
+    return balance ?? null
+  }
+
+  async getReferrerBalance(referrerId: string) {
+    if (!gamesCache.ready) {
+      return this.queryReferrerBalance(referrerId)
     }
+
+    const cached = await gamesCache.referrerBalance.get(referrerId)
+    if (cached) return cached
+
+    const balance = await this.queryReferrerBalance(referrerId)
+    if (!balance) return null
 
     await gamesCache.referrerBalance.set(referrerId, balance)
     return balance
@@ -185,10 +192,7 @@ export class AffiliateService {
 
     const withdrawal = await db
       .insert(ReferrerWithdrawalTable)
-      .values({
-        amount,
-        referrerId,
-      })
+      .values({ amount, referrerId })
       .returning()
 
     return withdrawal
@@ -301,35 +305,39 @@ export class AffiliateService {
         continue
       }
 
-      await locks.with([locks.referrerBalance(referrerId)], async () => {
-        await gamesDb.transaction(async (tx) => {
-          await tx
-            .update(ReferrerBalanceTable)
-            .set({
-              available: sql`${ReferrerBalanceTable.available} + ${totalAmount}`,
-            })
-            .where(eq(ReferrerBalanceTable.referrerId, referrerId))
+      await gamesDb.transaction(async (tx) => {
+        await tx
+          .select()
+          .from(ReferrerBalanceTable)
+          .where(eq(ReferrerBalanceTable.referrerId, referrerId))
+          .for('update')
 
-          await tx
-            .update(ReferrerTransactionTable)
-            .set({ isProcessed: true })
-            .where(
-              and(
-                lte(ReferrerTransactionTable.id, lastTransaction.id),
-                eq(ReferrerTransactionTable.referrerId, referrerId),
-                eq(ReferrerTransactionTable.isProcessed, false),
-              ),
-            )
+        await tx
+          .update(ReferrerBalanceTable)
+          .set({
+            available: sql`${ReferrerBalanceTable.available} + ${totalAmount}`,
+          })
+          .where(eq(ReferrerBalanceTable.referrerId, referrerId))
 
-          await tx
-            .update(ReferrerPayoutTable)
-            .set({ nextPayoutAt, lastPayoutAt: now })
-            .where(eq(ReferrerPayoutTable.referrerId, referrerId))
+        await tx
+          .update(ReferrerTransactionTable)
+          .set({ isProcessed: true })
+          .where(
+            and(
+              lte(ReferrerTransactionTable.id, lastTransaction.id),
+              eq(ReferrerTransactionTable.referrerId, referrerId),
+              eq(ReferrerTransactionTable.isProcessed, false),
+            ),
+          )
 
-          await gamesCache.referrerBalance.del(referrerId)
-          await gamesCache.lastReferrerTransactions.del(referrerId)
-        })
+        await tx
+          .update(ReferrerPayoutTable)
+          .set({ nextPayoutAt, lastPayoutAt: now })
+          .where(eq(ReferrerPayoutTable.referrerId, referrerId))
       })
+
+      await gamesCache.referrerBalance.del(referrerId)
+      await gamesCache.lastReferrerTransactions.del(referrerId)
     }
   }
 }

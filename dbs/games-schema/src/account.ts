@@ -23,6 +23,7 @@ export const AccountTable = pgTable(
       .notNull(),
   },
   (table) => ({
+    userIdIdx: index().on(table.userId),
     providerUserIdIdx: index().on(table.providerUserId),
   }),
 )

@@ -1,11 +1,15 @@
 import { Logger, loggerService } from '@core/logger'
-import { GlobalTaskSelect, GlobalTaskStatusTable } from '@dbs/games-schema'
+import {
+  BalanceSelect,
+  BalanceTable,
+  GlobalTaskSelect,
+  GlobalTaskStatusTable,
+} from '@dbs/games-schema'
 import { GlobalTaskKey, TaskStatus, TransactionType } from '@dbs/games-types'
 import { gamesDb } from '@games/services'
 import { and, eq } from 'drizzle-orm'
 import { balanceService } from './balance'
 import { gamesCache } from './cache'
-import { locks } from './locks'
 
 export enum GlobalTaskCompleteResult {
   AlreadyCompleted = 'AlreadyCompleted',
@@ -20,11 +24,12 @@ type GlobalTaskCompleteOutput =
       result: GlobalTaskCompleteResult.NotCompleted
       message?: string
     }
+  | { result: GlobalTaskCompleteResult.Completed; updatedStatus: TaskStatus }
   | {
-      result: Exclude<
-        GlobalTaskCompleteResult,
-        GlobalTaskCompleteResult.NotCompleted
-      >
+      result:
+        | GlobalTaskCompleteResult.AlreadyCompleted
+        | GlobalTaskCompleteResult.NotActive
+        | GlobalTaskCompleteResult.Failed
     }
 
 export enum GlobalTaskClaimRewardResult {
@@ -37,8 +42,9 @@ export enum GlobalTaskClaimRewardResult {
 type GlobalTaskClaimRewardOutput =
   | {
       result: GlobalTaskClaimRewardResult.Claimed
-      updatedBalance: number
+      updatedBalance: BalanceSelect
       payout: number
+      updatedStatus: TaskStatus
     }
   | {
       result: Exclude<
@@ -65,10 +71,16 @@ export class GlobalTaskService {
   }
 
   async getTasks() {
+    const query = () => gamesDb.query.GlobalTaskTable.findMany()
+
+    if (!gamesCache.ready) {
+      return query()
+    }
+
     const cached = await gamesCache.globalTasks.get()
     if (cached) return cached
 
-    const tasks = await gamesDb.query.GlobalTaskTable.findMany()
+    const tasks = await query()
     await gamesCache.globalTasks.set(tasks)
     return tasks
   }
@@ -78,10 +90,11 @@ export class GlobalTaskService {
     return tasks.find((task) => task.key === key) ?? null
   }
 
-  async getStatus(taskKey: GlobalTaskKey, userId: string) {
-    const cacheKey = `${userId}:${taskKey}`
-    const cached = await gamesCache.globalTaskStatus.get(cacheKey)
-    if (cached) return cached
+  private async queryStatus(options: {
+    taskKey: GlobalTaskKey
+    userId: string
+  }) {
+    const { taskKey, userId } = options
 
     const entity = await gamesDb.query.GlobalTaskStatusTable.findFirst({
       where: and(
@@ -92,19 +105,38 @@ export class GlobalTaskService {
 
     const status = entity?.status ?? TaskStatus.Pending
     const inserted = Boolean(entity)
+    return [status, inserted] as const
+  }
+
+  async getStatus(options: { taskKey: GlobalTaskKey; userId: string }) {
+    const { taskKey, userId } = options
+
+    if (!gamesCache.ready) {
+      return this.queryStatus({ taskKey, userId })
+    }
+
+    const cacheKey = `${userId}:${taskKey}`
+    const cached = await gamesCache.globalTaskStatus.get(cacheKey)
+    if (cached) return cached
+
+    const [status, inserted] = await this.queryStatus({ taskKey, userId })
     await gamesCache.globalTaskStatus.set(cacheKey, [status, inserted])
     return [status, inserted] as const
   }
 
-  async updateStatus(
-    taskKey: GlobalTaskKey,
-    userId: string,
-    status: TaskStatus,
-  ) {
-    const [, inserted] = await this.getStatus(taskKey, userId)
+  async updateStatus(payload: {
+    tx?: typeof gamesDb
+    userId: string
+    taskKey: GlobalTaskKey
+    status: TaskStatus
+  }) {
+    const { taskKey, userId, status } = payload
+    const db = payload.tx ?? gamesDb
+
+    const [, inserted] = await this.getStatus({ taskKey, userId })
 
     if (inserted) {
-      await gamesDb
+      await db
         .update(GlobalTaskStatusTable)
         .set({ status })
         .where(
@@ -114,15 +146,12 @@ export class GlobalTaskService {
           ),
         )
     } else {
-      await gamesDb.insert(GlobalTaskStatusTable).values({
+      await db.insert(GlobalTaskStatusTable).values({
         taskKey,
         userId,
         status,
       })
     }
-
-    const cacheKey = `${userId}:${taskKey}`
-    await gamesCache.globalTaskStatus.set(cacheKey, [status, true])
   }
 
   async completeTask(payload: {
@@ -132,11 +161,21 @@ export class GlobalTaskService {
   }): Promise<GlobalTaskCompleteOutput> {
     const { userId, taskKey, checker } = payload
 
-    return locks.with(
-      [locks.globalTaskStatus(taskKey, userId)],
-      async (): Promise<GlobalTaskCompleteOutput> => {
+    const completion = await gamesDb.transaction(
+      async (tx): Promise<GlobalTaskCompleteOutput> => {
         try {
-          const [status] = await this.getStatus(taskKey, userId)
+          const [statusEntity] = await tx
+            .select()
+            .from(GlobalTaskStatusTable)
+            .where(
+              and(
+                eq(GlobalTaskStatusTable.taskKey, taskKey),
+                eq(GlobalTaskStatusTable.userId, userId),
+              ),
+            )
+            .for('update')
+
+          const status = statusEntity?.status ?? TaskStatus.Pending
 
           if (status !== TaskStatus.Pending) {
             return { result: GlobalTaskCompleteResult.AlreadyCompleted }
@@ -160,14 +199,44 @@ export class GlobalTaskService {
               message: check.message,
             }
 
-          await this.updateStatus(taskKey, userId, TaskStatus.Completed)
-          return { result: GlobalTaskCompleteResult.Completed }
+          await this.updateStatus({
+            tx,
+            taskKey,
+            userId,
+            status: TaskStatus.Completed,
+          })
+
+          const cacheKey = `${userId}:${taskKey}`
+
+          await gamesCache.globalTaskStatus.set(cacheKey, [
+            TaskStatus.Completed,
+            true,
+          ])
+
+          return {
+            result: GlobalTaskCompleteResult.Completed,
+            updatedStatus: TaskStatus.Completed,
+          }
         } catch (error) {
           this.logger.error(error)
           return { result: GlobalTaskCompleteResult.Failed }
         }
       },
     )
+
+    if (
+      completion.result === GlobalTaskCompleteResult.Completed &&
+      gamesCache.ready
+    ) {
+      const cacheKey = `${userId}:${taskKey}`
+
+      await gamesCache.globalTaskStatus.set(cacheKey, [
+        completion.updatedStatus,
+        true,
+      ])
+    }
+
+    return completion
   }
 
   async claimReward(payload: {
@@ -176,10 +245,20 @@ export class GlobalTaskService {
   }): Promise<GlobalTaskClaimRewardOutput> {
     const { userId, taskKey } = payload
 
-    return locks.with(
-      [locks.globalTaskStatus(taskKey, userId)],
-      async (controller): Promise<GlobalTaskClaimRewardOutput> => {
-        const [status] = await this.getStatus(taskKey, userId)
+    const claim = await gamesDb.transaction(
+      async (tx): Promise<GlobalTaskClaimRewardOutput> => {
+        const [statusEntity] = await tx
+          .select()
+          .from(GlobalTaskStatusTable)
+          .where(
+            and(
+              eq(GlobalTaskStatusTable.taskKey, taskKey),
+              eq(GlobalTaskStatusTable.userId, userId),
+            ),
+          )
+          .for('update')
+
+        const status = statusEntity?.status ?? TaskStatus.Pending
 
         if (status === TaskStatus.Claimed) {
           return { result: GlobalTaskClaimRewardResult.AlreadyClaimed }
@@ -195,43 +274,70 @@ export class GlobalTaskService {
           return { result: GlobalTaskClaimRewardResult.Failed }
         }
 
-        await controller.add(locks.balance(userId))
-
-        const balance = await balanceService.getBalance(userId)
+        const [balance] = await tx
+          .select()
+          .from(BalanceTable)
+          .where(eq(BalanceTable.userId, userId))
+          .for('update')
 
         const wageringChange = Math.ceil(
           task.payout * (task.wageringMultiplier / 100),
         )
 
-        const updatedBalance = await gamesDb.transaction(async (tx) => {
-          const transaction = await balanceService.createTransaction({
-            tx,
-            payload: {
-              userId,
-              type: TransactionType.Bonus,
-              amount: task.payout,
-            },
-          })
-
-          const updatedBalance = await balanceService.updateBalance({
-            tx,
-            balance,
-            transaction,
-            wageringChange,
-          })
-
-          return updatedBalance
+        const transaction = await balanceService.createTransaction({
+          tx,
+          payload: {
+            userId,
+            type: TransactionType.Bonus,
+            amount: task.payout,
+          },
         })
 
-        await this.updateStatus(taskKey, userId, TaskStatus.Claimed)
+        const updatedBalance = await balanceService.updateBalance({
+          tx,
+          balance,
+          transaction,
+          wageringChange,
+        })
+
+        await this.updateStatus({
+          tx,
+          taskKey,
+          userId,
+          status: TaskStatus.Claimed,
+        })
+
+        const cacheKey = `${userId}:${taskKey}`
+
+        await gamesCache.globalTaskStatus.set(cacheKey, [
+          TaskStatus.Claimed,
+          true,
+        ])
 
         return {
           result: GlobalTaskClaimRewardResult.Claimed,
-          updatedBalance: updatedBalance.available,
+          updatedBalance,
           payout: task.payout,
+          updatedStatus: TaskStatus.Claimed,
         }
       },
     )
+
+    if (
+      claim.result === GlobalTaskClaimRewardResult.Claimed &&
+      gamesCache.ready
+    ) {
+      const cacheKey = `${userId}:${taskKey}`
+
+      await gamesCache.balance.set(userId, claim.updatedBalance)
+
+      await gamesCache.globalTaskStatus.set(cacheKey, [
+        claim.updatedStatus,
+        true,
+      ])
+    }
+
+    return claim
   }
 }
 

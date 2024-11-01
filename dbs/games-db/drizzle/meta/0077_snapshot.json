@@ -1,0 +1,2016 @@
+{
+  "id": "72e0c647-1842-461f-bd1a-ffd9525dc9bc",
+  "prevId": "b846703e-629f-4b6d-bf39-0e6453a9aedf",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.Account": {
+      "name": "Account",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "provider": {
+          "name": "provider",
+          "type": "AccountProvider",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "providerUserId": {
+          "name": "providerUserId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "providerUsername": {
+          "name": "providerUsername",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "providerUserFirstName": {
+          "name": "providerUserFirstName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "providerUserLastName": {
+          "name": "providerUserLastName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "providerUserImage": {
+          "name": "providerUserImage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "Account_userId_index": {
+          "name": "Account_userId_index",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "Account_providerUserId_index": {
+          "name": "Account_providerUserId_index",
+          "columns": [
+            {
+              "expression": "providerUserId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Account_userId_User_id_fk": {
+          "name": "Account_userId_User_id_fk",
+          "tableFrom": "Account",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Balance": {
+      "name": "Balance",
+      "schema": "",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "available": {
+          "name": "available",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "wageringRequired": {
+          "name": "wageringRequired",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalBet": {
+          "name": "totalBet",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalWin": {
+          "name": "totalWin",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalLost": {
+          "name": "totalLost",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalBetCount": {
+          "name": "totalBetCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "maxWin": {
+          "name": "maxWin",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "maxWinGameId": {
+          "name": "maxWinGameId",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maxMultiplier": {
+          "name": "maxMultiplier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "maxMultiplierGameId": {
+          "name": "maxMultiplierGameId",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Balance_userId_User_id_fk": {
+          "name": "Balance_userId_User_id_fk",
+          "tableFrom": "Balance",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Balance_maxWinGameId_GameRecord_id_fk": {
+          "name": "Balance_maxWinGameId_GameRecord_id_fk",
+          "tableFrom": "Balance",
+          "tableTo": "GameRecord",
+          "columnsFrom": [
+            "maxWinGameId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Balance_maxMultiplierGameId_GameRecord_id_fk": {
+          "name": "Balance_maxMultiplierGameId_GameRecord_id_fk",
+          "tableFrom": "Balance",
+          "tableTo": "GameRecord",
+          "columnsFrom": [
+            "maxMultiplierGameId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Budget": {
+      "name": "Budget",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "default": 1
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "lastSyncAt": {
+          "name": "lastSyncAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "available": {
+          "name": "available",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 10000000
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.ChatMessage": {
+      "name": "ChatMessage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "trackingId": {
+          "name": "trackingId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "type": {
+          "name": "type",
+          "type": "ChatMessageType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attachments": {
+          "name": "attachments",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::json"
+        },
+        "senderName": {
+          "name": "senderName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "senderUsername": {
+          "name": "senderUsername",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "senderImage": {
+          "name": "senderImage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "senderRoles": {
+          "name": "senderRoles",
+          "type": "UserRole[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isPinned": {
+          "name": "isPinned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profileId": {
+          "name": "profileId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "ChatMessage_isPinned_index": {
+          "name": "ChatMessage_isPinned_index",
+          "columns": [
+            {
+              "expression": "isPinned",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"ChatMessage\".\"isPinned\" = true",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "ChatMessage_userId_User_id_fk": {
+          "name": "ChatMessage_userId_User_id_fk",
+          "tableFrom": "ChatMessage",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ChatMessage_profileId_Profile_id_fk": {
+          "name": "ChatMessage_profileId_Profile_id_fk",
+          "tableFrom": "ChatMessage",
+          "tableTo": "Profile",
+          "columnsFrom": [
+            "profileId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Config": {
+      "name": "Config",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "default": 1
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "maintenanceEnabled": {
+          "name": "maintenanceEnabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.GameRecord": {
+      "name": "GameRecord",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "game": {
+          "name": "game",
+          "type": "Game",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "outcome": {
+          "name": "outcome",
+          "type": "GameOutcome",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "snapshot": {
+          "name": "snapshot",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bet": {
+          "name": "bet",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "multiplier": {
+          "name": "multiplier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payout": {
+          "name": "payout",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "previewUserName": {
+          "name": "previewUserName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "transactionId": {
+          "name": "transactionId",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "GameRecord_userId_index": {
+          "name": "GameRecord_userId_index",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "GameRecord_userId_User_id_fk": {
+          "name": "GameRecord_userId_User_id_fk",
+          "tableFrom": "GameRecord",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "GameRecord_transactionId_Transaction_id_fk": {
+          "name": "GameRecord_transactionId_Transaction_id_fk",
+          "tableFrom": "GameRecord",
+          "tableTo": "Transaction",
+          "columnsFrom": [
+            "transactionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.GlobalTaskStatus": {
+      "name": "GlobalTaskStatus",
+      "schema": "",
+      "columns": {
+        "taskKey": {
+          "name": "taskKey",
+          "type": "GlobalTaskKey",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "TaskStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "GlobalTaskStatus_taskKey_GlobalTask_key_fk": {
+          "name": "GlobalTaskStatus_taskKey_GlobalTask_key_fk",
+          "tableFrom": "GlobalTaskStatus",
+          "tableTo": "GlobalTask",
+          "columnsFrom": [
+            "taskKey"
+          ],
+          "columnsTo": [
+            "key"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "GlobalTaskStatus_userId_User_id_fk": {
+          "name": "GlobalTaskStatus_userId_User_id_fk",
+          "tableFrom": "GlobalTaskStatus",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "GlobalTaskStatus_taskKey_userId_pk": {
+          "name": "GlobalTaskStatus_taskKey_userId_pk",
+          "columns": [
+            "taskKey",
+            "userId"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.GlobalTask": {
+      "name": "GlobalTask",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "GlobalTaskKey",
+          "typeSchema": "public",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "requirements": {
+          "name": "requirements",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payout": {
+          "name": "payout",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wageringMultiplier": {
+          "name": "wageringMultiplier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Notification": {
+      "name": "Notification",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "NotificationKind",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "autoClose": {
+          "name": "autoClose",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "autoCloseMs": {
+          "name": "autoCloseMs",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "withCloseButton": {
+          "name": "withCloseButton",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Notification_userId_User_id_fk": {
+          "name": "Notification_userId_User_id_fk",
+          "tableFrom": "Notification",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Profile": {
+      "name": "Profile",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hasCustomName": {
+          "name": "hasCustomName",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usedProvider": {
+          "name": "usedProvider",
+          "type": "AccountProvider",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Profile_userId_User_id_fk": {
+          "name": "Profile_userId_User_id_fk",
+          "tableFrom": "Profile",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Profile_username_unique": {
+          "name": "Profile_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        },
+        "Profile_userId_unique": {
+          "name": "Profile_userId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "userId"
+          ]
+        }
+      }
+    },
+    "public.Promocode": {
+      "name": "Promocode",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "campaign": {
+          "name": "campaign",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wageringMultiplier": {
+          "name": "wageringMultiplier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "usages": {
+          "name": "usages",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxUsages": {
+          "name": "maxUsages",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bonusType": {
+          "name": "bonusType",
+          "type": "PromocodeBonusType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bonus": {
+          "name": "bonus",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Promocode_userId_User_id_fk": {
+          "name": "Promocode_userId_User_id_fk",
+          "tableFrom": "Promocode",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Promocode_createdBy_User_id_fk": {
+          "name": "Promocode_createdBy_User_id_fk",
+          "tableFrom": "Promocode",
+          "tableTo": "User",
+          "columnsFrom": [
+            "createdBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "Promocode_code_unique": {
+          "name": "Promocode_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      }
+    },
+    "public.PromocodeUsage": {
+      "name": "PromocodeUsage",
+      "schema": "",
+      "columns": {
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "status": {
+          "name": "status",
+          "type": "PromocodeUsageStatus",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "promocodeId": {
+          "name": "promocodeId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "PromocodeUsage_promocodeId_Promocode_id_fk": {
+          "name": "PromocodeUsage_promocodeId_Promocode_id_fk",
+          "tableFrom": "PromocodeUsage",
+          "tableTo": "Promocode",
+          "columnsFrom": [
+            "promocodeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "PromocodeUsage_userId_User_id_fk": {
+          "name": "PromocodeUsage_userId_User_id_fk",
+          "tableFrom": "PromocodeUsage",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "PromocodeUsage_promocodeId_userId_pk": {
+          "name": "PromocodeUsage_promocodeId_userId_pk",
+          "columns": [
+            "promocodeId",
+            "userId"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.ReferralCampaign": {
+      "name": "ReferralCampaign",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "totalVisits": {
+          "name": "totalVisits",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "totalSignups": {
+          "name": "totalSignups",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "referrerId": {
+          "name": "referrerId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ReferralCampaign_referrerId_User_id_fk": {
+          "name": "ReferralCampaign_referrerId_User_id_fk",
+          "tableFrom": "ReferralCampaign",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referrerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ReferralCampaign_code_unique": {
+          "name": "ReferralCampaign_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "code"
+          ]
+        }
+      }
+    },
+    "public.ReferrerBalance": {
+      "name": "ReferrerBalance",
+      "schema": "",
+      "columns": {
+        "referrerId": {
+          "name": "referrerId",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "available": {
+          "name": "available",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ReferrerBalance_referrerId_User_id_fk": {
+          "name": "ReferrerBalance_referrerId_User_id_fk",
+          "tableFrom": "ReferrerBalance",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referrerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.ReferrerPayout": {
+      "name": "ReferrerPayout",
+      "schema": "",
+      "columns": {
+        "referrerId": {
+          "name": "referrerId",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nextPayoutAt": {
+          "name": "nextPayoutAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastPayoutAt": {
+          "name": "lastPayoutAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ReferrerPayout_referrerId_User_id_fk": {
+          "name": "ReferrerPayout_referrerId_User_id_fk",
+          "tableFrom": "ReferrerPayout",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referrerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.ReferrerSettings": {
+      "name": "ReferrerSettings",
+      "schema": "",
+      "columns": {
+        "referrerId": {
+          "name": "referrerId",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "revShare": {
+          "name": "revShare",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 10
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ReferrerSettings_referrerId_User_id_fk": {
+          "name": "ReferrerSettings_referrerId_User_id_fk",
+          "tableFrom": "ReferrerSettings",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referrerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.ReferrerTransaction": {
+      "name": "ReferrerTransaction",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "referralAction": {
+          "name": "referralAction",
+          "type": "ReferralAction",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isProcessed": {
+          "name": "isProcessed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "referrerId": {
+          "name": "referrerId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "referralId": {
+          "name": "referralId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referralCampaignId": {
+          "name": "referralCampaignId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ReferrerTransaction_referrerId_User_id_fk": {
+          "name": "ReferrerTransaction_referrerId_User_id_fk",
+          "tableFrom": "ReferrerTransaction",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referrerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ReferrerTransaction_referralId_User_id_fk": {
+          "name": "ReferrerTransaction_referralId_User_id_fk",
+          "tableFrom": "ReferrerTransaction",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referralId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "ReferrerTransaction_referralCampaignId_ReferralCampaign_id_fk": {
+          "name": "ReferrerTransaction_referralCampaignId_ReferralCampaign_id_fk",
+          "tableFrom": "ReferrerTransaction",
+          "tableTo": "ReferralCampaign",
+          "columnsFrom": [
+            "referralCampaignId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.ReferrerWithdrawal": {
+      "name": "ReferrerWithdrawal",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "referrerId": {
+          "name": "referrerId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ReferrerWithdrawal_referrerId_User_id_fk": {
+          "name": "ReferrerWithdrawal_referrerId_User_id_fk",
+          "tableFrom": "ReferrerWithdrawal",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referrerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Session": {
+      "name": "Session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "AccountProvider",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "referrerId": {
+          "name": "referrerId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referralCampaignId": {
+          "name": "referralCampaignId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Session_userId_User_id_fk": {
+          "name": "Session_userId_User_id_fk",
+          "tableFrom": "Session",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Session_referrerId_User_id_fk": {
+          "name": "Session_referrerId_User_id_fk",
+          "tableFrom": "Session",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referrerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "Session_referralCampaignId_ReferralCampaign_id_fk": {
+          "name": "Session_referralCampaignId_ReferralCampaign_id_fk",
+          "tableFrom": "Session",
+          "tableTo": "ReferralCampaign",
+          "columnsFrom": [
+            "referralCampaignId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.Transaction": {
+      "name": "Transaction",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "type": {
+          "name": "type",
+          "type": "TransactionType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "game": {
+          "name": "game",
+          "type": "Game",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gameRecordId": {
+          "name": "gameRecordId",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Transaction_userId_User_id_fk": {
+          "name": "Transaction_userId_User_id_fk",
+          "tableFrom": "Transaction",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.User": {
+      "name": "User",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "roles": {
+          "name": "roles",
+          "type": "UserRole[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"User\"}'"
+        },
+        "referrerId": {
+          "name": "referrerId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referralCampaignId": {
+          "name": "referralCampaignId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profileId": {
+          "name": "profileId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "securityId": {
+          "name": "securityId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "User_referrerId_User_id_fk": {
+          "name": "User_referrerId_User_id_fk",
+          "tableFrom": "User",
+          "tableTo": "User",
+          "columnsFrom": [
+            "referrerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.UserSecurity": {
+      "name": "UserSecurity",
+      "schema": "",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "whitelisted": {
+          "name": "whitelisted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "lastIP": {
+          "name": "lastIP",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressTon": {
+          "name": "addressTon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressUsdt": {
+          "name": "addressUsdt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressUsdc": {
+          "name": "addressUsdc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressTrx": {
+          "name": "addressTrx",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressEth": {
+          "name": "addressEth",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressBtc": {
+          "name": "addressBtc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressLtc": {
+          "name": "addressLtc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressDoge": {
+          "name": "addressDoge",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressBnb": {
+          "name": "addressBnb",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressXmr": {
+          "name": "addressXmr",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressSol": {
+          "name": "addressSol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ipScore": {
+          "name": "ipScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressTonScore": {
+          "name": "addressTonScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressUsdtScore": {
+          "name": "addressUsdtScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressUsdcScore": {
+          "name": "addressUsdcScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressTrxScore": {
+          "name": "addressTrxScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressEthScore": {
+          "name": "addressEthScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressBtcScore": {
+          "name": "addressBtcScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressLtcScore": {
+          "name": "addressLtcScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressDogeScore": {
+          "name": "addressDogeScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressBnbScore": {
+          "name": "addressBnbScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressXmrScore": {
+          "name": "addressXmrScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "addressSolScore": {
+          "name": "addressSolScore",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "UserSecurity_lastIP_index": {
+          "name": "UserSecurity_lastIP_index",
+          "columns": [
+            {
+              "expression": "lastIP",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "UserSecurity_userId_User_id_fk": {
+          "name": "UserSecurity_userId_User_id_fk",
+          "tableFrom": "UserSecurity",
+          "tableTo": "User",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "public.AccountProvider": {
+      "name": "AccountProvider",
+      "schema": "public",
+      "values": [
+        "VK",
+        "Telegram"
+      ]
+    },
+    "public.ChatMessageType": {
+      "name": "ChatMessageType",
+      "schema": "public",
+      "values": [
+        "UserMessage",
+        "SystemMessage"
+      ]
+    },
+    "public.FraudRisk": {
+      "name": "FraudRisk",
+      "schema": "public",
+      "values": [
+        "Clear",
+        "Low",
+        "Medium",
+        "High",
+        "Unknown"
+      ]
+    },
+    "public.Game": {
+      "name": "Game",
+      "schema": "public",
+      "values": [
+        "Dice",
+        "Pincode"
+      ]
+    },
+    "public.GameOutcome": {
+      "name": "GameOutcome",
+      "schema": "public",
+      "values": [
+        "Win",
+        "Loss"
+      ]
+    },
+    "public.GlobalTaskKey": {
+      "name": "GlobalTaskKey",
+      "schema": "public",
+      "values": [
+        "VkGroupSubscribe",
+        "VkPinnedRepost",
+        "TelegramGroupSubscribe"
+      ]
+    },
+    "public.NotificationKind": {
+      "name": "NotificationKind",
+      "schema": "public",
+      "values": [
+        "Success",
+        "Info",
+        "Warning",
+        "Failure"
+      ]
+    },
+    "public.PromocodeBonusType": {
+      "name": "PromocodeBonusType",
+      "schema": "public",
+      "values": [
+        "DepositMultiplier",
+        "DepositFixed",
+        "Payout"
+      ]
+    },
+    "public.PromocodeUsageStatus": {
+      "name": "PromocodeUsageStatus",
+      "schema": "public",
+      "values": [
+        "Applied",
+        "Pending"
+      ]
+    },
+    "public.ReferralAction": {
+      "name": "ReferralAction",
+      "schema": "public",
+      "values": [
+        "Deposit",
+        "Withdrawal"
+      ]
+    },
+    "public.TaskStatus": {
+      "name": "TaskStatus",
+      "schema": "public",
+      "values": [
+        "Pending",
+        "Completed",
+        "Claimed"
+      ]
+    },
+    "public.TaskType": {
+      "name": "TaskType",
+      "schema": "public",
+      "values": [
+        "Global",
+        "Personal"
+      ]
+    },
+    "public.TransactionType": {
+      "name": "TransactionType",
+      "schema": "public",
+      "values": [
+        "Deposit",
+        "Withdrawal",
+        "Transfer",
+        "Bonus",
+        "Bet",
+        "Win",
+        "Loss",
+        "Refund"
+      ]
+    },
+    "public.UserRole": {
+      "name": "UserRole",
+      "schema": "public",
+      "values": [
+        "User",
+        "Admin",
+        "Moderator",
+        "Support"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

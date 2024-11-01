@@ -4,7 +4,7 @@ import {
   bigserial,
   index,
   integer,
-  json,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -24,7 +24,7 @@ export const GameRecordTable = pgTable(
 
     game: gameEnum('game').notNull(),
     outcome: gameOutcomeEnum('outcome').notNull(),
-    snapshot: json('snapshot').$type<GameSnapshot>().notNull(),
+    snapshot: jsonb('snapshot').$type<GameSnapshot>().notNull(),
 
     bet: bigint('bet', { mode: 'number' }).notNull(),
     multiplier: integer('multiplier').notNull(),

@@ -26,8 +26,8 @@ export const UserRelations = relations(UserTable, ({ one, many }) => ({
   transactions: many(TransactionTable),
   gameRecords: many(GameRecordTable),
   userSecurity: one(UserSecurityTable, {
-    fields: [UserTable.securityId],
-    references: [UserSecurityTable.id],
+    fields: [UserTable.id],
+    references: [UserSecurityTable.userId],
   }),
 
   /**

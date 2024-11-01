@@ -9,42 +9,65 @@ import { gamesCache } from './cache'
 import { gamesPubsubs } from './pubsubs'
 
 export class NotificationService {
-  getActual = async (userId?: string): Promise<NotificationSelect[]> => {
-    const actual: NotificationSelect[] = []
+  private async queryPersonal(userId: string) {
     const now = new Date().toISOString()
 
+    return gamesDb.query.NotificationTable.findMany({
+      where: and(
+        eq(NotificationTable.userId, userId),
+        gte(NotificationTable.expiresAt, now),
+      ),
+      orderBy: asc(NotificationTable.createdAt),
+    })
+  }
+
+  private async queryGlobal() {
+    const now = new Date().toISOString()
+
+    return await gamesDb.query.NotificationTable.findMany({
+      where: and(
+        isNull(NotificationTable.userId),
+        gte(NotificationTable.expiresAt, now),
+      ),
+      orderBy: asc(NotificationTable.createdAt),
+    })
+  }
+
+  private async getPersonal(userId: string) {
+    if (!gamesCache.ready) {
+      return this.queryPersonal(userId)
+    }
+
+    const cached = await gamesCache.personalNotifications.get(userId)
+    if (cached) return cached
+
+    const personal = await this.queryPersonal(userId)
+    await gamesCache.personalNotifications.set(userId, personal)
+    return personal
+  }
+
+  private async getGlobal() {
+    if (!gamesCache.ready) {
+      return this.queryGlobal()
+    }
+
+    const cached = await gamesCache.globalNotifications.get()
+    if (cached) return cached
+
+    const global = await this.queryGlobal()
+    await gamesCache.globalNotifications.set(global)
+    return global
+  }
+
+  getActual = async (userId?: string): Promise<NotificationSelect[]> => {
+    const actual: NotificationSelect[] = []
+
     if (userId) {
-      let personal = await gamesCache.personalNotifications.get(userId)
-
-      if (!personal) {
-        personal = await gamesDb.query.NotificationTable.findMany({
-          where: and(
-            eq(NotificationTable.userId, userId),
-            gte(NotificationTable.expiresAt, now),
-          ),
-          orderBy: asc(NotificationTable.createdAt),
-        })
-
-        await gamesCache.personalNotifications.set(userId, personal)
-      }
-
+      const personal = await this.getPersonal(userId)
       actual.push(...personal)
     }
 
-    let global = await gamesCache.globalNotifications.get()
-
-    if (!global) {
-      global = await gamesDb.query.NotificationTable.findMany({
-        where: and(
-          isNull(NotificationTable.userId),
-          gte(NotificationTable.expiresAt, now),
-        ),
-        orderBy: asc(NotificationTable.createdAt),
-      })
-
-      await gamesCache.globalNotifications.set(global)
-    }
-
+    const global = await this.getGlobal()
     actual.push(...global)
     return actual
   }
@@ -55,13 +78,15 @@ export class NotificationService {
       .values(payload)
       .returning()
 
-    if (notification.userId) {
-      await gamesCache.personalNotifications.del(notification.userId)
-    } else {
-      await gamesCache.globalNotifications.del()
-    }
+    if (gamesCache.ready) {
+      if (notification.userId) {
+        await gamesCache.personalNotifications.del(notification.userId)
+      } else {
+        await gamesCache.globalNotifications.del()
+      }
 
-    await gamesPubsubs.notifications.publish(notification)
+      await gamesPubsubs.notifications.publish(notification)
+    }
   }
 }
 

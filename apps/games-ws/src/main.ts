@@ -4,7 +4,6 @@ import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
 import {
   gamesPubsubs,
-  gamesRedis,
   maintenanceService,
   sessionService,
 } from '@games/services'
@@ -114,19 +113,6 @@ app.get('/ready', async (res) => {
       callback()
       replied = true
     })
-  }
-
-  const redisReady = await gamesRedis.redis
-    .ping()
-    .then(() => true)
-    .catch(() => false)
-
-  if (!redisReady) {
-    wrapReply(() => {
-      res.writeStatus('503 Service Unavailable').end()
-    })
-
-    return
   }
 
   const maintenanceMode = await maintenanceService.isMaintenanceMode()

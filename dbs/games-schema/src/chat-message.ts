@@ -5,7 +5,7 @@ import {
   boolean,
   index,
   integer,
-  json,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -26,7 +26,7 @@ export const ChatMessageTable = pgTable(
 
     type: chatMessageTypeEnum('type').notNull(),
     text: text('text'),
-    attachments: json('attachments')
+    attachments: jsonb('attachments')
       .$type<ChatMessageAttachment[]>()
       .default([]),
 

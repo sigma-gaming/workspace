@@ -80,13 +80,26 @@ export const authenticateRoute = new Hono().post(
   zValidator(
     'json',
     z.object({
+      app: z.string(),
       action: z.enum(['sign-in', 'connect']),
       integration: z.enum(['vk', 'telegram']),
       payload: z.string(),
     }),
   ),
   async (ctx) => {
-    const { action, integration, payload } = ctx.req.valid('json')
+    const { app, action, integration, payload } = ctx.req.valid('json')
+
+    if (app !== 'sigma') {
+      throw new BadRequestException({
+        message: 'Приложение не найдено',
+      })
+    }
+
+    if (!gamesCache.ready) {
+      throw new BadRequestException({
+        message: `Сервис временно недоступен, повторите попытку позже`,
+      })
+    }
 
     let userId: string | undefined
 

@@ -140,18 +140,15 @@ const CardActions = ({ children }: { children: ReactNode }) => {
   )
 }
 
-export const GlobalTaskCard = ({ taskKey }: Props) => {
-  const title = titleMap[taskKey]
-  const image = imageMap[taskKey]
-  const action = actionMap[taskKey]
-  const boxShadow = boxShadowMap[taskKey]
-  const tooltip = tooltipMap[taskKey]
+const GlobalTaskActions = ({ taskKey }: Props) => {
   const loggedIn = useUnit($$session.$loggedIn)
   const tasks = useUnit($$bonusesPage.$globalTasks)
   const statuses = useUnit($$bonusesPage.$globalTaskStatuses)
+  const statusesLoaded = useUnit($$bonusesPage.$globalTaskStatusesLoaded)
   const task = tasks?.find((task) => task.key === taskKey)
   const completingMap = useUnit($$bonusesPage.$completingGlobalTaskMap)
   const claimingRewardMap = useUnit($$bonusesPage.$claimingGlobalTaskRewardMap)
+  const action = actionMap[taskKey]
   const completing = completingMap[taskKey]
   const claimingReward = claimingRewardMap[taskKey]
   const isMobile = useMedia({ to: 'md' })
@@ -163,6 +160,91 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
 
   const actionUrl = action.createUrl(task)
   const status = statuses[taskKey]
+
+  if (loggedIn && !statusesLoaded)
+    return (
+      <CardActions>
+        <Skeleton width={160} height={36} />
+      </CardActions>
+    )
+
+  if (status === TaskStatus.Pending)
+    return (
+      <CardActions>
+        {actionUrl ? (
+          <LinkButton
+            className={actionClassName}
+            color="blue"
+            size={buttonSize}
+            to={actionUrl}
+            target={action.target}
+          >
+            {action.name}
+          </LinkButton>
+        ) : (
+          <Button
+            className={actionClassName}
+            color="blue"
+            size={buttonSize}
+            disabled={true}
+          >
+            {action.name}
+          </Button>
+        )}
+        <Button
+          className={actionClassName}
+          color="blue"
+          size={buttonSize}
+          onClick={() => $$bonusesPage.completeGlobalTask(taskKey)}
+          loading={completing}
+          disabled={!loggedIn}
+          rightSection={<IconRefresh width={16} height={16} />}
+        >
+          Проверить
+        </Button>
+      </CardActions>
+    )
+
+  if (status === TaskStatus.Completed)
+    return (
+      <CardActions>
+        <Button
+          className={actionClassName}
+          color="green"
+          size={buttonSize}
+          onClick={() => $$bonusesPage.claimGlobalTaskReward(taskKey)}
+          loading={claimingReward}
+        >
+          Забрать награду
+        </Button>
+      </CardActions>
+    )
+
+  if (status === TaskStatus.Claimed)
+    return (
+      <CardActions>
+        <div className="flex items-center gap-1.5 h-[30px] lg:h-9 text-green-600 leading-tight">
+          <IconCircleCheck className="shrink-0 w-5 h-5 lg:w-6 lg:h-6" />
+          <p className="text-sm lg:text-base font-medium">Награда получена</p>
+        </div>
+      </CardActions>
+    )
+}
+
+export const GlobalTaskCard = ({ taskKey }: Props) => {
+  const title = titleMap[taskKey]
+  const image = imageMap[taskKey]
+  const boxShadow = boxShadowMap[taskKey]
+  const tooltip = tooltipMap[taskKey]
+
+  const tasks = useUnit($$bonusesPage.$globalTasks)
+
+  const task = tasks?.find((task) => task.key === taskKey)
+
+  if (!task) {
+    return <CardSkeleton />
+  }
+
   const disabled = !task.isActive
 
   return (
@@ -209,66 +291,7 @@ export const GlobalTaskCard = ({ taskKey }: Props) => {
             {formatGem(gemFloat(task.payout))} на баланс
           </p>
 
-          {status === TaskStatus.Pending && (
-            <CardActions>
-              {actionUrl ? (
-                <LinkButton
-                  className={actionClassName}
-                  color="blue"
-                  size={buttonSize}
-                  to={actionUrl}
-                  target={action.target}
-                >
-                  {action.name}
-                </LinkButton>
-              ) : (
-                <Button
-                  className={actionClassName}
-                  color="blue"
-                  size={buttonSize}
-                  disabled={true}
-                >
-                  {action.name}
-                </Button>
-              )}
-              <Button
-                className={actionClassName}
-                color="blue"
-                size={buttonSize}
-                onClick={() => $$bonusesPage.completeGlobalTask(taskKey)}
-                loading={completing}
-                disabled={!loggedIn}
-                rightSection={<IconRefresh width={16} height={16} />}
-              >
-                Проверить
-              </Button>
-            </CardActions>
-          )}
-
-          {status === TaskStatus.Completed && (
-            <CardActions>
-              <Button
-                className={actionClassName}
-                color="green"
-                size={buttonSize}
-                onClick={() => $$bonusesPage.claimGlobalTaskReward(taskKey)}
-                loading={claimingReward}
-              >
-                Забрать награду
-              </Button>
-            </CardActions>
-          )}
-
-          {status === TaskStatus.Claimed && (
-            <CardActions>
-              <div className="flex items-center gap-1.5 h-[30px] lg:h-9 text-green-600 leading-tight">
-                <IconCircleCheck className="shrink-0 w-5 h-5 lg:w-6 lg:h-6" />
-                <p className="text-sm lg:text-base font-medium">
-                  Награда получена
-                </p>
-              </div>
-            </CardActions>
-          )}
+          <GlobalTaskActions taskKey={taskKey} />
 
           <div className="mt-4 flex gap-2 items-center select-none">
             <p className="text-xs text-dimmed">Как получить бонус?</p>

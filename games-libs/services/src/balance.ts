@@ -17,27 +17,29 @@ type TransactionInsertWithUserId = TransactionInsert & {
 }
 
 export class BalanceService {
-  lock = async (userId: string, ms = 3000) => {
-    return gamesCache.balance.lock(userId, ms)
-  }
-
   getBalance = async (userId: string): Promise<BalanceSelect> => {
+    const query = async () => {
+      const [balance] = await gamesDb
+        .select()
+        .from(BalanceTable)
+        .where(eq(BalanceTable.userId, userId))
+
+      if (!balance) {
+        throw new Error('Balance not found (should not happen)')
+      }
+
+      return balance
+    }
+
+    if (!gamesCache.ready) {
+      return query()
+    }
+
     const cached = await gamesCache.balance.get(userId)
+    if (cached) return cached
 
-    if (cached) {
-      return cached
-    }
-
-    const balance = await gamesDb.query.BalanceTable.findFirst({
-      where: eq(BalanceTable.userId, userId),
-    })
-
-    if (!balance) {
-      throw new Error('Balance not found (should not happen)')
-    }
-
+    const balance = await query()
     await gamesCache.balance.set(userId, balance)
-
     return balance
   }
 

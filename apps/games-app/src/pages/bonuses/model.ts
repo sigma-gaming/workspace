@@ -7,6 +7,7 @@ import { createMutation, createQuery } from '@farfetched/core'
 import { formatGem, gemFloat } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, EffectResult, sample } from 'effector'
+import { status } from 'patronum'
 import { z } from 'zod'
 import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
@@ -88,7 +89,9 @@ const $globalTasksLoading = getGlobalTasksQuery.$pending
 const $globalTaskStatuses = createStore<GlobalTaskStatuses>(
   INITIAL_GLOBAL_TASK_STATUSES,
 )
-const $globalTaskStatusesLoading = getGlobalTaskStatusesFx.pending
+const $globalTaskStatusesLoaded = status(getGlobalTaskStatusesFx).map(
+  (status) => status === 'done',
+)
 const $applyingPromocode = applyPromocodeMutation.$pending
 
 const INITIAL_LOADING = Object.values(GlobalTaskKey).reduce(
@@ -224,7 +227,7 @@ export const $$bonusesPage = {
   promocodeForm,
   $applyingPromocode,
   $globalTaskStatuses,
-  $globalTaskStatusesLoading,
+  $globalTaskStatusesLoaded,
   $completingGlobalTaskMap,
   $claimingGlobalTaskRewardMap,
   $globalTasks,

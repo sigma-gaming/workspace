@@ -23,7 +23,6 @@ import {
   GlobalEntityListService,
   GlobalJsonEntityService,
   GlobalNumberEntityService,
-  GlobalStringEntityService,
   KeyEntityListService,
   KeyJsonEntityService,
   KeyStringEntityService,
@@ -39,7 +38,6 @@ export class GamesCacheRegistry {
   maintenance: GlobalBooleanEntityService
   budget: GlobalJsonEntityService<BudgetSelect>
   budgetAvailable: GlobalNumberEntityService
-  budgetSyncedAt: GlobalStringEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
   user: KeyJsonEntityService<UserSelect>
   session: KeyJsonEntityService<SessionSelect>
@@ -79,13 +77,6 @@ export class GamesCacheRegistry {
       redis,
       redlock,
       key: `global:budgetAvailable`,
-      ttl: 60 * 60 * 24, // 1 day
-    })
-
-    this.budgetSyncedAt = new GlobalStringEntityService({
-      redis,
-      redlock,
-      key: `global:budgetSyncedAt`,
       ttl: 60 * 60 * 24, // 1 day
     })
 

@@ -1,10 +1,6 @@
 import './setup'
 import { logger } from '@core/logger'
-import {
-  affiliateService,
-  gamesRedis,
-  maintenanceService,
-} from '@games/services'
+import { affiliateService, maintenanceService } from '@games/services'
 import { App, SSLApp } from 'uWebSockets.js'
 import { env } from './env'
 
@@ -42,19 +38,6 @@ app.get('/ready', async (res) => {
       callback()
       replied = true
     })
-  }
-
-  const redisReady = await gamesRedis.redis
-    .ping()
-    .then(() => true)
-    .catch(() => false)
-
-  if (!redisReady) {
-    wrapReply(() => {
-      res.writeStatus('503 Service Unavailable').end()
-    })
-
-    return
   }
 
   const maintenanceMode = await maintenanceService.isMaintenanceMode()

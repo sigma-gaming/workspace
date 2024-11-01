@@ -2,7 +2,7 @@ import { createLazyInstance, resolveOptions } from '@core/di'
 import { NotificationSelect } from '@dbs/games-schema'
 import { ChatMessageDetailed } from '@games/model'
 import { GamesRedisOptionsToken } from '@games/options'
-import { PubSub, PubSubService, SubRedisService } from '@games/redis'
+import { PubSub, PubSubService, RedisService } from '@games/redis'
 import { Redis } from 'ioredis'
 import { gamesRedis } from './redis'
 
@@ -17,7 +17,11 @@ export class GamesPubSubRegistry {
   constructor() {
     const { host, password } = resolveOptions(GamesRedisOptionsToken)
 
-    const { redis: subRedis } = new SubRedisService({ host, password })
+    const { redis: subRedis } = new RedisService({
+      host,
+      password,
+    })
+
     const { redis } = gamesRedis
 
     this.pub = redis
@@ -36,6 +40,10 @@ export class GamesPubSubRegistry {
     this.maintenanceStarted = pubsubService.create<void>({
       channelName: 'maintenance-started',
     })
+  }
+
+  get ready() {
+    return this.pub.status === 'ready'
   }
 }
 

@@ -51,7 +51,7 @@ export const applyRoute = createRouter().post(
         status: 'success',
         bonusType: PromocodeBonusType.Payout,
         payout: application.payout,
-        updatedBalance: application.updatedBalance,
+        updatedBalance: application.updatedBalance.available,
       })
     }
 

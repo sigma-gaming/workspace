@@ -25,11 +25,12 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 </SocialCallbackLayout>
 
 <script>
+  import { BadRequestException, recreateException } from '@core/exceptions'
   import { AuthenticateResult } from '../../../api/types'
   import { authApi } from '../../../shared/api/auth'
 
   class VkIntegration extends HTMLElement {
-    connectedCallback() {
+    async connectedCallback() {
       const payload = this.dataset.payload
       const integration = 'vk'
       const action = this.dataset.action as 'sign-in' | 'connect' | undefined
@@ -38,32 +39,45 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 
       if (!action || !payload || !returnUrl || !accessUrl) return
 
-      authApi.authenticate
-        .$post({
-          json: { action, integration, payload },
-        })
-        .then((res) => res.json())
-        .then((authentication) => {
-          if (authentication.result === AuthenticateResult.Connected) {
-            window.location.replace(returnUrl)
-            return
-          }
+      const response = await authApi.authenticate.$post({
+        json: { app: 'sigma', action, integration, payload },
+      })
 
-          if (authentication.result === AuthenticateResult.NotAuthenticated) {
-            const url = `/sigma/errors/not-authenticated?returnUrl=${returnUrl}`
-            window.location.replace(url)
-            return
-          }
+      if (!response.ok) {
+        const json = await response.json()
+        const exception = recreateException(json)
 
+        if (exception instanceof BadRequestException) {
           const params = new URLSearchParams()
-          params.set('code', authentication.code)
           params.set('returnUrl', returnUrl)
-          window.location.replace(`${accessUrl}/exchange?${params.toString()}`)
-        })
-        .catch(() => {
-          const url = `/sigma/errors/unknown?returnUrl=${returnUrl}`
+          params.set('message', exception.payload.message)
+          const url = `/sigma/errors/system?${params.toString()}`
           window.location.replace(url)
-        })
+          return
+        }
+
+        const url = `/sigma/errors/unknown?returnUrl=${returnUrl}`
+        window.location.replace(url)
+        return
+      }
+
+      const authentication = await response.json()
+
+      if (authentication.result === AuthenticateResult.Connected) {
+        window.location.replace(returnUrl)
+        return
+      }
+
+      if (authentication.result === AuthenticateResult.NotAuthenticated) {
+        const url = `/sigma/errors/not-authenticated?returnUrl=${returnUrl}`
+        window.location.replace(url)
+        return
+      }
+
+      const params = new URLSearchParams()
+      params.set('code', authentication.code)
+      params.set('returnUrl', returnUrl)
+      window.location.replace(`${accessUrl}/exchange?${params.toString()}`)
     }
   }
 
