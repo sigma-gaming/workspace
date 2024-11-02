@@ -1,5 +1,6 @@
 import './setup'
 import './shared/sentry/init'
+import { shutdownAll } from '@core/di'
 import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
 import {
@@ -156,6 +157,9 @@ async function handleExit() {
   exited = true
 
   logger.info('Exit signal received')
+
+  logger.info('Shutting down services..')
+  await shutdownAll()
 
   logger.info('Closing WebSocket server server..')
   io.close(() => app.close())

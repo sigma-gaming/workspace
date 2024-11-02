@@ -28,10 +28,4 @@ export class RedisService {
       this.logger.error(error)
     })
   }
-
-  async onApplicationShutdown() {
-    this.logger.info('Shutting down...')
-    await this.redis.quit()
-    this.logger.info('Shutdown complete')
-  }
 }
