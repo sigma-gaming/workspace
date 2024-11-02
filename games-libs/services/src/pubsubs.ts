@@ -53,6 +53,11 @@ export class GamesPubSubRegistry extends Shutdownable {
   shutdownBefore = [GamesRedis]
 
   async shutdown() {
+    if (!this.ready) {
+      logger.info('PubSub is not ready, skipping shutdown')
+      return
+    }
+
     logger.info('Unsubscribing from all channels...')
     await this.service.unsubscribeAll()
     logger.info('Successfully unsubscribed from all channels')

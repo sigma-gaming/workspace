@@ -1,4 +1,5 @@
 import { createLazyInstance, resolveOptions, Shutdownable } from '@core/di'
+import { logger } from '@core/logger'
 import { GamesRedisOptionsToken } from '@games/options'
 import { RedisService, RedlockService } from '@games/redis'
 import { Redlock } from '@sesamecare-oss/redlock'
@@ -25,7 +26,14 @@ export class GamesRedis extends Shutdownable {
   }
 
   async shutdown() {
+    if (!this.ready) {
+      logger.info('Redis is not ready, skipping shutdown')
+      return
+    }
+
+    logger.info('Shutting down Redis...')
     await this.redis.quit()
+    logger.info('Redis shutdown complete')
   }
 }
 

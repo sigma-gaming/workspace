@@ -13,12 +13,28 @@ export abstract class Shutdownable {
   abstract shutdown(): Promise<void>
 }
 
-export async function shutdownAll() {
+export async function shutdownAll(timeout = 2500) {
   const sorted = topologicalSort(Array.from(registry))
 
-  for (const group of sorted) {
-    await Promise.all(group.map((service) => service.shutdown()))
+  const performShutdown = async () => {
+    for (const group of sorted) {
+      await Promise.all(
+        group.map((service) =>
+          service.shutdown().catch(() => {
+            console.info('Failed to shutdown service')
+          }),
+        ),
+      )
+    }
   }
+
+  const shutdownPromise = performShutdown()
+
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Shutdown timeout')), timeout)
+  })
+
+  return Promise.race([shutdownPromise, timeoutPromise])
 }
 
 function topologicalSort(services: Shutdownable[]): Shutdownable[][] {
@@ -45,6 +61,7 @@ function topologicalSort(services: Shutdownable[]): Shutdownable[][] {
   }
 
   const queue: Shutdownable[] = []
+  let index = 0
 
   for (const [service, degree] of inDegree.entries()) {
     if (degree === 0) queue.push(service)
@@ -52,8 +69,8 @@ function topologicalSort(services: Shutdownable[]): Shutdownable[][] {
 
   const sortedOrder: Shutdownable[] = []
 
-  while (queue.length > 0) {
-    const service = queue.shift()!
+  while (index < queue.length) {
+    const service = queue[index++]
     sortedOrder.push(service)
 
     for (const dependentService of dependencyGraph.get(service) || []) {

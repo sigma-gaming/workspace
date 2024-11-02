@@ -22,20 +22,10 @@ export class RedisService {
     this.setupErrorHandler()
   }
 
-  async shutdown() {
-    await this.redis.quit()
-  }
-
   private setupErrorHandler() {
     this.redis.on('error', (error) => {
       this.logger.info('Redis failure')
       this.logger.error(error)
     })
-  }
-
-  async onApplicationShutdown() {
-    this.logger.info('Shutting down...')
-    await this.redis.quit()
-    this.logger.info('Shutdown complete')
   }
 }
