@@ -87,3 +87,40 @@ export enum TaskStatus {
   Completed = 'Completed',
   Claimed = 'Claimed',
 }
+
+export enum PaymentStatus {
+  Pending = 'Pending',
+  Completed = 'Completed',
+  Failed = 'Failed',
+  Expired = 'Expired',
+  Cancelled = 'Cancelled',
+}
+
+export enum Currency {
+  RUB = 'RUB',
+  KZT = 'KZT',
+  USD = 'USD',
+  EUR = 'EUR',
+  TRX = 'TRX',
+  USDT_TRC20 = 'USDT_TRC20',
+  USDT_ERC20 = 'USDT_ERC20',
+  BTC = 'BTC',
+  LTC = 'LTC',
+  TON = 'TON',
+  NOT = 'NOT',
+  ETH = 'ETH',
+  BNB = 'BNB',
+  DOGE = 'DOGE',
+}
+
+export enum DepositMethod {
+  SBP = 'SBP',
+}
+
+export enum WithdrawalMethod {
+  SBP = 'SBP',
+}
+
+export enum PaymentProvider {
+  Bovapay = 'Bovapay',
+}

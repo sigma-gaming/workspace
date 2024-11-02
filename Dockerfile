@@ -6,8 +6,16 @@ RUN corepack enable
 
 FROM base AS build
 WORKDIR /build
-COPY . /build
+COPY package.json /build/package.json
+COPY pnpm-lock.yaml /build/pnpm-lock.yaml
+COPY pnpm-workspace.yaml /build/pnpm-workspace.yaml
+COPY ./tooling /build/tooling
+COPY ./core /build/core
+COPY ./games-libs /build/games-libs
+COPY ./dbs /build/dbs
+COPY ./apps /build/apps
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+COPY . /build
 ENV NODE_ENV=production
 RUN pnpm nx run-many -t build
 

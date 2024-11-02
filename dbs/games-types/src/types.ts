@@ -1,8 +1,10 @@
 import {
   ChatMessageAttachmentType,
+  DepositMethod,
   Game,
   GlobalTaskKey,
   PromocodeBonusType,
+  WithdrawalMethod,
 } from './enums-raw'
 
 export type GameSnapshotDice = {
@@ -61,3 +63,13 @@ export type GlobalTaskRequirements =
       groupId: number
       postId: number
     }
+
+export type DepositProviderPayload = {
+  method: DepositMethod.SBP
+  example: string
+}
+
+export type WithdrawalProviderPayload = {
+  method: WithdrawalMethod.SBP
+  example: string
+}
