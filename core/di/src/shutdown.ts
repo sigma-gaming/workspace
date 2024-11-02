@@ -71,6 +71,14 @@ function topologicalSort(services: Shutdownable[]): Shutdownable[][] {
 
   for (const service of services) {
     for (const dependency of service.shutdownBefore || []) {
+      const isShutdownable = dependency.prototype instanceof Shutdownable
+
+      if (!isShutdownable) {
+        throw new Error(
+          `${dependency.name} in shutdownBefore must extend Shutdownable`,
+        )
+      }
+
       const dependencyInstances = services.filter(
         (service) => service instanceof dependency,
       )
