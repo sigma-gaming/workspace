@@ -7,10 +7,32 @@ export interface Shutdownable {
 
 export abstract class Shutdownable {
   constructor() {
-    registry.add(this)
+    addService(this)
   }
 
   abstract shutdown(): Promise<void>
+}
+
+function getServiceName(service: Shutdownable) {
+  return service.constructor.name
+}
+
+function addService(service: Shutdownable) {
+  registry.add(service)
+
+  const name = getServiceName(service)
+  let count = 0
+
+  for (const service of registry) {
+    if (getServiceName(service) === name) {
+      count += 1
+    }
+  }
+
+  if (count > 10) {
+    const warning = `${name} registered ${count} times. This is probably a memory leak!`
+    console.warn(warning)
+  }
 }
 
 export async function shutdownAll(timeout = 2500) {
@@ -20,8 +42,9 @@ export async function shutdownAll(timeout = 2500) {
     for (const group of sorted) {
       await Promise.all(
         group.map((service) =>
-          service.shutdown().catch(() => {
-            console.info('Failed to shutdown service')
+          service.shutdown().catch((error) => {
+            const message = `Failed to shutdown service ${getServiceName(service)}`
+            console.error(message, error)
           }),
         ),
       )
