@@ -19,7 +19,16 @@ export class RedisService {
     })
 
     this.logger = loggerService.logger.child('Redis')
+    this.setupConnectionHandler()
     this.setupErrorHandler()
+  }
+
+  connectedOnce = false
+
+  private setupConnectionHandler() {
+    this.redis.on('connect', () => {
+      this.connectedOnce = true
+    })
   }
 
   private setupErrorHandler() {
@@ -27,5 +36,12 @@ export class RedisService {
       this.logger.info('Redis failure')
       this.logger.error(error)
     })
+  }
+
+  get ready() {
+    // Service may be created lazily, so the first status check may be false
+    // Which usually doesn't affect the actual readiness
+    if (!this.connectedOnce) return true
+    return this.redis.status === 'ready'
   }
 }

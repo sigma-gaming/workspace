@@ -6,6 +6,8 @@ import { Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
 
 export class GamesRedis extends Shutdownable {
+  private redisService: RedisService
+
   readonly redis: Redis
   readonly redlock: Redlock
 
@@ -14,15 +16,15 @@ export class GamesRedis extends Shutdownable {
 
     const { host, password } = resolveOptions(GamesRedisOptionsToken)
 
-    const { redis } = new RedisService({ host, password })
-    const { redlock } = new RedlockService(redis)
+    this.redisService = new RedisService({ host, password })
+    this.redis = this.redisService.redis
 
-    this.redis = redis
+    const { redlock } = new RedlockService(this.redis)
     this.redlock = redlock
   }
 
   get ready() {
-    return this.redis.status === 'ready'
+    return this.redisService.ready
   }
 
   async shutdown() {
