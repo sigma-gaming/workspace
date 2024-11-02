@@ -18,8 +18,8 @@ const ServerEnvSchema = z
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
 
-    GAMES_REDIS_HOST: z.string(),
-    GAMES_REDIS_PASSWORD: z.string(),
+    GAMES_CACHE_HOST: z.string(),
+    GAMES_CACHE_PASSWORD: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
@@ -35,9 +35,9 @@ const ServerEnvSchema = z
       url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
     },
 
-    gamesRedis: {
-      host: raw.GAMES_REDIS_HOST,
-      password: raw.GAMES_REDIS_PASSWORD,
+    gamesCache: {
+      host: raw.GAMES_CACHE_HOST,
+      password: raw.GAMES_CACHE_PASSWORD,
     },
 
     gamesApi: {

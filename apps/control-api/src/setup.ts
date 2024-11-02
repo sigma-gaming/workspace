@@ -13,8 +13,8 @@ registerOptions(GamesDbOptionsToken, {
 })
 
 registerOptions(GamesRedisOptionsToken, {
-  host: env.gamesRedis.host,
-  password: env.gamesRedis.password,
+  host: env.gamesCache.host,
+  password: env.gamesCache.password,
 })
 
 registerOptions(GamesCacheOptionsToken, {

@@ -18,8 +18,8 @@ const EnvSchema = z
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
 
-    GAMES_REDIS_HOST: z.string(),
-    GAMES_REDIS_PASSWORD: z.string(),
+    GAMES_CACHE_HOST: z.string(),
+    GAMES_CACHE_PASSWORD: z.string(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
@@ -31,9 +31,9 @@ const EnvSchema = z
       url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
     },
 
-    gamesRedis: {
-      host: raw.GAMES_REDIS_HOST,
-      password: raw.GAMES_REDIS_PASSWORD,
+    gamesCache: {
+      host: raw.GAMES_CACHE_HOST,
+      password: raw.GAMES_CACHE_PASSWORD,
     },
 
     gamesApi: {
