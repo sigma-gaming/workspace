@@ -57,6 +57,7 @@ jobs:
         with:
           buildkitd-config-inline: |
             [registry."harbor.harbor"]
+              http = true
               insecure = true
 
       - name: Login to Harbor Registry
