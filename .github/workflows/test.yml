@@ -23,3 +23,4 @@ jobs:
           cp -r . /home/runner/workspace/${{ github.run_id }}
           echo "Copied repository to /home/runner/workspace/${{ github.run_id }}"
           ls -la /home/runner/workspace/${{ github.run_id }}
+          echo 123
