@@ -9,8 +9,8 @@ concurrency:
 
 env:
   DOCKER_REGISTRY: harbor.harbor/sigma
-  WORKSPACE_DIRECTORY: /tmp/workspace/${{ github.run_id }}
-  WORKSPACE_RUN_DIRECTORY: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
+  WORKSPACE_DIRECTORY: /home/runner/workspace/${{ github.run_id }}
+  WORKSPACE_RUN_DIRECTORY: /home/runner/workspace/${{ github.run_id }}/${{ github.run_attempt }}
 
 jobs:
   copy-repository:
@@ -33,7 +33,7 @@ jobs:
     runs-on: arc-runner-set
     defaults:
       run:
-        working-directory: ${{ env.WORKSPACE_RUN_DIRECTORY }}
+        working-directory: ${{ env.WORKSPACE_DIRECTORY }}
 
     outputs:
       apps: ${{ steps.affected.outputs.apps }}
@@ -48,7 +48,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
