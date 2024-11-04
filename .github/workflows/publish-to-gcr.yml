@@ -3,6 +3,8 @@ name: Publish to Google Cloud Registry
 on:
   push:
     branches: ['main']
+    paths-ignore:
+      - '.github/workflows/**'
 
 env:
   DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker

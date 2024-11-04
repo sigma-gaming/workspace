@@ -1,0 +1,25 @@
+name: ARC Test
+
+on:
+  push:
+    branches: ['main']
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  copy-repository:
+    name: Copy repository
+    runs-on: arc-runner-set
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Copy repository
+        run: |-
+          mkdir -p /home/runner/workspace/${{ github.run_id }}
+          cp -r . /home/runner/workspace/${{ github.run_id }}
+          echo "Copied repository to /home/runner/workspace/${{ github.run_id }}"
+          ls -la /home/runner/workspace/${{ github.run_id }}
