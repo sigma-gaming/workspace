@@ -3,6 +3,8 @@ name: Publish to Google Cloud Registry
 on:
   push:
     branches: ['main']
+    paths-ignore:
+      - '.github/workflows/test.yml'
 
 env:
   DOCKER_REGISTRY: registry.sigmacloud.app
