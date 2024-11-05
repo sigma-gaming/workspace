@@ -7,8 +7,8 @@ on:
       - '.github/workflows/test.yml'
 
 env:
-  DOCKER_REGISTRY: registry.sigmacloud.app
-  DOCKER_PROJECT: registry.sigmacloud.app/sigma
+  DOCKER_REGISTRY: harbor.sigmacloud.app
+  DOCKER_PROJECT: harbor.sigmacloud.app/sigma
   WORKSPACE_DIRECTORY: /tmp/workspace/${{ github.run_id }}
   WORKSPACE_RUN_DIRECTORY: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
 
