@@ -1,4 +1,4 @@
-name: Publish to Google Cloud Registry
+name: Publish development images to GCR
 
 on:
   push:
@@ -7,8 +7,7 @@ on:
       - '.github/workflows/test.yml'
 
 env:
-  DOCKER_REGISTRY: harbor.sigmacloud.app
-  DOCKER_PROJECT: harbor.sigmacloud.app/sigma
+  DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
   WORKSPACE_DIRECTORY: /tmp/workspace/${{ github.run_id }}
   WORKSPACE_RUN_DIRECTORY: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
 
@@ -81,13 +80,18 @@ jobs:
         packageName: ${{ fromJson(needs.affected.outputs.apps) }}
 
     steps:      
-      - name: Login to Harbor Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ secrets.HARBOR_USERNAME }}
-          password: ${{ secrets.HARBOR_PASSWORD }}
-          logout: false
+      - name: Set gcloud project
+        run: gcloud config set project ${{ secrets.GCLOUD_PROJECT_ID }}
+
+      - name: Write gcloud service key to file
+        run: printf '%s' '${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}' > /tmp/gcloud-service-key.json
+
+      - name: Auth gcloud service account
+        run: gcloud auth activate-service-account --key-file=/tmp/gcloud-service-key.json
+
+      - name: Authenticate Docker registry
+        run: |-
+          gcloud auth configure-docker ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev --quiet
 
       - name: Parse package name
         id: parse
@@ -105,14 +109,14 @@ jobs:
           docker build . --target ${{ steps.parse.outputs.name }} \
             --build-arg sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }} \
             --build-arg sentry_release=dev-${{ steps.timestamp.outputs.timestamp }} \
-            --tag ${{ env.DOCKER_PROJECT }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest \
-            --tag ${{ env.DOCKER_PROJECT }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }} \
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest \
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }} \
             --platform linux/amd64
 
       - name: Push image
         run: |-
-          docker push ${{ env.DOCKER_PROJECT }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest
-          docker push ${{ env.DOCKER_PROJECT }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
 
   cleanup:
     name: Cleanup
