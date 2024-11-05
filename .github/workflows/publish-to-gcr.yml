@@ -81,8 +81,12 @@ jobs:
         packageName: ${{ fromJson(needs.affected.outputs.apps) }}
 
     steps:      
-      - name: Authenticate Docker registry
-        run: echo "${{ secrets.HARBOR_PASSWORD }}" | docker login ${{ env.DOCKER_REGISTRY }} --username ${{ secrets.HARBOR_USERNAME }} --password-stdin
+      - name: Login to Harbor Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
 
       - name: Parse package name
         id: parse
