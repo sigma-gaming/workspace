@@ -25,6 +25,7 @@ jobs:
         run: |-
           sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
           sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
+          sudo chmod -R 757 ${{ env.WORKSPACE_DIRECTORY }}
 
   affected:
     name: Get affected apps
@@ -49,7 +50,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: sudo pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
@@ -57,10 +58,10 @@ jobs:
           working-directory: ${{ env.WORKSPACE_DIRECTORY }}
 
       - name: Run checks for affected packages
-        run: sudo pnpm check:affected
+        run: pnpm check:affected
 
       - name: Build all apps
-        run: sudo pnpm build
+        run: pnpm build
 
       - name: Prebuild docker stage
         run: docker build . --target build --platform linux/amd64
@@ -71,8 +72,8 @@ jobs:
 
       - name: Remove all artifacts
         run: |-
-          sudo find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
-          sudo find . -name 'dist' -type d -prune -exec rm -rf '{}' +
+          find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+          find . -name 'dist' -type d -prune -exec rm -rf '{}' +
 
   publish:
     name: Publish
