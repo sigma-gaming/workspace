@@ -1,11 +1,15 @@
 import {
   AccountProvider,
   ChatMessageType,
+  Currency,
+  DepositMethod,
   FraudRisk,
   Game,
   GameOutcome,
   GlobalTaskKey,
   NotificationKind,
+  PaymentProvider,
+  PaymentStatus,
   PromocodeBonusType,
   PromocodeUsageStatus,
   ReferralAction,
@@ -13,6 +17,7 @@ import {
   TaskType,
   TransactionType,
   UserRole,
+  WithdrawalMethod,
 } from '@dbs/games-types'
 import { pgEnum } from 'drizzle-orm/pg-core'
 import { enumValues } from './lib/enums'
@@ -71,4 +76,26 @@ export const taskStatusEnum = pgEnum('TaskStatus', enumValues(TaskStatus))
 export const globalTaskKeyEnum = pgEnum(
   'GlobalTaskKey',
   enumValues(GlobalTaskKey),
+)
+
+export const paymentStatusEnum = pgEnum(
+  'PaymentStatus',
+  enumValues(PaymentStatus),
+)
+
+export const currencyEnum = pgEnum('Currency', enumValues(Currency))
+
+export const depositMethodEnum = pgEnum(
+  'DepositMethod',
+  enumValues(DepositMethod),
+)
+
+export const withdrawalMethodEnum = pgEnum(
+  'WithdrawalMethod',
+  enumValues(WithdrawalMethod),
+)
+
+export const paymentProviderEnum = pgEnum(
+  'PaymentProvider',
+  enumValues(PaymentProvider),
 )
