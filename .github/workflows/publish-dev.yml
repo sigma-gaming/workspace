@@ -25,7 +25,7 @@ jobs:
         run: |-
           sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
           sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
-          sudo chmod -R 757 ${{ env.WORKSPACE_DIRECTORY }}
+          sudo chmod -R 777 ${{ env.WORKSPACE_DIRECTORY }}
 
   affected:
     name: Get affected apps
