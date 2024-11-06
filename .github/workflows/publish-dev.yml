@@ -6,7 +6,7 @@ on:
 
 env:
   DOCKER_REGISTRY: europe-north1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
-  WORKSPACE_DIRECTORY: /home/workspace/${{ github.run_id }}
+  WORKSPACE_DIRECTORY: /tmp/workspace/${{ github.run_id }}
 
 concurrency:
   group: ${{ github.workflow }}
@@ -23,8 +23,8 @@ jobs:
 
       - name: Copy repository
         run: |-
-          mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
-          cp -r . ${{ env.WORKSPACE_DIRECTORY }}
+          sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
+          sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
 
   affected:
     name: Get affected apps
