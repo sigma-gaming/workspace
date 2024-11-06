@@ -49,7 +49,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: sudo pnpm install --frozen-lockfile
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
@@ -57,10 +57,10 @@ jobs:
           working-directory: ${{ env.WORKSPACE_DIRECTORY }}
 
       - name: Run checks for affected packages
-        run: pnpm check:affected
+        run: sudo pnpm check:affected
 
       - name: Build all apps
-        run: pnpm build
+        run: sudo pnpm build
 
       - name: Prebuild docker stage
         run: docker build . --target build --platform linux/amd64
@@ -71,8 +71,8 @@ jobs:
 
       - name: Remove all artifacts
         run: |-
-          find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
-          find . -name 'dist' -type d -prune -exec rm -rf '{}' +
+          sudo find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+          sudo find . -name 'dist' -type d -prune -exec rm -rf '{}' +
 
   publish:
     name: Publish
