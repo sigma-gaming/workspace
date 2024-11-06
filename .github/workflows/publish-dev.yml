@@ -23,8 +23,8 @@ jobs:
 
       - name: Copy repository
         run: |-
-          mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
-          cp -r . ${{ env.WORKSPACE_DIRECTORY }}
+          sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
+          sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
           sudo chown -R :runners ${{ env.WORKSPACE_DIRECTORY }}
           sudo chmod 2777 ${{ env.WORKSPACE_DIRECTORY }}
 
@@ -40,6 +40,9 @@ jobs:
       apps: ${{ steps.affected.outputs.apps }}
 
     steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - uses: pnpm/action-setup@v4
         with:
           run_install: false
@@ -91,7 +94,10 @@ jobs:
       matrix:
         packageName: ${{ fromJson(needs.affected.outputs.apps) }}
 
-    steps:      
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Set gcloud project
         run: gcloud config set project ${{ secrets.GCLOUD_PROJECT_ID }}
 
