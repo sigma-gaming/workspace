@@ -23,6 +23,7 @@ jobs:
 
       - name: Copy repository
         run: |-
+          echo $PATH
           sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
           sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
           sudo chmod -R 777 ${{ env.WORKSPACE_DIRECTORY }}
