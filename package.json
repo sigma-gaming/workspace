@@ -105,6 +105,7 @@
     "@nx/js": "17.0.2",
     "@nx/workspace": "17.0.2",
     "@sentry/cli": "^2.32.1",
+    "@sentry/cli-linux-arm64": "^2.38.2",
     "@sentry/vite-plugin": "^2.21.1",
     "@types/cookie": "^0.5.4",
     "@types/js-cookie": "^3.0.6",

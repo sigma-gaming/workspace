@@ -9,7 +9,6 @@ on:
 env:
   DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
   WORKSPACE_DIRECTORY: /tmp/workspace/${{ github.run_id }}
-  WORKSPACE_RUN_DIRECTORY: /tmp/workspace/${{ github.run_id }}/${{ github.run_attempt }}
 
 concurrency:
   group: ${{ github.workflow }}
@@ -29,8 +28,8 @@ jobs:
 
       - name: Copy repository
         run: |-
-          mkdir -p ${{ env.WORKSPACE_RUN_DIRECTORY }}
-          cp -r . ${{ env.WORKSPACE_RUN_DIRECTORY }}
+          mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
+          cp -r . ${{ env.WORKSPACE_DIRECTORY }}
 
   affected:
     name: Get affected apps
@@ -38,7 +37,7 @@ jobs:
     runs-on: [self-hosted, build, ARM64]
     defaults:
       run:
-        working-directory: ${{ env.WORKSPACE_RUN_DIRECTORY }}
+        working-directory: ${{ env.WORKSPACE_DIRECTORY }}
         shell: zsh {0}
 
     outputs:
@@ -48,10 +47,10 @@ jobs:
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
         with:
-          working-directory: ${{ env.WORKSPACE_RUN_DIRECTORY }}
+          working-directory: ${{ env.WORKSPACE_DIRECTORY }}
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --config.platform=linux --config.architecture=x64
 
       - name: Run checks and build
         run: pnpm check:affected
@@ -63,13 +62,18 @@ jobs:
         id: affected
         run: echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
 
+      - name: Remove all artifacts
+        run: |-
+          find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +
+          find . -name 'dist' -type d -prune -exec rm -rf '{}' +
+
   publish:
     name: Publish
     needs: [affected, copy-repository]
     runs-on: [self-hosted, build, ARM64]
     defaults:
       run:
-        working-directory: ${{ env.WORKSPACE_RUN_DIRECTORY }}
+        working-directory: ${{ env.WORKSPACE_DIRECTORY }}
         shell: zsh {0}
 
     if: needs.affected.outputs.apps != '[]'

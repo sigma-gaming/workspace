@@ -4,20 +4,22 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-FROM base AS build
+FROM base AS dependencies
 WORKDIR /build
 COPY package.json /build/package.json
 COPY pnpm-lock.yaml /build/pnpm-lock.yaml
 COPY pnpm-workspace.yaml /build/pnpm-workspace.yaml
+COPY ./node_modules /build/node_modules
+COPY .npmrc /build/.npmrc
+
+FROM dependencies AS build
 COPY ./tooling /build/tooling
 COPY ./core /build/core
-COPY ./games-libs /build/games-libs
 COPY ./dbs /build/dbs
+COPY ./games-libs /build/games-libs
 COPY ./apps /build/apps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-COPY . /build
+COPY ./tsconfig.base.json /build/tsconfig.base.json
 ENV NODE_ENV=production
-RUN pnpm nx run-many -t build
 
 # Apps
 

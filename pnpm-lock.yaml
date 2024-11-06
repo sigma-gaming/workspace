@@ -183,6 +183,9 @@ importers:
       '@sentry/cli':
         specifier: ^2.32.1
         version: 2.32.1
+      '@sentry/cli-linux-arm64':
+        specifier: ^2.38.2
+        version: 2.38.2
       '@sentry/vite-plugin':
         specifier: ^2.21.1
         version: 2.21.1
@@ -3918,6 +3921,12 @@ packages:
 
   '@sentry/cli-linux-arm64@2.32.1':
     resolution: {integrity: sha512-hsGqHYuecUl1Yhq4MhiRejfh1gNlmhyNPcQEoO/DDRBnGnJyEAdiDpKXJcc2e/lT9k40B55Ob2CP1SeY040T2w==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux, freebsd]
+
+  '@sentry/cli-linux-arm64@2.38.2':
+    resolution: {integrity: sha512-4Fp/jjQpNZj4Th+ZckMQvldAuuP0ZcyJ9tJCP1CCOn5poIKPYtY6zcbTP036R7Te14PS4ALOcDNX3VNKfpsifA==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux, freebsd]
@@ -12757,6 +12766,8 @@ snapshots:
 
   '@sentry/cli-linux-arm64@2.32.1':
     optional: true
+
+  '@sentry/cli-linux-arm64@2.38.2': {}
 
   '@sentry/cli-linux-arm@2.32.1':
     optional: true
