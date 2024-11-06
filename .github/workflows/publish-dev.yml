@@ -2,12 +2,10 @@ name: Publish development images to GCR
 
 on:
   push:
-    branches: ['main']
-    paths-ignore:
-      - '.github/workflows/test.yml'
+    branches: ['main', 'draft/build-process']
 
 env:
-  DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
+  DOCKER_REGISTRY: europe-north1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
   WORKSPACE_DIRECTORY: /tmp/workspace/${{ github.run_id }}
 
 concurrency:
@@ -16,10 +14,7 @@ concurrency:
 jobs:
   copy-repository:
     name: Copy repository
-    runs-on: [self-hosted, build, ARM64]
-    defaults:
-      run:
-        shell: zsh {0}
+    runs-on: [self-hosted, sigma-gaming]
 
     steps:
       - uses: actions/checkout@v4
@@ -34,26 +29,39 @@ jobs:
   affected:
     name: Get affected apps
     needs: copy-repository
-    runs-on: [self-hosted, build, ARM64]
+    runs-on: [self-hosted, sigma-gaming]
     defaults:
       run:
         working-directory: ${{ env.WORKSPACE_DIRECTORY }}
-        shell: zsh {0}
 
     outputs:
       apps: ${{ steps.affected.outputs.apps }}
 
     steps:
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
         with:
           working-directory: ${{ env.WORKSPACE_DIRECTORY }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --config.platform=linux --config.architecture=x64
-
-      - name: Run checks and build
+      - name: Run checks for affected packages
         run: pnpm check:affected
+
+      - name: Build all apps
+        run: pnpm build
 
       - name: Prebuild docker stage
         run: docker build . --target build --platform linux/amd64
@@ -70,11 +78,10 @@ jobs:
   publish:
     name: Publish
     needs: [affected, copy-repository]
-    runs-on: [self-hosted, build, ARM64]
+    runs-on: [self-hosted, sigma-gaming]
     defaults:
       run:
         working-directory: ${{ env.WORKSPACE_DIRECTORY }}
-        shell: zsh {0}
 
     if: needs.affected.outputs.apps != '[]'
 
@@ -95,7 +102,7 @@ jobs:
 
       - name: Authenticate Docker registry
         run: |-
-          gcloud auth configure-docker ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev --quiet
+          gcloud auth configure-docker europe-north1-docker.pkg.dev --quiet
 
       - name: Parse package name
         id: parse
@@ -125,14 +132,8 @@ jobs:
   cleanup:
     name: Cleanup
     needs: [copy-repository, publish]
-    runs-on: [self-hosted, build, ARM64]
-    defaults:
-      run:
-        shell: zsh {0}
+    runs-on: [self-hosted, sigma-gaming]
 
     steps:
       - name: Clean docker images
         run: docker image prune -a --force --filter "until=6h"
-      
-      - name: Clean temporary files
-        run: rm -rf ${{ env.WORKSPACE_DIRECTORY }}
