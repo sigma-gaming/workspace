@@ -10,7 +10,6 @@ COPY package.json /build/package.json
 COPY pnpm-lock.yaml /build/pnpm-lock.yaml
 COPY pnpm-workspace.yaml /build/pnpm-workspace.yaml
 COPY ./node_modules /build/node_modules
-COPY .npmrc /build/.npmrc
 
 FROM dependencies AS build
 COPY ./tooling /build/tooling
