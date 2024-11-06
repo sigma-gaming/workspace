@@ -6,7 +6,7 @@ on:
 
 env:
   DOCKER_REGISTRY: europe-north1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
-  WORKSPACE_DIRECTORY: /tmp/workspace/${{ github.run_id }}
+  WORKSPACE_DIRECTORY: /home/workspace/${{ github.run_id }}
 
 concurrency:
   group: ${{ github.workflow }}
@@ -40,7 +40,6 @@ jobs:
     steps:
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
           run_install: false
 
       - name: Install Node.js
