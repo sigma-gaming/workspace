@@ -26,7 +26,7 @@ jobs:
           sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
           sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
           sudo chown -R :runners ${{ env.WORKSPACE_DIRECTORY }}
-          sudo chmod 2777 ${{ env.WORKSPACE_DIRECTORY }}
+          sudo chmod -R 2777 ${{ env.WORKSPACE_DIRECTORY }}
 
   affected:
     name: Get affected apps
