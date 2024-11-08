@@ -23,11 +23,10 @@ jobs:
 
       - name: Copy repository
         run: |-
-          echo $USER
-          sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
-          sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
-          sudo chown -R :runner ${{ env.WORKSPACE_DIRECTORY }}
-          sudo chmod -R 755 ${{ env.WORKSPACE_DIRECTORY }}
+          mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
+          cp -r . ${{ env.WORKSPACE_DIRECTORY }}
+          chown -R :runner ${{ env.WORKSPACE_DIRECTORY }}
+          chmod -R 755 ${{ env.WORKSPACE_DIRECTORY }}
 
   affected:
     name: Get affected apps
