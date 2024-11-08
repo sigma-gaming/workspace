@@ -23,6 +23,7 @@ jobs:
 
       - name: Copy repository
         run: |-
+          id -Gn
           sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
           sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
 
