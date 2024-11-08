@@ -14,7 +14,7 @@ concurrency:
 jobs:
   copy-repository:
     name: Copy repository
-    runs-on: [self-hosted, sigma-gaming]
+    runs-on: arc-runner-set
 
     steps:
       - uses: actions/checkout@v4
@@ -25,13 +25,11 @@ jobs:
         run: |-
           sudo mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
           sudo cp -r . ${{ env.WORKSPACE_DIRECTORY }}
-          sudo chown -R :runners ${{ env.WORKSPACE_DIRECTORY }}
-          sudo chmod -R 2777 ${{ env.WORKSPACE_DIRECTORY }}
 
   affected:
     name: Get affected apps
     needs: copy-repository
-    runs-on: [self-hosted, sigma-gaming]
+    runs-on: arc-runner-set
     defaults:
       run:
         working-directory: ${{ env.WORKSPACE_DIRECTORY }}
@@ -45,6 +43,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
+          dest: ${{ env.WORKSPACE_DIRECTORY }}/.pnpm
           run_install: false
 
       - name: Install Node.js
@@ -82,7 +81,7 @@ jobs:
   publish:
     name: Publish
     needs: [affected, copy-repository]
-    runs-on: [self-hosted, sigma-gaming]
+    runs-on: arc-runner-set
     defaults:
       run:
         working-directory: ${{ env.WORKSPACE_DIRECTORY }}
@@ -139,7 +138,7 @@ jobs:
   cleanup:
     name: Cleanup
     needs: [copy-repository, publish]
-    runs-on: [self-hosted, sigma-gaming]
+    runs-on: arc-runner-set
 
     steps:
       - name: Clean docker images
