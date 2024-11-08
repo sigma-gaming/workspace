@@ -72,8 +72,8 @@ jobs:
             [registry."docker.io"]
               mirrors = ["mirror.gcr.io"] 
 
-      - name: Prebuild docker stage
-        run: docker build . --target build --platform linux/amd64
+      - name: Prebuild
+        run: docker build . --target prebuild --platform linux/amd64
 
       - name: Output affected apps
         id: affected
