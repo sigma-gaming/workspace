@@ -61,17 +61,12 @@ jobs:
       
       - name: Check
         run: |-
-          echo $PATH
-          ls /bin/pnpm
-          ls /bin/pnpx
-          ls /home/runner/bin/pnpm
-          ls /home/runner/bin/pnpx
+          pnpm -v
 
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
