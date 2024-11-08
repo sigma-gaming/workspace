@@ -58,6 +58,14 @@ jobs:
           ln -s ${{ steps.pnpm.outputs.bin_dest }}/pnpx /bin/pnpx
           ln -s ${{ steps.pnpm.outputs.bin_dest }}/pnpm /home/runner/bin/pnpm
           ln -s ${{ steps.pnpm.outputs.bin_dest }}/pnpx /home/runner/bin/pnpx
+      
+      - name: Check
+        run: |-
+          echo $PATH
+          ls /bin/pnpm
+          ls /bin/pnpx
+          ls /home/runner/bin/pnpm
+          ls /home/runner/bin/pnpx
 
       - name: Install Node.js
         uses: actions/setup-node@v4
