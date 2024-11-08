@@ -52,12 +52,12 @@ jobs:
           dest: ${{ env.WORKSPACE_DIRECTORY }}/.pnpm
           run_install: false
 
-      - name: Add pnpm to PATH
-        run: echo "${{ steps.pnpm.outputs.bin_dest }}" >> $GITHUB_PATH
-
-      - name: Print PATH
+      - name: Link pnpm to /bin
         run: |-
-          ls /home/runner/bin
+          ln -s ${{ steps.pnpm.outputs.bin_dest }}/pnpm /bin/pnpm
+          ln -s ${{ steps.pnpm.outputs.bin_dest }}/pnpx /bin/pnpx
+          ln -s ${{ steps.pnpm.outputs.bin_dest }}/pnpm /home/runner/bin/pnpm
+          ln -s ${{ steps.pnpm.outputs.bin_dest }}/pnpx /home/runner/bin/pnpx
 
       - name: Install Node.js
         uses: actions/setup-node@v4
