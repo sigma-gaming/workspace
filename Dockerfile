@@ -4,8 +4,12 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-FROM base AS package-tree
+FROM base AS dependencies-base
 WORKDIR /build
+COPY pnpm-lock.yaml ./pnpm-lock.yaml
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
+
+FROM dependencies-base AS dependencies-tree
 COPY package.json ./package.json
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
 COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
@@ -15,11 +19,11 @@ COPY ./dbs ./dbs
 COPY ./games-libs ./games-libs
 COPY ./apps ./apps
 
-FROM package-tree AS dependencies-prod
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod
+FROM dependencies-tree AS dependencies-prod
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline --prod
 
-FROM package-tree AS dependencies-dev
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+FROM dependencies-tree AS dependencies-dev
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline
 
 FROM dependencies-dev AS build
 COPY tsconfig.base.json ./tsconfig.base.json
