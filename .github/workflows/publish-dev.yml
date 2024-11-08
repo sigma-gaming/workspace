@@ -45,6 +45,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
+          package_json_file: ${{ env.WORKSPACE_DIRECTORY }}/package.json
           dest: ${{ env.WORKSPACE_DIRECTORY }}/.pnpm
           run_install: false
 
