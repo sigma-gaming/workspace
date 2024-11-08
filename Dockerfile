@@ -7,12 +7,12 @@ RUN corepack enable
 FROM base AS dependencies-base
 WORKDIR /build
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
+COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 
 FROM dependencies-base AS dependencies-tree
 COPY package.json ./package.json
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
-COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY ./tooling ./tooling
 COPY ./core ./core
 COPY ./dbs ./dbs
@@ -26,6 +26,7 @@ FROM dependencies-tree AS dependencies-dev
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline
 
 FROM dependencies-dev AS build
+COPY nx.json ./nx.json
 COPY tsconfig.base.json ./tsconfig.base.json
 COPY ./ssl ./ssl
 RUN pnpm build
