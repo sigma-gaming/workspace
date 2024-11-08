@@ -46,10 +46,14 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - uses: pnpm/action-setup@v4
+        id: pnpm
         with:
           version: 9.12.2
           dest: ${{ env.WORKSPACE_DIRECTORY }}/.pnpm
           run_install: false
+
+      - name: Add pnpm to PATH
+        run: echo "${{ steps.pnpm.outputs.bin_dest }}" >> $GITHUB_PATH
 
       - name: Install Node.js
         uses: actions/setup-node@v4
