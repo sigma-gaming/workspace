@@ -6,44 +6,34 @@ on:
 
 env:
   DOCKER_REGISTRY: europe-north1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
-  WORKSPACE_DIRECTORY: /workspace/${{ github.run_id }}
 
 concurrency:
   group: ${{ github.workflow }}
 
 jobs:
-  copy-repository:
-    name: Copy repository
+  timestamp:
+    name: Get current unix timestamp
     runs-on: arc-runner-set
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    outputs:
+      timestamp: ${{ steps.timestamp.outputs.timestamp }}
 
-      - name: Copy repository
-        run: |-
-          echo $GITHUB_PATH
-          echo $PATH
-          mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
-          cp -r . ${{ env.WORKSPACE_DIRECTORY }}
-          chown -R :runner ${{ env.WORKSPACE_DIRECTORY }}
-          chmod -R 755 ${{ env.WORKSPACE_DIRECTORY }}
+    steps:
+      - name: Get current unix timestamp
+        id: timestamp
+        uses: release-kit/unix-timestamp@v1
 
   affected:
     name: Get affected apps
-    needs: copy-repository
     runs-on: arc-runner-set
-    defaults:
-      run:
-        working-directory: ${{ env.WORKSPACE_DIRECTORY }}
 
     outputs:
       apps: ${{ steps.affected.outputs.apps }}
 
     steps:
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
         id: pnpm
@@ -55,20 +45,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
         uses: nrwl/nx-set-shas@v4
-        with:
-          working-directory: ${{ env.WORKSPACE_DIRECTORY }}
 
       - name: Run checks for affected packages
         run: pnpm check:affected
 
       - name: Build all apps
         run: pnpm build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Prebuild docker stage
         run: docker build . --target build --platform linux/amd64
@@ -79,11 +71,8 @@ jobs:
 
   publish:
     name: Publish
-    needs: [affected, copy-repository]
+    needs: [affected, timestamp]
     runs-on: arc-runner-set
-    defaults:
-      run:
-        working-directory: ${{ env.WORKSPACE_DIRECTORY }}
 
     if: needs.affected.outputs.apps != '[]'
 
@@ -93,6 +82,25 @@ jobs:
         packageName: ${{ fromJson(needs.affected.outputs.apps) }}
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        id: pnpm
+        with:
+          version: 9.12.2
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Gcloud auth
         uses: google-github-actions/auth@v2
         with:
@@ -116,29 +124,16 @@ jobs:
           string: ${{ matrix.packageName }}
           pattern: '^@?(?<scope>.*)\/(?<name>.*)$'
 
-      - name: Get current unix timestamp
-        id: timestamp
-        uses: release-kit/unix-timestamp@v1
-
       - name: Build image
         run: |-
           docker build . --target ${{ steps.parse.outputs.name }} \
             --build-arg sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }} \
-            --build-arg sentry_release=dev-${{ steps.timestamp.outputs.timestamp }} \
+            --build-arg sentry_release=dev-${{ needs.timestamp.outputs.timestamp }} \
             --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }} \
+            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ needs.timestamp.outputs.timestamp }} \
             --platform linux/amd64
 
       - name: Push image
         run: |-
           docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest
-          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ steps.timestamp.outputs.timestamp }}
-
-  cleanup:
-    name: Cleanup
-    needs: [copy-repository, publish]
-    runs-on: arc-runner-set
-
-    steps:
-      - name: Clean docker images
-        run: docker image prune -a --force --filter "until=6h"
+          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ needs.timestamp.outputs.timestamp }}
