@@ -4,21 +4,27 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-FROM base AS dependencies
+FROM base AS package-tree
 WORKDIR /build
-COPY package.json /build/package.json
-COPY pnpm-lock.yaml /build/pnpm-lock.yaml
-COPY pnpm-workspace.yaml /build/pnpm-workspace.yaml
-COPY ./node_modules /build/node_modules
+COPY package.json ./package.json
+COPY pnpm-lock.yaml ./pnpm-lock.yaml
+COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY ./tooling ./tooling
+COPY ./core ./core
+COPY ./dbs ./dbs
+COPY ./games-libs ./games-libs
+COPY ./apps ./apps
 
-FROM dependencies AS build
-COPY ./tooling /build/tooling
-COPY ./core /build/core
-COPY ./dbs /build/dbs
-COPY ./games-libs /build/games-libs
-COPY ./apps /build/apps
-COPY ./tsconfig.base.json /build/tsconfig.base.json
-ENV NODE_ENV=production
+FROM package-tree AS dependencies-prod
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod
+
+FROM package-tree AS dependencies-dev
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+FROM dependencies-dev AS build
+COPY tsconfig.base.json ./tsconfig.base.json
+COPY ./ssl ./ssl
+RUN pnpm build
 
 # Apps
 
@@ -31,14 +37,12 @@ COPY ./scripts/inject-env.mjs /scripts/inject-env.mjs
 CMD node /scripts/inject-env.mjs; nginx -g "daemon off;"
 
 FROM build AS games-app-build
-WORKDIR /build
 ARG sentry_auth_token
 ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-app
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
 RUN pnpm sentry-cli releases new -p games-app ${sentry_release}
-RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist
 RUN pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
 
@@ -75,7 +79,6 @@ ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-api
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
 RUN pnpm sentry-cli releases new -p games-api ${sentry_release}
-RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-api/dist
 RUN pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release ${sentry_release}
 
@@ -86,7 +89,6 @@ ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-tasks
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
 RUN pnpm sentry-cli releases new -p games-tasks ${sentry_release}
-RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-tasks/dist
 RUN pnpm sentry-cli sourcemaps upload /build/apps/games-tasks/dist --release ${sentry_release}
 
@@ -125,7 +127,6 @@ ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-ws
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
 RUN pnpm sentry-cli releases new -p games-ws ${sentry_release}
-RUN pnpm sentry-cli releases set-commits --auto ${sentry_release}
 RUN pnpm sentry-cli sourcemaps inject /build/apps/games-ws/dist
 RUN pnpm sentry-cli sourcemaps upload /build/apps/games-ws/dist --release ${sentry_release}
 
