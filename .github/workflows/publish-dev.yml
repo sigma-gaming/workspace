@@ -23,6 +23,8 @@ jobs:
 
       - name: Copy repository
         run: |-
+          echo $GITHUB_PATH
+          echo $PATH
           mkdir -p ${{ env.WORKSPACE_DIRECTORY }}
           cp -r . ${{ env.WORKSPACE_DIRECTORY }}
           chown -R :runner ${{ env.WORKSPACE_DIRECTORY }}
