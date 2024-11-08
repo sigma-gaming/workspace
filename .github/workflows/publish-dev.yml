@@ -57,10 +57,7 @@ jobs:
 
       - name: Print PATH
         run: |-
-          echo $PATH
-          echo $GITHUB_PATH
-          echo $RUNNER_TEMP
-          ls $RUNNER_TEMP
+          ls /home/runner
 
       - name: Install Node.js
         uses: actions/setup-node@v4
