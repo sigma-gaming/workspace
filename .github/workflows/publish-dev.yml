@@ -55,6 +55,11 @@ jobs:
       - name: Add pnpm to PATH
         run: echo "${{ steps.pnpm.outputs.bin_dest }}" >> $GITHUB_PATH
 
+      - name: Print PATH
+        run: |-
+          echo $PATH
+          echo $GITHUB_PATH
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
