@@ -49,7 +49,6 @@ jobs:
         id: pnpm
         with:
           version: 9.12.2
-          dest: ${{ env.WORKSPACE_DIRECTORY }}/.pnpm
           run_install: false
 
       - name: Link pnpm to /bin
