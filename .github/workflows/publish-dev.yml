@@ -26,7 +26,6 @@ jobs:
   affected:
     name: Get affected apps
     runs-on: arc-runner-set
-    needs: timestamp
 
     outputs:
       apps: ${{ steps.affected.outputs.apps }}
@@ -56,33 +55,6 @@ jobs:
 
       - name: Run checks for affected packages
         run: pnpm check:affected
-
-      - name: Gcloud auth
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
-
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-
-      - name: Prebuild dependencies on Google Cloud
-        run: |
-          cat <<EOF > cloudbuild.yaml
-          steps:
-            - name: "gcr.io/kaniko-project/executor:latest"
-              args:
-                - --target=dependencies-base
-                - --no-push
-                - --cache=true
-                - --cache-repo=${{ env.DOCKER_REGISTRY }}/cache
-                - --cache-ttl=6h
-                - --compressed-caching=false
-                - --single-snapshot
-          EOF
-
-          gcloud builds submit . --config cloudbuild.yaml --region ${{ vars.GCLOUD_REGISTRY_REGION }}
 
       - name: Output affected apps
         id: affected
@@ -128,16 +100,12 @@ jobs:
 
           cat <<EOF > cloudbuild.yaml
           steps:
-            - name: "gcr.io/kaniko-project/executor:latest"
+            - name: "gcr.io/cloud-builders/docker"
               args:
+                - build
                 - --target=${{ steps.parse.outputs.name }}
-                - --destination=$image:latest
-                - --destination=$image:dev-${{ needs.timestamp.outputs.timestamp }}
-                - --cache=true
-                - --cache-repo=${{ env.DOCKER_REGISTRY }}/cache
-                - --cache-ttl=6h
-                - --no-push-cache
-                - --single-snapshot
+                - --tag=$image:latest
+                - --tag=$image:dev-${{ needs.timestamp.outputs.timestamp }}
                 - --build-arg=sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
                 - --build-arg=sentry_release=dev-${{ needs.timestamp.outputs.timestamp }}
           EOF

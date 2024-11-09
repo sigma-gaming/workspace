@@ -48,10 +48,10 @@ ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-app
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm nx run @apps/games-app:build
-RUN pnpm sentry-cli releases new -p games-app ${sentry_release}
-RUN pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist
-RUN pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
+RUN pnpm nx run @apps/games-app:build && \
+  pnpm sentry-cli releases new -p games-app ${sentry_release} && \
+  pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist && \
+  pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
 
 FROM prebuild AS control-app-build
 RUN pnpm nx run @apps/control-app:build
@@ -91,10 +91,10 @@ ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-api
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm nx run @apis/games-api:build
-RUN pnpm sentry-cli releases new -p games-api ${sentry_release}
-RUN pnpm sentry-cli sourcemaps inject /build/apps/games-api/dist
-RUN pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release ${sentry_release}
+RUN pnpm nx run @apis/games-api:build && \
+  pnpm sentry-cli releases new -p games-api ${sentry_release} && \
+  pnpm sentry-cli sourcemaps inject /build/apps/games-api/dist && \
+  pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release ${sentry_release}
 
 FROM prebuild AS games-tasks-build
 ARG sentry_auth_token
@@ -102,10 +102,10 @@ ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-tasks
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm nx run @apis/games-tasks:build
-RUN pnpm sentry-cli releases new -p games-tasks ${sentry_release}
-RUN pnpm sentry-cli sourcemaps inject /build/apps/games-tasks/dist
-RUN pnpm sentry-cli sourcemaps upload /build/apps/games-tasks/dist --release ${sentry_release}
+RUN pnpm nx run @apis/games-tasks:build && \
+  pnpm sentry-cli releases new -p games-tasks ${sentry_release} && \
+  pnpm sentry-cli sourcemaps inject /build/apps/games-tasks/dist && \
+  pnpm sentry-cli sourcemaps upload /build/apps/games-tasks/dist --release ${sentry_release}
 
 FROM prebuild AS control-api-build
 RUN pnpm nx run @apis/control-api:build
@@ -153,10 +153,10 @@ ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-ws
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm nx run @apis/games-ws:build
-RUN pnpm sentry-cli releases new -p games-ws ${sentry_release}
-RUN pnpm sentry-cli sourcemaps inject /build/apps/games-ws/dist
-RUN pnpm sentry-cli sourcemaps upload /build/apps/games-ws/dist --release ${sentry_release}
+RUN pnpm nx run @apis/games-ws:build && \
+  pnpm sentry-cli releases new -p games-ws ${sentry_release} && \
+  pnpm sentry-cli sourcemaps inject /build/apps/games-ws/dist && \
+  pnpm sentry-cli sourcemaps upload /build/apps/games-ws/dist --release ${sentry_release}
 
 FROM api-base AS games-ws
 WORKDIR /workspace
