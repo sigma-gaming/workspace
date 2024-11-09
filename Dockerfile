@@ -9,7 +9,7 @@ WORKDIR /build
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
 COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY ./patches ./patches
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
+RUN pnpm fetch
 
 FROM dependencies-base AS dependencies-tree
 COPY package.json ./package.json
@@ -21,10 +21,10 @@ COPY ./games-libs ./games-libs
 COPY ./apps ./apps
 
 FROM dependencies-tree AS dependencies-prod
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline --prod
+RUN pnpm install --offline --prod
 
 FROM dependencies-tree AS dependencies-dev
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline
+RUN pnpm install --offline
 
 FROM dependencies-dev AS prebuild
 ENV NX_DAEMON=true
