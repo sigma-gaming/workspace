@@ -86,6 +86,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          skip_install: true
 
       - name: Parse package name
         id: parse
