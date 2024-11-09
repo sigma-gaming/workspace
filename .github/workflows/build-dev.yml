@@ -2,7 +2,7 @@ name: Build development images with Google Cloud Build
 
 on:
   push:
-    branches: ['main', 'draft/build-process']
+    branches: ['main']
 
 env:
   DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
