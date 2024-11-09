@@ -13,7 +13,7 @@ concurrency:
 jobs:
   timestamp:
     name: Get current unix timestamp
-    runs-on: arc-runner-set
+    runs-on: [ubuntu-22.04]
 
     outputs:
       timestamp: ${{ steps.timestamp.outputs.timestamp }}
@@ -25,7 +25,7 @@ jobs:
 
   affected:
     name: Get affected apps
-    runs-on: arc-runner-set
+    runs-on: [ubuntu-22.04]
 
     outputs:
       apps: ${{ steps.affected.outputs.apps }}
@@ -63,7 +63,7 @@ jobs:
   build:
     name: Build
     needs: [affected, timestamp]
-    runs-on: arc-runner-set
+    runs-on: [ubuntu-22.04]
 
     if: needs.affected.outputs.apps != '[]'
 
