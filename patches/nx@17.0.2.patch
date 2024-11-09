@@ -1,0 +1,24 @@
+diff --git a/src/daemon/client/client.js b/src/daemon/client/client.js
+index df217b236f07195f9a2fb25bfbb8b4b880f3b4b5..b001396c25a2a99d28c9e6217aab1363c743a11e 100644
+--- a/src/daemon/client/client.js
++++ b/src/daemon/client/client.js
+@@ -314,17 +314,8 @@ class DaemonClient {
+ exports.DaemonClient = DaemonClient;
+ exports.daemonClient = new DaemonClient((0, configuration_1.readNxJson)());
+ function isDocker() {
+-    try {
+-        (0, fs_1.statSync)('/.dockerenv');
+-        return true;
+-    }
+-    catch {
+-        try {
+-            return (0, fs_1.readFileSync)('/proc/self/cgroup', 'utf8')?.includes('docker');
+-        }
+-        catch { }
+-        return false;
+-    }
++    // enable daemon in docker for remote caching
++    return false;
+ }
+ function nxJsonIsNotPresent() {
+     return !(0, nx_json_1.hasNxJson)(workspace_root_1.workspaceRoot);

@@ -8,6 +8,7 @@ FROM base AS dependencies-base
 WORKDIR /build
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
 COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY ./patches ./patches
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm fetch
 
 FROM dependencies-base AS dependencies-tree
@@ -26,6 +27,7 @@ FROM dependencies-tree AS dependencies-dev
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --offline
 
 FROM dependencies-dev AS prebuild
+ENV NX_DAEMON=true
 COPY nx.json ./nx.json
 COPY tsconfig.base.json ./tsconfig.base.json
 COPY ./ssl ./ssl
@@ -180,5 +182,5 @@ ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 FROM gcloud-sdk-base AS gcr-cleaner
 WORKDIR /workspace
-COPY --from=build /build ./
+COPY --from=prebuild /build ./
 CMD ["node", "apps/gcr-cleaner/script.mjs"]

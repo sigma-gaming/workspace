@@ -108,9 +108,6 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Gcloud auth
         uses: google-github-actions/auth@v2
         with:

@@ -145,5 +145,10 @@
     "webpack-cli": "^5.1.4",
     "webpack-node-externals": "^3.0.0"
   },
-  "packageManager": "pnpm@9.12.2"
+  "packageManager": "pnpm@9.12.2",
+  "pnpm": {
+    "patchedDependencies": {
+      "nx@17.0.2": "patches/nx@17.0.2.patch"
+    }
+  }
 }
