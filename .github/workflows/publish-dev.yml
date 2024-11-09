@@ -26,9 +26,7 @@ jobs:
   affected:
     name: Get affected apps
     runs-on: arc-runner-set
-
-    outputs:
-      apps: ${{ steps.affected.outputs.apps }}
+    needs: timestamp
 
     steps:
       - uses: actions/checkout@v4
@@ -70,43 +68,10 @@ jobs:
         with:
           buildkitd-config-inline: |
             [registry."docker.io"]
-              mirrors = ["mirror.gcr.io"] 
+              mirrors = ["mirror.gcr.io"]
 
       - name: Prebuild
         run: docker build . --target prebuild --platform linux/amd64
-
-      - name: Output affected apps
-        id: affected
-        run: echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
-
-  publish:
-    name: Publish
-    needs: [affected, timestamp]
-    runs-on: arc-runner-set
-
-    if: needs.affected.outputs.apps != '[]'
-
-    strategy:
-      fail-fast: false
-      matrix:
-        packageName: ${{ fromJson(needs.affected.outputs.apps) }}
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@v4
-        id: pnpm
-        with:
-          version: 9.12.2
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
 
       - name: Gcloud auth
         uses: google-github-actions/auth@v2
@@ -118,39 +83,37 @@ jobs:
         with:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          buildkitd-config-inline: |
-            [registry."docker.io"]
-              mirrors = ["mirror.gcr.io"] 
-
       - name: Authenticate Docker registry
         run: gcloud auth configure-docker europe-north1-docker.pkg.dev --quiet
 
-      - name: Parse package name
-        id: parse
-        uses: release-kit/regex@v1
-        with:
-          string: ${{ matrix.packageName }}
-          pattern: '^@?(?<scope>.*)\/(?<name>.*)$'
-
-      - name: Build image
+      - name: Build and push affected apps
         run: |-
-          docker build . --target ${{ steps.parse.outputs.name }} \
-            --build-arg sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }} \
-            --build-arg sentry_release=dev-${{ needs.timestamp.outputs.timestamp }} \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest \
-            --tag ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ needs.timestamp.outputs.timestamp }} \
-            --platform linux/amd64
+          affected_apps=$(pnpm nx show projects --type=app --affected --json)
 
-      - name: Push image
-        run: |-
-          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:latest
-          docker push ${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}:dev-${{ needs.timestamp.outputs.timestamp }}
+          echo "Building Docker images for the following apps:"
+          echo "$affected_apps"
+
+          echo "$affected_apps" | jq -r '.[]' | while read -r app; do
+            app_name=$(echo "$app" | sed 's|.*/||')
+            full_path=$(echo "$app" | sed 's|^@||')
+
+            echo "Building Docker image for $app_name"
+
+            docker build . --target "$app_name" \
+              --build-arg sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }} \
+              --build-arg sentry_release=dev-${{ needs.timestamp.outputs.timestamp }} \
+              --tag ${{ env.DOCKER_REGISTRY }}/$full_path:latest \
+              --tag ${{ env.DOCKER_REGISTRY }}/$full_path:dev-${{ needs.timestamp.outputs.timestamp }} \
+              --platform linux/amd64
+          done
+
+          echo "Pushing Docker images to ${{ env.DOCKER_REGISTRY }}"
+
+          echo "$affected_apps" | jq -r '.[]' | while read -r app; do
+            app_name=$(echo "$app" | sed 's|.*/||')
+            full_path=$(echo "$app" | sed 's|^@||')
+
+            echo "Pushing Docker image for $app_name"
+
+            docker push ${{ env.DOCKER_REGISTRY }}/$full_path --all-tags
+          done
