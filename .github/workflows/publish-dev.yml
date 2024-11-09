@@ -5,7 +5,7 @@ on:
     branches: ['main', 'draft/build-process']
 
 env:
-  DOCKER_REGISTRY: europe-north1-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
+  DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
 
 concurrency:
   group: ${{ github.workflow }}
@@ -79,10 +79,10 @@ jobs:
                 - --cache-repo=${{ env.DOCKER_REGISTRY }}/cache
                 - --cache-ttl=6h
                 - --compressed-caching=false
-                - --snapshot-mode=redo
+                - --single-snapshot
           EOF
 
-          gcloud builds submit . --config cloudbuild.yaml --region europe-west1
+          gcloud builds submit . --config cloudbuild.yaml --region ${{ vars.GCLOUD_REGISTRY_REGION }}
 
       - name: Output affected apps
         id: affected
@@ -136,9 +136,10 @@ jobs:
                 - --cache=true
                 - --cache-repo=${{ env.DOCKER_REGISTRY }}/cache
                 - --cache-ttl=6h
+                - --no-push-cache
+                - --single-snapshot
                 - --build-arg=sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
                 - --build-arg=sentry_release=dev-${{ needs.timestamp.outputs.timestamp }}
-                - --snapshot-mode=redo
           EOF
 
-          gcloud builds submit . --config cloudbuild.yaml --region europe-west1
+          gcloud builds submit . --config cloudbuild.yaml --region ${{ vars.GCLOUD_REGISTRY_REGION }}
