@@ -108,6 +108,12 @@ jobs:
                 - --tag=$image:dev-${{ needs.timestamp.outputs.timestamp }}
                 - --build-arg=sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
                 - --build-arg=sentry_release=dev-${{ needs.timestamp.outputs.timestamp }}
+          images:
+            - $image:latest
+            - $image:dev-${{ needs.timestamp.outputs.timestamp }}
           EOF
 
-          gcloud builds submit . --config cloudbuild.yaml --region ${{ vars.GCLOUD_REGISTRY_REGION }}
+          gcloud builds submit . \
+            --config cloudbuild.yaml \
+            --region ${{ vars.GCLOUD_REGISTRY_REGION }} \
+            --suppress-logs
