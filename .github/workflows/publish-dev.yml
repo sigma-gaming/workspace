@@ -28,6 +28,9 @@ jobs:
     runs-on: arc-runner-set
     needs: timestamp
 
+    outputs:
+      apps: ${{ steps.affected.outputs.apps }}
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,24 +57,63 @@ jobs:
       - name: Run checks for affected packages
         run: pnpm check:affected
 
-      - name: Build all apps
-        run: pnpm build
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Gcloud auth
+        uses: google-github-actions/auth@v2
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
         with:
-          buildkitd-config-inline: |
-            [registry."docker.io"]
-              mirrors = ["mirror.gcr.io"]
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
 
-      - name: Prebuild
-        run: docker build . --target prebuild --platform linux/amd64
+      - name: Prebuild on Google Cloud
+        run: |
+          cat <<EOF > cloudbuild.yaml
+          steps:
+            - name: "gcr.io/kaniko-project/executor:latest"
+              args:
+                - --target=prebuild
+                - --no-push
+                - --cache=true
+                - --cache-repo=${{ env.DOCKER_REGISTRY }}/cache
+                - --cache-ttl=6h
+          EOF
+
+          gcloud builds submit . --config cloudbuild.yaml
+
+      - name: Output affected apps
+        id: affected
+        run: echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
+
+  publish:
+    name: Publish
+    needs: [affected, timestamp]
+    runs-on: arc-runner-set
+
+    if: needs.affected.outputs.apps != '[]'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        packageName: ${{ fromJson(needs.affected.outputs.apps) }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        id: pnpm
+        with:
+          version: 9.12.2
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
       - name: Gcloud auth
         uses: google-github-actions/auth@v2
@@ -83,37 +125,27 @@ jobs:
         with:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
 
-      - name: Authenticate Docker registry
-        run: gcloud auth configure-docker europe-north1-docker.pkg.dev --quiet
+      - name: Parse package name
+        id: parse
+        uses: release-kit/regex@v1
+        with:
+          string: ${{ matrix.packageName }}
+          pattern: '^@?(?<scope>.*)\/(?<name>.*)$'
 
-      - name: Build and push affected apps
-        run: |-
-          affected_apps=$(pnpm nx show projects --type=app --affected --json)
+      - name: Build on Google Cloud
+        run: |
+          image=${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}
 
-          echo "Building Docker images for the following apps:"
-          echo "$affected_apps"
+          cat <<EOF > cloudbuild.yaml
+          steps:
+            - name: "gcr.io/kaniko-project/executor:latest"
+              args:
+                - --target=${{ steps.parse.outputs.name }}
+                - --destination=$image:latest
+                - --destination=$image:dev-${{ needs.timestamp.outputs.timestamp }}
+                - --cache=true
+                - --cache-repo=${{ env.DOCKER_REGISTRY }}/cache
+                - --cache-ttl=6h
+          EOF
 
-          echo "$affected_apps" | jq -r '.[]' | while read -r app; do
-            app_name=$(echo "$app" | sed 's|.*/||')
-            full_path=$(echo "$app" | sed 's|^@||')
-
-            echo "Building Docker image for $app_name"
-
-            docker build . --target "$app_name" \
-              --build-arg sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }} \
-              --build-arg sentry_release=dev-${{ needs.timestamp.outputs.timestamp }} \
-              --tag ${{ env.DOCKER_REGISTRY }}/$full_path:latest \
-              --tag ${{ env.DOCKER_REGISTRY }}/$full_path:dev-${{ needs.timestamp.outputs.timestamp }} \
-              --platform linux/amd64
-          done
-
-          echo "Pushing Docker images to ${{ env.DOCKER_REGISTRY }}"
-
-          echo "$affected_apps" | jq -r '.[]' | while read -r app; do
-            app_name=$(echo "$app" | sed 's|.*/||')
-            full_path=$(echo "$app" | sed 's|^@||')
-
-            echo "Pushing Docker image for $app_name"
-
-            docker push ${{ env.DOCKER_REGISTRY }}/$full_path --all-tags
-          done
+          gcloud builds submit . --config cloudbuild.yaml
