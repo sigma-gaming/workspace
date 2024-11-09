@@ -9,11 +9,9 @@
       "{workspaceRoot}/tsconfig.base.json",
       "{workspaceRoot}/package.json",
       "{workspaceRoot}/nx.json",
-      "{workspaceRoot}/Dockerfile",
       "{workspaceRoot}/pnpm-workspace.yaml",
       "{workspaceRoot}/pnpm-lock.yaml",
-      "{workspaceRoot}/.npmrc",
-      "{workspaceRoot}/scripts/**/*"
+      "{workspaceRoot}/.npmrc"
     ],
     "ci": [
       "{workspaceRoot}/stacks/dev.docker-compose.yml",
@@ -26,13 +24,11 @@
       "{projectRoot}/index.html",
       "{projectRoot}/**.js",
       "{projectRoot}/**.mjs",
-      "{projectRoot}/prisma/schema.prisma",
       "{projectRoot}/public/**/*",
       "{projectRoot}/src/**/*",
       "!{projectRoot}/src/*.test.ts",
       "!{projectRoot}/src/*.test.tsx",
-      "{projectRoot}/build.*",
-      "{projectRoot}/scripts/**/*"
+      "{projectRoot}/build.*"
     ],
     "dist": [
       "{projectRoot}/dist/**/*"

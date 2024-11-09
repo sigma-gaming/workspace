@@ -1,0 +1,123 @@
+name: Build development images with Google Cloud Build
+
+on:
+  push:
+    branches: ['main']
+
+env:
+  DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  timestamp:
+    name: Get current unix timestamp
+    runs-on: [ubuntu-22.04]
+
+    outputs:
+      timestamp: ${{ steps.timestamp.outputs.timestamp }}
+
+    steps:
+      - name: Get current unix timestamp
+        id: timestamp
+        uses: release-kit/unix-timestamp@v1
+
+  affected:
+    name: Get affected apps
+    runs-on: [ubuntu-22.04]
+
+    outputs:
+      apps: ${{ steps.affected.outputs.apps }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        id: pnpm
+        with:
+          version: 9.12.2
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Run checks for affected packages
+        run: pnpm check:affected
+
+      - name: Output affected apps
+        id: affected
+        run: echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build
+    needs: [affected, timestamp]
+    runs-on: [ubuntu-22.04]
+
+    if: needs.affected.outputs.apps != '[]'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        packageName: ${{ fromJson(needs.affected.outputs.apps) }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gcloud auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          skip_install: true
+
+      - name: Parse package name
+        id: parse
+        uses: release-kit/regex@v1
+        with:
+          string: ${{ matrix.packageName }}
+          pattern: '^@?(?<scope>.*)\/(?<name>.*)$'
+
+      - name: Build on Google Cloud
+        run: |
+          image=${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}
+
+          cat <<EOF > cloudbuild.yaml
+          steps:
+            - name: "gcr.io/cloud-builders/docker"
+              env:
+                - "DOCKER_BUILDKIT=1"
+              args:
+                - build
+                - --target=${{ steps.parse.outputs.name }}
+                - --tag=$image:latest
+                - --tag=$image:dev-${{ needs.timestamp.outputs.timestamp }}
+                - --build-arg=sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+                - --build-arg=sentry_release=dev-${{ needs.timestamp.outputs.timestamp }}
+                - .
+          images:
+            - $image:latest
+            - $image:dev-${{ needs.timestamp.outputs.timestamp }}
+          EOF
+
+          gcloud builds submit . \
+            --config cloudbuild.yaml \
+            --region ${{ vars.GCLOUD_REGISTRY_REGION }} \
+            --async

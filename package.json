@@ -8,13 +8,6 @@
     "type": "git",
     "url": "https://github.com/sigma-gaming/workspace"
   },
-  "workspaces": [
-    "apps/*",
-    "dbs/*",
-    "core/*",
-    "tooling/*",
-    "games-libs/*"
-  ],
   "engines": {
     "node": "20"
   },
@@ -37,6 +30,7 @@
     "check": "CI=true pnpm nx run-many -t build test lint typecheck --parallel 5",
     "check:affected": "CI=true pnpm nx affected -t build test lint typecheck --parallel 5",
     "typecheck": "pnpm nx run-many -t typecheck",
+    "build": "pnpm nx run-many -t build",
     "test": "pnpm nx run-many -t test --watch",
     "lint": "pnpm nx run-many -t lint",
     "lint:fix": "pnpm nx run-many -t lint:fix",
@@ -105,6 +99,7 @@
     "@nx/js": "17.0.2",
     "@nx/workspace": "17.0.2",
     "@sentry/cli": "^2.32.1",
+    "@sentry/cli-linux-arm64": "^2.38.2",
     "@sentry/vite-plugin": "^2.21.1",
     "@types/cookie": "^0.5.4",
     "@types/js-cookie": "^3.0.6",
@@ -150,5 +145,10 @@
     "webpack-cli": "^5.1.4",
     "webpack-node-externals": "^3.0.0"
   },
-  "packageManager": "pnpm@9.12.2"
+  "packageManager": "pnpm@9.12.2",
+  "pnpm": {
+    "patchedDependencies": {
+      "nx@17.0.2": "patches/nx@17.0.2.patch"
+    }
+  }
 }
