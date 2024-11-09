@@ -1,4 +1,4 @@
-name: Publish development images to GCR
+name: Build development images with Google Cloud Build
 
 on:
   push:
@@ -60,8 +60,8 @@ jobs:
         id: affected
         run: echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
 
-  publish:
-    name: Publish
+  build:
+    name: Build
     needs: [affected, timestamp]
     runs-on: arc-runner-set
 
@@ -101,6 +101,8 @@ jobs:
           cat <<EOF > cloudbuild.yaml
           steps:
             - name: "gcr.io/cloud-builders/docker"
+              env:
+                - "DOCKER_BUILDKIT=1"
               args:
                 - build
                 - --target=${{ steps.parse.outputs.name }}
