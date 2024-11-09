@@ -82,7 +82,7 @@ jobs:
                 - --snapshot-mode=redo
           EOF
 
-          gcloud builds submit . --config cloudbuild.yaml --region europe-north1
+          gcloud builds submit . --config cloudbuild.yaml --region europe-west1
 
       - name: Output affected apps
         id: affected
@@ -141,4 +141,4 @@ jobs:
                 - --snapshot-mode=redo
           EOF
 
-          gcloud builds submit . --config cloudbuild.yaml --region europe-north1
+          gcloud builds submit . --config cloudbuild.yaml --region europe-west1
