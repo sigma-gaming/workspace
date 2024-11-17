@@ -568,6 +568,13 @@
       "when": 1730440647657,
       "tag": "0080_mysterious_gateway",
       "breakpoints": true
+    },
+    {
+      "idx": 81,
+      "version": "7",
+      "when": 1731363616370,
+      "tag": "0081_boring_gateway",
+      "breakpoints": true
     }
   ]
 }

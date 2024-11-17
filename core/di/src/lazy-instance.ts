@@ -9,14 +9,13 @@ export const createLazyInstance = <
   Factory: new () => T,
   selector?: (instance: T) => V,
 ) => {
-  let cached: T | null = null
+  let instance: T | null = null
 
   return new Proxy({} as V, {
     get(_, prop: keyof V) {
-      const service = cached ?? new Factory()
-      if (!cached) cached = service
-      if (!selector) return service[prop]
-      return selector(service)[prop]
+      instance ??= new Factory()
+      if (!selector) return instance[prop]
+      return selector(instance)[prop]
     },
   })
 }

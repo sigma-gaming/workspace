@@ -40,9 +40,10 @@ export const Withdrawal = pgTable('Withdrawal', {
   userId: uuid('userId')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
-  transactionId: uuid('transactionId').references(() => TransactionTable.id, {
-    onDelete: 'cascade',
-  }),
+  transactionId: bigint('transactionId', { mode: 'number' }).references(
+    () => TransactionTable.id,
+    { onDelete: 'cascade' },
+  ),
 })
 
 export type WithdrawalSelect = typeof Withdrawal.$inferSelect

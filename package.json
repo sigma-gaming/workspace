@@ -19,6 +19,7 @@
     "dev:games-api": "nx run @apis/games-api:dev",
     "dev:games-ws": "nx run @apis/games-ws:dev",
     "dev:referral": "nx run @apis/referral-redirect-api:dev",
+    "dev:payment": "nx run @apis/payment-api:dev",
     "db:games:generate": "nx run @dbs/games-db:migration:generate",
     "db:games:apply:dev": "nx run @dbs/games-db:migration:apply:dev",
     "dev:control-app": "nx run @apps/control-app:dev",

@@ -40,9 +40,10 @@ export const Deposit = pgTable('Deposit', {
   userId: uuid('userId')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
-  transactionId: uuid('transactionId').references(() => TransactionTable.id, {
-    onDelete: 'cascade',
-  }),
+  transactionId: bigint('transactionId', { mode: 'number' }).references(
+    () => TransactionTable.id,
+    { onDelete: 'cascade' },
+  ),
 })
 
 export type DepositSelect = typeof Deposit.$inferSelect

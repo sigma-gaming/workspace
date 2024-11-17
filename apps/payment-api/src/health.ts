@@ -1,0 +1,21 @@
+import { gamesDb } from '@games/services'
+import { sql } from 'drizzle-orm'
+import { Hono } from 'hono'
+import { HTTPException } from 'hono/http-exception'
+
+export const healthyRoute = new Hono().get('/', async (ctx) => {
+  return ctx.text('Yes')
+})
+
+export const readyRoute = new Hono().get('/', async (ctx) => {
+  const postgresReady = await gamesDb
+    .execute(sql`SELECT 1`)
+    .then(() => true)
+    .catch(() => false)
+
+  if (!postgresReady) {
+    throw new HTTPException(503)
+  }
+
+  return ctx.text('Yes')
+})

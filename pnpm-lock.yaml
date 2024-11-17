@@ -647,6 +647,33 @@ importers:
         specifier: workspace:*
         version: link:../../tooling/env
 
+  apps/payment-api:
+    dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
+      '@dbs/games-db':
+        specifier: workspace:*
+        version: link:../../dbs/games-db
+      '@dbs/games-schema':
+        specifier: workspace:*
+        version: link:../../dbs/games-schema
+      '@games/options':
+        specifier: workspace:*
+        version: link:../../games-libs/options
+      '@games/redis':
+        specifier: workspace:*
+        version: link:../../games-libs/redis
+      '@games/services':
+        specifier: workspace:*
+        version: link:../../games-libs/services
+      '@tooling/env':
+        specifier: workspace:*
+        version: link:../../tooling/env
+
   apps/referral-redirect-api:
     dependencies:
       '@core/di':
@@ -2237,9 +2264,11 @@ packages:
 
   '@esbuild-kit/core-utils@3.3.2':
     resolution: {integrity: sha512-sPRAnw9CdSsRmEtnsl2WXWdyquogVpB3yZ3dgwJfe8zrOzTsV7cJvmwrKVa+0ma5BoiGJ+BoqkMvawbayKUsqQ==}
+    deprecated: 'Merged into tsx: https://tsx.is'
 
   '@esbuild-kit/esm-loader@2.6.5':
     resolution: {integrity: sha512-FxEMIkJKnodyA1OaCUoEvbYRkoZlLZ4d/eXFu9Fh8CbBBgP5EmZxrfTRyN0qpXZ4vOvqnE5YdRdcrmUUXuU+dA==}
+    deprecated: 'Merged into tsx: https://tsx.is'
 
   '@esbuild/aix-ppc64@0.19.12':
     resolution: {integrity: sha512-bmoCYyWdEL3wDQIVbcyzRyeKLgk2WtWLTWz1ZIAZF/EGbNOwSA6ew3PftJ1PqMiOOGu0OyFMzG53L0zqIpPeNA==}
@@ -4592,6 +4621,7 @@ packages:
 
   acorn-import-assertions@1.9.0:
     resolution: {integrity: sha512-cmMwop9x+8KFhxvKrKfPYmN6/pKTYYHBqLa0DfvVZcKMJWNyWLnaqND7dx/qn66R7ewM1UX5XMaDVP5wlVTaVA==}
+    deprecated: package has been renamed to acorn-import-attributes
     peerDependencies:
       acorn: ^8
 
