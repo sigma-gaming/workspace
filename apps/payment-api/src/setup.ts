@@ -1,5 +1,6 @@
 import { registerOptions } from '@core/di'
 import {
+  BovapayOptionsToken,
   GamesCacheOptionsToken,
   GamesDbOptionsToken,
   GamesRedisOptionsToken,
@@ -18,4 +19,10 @@ registerOptions(GamesRedisOptionsToken, {
 
 registerOptions(GamesCacheOptionsToken, {
   version: env.gamesApi.version,
+})
+
+registerOptions(BovapayOptionsToken, {
+  apiKey: env.bovapay.apiKey,
+  apiUrl: env.bovapay.apiUrl,
+  callbackUrl: env.bovapay.callbackUrl,
 })

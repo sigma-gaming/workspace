@@ -19,6 +19,10 @@ const EnvSchema = z
 
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
+
+    BOVAPAY_API_URL: z.string(),
+    BOVAPAY_API_KEY: z.string(),
+    BOVAPAY_CALLBACK_URL: z.string(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
@@ -46,6 +50,12 @@ const EnvSchema = z
 
     jwt: {
       secret: raw.JWT_SECRET,
+    },
+
+    bovapay: {
+      apiUrl: raw.BOVAPAY_API_URL,
+      apiKey: raw.BOVAPAY_API_KEY,
+      callbackUrl: raw.BOVAPAY_CALLBACK_URL,
     },
   }))
 

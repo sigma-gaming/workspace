@@ -1,8 +1,7 @@
-import { createHash } from 'crypto'
 import { BadRequestException, UnauthorizedException } from '@core/exceptions'
 import { zValidator } from '@core/server'
+import { bovapayService } from '@games/services'
 import { z } from 'zod'
-import { env } from '../env'
 import { createRouter } from '../hono'
 
 function withOrder<Schema extends z.ZodObject<z.ZodRawShape>>(schema: Schema) {
@@ -34,17 +33,6 @@ const PayloadSchema = withOrder(
   }),
 )
 
-type BovapayPayload = z.infer<typeof PayloadSchema>
-
-const verifySignature = (
-  payload: BovapayPayload,
-  signature: string,
-): boolean => {
-  const data = env.bovapay.apiKey + JSON.stringify(payload)
-  const hash = createHash('sha1').update(data).digest('hex')
-  return hash === signature.toLowerCase()
-}
-
 export const bovapayRoute = createRouter().post(
   '/',
   zValidator('json', PayloadSchema),
@@ -59,7 +47,7 @@ export const bovapayRoute = createRouter().post(
       })
     }
 
-    const isValidSignature = verifySignature(payload, signature)
+    const isValidSignature = bovapayService.verifySignature(payload, signature)
     if (!isValidSignature) {
       throw new UnauthorizedException()
     }

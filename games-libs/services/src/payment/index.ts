@@ -1,3 +1,5 @@
+export * from './bovapay.service'
 export * from './deposit.config'
 export * from './service'
+export * from './types'
 export * from './withdrawal.config'

@@ -7,7 +7,7 @@ export type GamesCacheOptions = {
 export const GamesCacheOptionsToken =
   createOptionsToken<GamesCacheOptions>('GamesCacheOptions')
 
-type GamesDbOptions = {
+export type GamesDbOptions = {
   url: string
   logger?: boolean
 }
@@ -50,3 +50,13 @@ export type VkOptions = {
 }
 
 export const VkOptionsToken = createOptionsToken<VkOptions>('VkOptionsToken')
+
+export type BovapayOptions = {
+  apiUrl: string
+  apiKey: string
+  callbackUrl: string
+}
+
+export const BovapayOptionsToken = createOptionsToken<BovapayOptions>(
+  'BovapayOptionsToken',
+)
