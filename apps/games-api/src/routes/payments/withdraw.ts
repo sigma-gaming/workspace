@@ -1,0 +1,83 @@
+import { BadRequestException } from '@core/exceptions'
+import { zValidator } from '@core/server'
+import { Currency, PaymentProvider, WithdrawalMethod } from '@dbs/games-types'
+import { gemInt } from '@games/model'
+import { PaymentResult, paymentService, sessionService } from '@games/services'
+import { z } from 'zod'
+import { createRouter } from '../../hono'
+
+const PayloadSchema = z.object({
+  amount: z.number().min(gemInt(1)),
+  provider: z.nativeEnum(PaymentProvider),
+  method: z.nativeEnum(WithdrawalMethod),
+  currency: z.nativeEnum(Currency),
+  accountDetails: z.string().min(1),
+})
+
+export const withdrawRoute = createRouter().post(
+  '/',
+  zValidator('json', PayloadSchema),
+  async (ctx) => {
+    const { userId } = await sessionService.getHonoSession(ctx)
+    const { amount, provider, method, currency, accountDetails } =
+      ctx.req.valid('json')
+
+    const result = await paymentService.createWithdrawal({
+      userId,
+      amount,
+      provider,
+      method,
+      currency,
+      accountDetails,
+      userIp: ctx.env.ip,
+    })
+
+    switch (result.result) {
+      case PaymentResult.Success:
+        return ctx.json({
+          transactionId: result.transactionId,
+          amount: result.amount,
+          currency: result.currency,
+        })
+
+      case PaymentResult.InsufficientFunds:
+        throw new BadRequestException({
+          path: ['amount'],
+          message: `Insufficient funds. Available: ${result.available} ${result.currency}`,
+        })
+
+      case PaymentResult.InvalidAmount:
+        throw new BadRequestException({
+          path: ['amount'],
+          message: result.minAmount
+            ? `Minimum withdrawal amount is ${result.minAmount} ${result.currency}`
+            : `Maximum withdrawal amount is ${result.maxAmount} ${result.currency}`,
+        })
+
+      case PaymentResult.UnsupportedMethod:
+        throw new BadRequestException({
+          path: ['method'],
+          message: `Withdrawal method ${result.method} is not supported for provider ${result.provider}`,
+        })
+
+      case PaymentResult.UnsupportedCurrency:
+        throw new BadRequestException({
+          path: ['currency'],
+          message: `Currency ${result.currency} is not supported for method ${result.method}`,
+        })
+
+      case PaymentResult.ProviderError:
+        throw new BadRequestException({
+          path: ['provider'],
+          message: `Payment provider error: ${result.error}`,
+        })
+
+      case PaymentResult.Failed:
+      default:
+        throw new BadRequestException({
+          path: ['payment'],
+          message: result.error || 'Withdrawal failed',
+        })
+    }
+  },
+)

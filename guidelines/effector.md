@@ -498,6 +498,25 @@ const updateUserMutation = createMutation({
    - Keep logic clear and focused
    - Consider using `combine` for multiple sources
 
+6. Using `useUnit`:
+   - Use `useUnit` with individual stores
+   - Do not use `useUnit` for events when the app is not SSR
+   - Avoid passing nested structures containing stores
+   - Bad:
+     ```typescript
+     // Avoid this
+     const model = useUnit($$model)  // model contains nested stores
+     ```
+   - Good:
+     ```typescript
+     // Do this instead
+     const value1 = useUnit($store1)
+     const value2 = useUnit($store2)
+     const loading = useUnit($loading)
+     ```
+   - Exceptions:
+     - Query and Mutation instances from Farfetched
+
 ## Common Patterns
 
 1. Model Organization:

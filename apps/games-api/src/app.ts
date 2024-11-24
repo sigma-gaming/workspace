@@ -10,6 +10,7 @@ import { gameHistoryRouter } from './routes/game-history'
 import { healthyRoute, readyRoute } from './routes/health'
 import { meRouter } from './routes/me'
 import { notificationsRouter } from './routes/notifications'
+import { paymentsRouter } from './routes/payments'
 import { promocodesRouter } from './routes/promocodes'
 import { settingsRouter } from './routes/settings'
 import { tasksRouter } from './routes/tasks'
@@ -37,6 +38,7 @@ export const app = createRouter()
   .route('/me', meRouter)
   .route('/settings', settingsRouter)
   .route('/balance', balanceRouter)
+  .route('/payments', paymentsRouter)
   .route('/gameHistory', gameHistoryRouter)
   .route('/promocodes', promocodesRouter)
   .route('/tasks', tasksRouter)

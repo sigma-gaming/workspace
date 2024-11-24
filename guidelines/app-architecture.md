@@ -99,14 +99,15 @@ This document describes the architectural approach to organizing frontend applic
   - Navigation helpers
 
 ### Entities Layer
-- **Purpose**: Business domain models and core logic
+- **Purpose**: Business domain models and data-related logic / utilities
 - **Responsibilities**:
   - Data models
-  - Business rules
+  - Entity-specific business rules
   - Entity-specific operations
   - Data transformation
 - **Key Characteristics**:
-  - Pure business logic usually
+  - Data fetching using shared/api layer
+  - Data transformation if applicable
   - No UI components usually, but can contain some basic UI related to the entity
   - Highly reusable
   - Can be used by multiple pages / widgets / features

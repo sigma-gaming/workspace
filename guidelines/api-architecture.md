@@ -2,6 +2,8 @@
 
 This document describes the architecture patterns and best practices used in our API services. It covers the organization of API projects, route composition, data validation, service layer, and database interactions.
 
+For monorepo structure and import guidelines, see [Monorepo Structure Guidelines](./monorepo-structure.md).
+
 ## Project Structure
 
 A typical API project follows this structure:
@@ -10,8 +12,9 @@ A typical API project follows this structure:
 src/
   ├── app.ts              # Main application setup and route composition
   ├── env.ts              # Environment configuration
-  ├── main.ts             # Application entry point
-  ├── middlewares/        # Global middleware functions
+  ├── hono.ts            # Router creation with typed context
+  ├── main.ts            # Application entry point
+  ├── middlewares/       # Global middleware functions
   ├── routes/            # Route handlers and controllers
   │   ├── chat/
   │   │   ├── index.ts           # Route composition
@@ -24,25 +27,60 @@ src/
   └── shared/           # Shared utilities and types
 ```
 
-## Route Composition with Hono
+## Imports
 
-We use Hono for building our APIs. Routes are composed hierarchically:
+Follow the monorepo import guidelines using path aliases:
 
 ```typescript
+// Core libraries
+import { zValidator } from '@core/server'
+import { createLazyInstance } from '@core/di'
+import { BadRequestException } from '@core/exceptions'
+
+// Game libraries
+import { chatService, profileService } from '@games/services'
+import { SessionVariant } from '@games/model'
+import { ChatServiceOptions } from '@games/options'
+
+// Database
+import { ChatMessageTable } from '@dbs/games-schema'
+import { Currency, UserRole } from '@dbs/games-types'
+```
+
+## Route Composition with Hono
+
+We use Hono for building our APIs. Each API project has its own `createRouter` function that includes typed context:
+
+```typescript
+// hono.ts - Router with typed context
+import { HonoUwsEnv } from '@core/server'
+import { SessionVariant } from '@games/model'
+
+export type ApiEnv = HonoUwsEnv & {
+  Variables: {
+    sessionVariant: SessionVariant
+  }
+}
+
+export function createRouter() {
+  return new Hono<ApiEnv>()
+}
+
 // app.ts - Top level composition
+import { createRouter } from './hono'
+
 export const app = createRouter()
   .use('*', globalMiddleware())
   .route('/chat', chatRouter)
   .route('/profile', profileRouter)
-  .route('/balance', balanceRouter)
 
 // routes/chat/index.ts - Module level composition
-export const chatRouter = new Hono()
+export const chatRouter = createRouter()
   .route('/getMessages', getMessagesHandler)
   .route('/sendMessage', sendMessageHandler)
 
 // routes/chat/get-messages.ts - Individual route handler
-export const getMessagesHandler = new Hono()
+export const getMessagesHandler = createRouter()
   .get('/', async (ctx) => {
     const messages = await chatService.getMessages()
     return ctx.json(messages)
@@ -78,33 +116,29 @@ export const getMessagesHandler = new Hono()
 Services encapsulate business logic and data access. They are typically initialized lazily to avoid unnecessary instantiation:
 
 ```typescript
-// services/my-service.ts
 import { createLazyInstance } from '@core/di'
-import { MyServiceOptionsToken } from '@my/options'
+import { ChatServiceOptions } from '@games/options'
+import { ChatMessageTable } from '@dbs/games-schema'
 
-export class MyService {
-  private options: MyServiceOptions
+export class ChatService {
+  private options: ChatServiceOptions
 
   constructor() {
-    this.options = resolveOptions(MyServiceOptionsToken)
+    this.options = resolveOptions(ChatServiceOptionsToken)
   }
 
-  async getData() {
-    // Use this.options for configuration
-    // Business logic implementation
-    // Database access
-    // External service integration
+  async getMessages() {
+    // Implementation
   }
 }
 
-// Lazy initialization via Proxy
-export const myService = createLazyInstance(MyService)
+export const chatService = createLazyInstance(ChatService)
 ```
 
 ### Service Layer Organization
 
 1. Options Management
-   - Options are defined in a separate package (for example, `games-libs/options`)
+   - Options are defined in a separate package (for example, `@games/options`)
    - Use `resolveOptions` to get typed options
    - Use `registerOptions` to register options on application level (usually in setup.ts file in API src folder)
    - Options are validated at service initialization
@@ -123,6 +157,10 @@ export const myService = createLazyInstance(MyService)
    // Individual services are created lazily
    // and only initialized when first accessed
    ```
+
+### Decorators
+
+Decorators are **never used** in application or service layer. This prevents different bundling and environment issues related to decorators support.
 
 ### Service Layer Responsibilities
 

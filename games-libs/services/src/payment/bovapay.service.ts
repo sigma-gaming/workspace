@@ -1,15 +1,30 @@
-import crypto, { createHash } from 'crypto'
+import crypto from 'crypto'
 import { createLazyInstance, resolveOptions } from '@core/di'
 import { PaymentProvider } from '@dbs/games-types'
 import { BovapayOptions, BovapayOptionsToken } from '@games/options'
-import axios from 'axios'
+import {
+  createDeposit,
+  createPayout,
+  generateSignature,
+  getTransactionStatus,
+} from '../api/bovapay/client'
+import {
+  BovapayCreateDepositRequest,
+  BovapayCreatePayoutRequest,
+  BovapayStatus,
+} from '../api/bovapay/types'
 import {
   DepositRequest,
+  DepositResponse,
   PaymentProviderService,
-  PaymentResponse,
   PaymentStatus,
+  PayoutRequest,
+  PayoutResponse,
   WithdrawalRequest,
+  WithdrawalResponse,
 } from './types'
+
+const encoder = new TextEncoder()
 
 export class BovapayService implements PaymentProviderService {
   readonly provider = PaymentProvider.Bovapay
@@ -19,47 +34,7 @@ export class BovapayService implements PaymentProviderService {
     this.options = resolveOptions(BovapayOptionsToken)
   }
 
-  private generateSignature(payload: Record<string, any>): string {
-    const data = this.options.apiKey + JSON.stringify(payload)
-    const hash = createHash('sha1').update(data).digest('hex')
-    return hash
-  }
-
-  verifySignature = (
-    payload: Record<string, any>,
-    signature: string,
-  ): boolean => {
-    return this.generateSignature(payload) === signature
-  }
-
-  private async makeRequest<T>(
-    method: string,
-    endpoint: string,
-    data?: Record<string, any>,
-  ): Promise<T> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
-
-    if (data) {
-      headers.Signature = this.generateSignature(data)
-    }
-
-    const response = await axios({
-      method,
-      url: `${this.options.apiUrl}${endpoint}`,
-      headers,
-      data,
-    })
-
-    if (response.data.status !== 'ok') {
-      throw new Error(response.data.message || 'Unknown error')
-    }
-
-    return response.data.data
-  }
-
-  private mapBovapayStatus(status: string): PaymentStatus {
+  private mapBovapayStatus(status: BovapayStatus): PaymentStatus {
     switch (status) {
       case 'paid':
         return PaymentStatus.Completed
@@ -78,53 +53,111 @@ export class BovapayService implements PaymentProviderService {
     }
   }
 
-  async createDeposit(request: DepositRequest): Promise<PaymentResponse> {
-    const data = {
-      user_uuid: request.userId,
-      merchant_id: crypto.randomUUID(),
-      payeer_identifier: request.userId,
-      payeer_ip: request.userIp,
-      payeer_type: 'trust', // TODO: Determine based on user history
-      currency: request.currency.toLowerCase(),
-      payment_method: request.method.toLowerCase(),
-      amount: request.amount,
-      callback_url: this.options.callbackUrl,
-      redirect_url: request.redirectUrl,
-      email: request.email,
-      customer_name: request.customerName,
-    }
+  verifySignature(data: Record<string, any>, signature: string): boolean {
+    const expectedSignature = generateSignature(data, this.options.apiKey)
 
-    const response = await this.makeRequest<any>(
-      'POST',
-      '/merchant/v1/deposits',
-      data,
+    return crypto.timingSafeEqual(
+      encoder.encode(signature),
+      encoder.encode(expectedSignature),
     )
+  }
 
-    return {
-      transactionId: response.merchant_id,
-      providerTransactionId: response.uuid,
-      status: this.mapBovapayStatus(response.state),
-      amount: Number(response.source_transaction.fiat_amount),
-      currency: request.currency,
-      formUrl: response.form_url,
-      createdAt: new Date(response.created_at),
-      updatedAt: new Date(response.updated_at),
+  async createDeposit(request: DepositRequest): Promise<DepositResponse> {
+    try {
+      const depositRequest: BovapayCreateDepositRequest = {
+        user_uuid: request.userId,
+        merchant_id: crypto.randomUUID(),
+        payeer_identifier: request.userId,
+        payeer_ip: request.userIp,
+        payeer_type: 'trust', // TODO: Determine based on user history
+        currency: request.currency.toLowerCase() as any,
+        payment_method: request.method.toLowerCase() as any,
+        amount: request.amount,
+        callback_url: this.options.callbackUrl,
+        redirect_url: request.redirectUrl,
+        email: request.email,
+        customer_name: request.customerName,
+      }
+
+      const response = await createDeposit(depositRequest, {
+        apiKey: this.options.apiKey,
+        apiUrl: this.options.apiUrl,
+      })
+
+      return {
+        transactionId: response.data.uuid,
+        providerTransactionId: response.data.uuid,
+        status: this.mapBovapayStatus(response.data.state),
+        amount: Number(response.data.source_transaction.fiat_amount),
+        currency: request.currency,
+        redirectUrl: response.data.form_url,
+        createdAt: new Date(response.data.created_at),
+        updatedAt: new Date(response.data.updated_at),
+      }
+    } catch (error) {
+      throw new Error('Failed to create deposit')
+    }
+  }
+
+  async createPayout(request: PayoutRequest): Promise<PayoutResponse> {
+    try {
+      const payoutRequest: BovapayCreatePayoutRequest = {
+        user_id: request.userId,
+        amount: request.amount,
+        currency: request.currency.toLowerCase() as any,
+        method: request.method as any,
+      }
+
+      const response = await createPayout(payoutRequest, {
+        apiKey: this.options.apiKey,
+        apiUrl: this.options.apiUrl,
+      })
+
+      return {
+        transactionId: response.data.payout_id,
+        status: this.mapBovapayStatus(response.data.status),
+        createdAt: new Date(response.data.created_at),
+      }
+    } catch (error) {
+      throw new Error('Failed to create payout')
     }
   }
 
   async createWithdrawal(
-    _request: WithdrawalRequest,
-  ): Promise<PaymentResponse> {
-    // TODO: Implement withdrawal when Bovapay provides the API
-    throw new Error('Withdrawals not yet supported by Bovapay')
+    request: WithdrawalRequest,
+  ): Promise<WithdrawalResponse> {
+    try {
+      const payoutRequest: BovapayCreatePayoutRequest = {
+        user_id: request.userId,
+        amount: request.amount,
+        currency: request.currency.toLowerCase() as any,
+        method: request.method as any,
+      }
+
+      const response = await createPayout(payoutRequest, {
+        apiKey: this.options.apiKey,
+        apiUrl: this.options.apiUrl,
+      })
+
+      return {
+        transactionId: response.data.payout_id,
+        providerTransactionId: response.data.payout_id,
+        status: this.mapBovapayStatus(response.data.status),
+        amount: request.amount,
+        currency: request.currency,
+        createdAt: new Date(response.data.created_at),
+        updatedAt: new Date(response.data.created_at),
+      }
+    } catch (error) {
+      throw new Error('Failed to create withdrawal')
+    }
   }
 
   async getTransactionStatus(transactionId: string): Promise<PaymentStatus> {
-    const response = await this.makeRequest<any>(
-      'GET',
-      `/v1/p2p_transactions/${transactionId}`,
-    )
-
+    const response = await getTransactionStatus(transactionId, {
+      apiKey: this.options.apiKey,
+      apiUrl: this.options.apiUrl,
+    })
     return this.mapBovapayStatus(response.payload.state)
   }
 }

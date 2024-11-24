@@ -6,7 +6,14 @@ import {
 } from '@dbs/games-types'
 import { bovapayService } from './bovapay.service'
 import { DEPOSIT_CONFIG } from './deposit.config'
-import { PaymentProviderService, PaymentResponse, PaymentStatus } from './types'
+import {
+  DepositOutput,
+  DepositParams,
+  PaymentProviderService,
+  PaymentResult,
+  WithdrawalOutput,
+  WithdrawalParams,
+} from './types'
 import { WITHDRAWAL_CONFIG } from './withdrawal.config'
 
 export class PaymentService {
@@ -16,137 +23,170 @@ export class PaymentService {
   private getProviderService(
     provider: PaymentProvider,
   ): PaymentProviderService {
-    const system = this.providerServices.get(provider)
-    if (!system) {
+    const service = this.providerServices.get(provider)
+
+    if (!service) {
       throw new Error(`Payment provider ${provider} not initialized`)
     }
-    return system
+
+    return service
   }
 
-  private validateDepositMethod(
+  private validateDepositBundle(
     method: DepositMethod,
     provider: PaymentProvider,
     currency: Currency,
   ) {
     const methodConfig = DEPOSIT_CONFIG[method]
     if (!methodConfig) {
-      throw new Error(`Deposit method ${method} is not supported`)
+      return {
+        result: PaymentResult.UnsupportedMethod,
+        method,
+        provider,
+      } as const
     }
 
     const providerConfig = methodConfig[provider]
     if (!providerConfig) {
-      throw new Error(
-        `Provider ${provider} is not supported for deposit method ${method}`,
-      )
+      return {
+        result: PaymentResult.UnsupportedMethod,
+        method,
+        provider,
+      } as const
     }
 
-    const currencyConfig = providerConfig[currency]
-    if (!currencyConfig) {
-      throw new Error(
-        `Currency ${currency} is not supported for deposit method ${method} with provider ${provider}`,
-      )
+    const depositBundle = providerConfig[currency]
+    if (!depositBundle) {
+      return {
+        result: PaymentResult.UnsupportedCurrency,
+        currency,
+        method,
+      } as const
     }
 
-    return currencyConfig
+    return { result: PaymentResult.Success, bundle: depositBundle } as const
   }
 
-  private validateWithdrawalMethod(
+  private validateWithdrawalBundle(
     method: WithdrawalMethod,
     provider: PaymentProvider,
     currency: Currency,
   ) {
     const methodConfig = WITHDRAWAL_CONFIG[method]
     if (!methodConfig) {
-      throw new Error(`Withdrawal method ${method} is not supported`)
+      return {
+        result: PaymentResult.UnsupportedMethod,
+        method,
+        provider,
+      } as const
     }
 
     const providerConfig = methodConfig[provider]
     if (!providerConfig) {
-      throw new Error(
-        `Provider ${provider} is not supported for withdrawal method ${method}`,
-      )
+      return {
+        result: PaymentResult.UnsupportedMethod,
+        method,
+        provider,
+      } as const
     }
 
-    const currencyConfig = providerConfig[currency]
-    if (!currencyConfig) {
-      throw new Error(
-        `Currency ${currency} is not supported for withdrawal method ${method} with provider ${provider}`,
-      )
+    const withdrawalBundle = providerConfig[currency]
+    if (!withdrawalBundle) {
+      return {
+        result: PaymentResult.UnsupportedCurrency,
+        currency,
+        method,
+      } as const
     }
 
-    return currencyConfig
+    return { result: PaymentResult.Success, bundle: withdrawalBundle } as const
   }
 
-  async createDeposit(params: {
-    userId: string
-    method: DepositMethod
-    provider: PaymentProvider
-    amount: number
-    currency: Currency
-    redirectUrl: string
-    userIp: string
-    email?: string
-    customerName?: string
-  }): Promise<PaymentResponse> {
-    const config = this.validateDepositMethod(
+  async createDeposit(params: DepositParams): Promise<DepositOutput> {
+    const validation = this.validateDepositBundle(
       params.method,
       params.provider,
       params.currency,
     )
 
-    // Validate amount
-    if (config.minAmount && params.amount < config.minAmount) {
-      throw new Error(
-        `Minimum deposit amount is ${config.minAmount} ${params.currency}`,
-      )
-    }
-    if (config.maxAmount && params.amount > config.maxAmount) {
-      throw new Error(
-        `Maximum deposit amount is ${config.maxAmount} ${params.currency}`,
-      )
+    if (validation.result !== PaymentResult.Success) {
+      return validation
     }
 
-    const service = this.getProviderService(params.provider)
-    return await service.createDeposit(params)
-  }
-
-  async createWithdrawal(params: {
-    userId: string
-    method: WithdrawalMethod
-    provider: PaymentProvider
-    amount: number
-    currency: Currency
-    userIp: string
-    accountDetails: string
-    email?: string
-    customerName?: string
-  }): Promise<PaymentResponse> {
-    const config = this.validateWithdrawalMethod(
-      params.method,
-      params.provider,
-      params.currency,
-    )
+    const { bundle } = validation
 
     // Validate amount
-    if (config.minAmount && params.amount < config.minAmount) {
-      throw new Error(
-        `Minimum withdrawal amount is ${config.minAmount} ${params.currency}`,
-      )
-    }
-    if (config.maxAmount && params.amount > config.maxAmount) {
-      throw new Error(
-        `Maximum withdrawal amount is ${config.maxAmount} ${params.currency}`,
-      )
+    if (bundle.minAmount && params.amount < bundle.minAmount) {
+      return {
+        result: PaymentResult.InvalidAmount,
+        minAmount: bundle.minAmount,
+        currency: params.currency,
+      }
     }
 
-    const service = this.getProviderService(params.provider)
-    return await service.createWithdrawal(params)
+    if (bundle.maxAmount && params.amount > bundle.maxAmount) {
+      return {
+        result: PaymentResult.InvalidAmount,
+        maxAmount: bundle.maxAmount,
+        currency: params.currency,
+      }
+    }
+
+    try {
+      const service = this.getProviderService(params.provider)
+      const response = await service.createDeposit(params)
+
+      return {
+        result: PaymentResult.Success,
+        transactionId: response.transactionId,
+        redirectUrl: response.redirectUrl,
+        amount: params.amount,
+        currency: params.currency,
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        return {
+          result: PaymentResult.ProviderError,
+          error: error.message,
+        }
+      }
+      return {
+        result: PaymentResult.Failed,
+        error: 'Unknown error occurred',
+      }
+    }
   }
 
-  async getTransactionStatus(
-    provider: PaymentProvider,
-    transactionId: string,
-  ): Promise<PaymentStatus> {
+  async createWithdrawal(params: WithdrawalParams): Promise<WithdrawalOutput> {
+    try {
+      const service = this.getProviderService(params.provider)
+      const response = await service.createWithdrawal({
+        userId: params.userId,
+        amount: params.amount,
+        provider: params.provider,
+        method: params.method,
+        currency: params.currency,
+        accountDetails: params.accountDetails,
+        userIp: params.userIp,
+        email: params.email,
+        customerName: params.customerName,
+      })
+
+      return {
+        result: PaymentResult.Success,
+        transactionId: response.transactionId,
+        amount: response.amount,
+        currency: response.currency,
+      }
+    } catch (error) {
+      return {
+        result: PaymentResult.Failed,
+        error: error instanceof Error ? error.message : String(error),
+      }
+    }
+  }
+
+  async getTransactionStatus(provider: PaymentProvider, transactionId: string) {
     const service = this.getProviderService(provider)
     return service.getTransactionStatus(transactionId)
   }
