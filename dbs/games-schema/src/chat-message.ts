@@ -1,7 +1,7 @@
 import { ChatMessageAttachment } from '@dbs/games-types'
 import { sql } from 'drizzle-orm'
 import {
-  bigserial,
+  bigint,
   boolean,
   index,
   integer,
@@ -18,7 +18,9 @@ import { UserTable } from './user'
 export const ChatMessageTable = pgTable(
   'ChatMessage',
   {
-    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
     trackingId: uuid('trackingId').notNull().defaultRandom(),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()

@@ -166,7 +166,6 @@ export class PaymentService {
         provider: params.provider,
         method: params.method,
         currency: params.currency,
-        accountDetails: params.accountDetails,
         userIp: params.userIp,
         email: params.email,
         customerName: params.customerName,

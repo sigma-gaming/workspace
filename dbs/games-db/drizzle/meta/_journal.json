@@ -575,6 +575,69 @@
       "when": 1731363616370,
       "tag": "0081_boring_gateway",
       "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1732828532682,
+      "tag": "0082_needy_black_bolt",
+      "breakpoints": true
+    },
+    {
+      "idx": 83,
+      "version": "7",
+      "when": 1732829534215,
+      "tag": "0083_chemical_shotgun",
+      "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1732829756805,
+      "tag": "0084_salty_triathlon",
+      "breakpoints": true
+    },
+    {
+      "idx": 85,
+      "version": "7",
+      "when": 1732830201659,
+      "tag": "0085_right_shen",
+      "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1732830337139,
+      "tag": "0086_sloppy_ravenous",
+      "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1732830479030,
+      "tag": "0087_ambiguous_warlock",
+      "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1732830525958,
+      "tag": "0088_talented_grandmaster",
+      "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1732830568377,
+      "tag": "0089_regular_sprite",
+      "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1732830823663,
+      "tag": "0090_blue_trish_tilby",
+      "breakpoints": true
     }
   ]
 }

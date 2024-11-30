@@ -4,7 +4,6 @@ import { Button, Menu, Modal, rem, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconCoins,
-  IconLoader2,
   IconLogout,
   IconSettings,
   IconWallet,
@@ -12,12 +11,12 @@ import {
 import { Link } from 'atomic-router-react'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
-import { $$balance } from '../../entities/balance'
 import { $$profile } from '../../entities/profile/index.ts'
 import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$session } from '../../entities/session/index.ts'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
+import { $$paymentModals } from '../../widgets/payment-modals/index.ts'
 import { Balance } from './balance.tsx'
 
 function useAvatarSize() {
@@ -31,8 +30,6 @@ function useAvatarSize() {
 export const MiniProfile = () => {
   const isMobile = useMedia({ to: 'md' })
   const userLoggedIn = useUnit($$session.$loggedIn)
-  const balanceDepositing = useUnit($$balance.$depositing)
-  const balanceWithdrawing = useUnit($$balance.$withdrawing)
   const userLoaded = useUnit($$user.$loaded)
   const profileLoaded = useUnit($$profile.$loaded)
   const profile = useUnit($$profile.$profile)
@@ -101,39 +98,21 @@ export const MiniProfile = () => {
 
         <Menu.Item
           className="text-green-400"
-          onClick={() => $$balance.deposit()}
-          closeMenuOnClick={false}
-          disabled={balanceDepositing}
+          onClick={() => $$paymentModals.openDeposit()}
           leftSection={
-            balanceDepositing ? (
-              <IconLoader2
-                className="animate-spin"
-                style={{ width: rem(16), height: rem(16) }}
-              />
-            ) : (
-              <IconWallet style={{ width: rem(16), height: rem(16) }} />
-            )
+            <IconWallet style={{ width: rem(16), height: rem(16) }} />
           }
         >
-          {balanceDepositing ? 'Пополняем баланс...' : 'Пополнить баланс'}
+          Пополнить баланс
         </Menu.Item>
 
         <Menu.Item
-          onClick={() => $$balance.withdraw()}
-          closeMenuOnClick={false}
-          disabled={balanceWithdrawing}
+          onClick={() => $$paymentModals.openWithdraw()}
           leftSection={
-            balanceWithdrawing ? (
-              <IconLoader2
-                className="animate-spin"
-                style={{ width: rem(16), height: rem(16) }}
-              />
-            ) : (
-              <IconCoins style={{ width: rem(16), height: rem(16) }} />
-            )
+            <IconCoins style={{ width: rem(16), height: rem(16) }} />
           }
         >
-          {balanceWithdrawing ? 'Выводим деньги...' : 'Вывести деньги'}
+          Вывести деньги
         </Menu.Item>
 
         <Menu.Divider />

@@ -1,7 +1,6 @@
 import { GameSnapshot } from '@dbs/games-types'
 import {
   bigint,
-  bigserial,
   index,
   integer,
   jsonb,
@@ -17,7 +16,9 @@ import { UserTable } from './user'
 export const GameRecordTable = pgTable(
   'GameRecord',
   {
-    id: bigserial('id', { mode: 'number' }).primaryKey(),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),

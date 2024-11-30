@@ -1,7 +1,7 @@
 import {
   boolean,
+  integer,
   pgTable,
-  serial,
   text,
   timestamp,
   uuid,
@@ -10,7 +10,7 @@ import { accountProviderEnum } from './enums'
 import { UserTable } from './user'
 
 export const ProfileTable = pgTable('Profile', {
-  id: serial('id').primaryKey(),
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),

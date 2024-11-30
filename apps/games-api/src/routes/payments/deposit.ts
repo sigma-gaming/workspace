@@ -1,4 +1,4 @@
-import { BadRequestException } from '@core/exceptions'
+import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { zValidator } from '@core/server'
 import { Currency, DepositMethod, PaymentProvider } from '@dbs/games-types'
 import { gemInt } from '@games/model'
@@ -11,7 +11,6 @@ const PayloadSchema = z.object({
   provider: z.nativeEnum(PaymentProvider),
   method: z.nativeEnum(DepositMethod),
   currency: z.nativeEnum(Currency),
-  redirectUrl: z.string().url(),
 })
 
 export const depositRoute = createRouter().post(
@@ -19,8 +18,14 @@ export const depositRoute = createRouter().post(
   zValidator('json', PayloadSchema),
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)
-    const { amount, provider, method, currency, redirectUrl } =
-      ctx.req.valid('json')
+    const { amount, provider, method, currency } = ctx.req.valid('json')
+    const host = ctx.req.header('x-forwarded-host') ?? ctx.req.header('host')
+
+    if (!host) {
+      throw new InternalServerException()
+    }
+
+    const redirectUrl = host
 
     const result = await paymentService.createDeposit({
       userId,

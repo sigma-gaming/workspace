@@ -10,6 +10,7 @@ import { NotFoundPageView } from '../pages/not-found'
 import { router } from '../routing'
 import { RouteLayout } from '../routing/types.ts'
 import { usePageTitle } from '../shared/meta/title.ts'
+import { DepositModal } from '../widgets/payment-modals'
 
 const loadFramerFeatures = () =>
   import('./framer-features.ts').then(({ features }) => features)
@@ -69,6 +70,7 @@ export const AppView = () => {
           />
           <OptimizedPages />
           <MaintenanceOverlay />
+          <DepositModal />
         </ThemeProvider>
       </RouterProvider>
     </LazyMotion>

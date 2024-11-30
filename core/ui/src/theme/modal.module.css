@@ -3,12 +3,11 @@
 }
 
 .content {
-  @apply will-change-transform shadow-border;
-  background-color: #25273C;
+  @apply will-change-transform shadow-border bg-[#1B1C2F];
 }
 
 .header {
-  background: linear-gradient(180deg, #25273c, rgba(37, 39, 60, 0.95) 50%, rgba(37, 39, 60, 0.8) 70%, rgba(37, 39, 60, 0.4) 85%, rgba(37, 39, 60, 0));
+  @apply bg-[#1B1C2F] pt-3;
 }
 
 .title {

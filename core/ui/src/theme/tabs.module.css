@@ -1,36 +1,38 @@
-.list {
-  @apply overflow-x-auto overflow-y-visible flex-nowrap scrollbar-hide;
-  box-shadow: inset 0 -2px #25273e;
-}
-
-.list:before {
-  content: none;
-}
-
-.tabLabel {
-  @apply font-medium;
-}
-
-.tabSection[data-position="left"] {
-  @apply mr-2;
-}
-
-.tabSection[data-position="right"] {
-  @apply ml-2;
-}
-
-.tab {
-  @apply border-b-2 border-[#25273e];
-}
-
-.tab:where([data-active]) {
-  @apply border-[var(--tabs-color)];
-}
-
-.tab:hover {
-  @apply bg-[#25273E];
-
-  &:not([data-active]) {
-    @apply border-[#333655];
+.root:not([data-variant="unstyled"]) {
+  .list {
+    @apply overflow-x-auto overflow-y-visible flex-nowrap scrollbar-hide;
+    box-shadow: inset 0 -2px #25273e;
+  }
+  
+  .list:before {
+    content: none;
+  }
+  
+  .tabLabel {
+    @apply font-medium;
+  }
+  
+  .tabSection[data-position="left"] {
+    @apply mr-2;
+  }
+  
+  .tabSection[data-position="right"] {
+    @apply ml-2;
+  }
+  
+  .tab {
+    @apply border-b-2 border-[#25273e];
+  }
+  
+  .tab:where([data-active]) {
+    @apply border-[var(--tabs-color)];
+  }
+  
+  .tab:hover {
+    @apply bg-[#25273E];
+  
+    &:not([data-active]) {
+      @apply border-[#333655];
+    }
   }
 }

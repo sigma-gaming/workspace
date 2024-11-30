@@ -103,7 +103,6 @@ export type WithdrawalParams = {
   provider: PaymentProvider
   method: WithdrawalMethod
   currency: Currency
-  accountDetails: string
   userIp: string
   email?: string
   customerName?: string
@@ -134,7 +133,6 @@ export type DepositRequest = {
 
 export type WithdrawalRequest = {
   method: WithdrawalMethod
-  accountDetails: string
 } & PaymentRequest
 
 export type PayoutRequest = {

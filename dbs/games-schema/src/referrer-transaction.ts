@@ -1,6 +1,5 @@
 import {
   bigint,
-  bigserial,
   boolean,
   index,
   integer,
@@ -15,7 +14,9 @@ import { UserTable } from './user'
 export const ReferrerTransactionTable = pgTable(
   'ReferrerTransaction',
   {
-    id: bigserial('id', { mode: 'number' }).primaryKey().notNull(),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),

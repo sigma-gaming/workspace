@@ -2,9 +2,9 @@ import { WithdrawalProviderPayload } from '@dbs/games-types'
 import { sql } from 'drizzle-orm'
 import {
   bigint,
+  integer,
   jsonb,
   pgTable,
-  serial,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
@@ -18,7 +18,7 @@ import { TransactionTable } from './transaction'
 import { UserTable } from './user'
 
 export const Withdrawal = pgTable('Withdrawal', {
-  id: serial('id').primaryKey(),
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .defaultNow()
     .notNull(),

@@ -11,7 +11,6 @@ const PayloadSchema = z.object({
   provider: z.nativeEnum(PaymentProvider),
   method: z.nativeEnum(WithdrawalMethod),
   currency: z.nativeEnum(Currency),
-  accountDetails: z.string().min(1),
 })
 
 export const withdrawRoute = createRouter().post(
@@ -19,8 +18,7 @@ export const withdrawRoute = createRouter().post(
   zValidator('json', PayloadSchema),
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)
-    const { amount, provider, method, currency, accountDetails } =
-      ctx.req.valid('json')
+    const { amount, provider, method, currency } = ctx.req.valid('json')
 
     const result = await paymentService.createWithdrawal({
       userId,
@@ -28,7 +26,6 @@ export const withdrawRoute = createRouter().post(
       provider,
       method,
       currency,
-      accountDetails,
       userIp: ctx.env.ip,
     })
 
