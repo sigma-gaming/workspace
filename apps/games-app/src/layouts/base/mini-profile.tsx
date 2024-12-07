@@ -16,7 +16,7 @@ import { TelegramButton, VkButton } from '../../entities/provider'
 import { $$session } from '../../entities/session/index.ts'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
-import { $$paymentModals } from '../../widgets/payment-modals/index.ts'
+import { $$paymentModal } from '../../widgets/payment-modal'
 import { Balance } from './balance.tsx'
 
 function useAvatarSize() {
@@ -98,7 +98,7 @@ export const MiniProfile = () => {
 
         <Menu.Item
           className="text-green-400"
-          onClick={() => $$paymentModals.openDeposit()}
+          onClick={() => $$paymentModal.openDeposit()}
           leftSection={
             <IconWallet style={{ width: rem(16), height: rem(16) }} />
           }
@@ -107,7 +107,7 @@ export const MiniProfile = () => {
         </Menu.Item>
 
         <Menu.Item
-          onClick={() => $$paymentModals.openWithdraw()}
+          onClick={() => $$paymentModal.openWithdraw()}
           leftSection={
             <IconCoins style={{ width: rem(16), height: rem(16) }} />
           }

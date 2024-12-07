@@ -1,5 +1,5 @@
 .root {
-  @apply bg-[#25273E];
+  @apply bg-[#25273E] rounded-xl;
 
   &[data-disabled='true'] {
     @apply opacity-60;

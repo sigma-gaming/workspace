@@ -7,12 +7,15 @@ import { Error } from './error.tsx'
 import { Gem } from './gem.tsx'
 import { History } from './history.tsx'
 import { NotFound } from './not-found.tsx'
+import { Piastrix } from './piastrix.tsx'
 import { Play } from './play.tsx'
 import { Question } from './question.tsx'
+import { Sbp } from './sbp.tsx'
 import { Send } from './send.tsx'
 import { Sigma } from './sigma.tsx'
 import { Sparkle } from './sparkle.tsx'
 import { Telegram } from './telegram.tsx'
+import { TonSymbol } from './ton-symbol.tsx'
 import { Transfer } from './transfer.tsx'
 import { TrendingUp } from './trending-up.tsx'
 import { Vk } from './vk.tsx'
@@ -36,4 +39,7 @@ export const Icons = {
   Sparkle,
   NotFound,
   Announcement,
+  Sbp,
+  Piastrix,
+  TonSymbol,
 }

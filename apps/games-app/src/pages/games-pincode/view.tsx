@@ -4,7 +4,7 @@ import { GamePlaygroundLayout } from '../../layouts/game-playground/view.tsx'
 import { $$pincodePage } from './model.ts'
 import { AnimatedPincode } from './ui/animated-pincode.tsx'
 import { BetField } from './ui/field-bet.tsx'
-import { HardcoreModeField } from './ui/field-hardcore-mode.tsx'
+import { ModeField } from './ui/field-mode.tsx'
 import { FormActions } from './ui/form-actions.tsx'
 import { MultiplierTable } from './ui/multiplier-table.tsx'
 
@@ -23,7 +23,7 @@ export const PincodeGamePageView = memo(() => {
       fieldsZone={
         <>
           <BetField />
-          <HardcoreModeField />
+          <ModeField />
         </>
       }
       actionsZone={<FormActions />}

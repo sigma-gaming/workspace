@@ -1,27 +1,25 @@
 import { Currency, PaymentProvider, WithdrawalMethod } from '@dbs/games-types'
+import { toConfigTree, WithdrawalConfigList } from '@games/model'
 
-export type WithdrawalBundleConfig = {
-  minAmount?: number
-  maxAmount?: number
-  commissionRate?: number
-}
-
-export type WithdrawalConfig = {
-  [method in WithdrawalMethod]?: {
-    [provider in PaymentProvider]?: {
-      [currency in Currency]?: WithdrawalBundleConfig
-    }
-  }
-}
-
-export const WITHDRAWAL_CONFIG: WithdrawalConfig = {
-  [WithdrawalMethod.SBP]: {
-    [PaymentProvider.Bovapay]: {
-      [Currency.RUB]: {
-        minAmount: 1000,
-        maxAmount: 100000,
-        commissionRate: 0.03,
+export const WITHDRAWAL_CONFIG_LIST: WithdrawalConfigList = [
+  {
+    method: WithdrawalMethod.SBP,
+    providers: [
+      {
+        provider: PaymentProvider.Bovapay,
+        currencies: [
+          {
+            currency: Currency.RUB,
+            entry: {
+              minAmount: 100,
+              maxAmount: 10000,
+              commissionRate: 0.05,
+            },
+          },
+        ],
       },
-    },
+    ],
   },
-}
+]
+
+export const WITHDRAWAL_CONFIG_TREE = toConfigTree(WITHDRAWAL_CONFIG_LIST)

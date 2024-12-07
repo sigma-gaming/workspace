@@ -115,12 +115,18 @@ export enum Currency {
 
 export enum DepositMethod {
   SBP = 'SBP',
+  CreditCard = 'CreditCard',
+  Piastrix = 'Piastrix',
+  Toncoin = 'Toncoin',
 }
 
 export enum WithdrawalMethod {
   SBP = 'SBP',
+  CreditCard = 'CreditCard',
+  Piastrix = 'Piastrix',
 }
 
 export enum PaymentProvider {
   Bovapay = 'Bovapay',
+  Test = 'Test',
 }

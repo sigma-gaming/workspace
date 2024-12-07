@@ -1,0 +1,91 @@
+.methodListOuter {
+  @apply relative;
+
+  &:before,
+  &:after {
+    @apply block absolute z-10 left-0 w-full h-6 opacity-0;
+    @apply transition-opacity pointer-events-none;
+    content: '';
+  }
+
+  &:before {
+    @apply top-0;
+    background: linear-gradient(to top, rgba(27, 28, 47, 0), #1B1C2F);
+  }
+
+  &:after {
+    @apply bottom-0;
+    background: linear-gradient(to bottom, rgba(27, 28, 47, 0), #1B1C2F);
+  }
+
+  &[data-top-shadow='true']:before {
+    @apply opacity-100;
+  }
+
+  &[data-bottom-shadow='true']:after {
+    @apply opacity-100;
+  }
+}
+
+.methodList {
+  @apply flex flex-col gap-2 mt-2.5 max-h-[220px] overflow-y-auto;
+  @apply rounded-2xl;
+}
+
+.methodCard {
+  @apply p-3 bg-[#2C2E49] border-none rounded-2xl;
+  @apply opacity-50 transition-opacity;
+}
+
+.methodIcon {
+  @apply flex items-center justify-center w-8 h-8 rounded-lg;
+}
+
+.methodLabel {
+  @apply text-base font-semibold;
+}
+
+.methodCard[aria-checked='false']:hover {
+  @apply opacity-75;
+}
+
+.methodCard[aria-checked='true'] {
+  @apply opacity-100;
+}
+
+/* .methodCard {
+  @apply p-3 bg-[#202235] hover:bg-[#25273E] border-none rounded-2xl;
+  @apply transition-colors;
+}
+
+.methodIcon {
+  @apply flex items-center justify-center w-8 h-8 rounded-lg;
+  @apply transition-opacity;
+}
+
+.methodLabel {
+  @apply text-base font-semibold opacity-50;
+  @apply transition-opacity;
+}
+
+.methodCard[aria-checked='false'] .methodIcon {
+  @apply opacity-25
+}
+
+.methodCard[aria-checked='false']:hover {
+  & .methodIcon {
+    @apply opacity-50;
+  }
+
+  & .methodLabel {
+    @apply opacity-75;
+  }
+}
+
+.methodCard[aria-checked='true'] {
+  @apply bg-[#2C2E49];
+
+  & .methodLabel {
+    @apply opacity-100;
+  }
+} */

@@ -1,27 +1,92 @@
 import { Currency, DepositMethod, PaymentProvider } from '@dbs/games-types'
+import { DepositConfigList, toConfigTree } from '@games/model'
 
-export type DepositBundleConfig = {
-  minAmount?: number
-  maxAmount?: number
-  commissionRate?: number
-}
-
-export type DepositConfig = {
-  [method in DepositMethod]?: {
-    [provider in PaymentProvider]?: {
-      [currency in Currency]?: DepositBundleConfig
-    }
-  }
-}
-
-export const DEPOSIT_CONFIG: DepositConfig = {
-  [DepositMethod.SBP]: {
-    [PaymentProvider.Bovapay]: {
-      [Currency.RUB]: {
-        minAmount: 100,
-        maxAmount: 100000,
-        commissionRate: 0.02,
+export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
+  {
+    method: DepositMethod.SBP,
+    providers: [
+      {
+        provider: PaymentProvider.Bovapay,
+        currencies: [
+          {
+            currency: Currency.RUB,
+            entry: {
+              minAmount: 1000,
+              maxAmount: 10000000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
       },
-    },
+      {
+        provider: PaymentProvider.Test,
+        currencies: [
+          {
+            currency: Currency.USD,
+            entry: {
+              minAmount: 100,
+              maxAmount: 10000000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
+      },
+    ],
   },
-}
+  {
+    method: DepositMethod.CreditCard,
+    providers: [
+      {
+        provider: PaymentProvider.Bovapay,
+        currencies: [
+          {
+            currency: Currency.RUB,
+            entry: {
+              minAmount: 100,
+              maxAmount: 100000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    method: DepositMethod.Piastrix,
+    providers: [
+      {
+        provider: PaymentProvider.Bovapay,
+        currencies: [
+          {
+            currency: Currency.RUB,
+            entry: {
+              minAmount: 100,
+              maxAmount: 100000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    method: DepositMethod.Toncoin,
+    providers: [
+      {
+        provider: PaymentProvider.Bovapay,
+        currencies: [
+          {
+            currency: Currency.RUB,
+            entry: {
+              minAmount: 100,
+              maxAmount: 100000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
+      },
+    ],
+  },
+]
+
+export const DEPOSIT_CONFIG_TREE = toConfigTree(DEPOSIT_CONFIG_LIST)

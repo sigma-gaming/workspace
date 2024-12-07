@@ -32,7 +32,7 @@ const colorMap: Record<PincodeMode, string> = {
   hardcore: 'orange.8',
 }
 
-export const HardcoreModeField = () => {
+export const ModeField = () => {
   const value = useUnit($$pincodePage.fields.mode.$value)
   const autoplaying = useUnit($$pincodePage.$autoplaying)
 
@@ -40,9 +40,12 @@ export const HardcoreModeField = () => {
     <div className="flex flex-col gap-2">
       <Input.Label>Сложность</Input.Label>
       <SegmentedControl
+        classNames={{
+          root: 'rounded-3xl',
+          indicator: 'rounded-[20px]',
+        }}
         fullWidth
         withItemsBorders={false}
-        radius="xl"
         value={value}
         onChange={(value) =>
           $$pincodePage.fields.mode.update(value as PincodeMode)

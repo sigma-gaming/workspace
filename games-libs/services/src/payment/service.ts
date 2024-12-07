@@ -5,7 +5,7 @@ import {
   WithdrawalMethod,
 } from '@dbs/games-types'
 import { bovapayService } from './bovapay.service'
-import { DEPOSIT_CONFIG } from './deposit.config'
+import { DEPOSIT_CONFIG_LIST, DEPOSIT_CONFIG_TREE } from './deposit.config'
 import {
   DepositOutput,
   DepositParams,
@@ -14,11 +14,22 @@ import {
   WithdrawalOutput,
   WithdrawalParams,
 } from './types'
-import { WITHDRAWAL_CONFIG } from './withdrawal.config'
+import {
+  WITHDRAWAL_CONFIG_LIST,
+  WITHDRAWAL_CONFIG_TREE,
+} from './withdrawal.config'
 
 export class PaymentService {
   private providerServices: Map<PaymentProvider, PaymentProviderService> =
     new Map([[PaymentProvider.Bovapay, bovapayService]])
+
+  getDepositConfigList() {
+    return DEPOSIT_CONFIG_LIST
+  }
+
+  getWithdrawalConfigList() {
+    return WITHDRAWAL_CONFIG_LIST
+  }
 
   private getProviderService(
     provider: PaymentProvider,
@@ -37,7 +48,7 @@ export class PaymentService {
     provider: PaymentProvider,
     currency: Currency,
   ) {
-    const methodConfig = DEPOSIT_CONFIG[method]
+    const methodConfig = DEPOSIT_CONFIG_TREE[method]
     if (!methodConfig) {
       return {
         result: PaymentResult.UnsupportedMethod,
@@ -72,7 +83,7 @@ export class PaymentService {
     provider: PaymentProvider,
     currency: Currency,
   ) {
-    const methodConfig = WITHDRAWAL_CONFIG[method]
+    const methodConfig = WITHDRAWAL_CONFIG_TREE[method]
     if (!methodConfig) {
       return {
         result: PaymentResult.UnsupportedMethod,
