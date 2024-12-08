@@ -57,8 +57,8 @@ export class PaymentService {
       } as const
     }
 
-    const providerConfig = methodConfig[provider]
-    if (!providerConfig) {
+    const currencyConfig = methodConfig[currency]
+    if (!currencyConfig) {
       return {
         result: PaymentResult.UnsupportedMethod,
         method,
@@ -66,7 +66,7 @@ export class PaymentService {
       } as const
     }
 
-    const depositBundle = providerConfig[currency]
+    const depositBundle = currencyConfig[provider]
     if (!depositBundle) {
       return {
         result: PaymentResult.UnsupportedCurrency,
@@ -92,8 +92,8 @@ export class PaymentService {
       } as const
     }
 
-    const providerConfig = methodConfig[provider]
-    if (!providerConfig) {
+    const currencyConfig = methodConfig[currency]
+    if (!currencyConfig) {
       return {
         result: PaymentResult.UnsupportedMethod,
         method,
@@ -101,7 +101,7 @@ export class PaymentService {
       } as const
     }
 
-    const withdrawalBundle = providerConfig[currency]
+    const withdrawalBundle = currencyConfig[provider]
     if (!withdrawalBundle) {
       return {
         result: PaymentResult.UnsupportedCurrency,

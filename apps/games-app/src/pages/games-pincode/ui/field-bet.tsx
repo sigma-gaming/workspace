@@ -18,6 +18,7 @@ export const BetField = () => {
               id="bet-field"
               className="grow"
               classNames={{ wrapper: 'mt-0' }}
+              placeholder="Введите сумму"
               value={bet}
               onChange={(value) => $$pincodePage.fields.bet.update(value)}
               error={errors.bet[0]}

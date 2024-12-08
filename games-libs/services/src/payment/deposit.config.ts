@@ -4,12 +4,12 @@ import { DepositConfigList, toConfigTree } from '@games/model'
 export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
   {
     method: DepositMethod.SBP,
-    providers: [
+    currencies: [
       {
-        provider: PaymentProvider.Bovapay,
-        currencies: [
+        currency: Currency.RUB,
+        providers: [
           {
-            currency: Currency.RUB,
+            provider: PaymentProvider.Bovapay,
             entry: {
               minAmount: 1000,
               maxAmount: 10000000,
@@ -19,12 +19,12 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
         ],
       },
       {
-        provider: PaymentProvider.Test,
-        currencies: [
+        currency: Currency.KZT,
+        providers: [
           {
-            currency: Currency.USD,
+            provider: PaymentProvider.Test,
             entry: {
-              minAmount: 100,
+              minAmount: 1000,
               maxAmount: 10000000,
               commissionRate: 0.02,
             },
@@ -35,12 +35,12 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
   },
   {
     method: DepositMethod.CreditCard,
-    providers: [
+    currencies: [
       {
-        provider: PaymentProvider.Bovapay,
-        currencies: [
+        currency: Currency.RUB,
+        providers: [
           {
-            currency: Currency.RUB,
+            provider: PaymentProvider.Bovapay,
             entry: {
               minAmount: 100,
               maxAmount: 100000,
@@ -53,12 +53,12 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
   },
   {
     method: DepositMethod.Piastrix,
-    providers: [
+    currencies: [
       {
-        provider: PaymentProvider.Bovapay,
-        currencies: [
+        currency: Currency.RUB,
+        providers: [
           {
-            currency: Currency.RUB,
+            provider: PaymentProvider.Bovapay,
             entry: {
               minAmount: 100,
               maxAmount: 100000,
@@ -71,12 +71,13 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
   },
   {
     method: DepositMethod.Toncoin,
-    providers: [
+    currencies: [
       {
-        provider: PaymentProvider.Bovapay,
-        currencies: [
+        currency: Currency.TON,
+        only: true,
+        providers: [
           {
-            currency: Currency.RUB,
+            provider: PaymentProvider.Bovapay,
             entry: {
               minAmount: 100,
               maxAmount: 100000,

@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 type GemInputProps = Omit<NumberInputProps, 'value' | 'onChange'> & {
   value: number
-  onChange: (value: number) => void
+  onChange?: (value: number) => void
 }
 
 export const GemInput = forwardRef<HTMLInputElement, GemInputProps>(
@@ -12,8 +12,6 @@ export const GemInput = forwardRef<HTMLInputElement, GemInputProps>(
       if (value === 0) return ''
       return value / 100
     }
-
-    console.log(value, rest)
 
     const [internal, setInternal] = useState(() => toString(value))
     const onChangeRef = useRef(onChange)
@@ -34,21 +32,13 @@ export const GemInput = forwardRef<HTMLInputElement, GemInputProps>(
         typeof internal === 'number' ? internal : Number.parseFloat(internal)
       if (Number.isNaN(float)) float = 0
       const gems = Math.floor(float * 100)
-      onChangeRef.current(gems)
+      onChangeRef.current?.(gems)
     }, [internal, onChangeRef])
 
     const handleBlur = () => {
-      console.log('blur')
-      if (value > max) onChangeRef.current(max)
-      else if (value < min) onChangeRef.current(min)
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowUp') {
-        setInternal(String(Number(internal) + 1))
-      } else if (e.key === 'ArrowDown') {
-        setInternal(String(Number(internal) - 1))
-      }
+      if (value === 0) return
+      if (value > max) onChangeRef.current?.(max)
+      else if (value < min) onChangeRef.current?.(min)
     }
 
     return (
@@ -57,12 +47,12 @@ export const GemInput = forwardRef<HTMLInputElement, GemInputProps>(
         value={internal}
         onChange={setInternal}
         onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
         allowedDecimalSeparators={[',', '.']}
         decimalScale={2}
-        step={1}
         min={min / 100}
         max={max / 100}
+        step={1}
+        stepHoldDelay={500}
         thousandSeparator={' '}
         hideControls
         {...rest}

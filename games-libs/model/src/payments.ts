@@ -5,27 +5,30 @@ import {
   WithdrawalMethod,
 } from '@dbs/games-types'
 
+export type CurrencyExchangeRate = Record<Currency, number>
+
 export type ConfigList<Method extends string, Entry> = Array<{
   method: Method
-  providers: Array<{
-    provider: PaymentProvider
-    currencies: Array<{
-      currency: Currency
+  currencies: Array<{
+    currency: Currency
+    only?: boolean
+    providers: Array<{
+      provider: PaymentProvider
       entry: Entry
     }>
   }>
 }>
 
-export type CurrencyConfigTree<Entry> = {
-  [currency in Currency]?: Entry
+export type ProviderConfigTree<Entry> = {
+  [provider in PaymentProvider]?: Entry
 }
 
-export type ProviderConfigTree<Entry> = {
-  [provider in PaymentProvider]?: CurrencyConfigTree<Entry>
+export type CurrencyConfigTree<Entry> = {
+  [currency in Currency]?: ProviderConfigTree<Entry>
 }
 
 export type ConfigTree<Method extends string, Entry> = {
-  [method in Method]?: ProviderConfigTree<Entry>
+  [method in Method]?: CurrencyConfigTree<Entry>
 }
 
 export type DepositConfigEntry = {
@@ -68,15 +71,15 @@ export function toConfigTree<Method extends string, Entry>(
   list: ConfigList<Method, Entry>,
 ): ConfigTree<Method, Entry> {
   return list.reduce(
-    (acc, { method, providers }) => {
-      acc[method] = providers.reduce((acc, { provider, currencies }) => {
-        acc[provider] = currencies.reduce((acc, { currency, entry }) => {
-          acc[currency] = entry
+    (acc, { method, currencies }) => {
+      acc[method] = currencies.reduce((acc, { currency, providers }) => {
+        acc[currency] = providers.reduce((acc, { provider, entry }) => {
+          acc[provider] = entry
           return acc
-        }, {} as CurrencyConfigTree<Entry>)
+        }, {} as ProviderConfigTree<Entry>)
 
         return acc
-      }, {} as ProviderConfigTree<Entry>)
+      }, {} as CurrencyConfigTree<Entry>)
 
       return acc
     },

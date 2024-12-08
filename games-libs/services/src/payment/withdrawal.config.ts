@@ -4,12 +4,12 @@ import { toConfigTree, WithdrawalConfigList } from '@games/model'
 export const WITHDRAWAL_CONFIG_LIST: WithdrawalConfigList = [
   {
     method: WithdrawalMethod.SBP,
-    providers: [
+    currencies: [
       {
-        provider: PaymentProvider.Bovapay,
-        currencies: [
+        currency: Currency.RUB,
+        providers: [
           {
-            currency: Currency.RUB,
+            provider: PaymentProvider.Bovapay,
             entry: {
               minAmount: 100,
               maxAmount: 10000,

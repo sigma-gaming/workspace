@@ -5,6 +5,7 @@
 .content {
   --modal-content-bg-color: #1B1C2F;
   @apply will-change-transform bg-[--modal-content-bg-color];
+  @apply scrollbar-hide;
 }
 
 .header {

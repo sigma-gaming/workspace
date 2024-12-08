@@ -7,6 +7,9 @@ import { screens } from './screens'
 
 const basePlugin = plugin(({ addBase }) => {
   addBase({
+    'html': {
+      colorScheme: 'dark',
+    },
     'html, body, #root': {
       height: '100%',
       overscrollBehaviorY: 'none',
