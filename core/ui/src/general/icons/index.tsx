@@ -15,6 +15,7 @@ import { Send } from './send.tsx'
 import { Sigma } from './sigma.tsx'
 import { Sparkle } from './sparkle.tsx'
 import { Telegram } from './telegram.tsx'
+import { Ton } from './ton.tsx'
 import { TonSymbol } from './ton-symbol.tsx'
 import { Transfer } from './transfer.tsx'
 import { TrendingUp } from './trending-up.tsx'
@@ -42,4 +43,5 @@ export const Icons = {
   Sbp,
   Piastrix,
   TonSymbol,
+  Ton,
 }

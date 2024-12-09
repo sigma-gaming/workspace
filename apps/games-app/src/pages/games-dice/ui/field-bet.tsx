@@ -1,7 +1,7 @@
 import { GemInput, WithError } from '@core/ui'
 import { ActionIcon, Input } from '@mantine/core'
 import { useUnit } from 'effector-react'
-import { $$dicePage } from '../model'
+import { $$dicePage, MAX_BET, MIN_BET } from '../model'
 
 export const BetField = () => {
   const bet = useUnit($$dicePage.fields.bet.$value)
@@ -19,6 +19,8 @@ export const BetField = () => {
               className="grow"
               classNames={{ wrapper: 'mt-0' }}
               value={bet}
+              min={MIN_BET}
+              max={MAX_BET}
               onChange={(value) => $$dicePage.fields.bet.update(value)}
               error={errors.bet[0]}
               disabled={autoplaying}

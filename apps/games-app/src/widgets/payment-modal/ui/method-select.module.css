@@ -25,7 +25,7 @@
 }
 
 .methodList {
-  @apply flex flex-col gap-2 mt-2.5 max-h-[220px] overflow-y-auto scrollbar-hide;
+  @apply flex flex-col gap-1 mt-2.5 max-h-[220px] overflow-y-auto scrollbar-hide;
   @apply rounded-2xl;
 
   &[data-scrollable='false'] {

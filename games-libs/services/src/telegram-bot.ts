@@ -1,6 +1,6 @@
 import { createLazyInstance, resolveOptions } from '@core/di'
 import { TelegramBotOptionsToken } from '@games/options'
-import { Bot } from 'grammy'
+import { Bot, GrammyError } from 'grammy'
 
 type ChatMemberPayload = {
   chatId: number
@@ -33,8 +33,16 @@ export class TelegramBotService {
   }
 
   async checkSubscription(userId: number, groupId: number) {
-    const chatMember = await this.bot.api.getChatMember(groupId, userId)
-    return this.isSubscribedStatus(chatMember.status)
+    try {
+      const chatMember = await this.bot.api.getChatMember(groupId, userId)
+      return this.isSubscribedStatus(chatMember.status)
+    } catch (error) {
+      if (error instanceof GrammyError && error.error_code === 404) {
+        return false
+      }
+
+      throw new Error('Failed to check subscription')
+    }
   }
 
   onChatMember(handler: (payload: ChatMemberPayload) => void) {

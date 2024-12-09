@@ -14,6 +14,7 @@ import {
 import { TaskStatus } from '@dbs/games-types'
 import {
   ChatMessageDetailed,
+  CurrencyExchangeRates,
   ProfileDetailed,
   ReferrerTransactionDetailed,
 } from '@games/model'
@@ -55,6 +56,7 @@ export class GamesCacheRegistry {
   promocode: KeyJsonEntityService<PromocodeSelect>
   globalTasks: GlobalJsonEntityService<GlobalTaskSelect[]>
   globalTaskStatus: KeyJsonEntityService<[TaskStatus, boolean]>
+  currencyRates: GlobalJsonEntityService<CurrencyExchangeRates>
 
   constructor() {
     const { version } = resolveOptions(GamesCacheOptionsToken)
@@ -202,6 +204,13 @@ export class GamesCacheRegistry {
       keygen: (keyAndUserId: string) =>
         `${version}:globalTaskStatus:${keyAndUserId}`,
       ttl: 60 * 60, // 1 hour
+    })
+
+    this.currencyRates = new GlobalJsonEntityService<CurrencyExchangeRates>({
+      redis,
+      redlock,
+      key: `global:currencyRates`,
+      ttl: 60 * 15, // 15 minutes
     })
   }
 

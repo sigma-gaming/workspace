@@ -5,10 +5,11 @@ import {
   WithdrawalMethod,
 } from '@dbs/games-types'
 
-export type CurrencyExchangeRate = Record<Currency, number>
+export type CurrencyExchangeRates = Partial<Record<Currency, number>>
 
 export type ConfigList<Method extends string, Entry> = Array<{
   method: Method
+  isP2p?: boolean
   currencies: Array<{
     currency: Currency
     only?: boolean

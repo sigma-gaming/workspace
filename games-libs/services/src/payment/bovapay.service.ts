@@ -2,12 +2,7 @@ import crypto from 'crypto'
 import { createLazyInstance, resolveOptions } from '@core/di'
 import { PaymentProvider } from '@dbs/games-types'
 import { BovapayOptions, BovapayOptionsToken } from '@games/options'
-import {
-  createDeposit,
-  createPayout,
-  generateSignature,
-  getTransactionStatus,
-} from '../api/bovapay/client'
+import { bovapayApi, generateSignature } from '../api/bovapay'
 import {
   BovapayCreateDepositRequest,
   BovapayCreatePayoutRequest,
@@ -79,7 +74,7 @@ export class BovapayService implements PaymentProviderService {
         customer_name: request.customerName,
       }
 
-      const response = await createDeposit(depositRequest, {
+      const response = await bovapayApi.createDeposit(depositRequest, {
         apiKey: this.options.apiKey,
         apiUrl: this.options.apiUrl,
       })
@@ -108,7 +103,7 @@ export class BovapayService implements PaymentProviderService {
         method: request.method as any,
       }
 
-      const response = await createPayout(payoutRequest, {
+      const response = await bovapayApi.createPayout(payoutRequest, {
         apiKey: this.options.apiKey,
         apiUrl: this.options.apiUrl,
       })
@@ -134,7 +129,7 @@ export class BovapayService implements PaymentProviderService {
         method: request.method as any,
       }
 
-      const response = await createPayout(payoutRequest, {
+      const response = await bovapayApi.createPayout(payoutRequest, {
         apiKey: this.options.apiKey,
         apiUrl: this.options.apiUrl,
       })
@@ -154,7 +149,7 @@ export class BovapayService implements PaymentProviderService {
   }
 
   async getTransactionStatus(transactionId: string): Promise<PaymentStatus> {
-    const response = await getTransactionStatus(transactionId, {
+    const response = await bovapayApi.getTransactionStatus(transactionId, {
       apiKey: this.options.apiKey,
       apiUrl: this.options.apiUrl,
     })

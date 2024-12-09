@@ -1,0 +1,157 @@
+import { Icons } from '@core/ui'
+import { DepositMethod, WithdrawalMethod } from '@dbs/games-types'
+import { Radio, Skeleton } from '@mantine/core'
+import { IconCreditCardFilled } from '@tabler/icons-react'
+import { useUnit } from 'effector-react'
+import { ReactNode, useEffect, useLayoutEffect, useRef } from 'react'
+import { $configLoaded, $methods, $operation, fields } from '../model/form'
+import styles from './method-select.module.css'
+
+const depositMethodLabelMap: Record<DepositMethod, string> = {
+  [DepositMethod.SBP]: 'СБП',
+  [DepositMethod.CreditCard]: 'Банковская карта',
+  [DepositMethod.Piastrix]: 'Piastrix',
+  [DepositMethod.Toncoin]: 'Toncoin',
+}
+
+const depositMethodIconMap: Record<DepositMethod, ReactNode> = {
+  [DepositMethod.SBP]: <Icons.Sbp />,
+  [DepositMethod.CreditCard]: <IconCreditCardFilled className="text-white" />,
+  [DepositMethod.Piastrix]: <Icons.Piastrix className="text-white" />,
+  [DepositMethod.Toncoin]: <Icons.TonSymbol className="text-white size-4" />,
+}
+
+const depositMethodColorMap: Record<DepositMethod, string> = {
+  [DepositMethod.SBP]: '#ffffff',
+  [DepositMethod.CreditCard]: '#2171a1',
+  [DepositMethod.Piastrix]: '#F54282',
+  [DepositMethod.Toncoin]: '#0098E9',
+}
+
+const withdrawalMethodLabelMap: Record<WithdrawalMethod, string> = {
+  [WithdrawalMethod.SBP]: 'СБП',
+  [WithdrawalMethod.CreditCard]: 'Банковская карта',
+  [WithdrawalMethod.Piastrix]: 'Piastrix',
+}
+
+const withdrawalMethodIconMap: Record<WithdrawalMethod, ReactNode> = {
+  [WithdrawalMethod.SBP]: <Icons.Sbp />,
+  [WithdrawalMethod.CreditCard]: null,
+  [WithdrawalMethod.Piastrix]: null,
+}
+
+const withdrawalMethodColorMap: Record<WithdrawalMethod, string> = {
+  [WithdrawalMethod.SBP]: '#ffffff',
+  [WithdrawalMethod.CreditCard]: '#ffffff',
+  [WithdrawalMethod.Piastrix]: '#ffffff',
+}
+
+export const MethodSelect = () => {
+  const configLoaded = useUnit($configLoaded)
+  const operation = useUnit($operation)
+  const methods = useUnit($methods)
+  const selectedMethod = useUnit(fields.method.$value)
+  const methodListOuterRef = useRef<HTMLDivElement>(null)
+  const methodListRef = useRef<HTMLDivElement>(null)
+
+  const getMethodLabel = (method: DepositMethod | WithdrawalMethod) => {
+    const labelMap =
+      operation === 'deposit' ? depositMethodLabelMap : withdrawalMethodLabelMap
+    return labelMap[method as keyof typeof labelMap]
+  }
+
+  const getMethodIcon = (method: DepositMethod | WithdrawalMethod) => {
+    const iconMap =
+      operation === 'deposit' ? depositMethodIconMap : withdrawalMethodIconMap
+    return iconMap[method as keyof typeof iconMap]
+  }
+
+  const getMethodColor = (method: DepositMethod | WithdrawalMethod) => {
+    const colorMap =
+      operation === 'deposit' ? depositMethodColorMap : withdrawalMethodColorMap
+    return colorMap[method as keyof typeof colorMap]
+  }
+
+  const handleMethodListScroll = () => {
+    const methodListOuter = methodListOuterRef.current
+    const methodList = methodListRef.current
+    if (!methodListOuter || !methodList) return
+
+    const isOnTop = methodList.scrollTop === 0
+    const isOnBottom =
+      methodList.scrollTop + methodList.offsetHeight === methodList.scrollHeight
+    methodListOuter.dataset.topShadow = String(!isOnTop)
+    methodListOuter.dataset.bottomShadow = String(!isOnBottom)
+  }
+
+  useLayoutEffect(() => {
+    if (methods.length === 0) return
+    handleMethodListScroll()
+  }, [methods])
+
+  useEffect(() => {
+    if (!selectedMethod) return
+    const methodList = methodListRef.current
+    if (!methodList) return
+    const selector = `[data-value="${selectedMethod}"]`
+    const card = methodList.querySelector<HTMLButtonElement>(selector)
+    if (!card) return
+    methodList.scrollTop = card.offsetTop - methodList.offsetTop
+  }, [selectedMethod])
+
+  return (
+    <Radio.Group
+      label={'Способ ' + (operation === 'deposit' ? 'пополнения' : 'вывода')}
+      value={selectedMethod}
+      onChange={(value) => fields.method.update(value as DepositMethod)}
+    >
+      <div ref={methodListOuterRef} className={styles.methodListOuter}>
+        <div
+          ref={methodListRef}
+          className={styles.methodList}
+          onScroll={handleMethodListScroll}
+          data-scrollable={configLoaded}
+        >
+          {configLoaded &&
+            methods.map(({ method }) => {
+              const selected = method === selectedMethod
+
+              return (
+                <Radio.Card
+                  key={method}
+                  className={styles.methodCard}
+                  value={method}
+                  data-value={method}
+                >
+                  <div className={styles.methodCardInner}>
+                    <div
+                      className={styles.methodIcon}
+                      style={{ backgroundColor: getMethodColor(method) }}
+                      data-selected={selected}
+                    >
+                      {getMethodIcon(method)}
+                    </div>
+                    <div className="pr-1">
+                      <p className={styles.methodLabel}>
+                        {getMethodLabel(method)}
+                      </p>
+                    </div>
+                  </div>
+                </Radio.Card>
+              )
+            })}
+
+          {!configLoaded &&
+            Array.from({ length: 4 }, (_, index) => {
+              return (
+                <Skeleton
+                  key={'skeleton-' + index}
+                  className={styles.methodSkeleton}
+                />
+              )
+            })}
+        </div>
+      </div>
+    </Radio.Group>
+  )
+}

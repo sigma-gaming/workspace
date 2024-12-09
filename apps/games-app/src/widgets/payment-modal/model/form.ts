@@ -7,9 +7,9 @@ import {
   WithdrawalMethod,
 } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { gemInt, PaymentConfigLists } from '@games/model'
+import { CurrencyExchangeRates, gemInt, PaymentConfigLists } from '@games/model'
 import { combine, createEvent, createStore, sample } from 'effector'
-import { condition, debug } from 'patronum'
+import { condition, interval } from 'patronum'
 import { z } from 'zod'
 import { createApiEffect } from '../../../shared/api/effects'
 import { gamesApi } from '../../../shared/api/games'
@@ -23,6 +23,10 @@ function correctAmount(amount: number) {
 }
 
 const getConfigFx = createApiEffect('query', gamesApi.payments.getConfig.$get)
+const getCurrencyRatesFx = createApiEffect(
+  'query',
+  gamesApi.payments.getCurrencyRates.$get,
+)
 
 export const depositMutation = createMutation({
   name: 'payments/deposit',
@@ -36,7 +40,6 @@ export const withdrawMutation = createMutation({
 
 export const operationChanged = createEvent<Operation>()
 export const refreshCorrectionAmount = createEvent()
-export const amountCorrectionRequested = createEvent()
 export const amountCorrectionRefreshed = createEvent<number>()
 
 export const { $succeeded: $configLoaded } = createStatus(getConfigFx)
@@ -49,9 +52,12 @@ const $config = createStore<PaymentConfigLists | null>(null)
   .on(getConfigFx.doneData, (_, lists) => lists)
   .reset(destroy)
 
-const INITIAL_AMOUNT = gemInt(1000)
+export const $exchangeRates = createStore<CurrencyExchangeRates | null>(null)
+  .on(getCurrencyRatesFx.doneData, (_, rates) => rates)
+  .reset(destroy)
 
-export const $correctedAmount = createStore(correctAmount(INITIAL_AMOUNT))
+const INITIAL_AMOUNT = gemInt(1000)
+export const $correctedAmount = createStore(INITIAL_AMOUNT)
 export const $amountCorrectedFor = createStore(INITIAL_AMOUNT)
 
 // Deposit form
@@ -89,16 +95,23 @@ export const $methods = combine(
   (lists, operation) => lists?.[operation] ?? [],
 )
 
-export const $currencies = combine(
+export const $methodConfig = combine(
   $methods,
   fields.method.$value,
   (methods, method) => {
-    if (!method) return []
-    if (methods.length === 0) return []
-    const methodConfig = methods.find((c) => c.method === method) ?? null
-    return methodConfig?.currencies ?? []
+    if (!method) return null
+    if (methods.length === 0) return null
+    return methods.find((c) => c.method === method) ?? null
   },
 )
+
+export const $isP2pMethod = $methodConfig.map((methodConfig) => {
+  return Boolean(methodConfig?.isP2p)
+})
+
+export const $currencies = $methodConfig.map((methodConfig) => {
+  return methodConfig?.currencies ?? []
+})
 
 export const $currencyConfig = combine(
   $currencies,
@@ -124,28 +137,67 @@ export const $providerConfig = combine(
   },
 )
 
+export const $exchangeRate = combine(
+  fields.currency.$value,
+  $exchangeRates,
+  (currency, exchangeRates) => {
+    if (!currency) return null
+    if (!exchangeRates) return null
+    return exchangeRates[currency] ?? null
+  },
+)
+
+export const $exchangeRateMissing = combine(
+  fields.currency.$value,
+  $exchangeRates,
+  (currency, exchangeRates) => {
+    if (!currency) return false
+    if (!exchangeRates) return false
+    return typeof exchangeRates[currency] === 'undefined'
+  },
+)
+
 export const $totalAmount = combine(
   $operation,
   $providerConfig,
+  $exchangeRate,
   $correctedAmount,
-  (operation, providerConfig, correctedAmount) => {
+  (operation, providerConfig, exchangeRate, correctedAmount) => {
+    if (typeof exchangeRate !== 'number') {
+      return 0
+    }
+
     let commissionRate = 0
 
     if (providerConfig) {
       commissionRate = providerConfig.entry.commissionRate
     }
 
-    if (operation === 'deposit') {
-      return Math.round((correctedAmount * (1 + commissionRate)) / 100)
-    }
+    const gemsAmount =
+      operation === 'deposit'
+        ? Math.round(correctedAmount * (1 + commissionRate))
+        : Math.round(correctedAmount * (1 - commissionRate))
 
-    return Math.round((correctedAmount * (1 - commissionRate)) / 100)
+    return gemsAmount / exchangeRate
   },
 )
 
 sample({
   clock: initialize,
   target: getConfigFx,
+})
+
+const { tick: exchangeRatesRequested } = interval({
+  start: initialize,
+  timeout: 30_000,
+  stop: destroy,
+  leading: true,
+  trailing: false,
+})
+
+sample({
+  clock: exchangeRatesRequested,
+  target: getCurrencyRatesFx,
 })
 
 sample({
@@ -185,31 +237,20 @@ sample({
     const { minAmount, maxAmount } = config.entry
     return Math.min(maxAmount, Math.max(minAmount, amount))
   },
-  target: [fields.amount.update, amountCorrectionRefreshed],
+  target: fields.amount.update,
 })
 
 sample({
-  clock: refreshCorrectionAmount,
+  clock: [$isP2pMethod, fields.amount.$value, refreshCorrectionAmount],
   source: fields.amount.$value,
   target: amountCorrectionRefreshed,
 })
 
 sample({
-  clock: amountCorrectionRequested,
-  source: {
-    amount: fields.amount.$value,
-    correctedFor: $amountCorrectedFor,
-  },
-  filter: ({ amount, correctedFor }) => amount !== correctedFor,
-  fn: ({ amount }) => amount,
-  target: amountCorrectionRefreshed,
-})
-
-sample({
   clock: amountCorrectionRefreshed,
-  source: $operation,
-  fn: (operation, amount) => {
-    if (operation === 'withdrawal') return amount
+  source: $isP2pMethod,
+  fn: (isP2pMethod, amount) => {
+    if (!isP2pMethod) return amount
     return correctAmount(amount)
   },
   target: $correctedAmount,
@@ -218,14 +259,6 @@ sample({
 sample({
   source: amountCorrectionRefreshed,
   target: $amountCorrectedFor,
-})
-
-debug({
-  $amount: fields.amount.$value,
-  $correctedAmount,
-  $totalAmount,
-  amountCorrectionRefreshed,
-  amountCorrectionRequested,
 })
 
 condition({

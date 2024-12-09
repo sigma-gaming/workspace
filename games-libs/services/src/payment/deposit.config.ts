@@ -4,6 +4,7 @@ import { DepositConfigList, toConfigTree } from '@games/model'
 export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
   {
     method: DepositMethod.SBP,
+    isP2p: true,
     currencies: [
       {
         currency: Currency.RUB,
@@ -35,6 +36,7 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
   },
   {
     method: DepositMethod.CreditCard,
+    isP2p: true,
     currencies: [
       {
         currency: Currency.RUB,
@@ -62,6 +64,32 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
             entry: {
               minAmount: 100,
               maxAmount: 100000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
+      },
+      {
+        currency: Currency.USD,
+        providers: [
+          {
+            provider: PaymentProvider.Test,
+            entry: {
+              minAmount: 1000,
+              maxAmount: 10000000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
+      },
+      {
+        currency: Currency.EUR,
+        providers: [
+          {
+            provider: PaymentProvider.Test,
+            entry: {
+              minAmount: 1000,
+              maxAmount: 10000000,
               commissionRate: 0.02,
             },
           },

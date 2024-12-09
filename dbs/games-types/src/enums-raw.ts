@@ -99,6 +99,9 @@ export enum PaymentStatus {
 export enum Currency {
   RUB = 'RUB',
   KZT = 'KZT',
+  KGS = 'KGS',
+  UZS = 'UZS',
+  UAH = 'UAH',
   USD = 'USD',
   EUR = 'EUR',
   TRX = 'TRX',
