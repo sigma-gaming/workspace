@@ -1,5 +1,6 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { logger } from '@core/logger'
+import { takeFirstOrThrow } from '@core/utils'
 import {
   ChatMessageInsert,
   ChatMessageSelect,
@@ -21,6 +22,21 @@ import { profileService } from './profile'
 import { gamesPubsubs } from './pubsubs'
 
 export class ChatService {
+  private async validateAttachment(
+    userId: string,
+    attachment: ChatMessageAttachment,
+  ) {
+    if (attachment.type === ChatMessageAttachmentType.Game) {
+      await this.validateUserGameAttachment(userId, attachment)
+      return
+    }
+
+    throw new BadRequestException({
+      path: ['attachments'],
+      message: 'Недопустимое вложение',
+    })
+  }
+
   private async validateUserGameAttachment(
     userId: string,
     attachment: ChatMessageAttachmentGame,
@@ -104,19 +120,17 @@ export class ChatService {
       })
     }
 
-    if (userId && attachments.length > 0) {
-      if (attachments.length > 1) {
-        throw new BadRequestException({
-          path: ['attachments'],
-          message: 'Доступно только одно вложение',
-        })
-      }
+    if (attachments.length > 1) {
+      throw new BadRequestException({
+        path: ['attachments'],
+        message: 'Доступно только одно вложение',
+      })
+    }
 
-      const [attachment] = attachments
+    const [attachment] = attachments
 
-      if (attachment.type === ChatMessageAttachmentType.Game) {
-        await this.validateUserGameAttachment(userId, attachment)
-      }
+    if (userId && attachment) {
+      await this.validateAttachment(userId, attachment)
     }
 
     let chatMessageInsert: ChatMessageInsert
@@ -141,10 +155,11 @@ export class ChatService {
       }
     }
 
-    const [message] = await gamesDb
+    const message = await gamesDb
       .insert(ChatMessageTable)
       .values(chatMessageInsert)
       .returning()
+      .then(takeFirstOrThrow)
 
     const detailedMessage: ChatMessageDetailed = message
 

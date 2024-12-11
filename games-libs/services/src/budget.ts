@@ -1,4 +1,5 @@
 import { logger } from '@core/logger'
+import { takeFirstOrThrow } from '@core/utils'
 import { BudgetTable } from '@dbs/games-schema'
 import { gamesDb } from '@games/services'
 import { gamesCache } from './cache'
@@ -10,10 +11,11 @@ export class BudgetService {
 
     logger.info('Budget not found in db, creating a new one')
 
-    const [created] = await gamesDb
+    const created = await gamesDb
       .insert(BudgetTable)
       .values({ id: 1 })
       .returning()
+      .then(takeFirstOrThrow)
 
     return created
   }

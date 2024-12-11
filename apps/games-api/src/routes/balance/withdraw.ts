@@ -1,4 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
+import { takeFirstOrThrow } from '@core/utils'
 import { BalanceTable } from '@dbs/games-schema'
 import { FraudRisk, ReferralAction, TransactionType } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
@@ -28,11 +29,12 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
   }
 
   const updatedBalance = await gamesDb.transaction(async (tx) => {
-    const [balance] = await tx
+    const balance = await tx
       .select()
       .from(BalanceTable)
       .where(eq(BalanceTable.userId, userId))
       .for('update')
+      .then(takeFirstOrThrow)
 
     if (balance.available < positiveAmount) {
       throw new BadRequestException({

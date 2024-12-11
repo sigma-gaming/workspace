@@ -21,7 +21,7 @@ async function sendLastWins() {
       return next()
     }
 
-    lastWinSent = newWins[0].id
+    lastWinSent = newWins[0]!.id
     sendToAllLocal('gameHistory/lastWins', newWins)
 
     /*
@@ -56,7 +56,7 @@ async function sendBigWins() {
       return next()
     }
 
-    lastBigWinSent = newWins[0].id
+    lastBigWinSent = newWins[0]!.id
     sendToAllLocal('gameHistory/bigWins', newWins)
 
     /*

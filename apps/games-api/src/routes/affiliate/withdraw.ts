@@ -1,4 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
+import { takeFirstOrThrow } from '@core/utils'
 import { BalanceTable, ReferrerBalanceTable } from '@dbs/games-schema'
 import { TransactionType } from '@dbs/games-types'
 import {
@@ -34,11 +35,12 @@ export const withdrawRoute = createRouter().post('/', async (ctx) => {
         })
       }
 
-      const [balance] = await tx
+      const balance = await tx
         .select()
         .from(BalanceTable)
         .where(eq(BalanceTable.userId, userId))
         .for('update')
+        .then(takeFirstOrThrow)
 
       const transaction = await balanceService.createTransaction({
         tx,

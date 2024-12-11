@@ -33,7 +33,7 @@ const placeholders = [
 
 function getRandomPlaceholder() {
   const index = Math.floor(Math.random() * placeholders.length)
-  return placeholders[index]
+  return placeholders[index]!
 }
 
 const PincodeNumber = memo(() => {
@@ -54,7 +54,7 @@ const PincodeNumber = memo(() => {
 
     for (const [i, node] of numbers.entries()) {
       if (!node.current) return
-      node.current.textContent = pincode[i]
+      node.current.textContent = pincode[i]!
     }
   }
 

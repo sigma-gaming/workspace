@@ -1,3 +1,4 @@
+import { takeFirstOrThrow } from '@core/utils'
 import { BalanceTable } from '@dbs/games-schema'
 import { ReferralAction, TransactionType } from '@dbs/games-types'
 import {
@@ -16,11 +17,12 @@ export const depositRoute = createRouter().post('/', async (ctx) => {
   const amount = 1000_000
 
   const updatedBalance = await gamesDb.transaction(async (tx) => {
-    const [balance] = await tx
+    const balance = await tx
       .select()
       .from(BalanceTable)
       .where(eq(BalanceTable.userId, userId))
       .for('update')
+      .then(takeFirstOrThrow)
 
     const transaction = await balanceService.createTransaction({
       tx,

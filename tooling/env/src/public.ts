@@ -25,7 +25,7 @@ export function getPublicEnv({
 
     for (const key in object) {
       if (!key.startsWith('PUBLIC_')) continue
-      result[key] = object[key]
+      result[key] = object[key]!
     }
 
     return result

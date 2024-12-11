@@ -1,4 +1,5 @@
 import { Logger, loggerService } from '@core/logger'
+import { takeFirstOrThrow } from '@core/utils'
 import { UserSecuritySelect, UserSecurityTable } from '@dbs/games-schema'
 import { FraudRisk } from '@dbs/games-types'
 import { gamesDb } from '@games/services'
@@ -104,10 +105,11 @@ export class FraudService {
           return
         }
 
-        const [{ count: sameCount }] = await gamesDb
+        const { count: sameCount } = await gamesDb
           .select({ count: count() })
           .from(UserSecurityTable)
           .where(and(eq(UserSecurityTable[field], value)))
+          .then(takeFirstOrThrow)
 
         const newScore = sameCount * multiplier
 

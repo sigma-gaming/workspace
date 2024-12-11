@@ -101,7 +101,7 @@ function topologicalSort(services: Shutdownable[]): Shutdownable[][] {
   const sortedOrder: Shutdownable[] = []
 
   while (index < queue.length) {
-    const service = queue[index++]
+    const service = queue[index++]!
     sortedOrder.push(service)
 
     for (const dependentService of dependencyGraph.get(service) || []) {

@@ -219,8 +219,7 @@ sample({
   source: $currencies,
   fn: (currencies) => {
     if (currencies.length === 0) return null
-    const firstCurrency = currencies[0].currency
-    return firstCurrency
+    return currencies[0]?.currency ?? null
   },
   target: fields.currency.update,
 })
@@ -230,8 +229,7 @@ sample({
   source: $providers,
   fn: (providers) => {
     if (providers.length === 0) return null
-    const firstProvider = providers[0].provider
-    return firstProvider
+    return providers[0]?.provider ?? null
   },
   target: fields.provider.update,
 })

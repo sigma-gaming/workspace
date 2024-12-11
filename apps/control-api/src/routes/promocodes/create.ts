@@ -1,5 +1,6 @@
 import { BadRequestException } from '@core/exceptions'
 import { zValidator } from '@core/server'
+import { takeFirstOrThrow } from '@core/utils'
 import { PromocodeTable } from '@dbs/games-schema'
 import { PromocodeBonus, PromocodeBonusType, UserRole } from '@dbs/games-types'
 import { gemInt } from '@games/model'
@@ -66,10 +67,11 @@ export const createRoute = createRouter().post(
       codes.push(...promocodeService.generateMany(payload))
     }
 
-    const [{ count: existingCount }] = await gamesDb
+    const { count: existingCount } = await gamesDb
       .select({ count: count() })
       .from(PromocodeTable)
       .where(inArray(PromocodeTable.code, codes))
+      .then(takeFirstOrThrow)
 
     if (existingCount > 0) {
       if (payload.count === 1) {

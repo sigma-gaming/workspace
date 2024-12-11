@@ -1,4 +1,5 @@
 import { InternalServerException } from '@core/exceptions'
+import { takeFirstOrThrow } from '@core/utils'
 import {
   AccountInsert,
   AccountSelect,
@@ -164,12 +165,13 @@ export class AuthService {
 
     const { createdUser, createdAccount } = await gamesDb.transaction(
       async (tx) => {
-        const [createdUser] = await tx
+        const createdUser = await tx
           .insert(UserTable)
           .values({ referrerId, referralCampaignId })
           .returning()
+          .then(takeFirstOrThrow)
 
-        const [{ id: profileId }] = await tx
+        const { id: profileId } = await tx
           .insert(ProfileTable)
           .values({
             userId: createdUser.id,
@@ -178,6 +180,7 @@ export class AuthService {
             image: providerUserImage,
           })
           .returning()
+          .then(takeFirstOrThrow)
 
         await tx.insert(BalanceTable).values({ userId: createdUser.id })
 
@@ -186,10 +189,11 @@ export class AuthService {
           .set({ profileId })
           .where(eq(UserTable.id, createdUser.id))
 
-        const [createdAccount] = await tx
+        const createdAccount = await tx
           .insert(AccountTable)
           .values({ userId: createdUser.id, ...accountSharedInput })
           .returning()
+          .then(takeFirstOrThrow)
 
         await tx.insert(UserSecurityTable).values({
           userId: createdUser.id,

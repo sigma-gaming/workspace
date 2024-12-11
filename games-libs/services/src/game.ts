@@ -1,3 +1,4 @@
+import { takeFirstOrThrow } from '@core/utils'
 import {
   BalanceSelect,
   GameRecordTable,
@@ -98,7 +99,7 @@ export class GameService {
 
       const multiplier = Math.floor(Math.max(0, payout / bet) * 100)
 
-      const [gameRecord] = await tx
+      const gameRecord = await tx
         .insert(GameRecordTable)
         .values({
           game,
@@ -112,6 +113,7 @@ export class GameService {
           transactionId: transaction.id,
         })
         .returning()
+        .then(takeFirstOrThrow)
 
       const updatedBalance = await balanceService.updateBalance({
         tx,

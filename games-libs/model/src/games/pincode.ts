@@ -169,8 +169,9 @@ for (let code = 0; code < 10000; code++) {
   const countMap = new Map<string, number>()
 
   for (let i = 0; i < 4; i++) {
-    const current = countMap.get(codeString[i]) ?? 0
-    countMap.set(codeString[i], current + 1)
+    const number = codeString[i]!
+    const current = countMap.get(number) ?? 0
+    countMap.set(number, current + 1)
   }
 
   if (countMap.get('0') === 2) {

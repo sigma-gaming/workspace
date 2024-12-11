@@ -1,8 +1,10 @@
 import crypto from 'crypto'
 import { Logger, loggerService } from '@core/logger'
+import { takeFirstOrThrow } from '@core/utils'
 import {
   ReferralCampaignInsert,
   ReferralCampaignTable,
+  ReferrerBalanceSelect,
   ReferrerBalanceTable,
   ReferrerPayoutTable,
   ReferrerSettingsTable,
@@ -206,14 +208,15 @@ export class AffiliateService {
     tx?: typeof gamesDb
     referrerId: string
     available: number
-  }) {
+  }): Promise<ReferrerBalanceSelect> {
     const db = tx ?? gamesDb
 
-    const [updatedReferrerBalance] = await db
+    const updatedReferrerBalance = await db
       .update(ReferrerBalanceTable)
       .set({ available })
       .where(eq(ReferrerBalanceTable.referrerId, referrerId))
       .returning()
+      .then(takeFirstOrThrow)
 
     return updatedReferrerBalance
   }
@@ -247,15 +250,13 @@ export class AffiliateService {
 
     const finalAmount = (amount - amount * FEE) * (settings.revShare / 100)
 
-    const transaction = await db.insert(ReferrerTransactionTable).values({
+    await db.insert(ReferrerTransactionTable).values({
       referrerId,
       referralAction,
       referralCampaignId,
       referralId,
       amount: finalAmount,
     })
-
-    return transaction
   }
 
   async processReferrerPayouts() {

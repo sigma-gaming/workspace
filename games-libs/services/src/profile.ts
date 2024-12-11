@@ -1,4 +1,5 @@
 import { InternalServerException, NotFoundException } from '@core/exceptions'
+import { takeFirstOrThrow } from '@core/utils'
 import {
   AccountSelect,
   AccountTable,
@@ -27,7 +28,7 @@ export class ProfileService {
       throw new NotFoundException()
     }
 
-    const { user, profile } = joins[0]
+    const { user, profile } = takeFirstOrThrow(joins)
 
     if (!profile) {
       throw new NotFoundException()

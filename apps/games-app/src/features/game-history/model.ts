@@ -98,7 +98,7 @@ const feedFactory = createFactory(
       clock: updateFeed,
       source: $queueOnlyNew,
       filter: and($initialLoaded, $hasNewRecords),
-      fn: (queue) => queue[0],
+      fn: (queue) => queue[0]!,
     })
 
     sample({

@@ -24,7 +24,7 @@ export function getUserInitials(name: string | null | undefined) {
     .trim()
     .split(' ')
     .slice(0, 2)
-    .map((word) => word[0].toUpperCase())
+    .map((word) => word[0]!.toUpperCase())
     .join('')
 }
 

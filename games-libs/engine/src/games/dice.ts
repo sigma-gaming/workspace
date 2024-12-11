@@ -1,4 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
+import { takeFirstOrThrow } from '@core/utils'
 import { BalanceTable } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { calculateDiceWinAmount } from '@games/model'
@@ -14,11 +15,12 @@ export async function playDice({
   const { bet, sides } = payload
 
   return gamesDb.transaction(async (tx) => {
-    const [balance] = await tx
+    const balance = await tx
       .select()
       .from(BalanceTable)
       .where(eq(BalanceTable.userId, userId))
       .for('update')
+      .then(takeFirstOrThrow)
 
     if (balance.available < bet) {
       throw new BadRequestException({

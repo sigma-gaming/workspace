@@ -1,4 +1,5 @@
 import { Logger, loggerService } from '@core/logger'
+import { takeFirstOrThrow } from '@core/utils'
 import {
   BalanceSelect,
   BalanceTable,
@@ -134,6 +135,10 @@ export class PromocodeService {
             .where(eq(BalanceTable.userId, userId))
             .for('update')
 
+          if (!balance) {
+            throw new Error('Balance not found (should not happen)')
+          }
+
           const [promocode] = await tx
             .select()
             .from(PromocodeTable)
@@ -192,11 +197,12 @@ export class PromocodeService {
             promocode.bonus.payout * (promocode.wageringMultiplier / 100),
           )
 
-          const [updatedPromocode] = await tx
+          const updatedPromocode = await tx
             .update(PromocodeTable)
             .set({ usages: promocode.usages + 1 })
             .where(eq(PromocodeTable.id, promocode.id))
             .returning()
+            .then(takeFirstOrThrow)
 
           await tx.insert(PromocodeUsageTable).values({
             status: PromocodeUsageStatus.Applied,

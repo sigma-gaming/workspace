@@ -7,11 +7,16 @@ let nextRandom: string | null = null
 
 if (existingSticky) {
   const [random, expiresAt] = existingSticky.split('@')
-  const expiresDate = new Date(expiresAt)
 
-  if (new Date() > expiresDate) {
+  if (random && expiresAt) {
+    const expiresDate = new Date(expiresAt)
+
+    if (new Date() > expiresDate) {
+      expired = true
+      nextRandom = random
+    }
+  } else {
     expired = true
-    nextRandom = random
   }
 } else {
   expired = true

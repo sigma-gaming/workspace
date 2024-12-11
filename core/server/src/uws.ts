@@ -63,7 +63,10 @@ export function createServer<E extends HonoUwsEnv>({
     })
 
     function getForwardedHeader(name: string) {
-      return (headers.get('x-forwarded-' + name) || '').split(',', 1)[0].trim()
+      return (
+        (headers.get('x-forwarded-' + name) || '').split(',', 1)[0]?.trim() ??
+        null
+      )
     }
 
     protocol =

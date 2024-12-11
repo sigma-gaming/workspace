@@ -1,4 +1,5 @@
 import { Logger, loggerService } from '@core/logger'
+import { takeFirstOrThrow } from '@core/utils'
 import {
   BalanceSelect,
   BalanceTable,
@@ -274,11 +275,12 @@ export class GlobalTaskService {
           return { result: GlobalTaskClaimRewardResult.Failed }
         }
 
-        const [balance] = await tx
+        const balance = await tx
           .select()
           .from(BalanceTable)
           .where(eq(BalanceTable.userId, userId))
           .for('update')
+          .then(takeFirstOrThrow)
 
         const wageringChange = Math.ceil(
           task.payout * (task.wageringMultiplier / 100),

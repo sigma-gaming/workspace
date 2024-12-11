@@ -1,3 +1,4 @@
+import { takeFirstOrThrow } from '@core/utils'
 import {
   NotificationInsert,
   NotificationSelect,
@@ -73,10 +74,11 @@ export class NotificationService {
   }
 
   send = async (payload: NotificationInsert) => {
-    const [notification] = await gamesDb
+    const notification = await gamesDb
       .insert(NotificationTable)
       .values(payload)
       .returning()
+      .then(takeFirstOrThrow)
 
     if (gamesCache.ready) {
       if (notification.userId) {

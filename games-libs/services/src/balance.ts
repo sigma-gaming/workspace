@@ -1,3 +1,4 @@
+import { takeFirstOrThrow } from '@core/utils'
 import {
   BalanceSelect,
   BalanceTable,
@@ -49,7 +50,7 @@ export class BalanceService {
   }: {
     tx?: typeof gamesDb
     payload: TransactionInsertWithUserId
-  }) {
+  }): Promise<TransactionSelect> {
     const db = tx ?? gamesDb
 
     const [transaction] = await db
@@ -57,7 +58,7 @@ export class BalanceService {
       .values(payload)
       .returning()
 
-    return transaction
+    return transaction!
   }
 
   async updateBalance({
@@ -72,7 +73,7 @@ export class BalanceService {
     transaction: TransactionSelect
     wageringChange?: number
     gameRecord?: GameRecordSelect
-  }) {
+  }): Promise<BalanceSelect> {
     if (!transaction.userId) {
       throw new Error('transaction.userId is missing - should not happen')
     }
@@ -128,7 +129,7 @@ export class BalanceService {
       totalBetCount += 1
     }
 
-    const [updatedBalance] = await db
+    const updatedBalance = await db
       .update(BalanceTable)
       .set({
         available,
@@ -144,6 +145,7 @@ export class BalanceService {
       })
       .where(eq(BalanceTable.userId, transaction.userId))
       .returning()
+      .then(takeFirstOrThrow)
 
     return updatedBalance
   }

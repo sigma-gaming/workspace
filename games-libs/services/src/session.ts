@@ -4,6 +4,7 @@ import {
   NotAuthenticatedException,
   SessionExpiredException,
 } from '@core/exceptions'
+import { takeFirstOrThrow } from '@core/utils'
 import { SessionSelect, SessionTable } from '@dbs/games-schema'
 import { SessionState, SessionTokenPayload, SessionVariant } from '@games/model'
 import { SessionOptionsToken } from '@games/options'
@@ -137,10 +138,11 @@ export class SessionService {
       throw new InternalServerException()
     }
 
-    const [session] = await gamesDb
+    const session = await gamesDb
       .insert(SessionTable)
       .values({ ...payload, expiresAt })
       .returning()
+      .then(takeFirstOrThrow)
 
     if (gamesCache.ready) {
       await gamesCache.session.set(session.id, session)
@@ -176,11 +178,12 @@ export class SessionService {
     const expiresIn = 60 * 60 * 24 * 31
     const expiresAt = new Date(Date.now() + 1000 * expiresIn).toISOString()
 
-    const [session] = await gamesDb
+    const session = await gamesDb
       .update(SessionTable)
       .set({ expiresAt })
       .where(eq(SessionTable.id, sessionId))
       .returning()
+      .then(takeFirstOrThrow)
 
     if (gamesCache.ready) {
       await gamesCache.session.set(sessionId, session)

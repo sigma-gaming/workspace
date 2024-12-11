@@ -1,5 +1,6 @@
 import { BadRequestException } from '@core/exceptions'
 import { zValidator } from '@core/server'
+import { takeFirstOrThrow } from '@core/utils'
 import { ReferralCampaignTable } from '@dbs/games-schema'
 import { affiliateService, gamesDb, sessionService } from '@games/services'
 import { count, desc, eq } from 'drizzle-orm'
@@ -32,10 +33,11 @@ export const getCampaingsRoute = createRouter().get(
       offset,
     })
 
-    const [{ totalCount }] = await gamesDb
+    const { totalCount } = await gamesDb
       .select({ totalCount: count().mapWith(Number) })
       .from(ReferralCampaignTable)
       .where(where)
+      .then(takeFirstOrThrow)
 
     return ctx.json({ campaigns, totalCount })
   },
