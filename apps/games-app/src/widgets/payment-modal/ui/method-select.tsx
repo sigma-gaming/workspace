@@ -3,7 +3,7 @@ import { DepositMethod, WithdrawalMethod } from '@dbs/games-types'
 import { Radio, Skeleton } from '@mantine/core'
 import { IconCreditCardFilled } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
-import { ReactNode, useEffect, useLayoutEffect, useRef } from 'react'
+import { memo, ReactNode, useEffect, useLayoutEffect, useRef } from 'react'
 import { $configLoaded, $methods, $operation, fields } from '../model/form'
 import styles from './method-select.module.css'
 
@@ -46,7 +46,7 @@ const withdrawalMethodColorMap: Record<WithdrawalMethod, string> = {
   [WithdrawalMethod.Piastrix]: '#ffffff',
 }
 
-export const MethodSelect = () => {
+export const MethodSelect = memo(() => {
   const configLoaded = useUnit($configLoaded)
   const operation = useUnit($operation)
   const methods = useUnit($methods)
@@ -154,4 +154,4 @@ export const MethodSelect = () => {
       </div>
     </Radio.Group>
   )
-}
+})

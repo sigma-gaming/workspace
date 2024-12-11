@@ -1,7 +1,7 @@
 import { GemInput, WithError } from '@core/ui'
 import { ActionIcon, Input } from '@mantine/core'
 import { useUnit } from 'effector-react'
-import { $$pincodePage } from '../model'
+import { $$pincodePage, MAX_BET, MIN_BET } from '../model'
 
 export const BetField = () => {
   const bet = useUnit($$pincodePage.fields.bet.$value)
@@ -21,6 +21,8 @@ export const BetField = () => {
               placeholder="Введите сумму"
               value={bet}
               onChange={(value) => $$pincodePage.fields.bet.update(value)}
+              min={MIN_BET}
+              max={MAX_BET}
               error={errors.bet[0]}
               disabled={autoplaying}
             />

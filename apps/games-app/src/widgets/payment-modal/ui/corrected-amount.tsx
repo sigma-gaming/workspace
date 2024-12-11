@@ -2,13 +2,14 @@ import { GemInput, Icons } from '@core/ui'
 import { ActionIcon, Tooltip } from '@mantine/core'
 import { IconRefresh } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
+import { memo } from 'react'
 import {
   $correctedAmount,
   $methodConfig,
   refreshCorrectionAmount,
 } from '../model/form'
 
-export const CorrectedAmount = () => {
+export const CorrectedAmount = memo(() => {
   const methodConfig = useUnit($methodConfig)
   const correctedAmount = useUnit($correctedAmount)
 
@@ -66,4 +67,4 @@ export const CorrectedAmount = () => {
       </div>
     </div>
   )
-}
+})

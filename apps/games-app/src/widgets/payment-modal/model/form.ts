@@ -9,7 +9,7 @@ import {
 import { createMutation } from '@farfetched/core'
 import { CurrencyExchangeRates, gemInt, PaymentConfigLists } from '@games/model'
 import { combine, createEvent, createStore, sample } from 'effector'
-import { condition, interval } from 'patronum'
+import { and, condition, interval } from 'patronum'
 import { z } from 'zod'
 import { createApiEffect } from '../../../shared/api/effects'
 import { gamesApi } from '../../../shared/api/games'
@@ -52,7 +52,9 @@ const $config = createStore<PaymentConfigLists | null>(null)
   .on(getConfigFx.doneData, (_, lists) => lists)
   .reset(destroy)
 
-export const $exchangeRates = createStore<CurrencyExchangeRates | null>(null)
+export const $exchangeRates = createStore<CurrencyExchangeRates | null>({
+  [Currency.RUB]: gemInt(1),
+})
   .on(getCurrencyRatesFx.doneData, (_, rates) => rates)
   .reset(destroy)
 
@@ -88,6 +90,13 @@ export const form = createForm({
     currency: z.nativeEnum(Currency),
   }),
 })
+
+export const $requiredFieldsFilled = and(
+  fields.amount.$value,
+  fields.provider.$value,
+  fields.currency.$value,
+  fields.method.$value,
+)
 
 export const $methods = combine(
   $config,
@@ -261,8 +270,14 @@ sample({
   target: $amountCorrectedFor,
 })
 
+const finalValuesSubmitted = sample({
+  clock: form.submitted,
+  source: $correctedAmount,
+  fn: (amount, values) => ({ ...values, amount }),
+})
+
 condition({
-  source: form.submitted,
+  source: finalValuesSubmitted,
   if: $operation.map((operation) => operation === 'deposit'),
   then: depositMutation.start,
   else: withdrawMutation.start,

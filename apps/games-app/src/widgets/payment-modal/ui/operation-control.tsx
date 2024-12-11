@@ -10,10 +10,7 @@ export const OperationControl = () => {
       value={operation}
       onChange={(value) => operationChanged(value as Operation)}
       data={[
-        {
-          label: 'Пополнение',
-          value: 'deposit' satisfies Operation,
-        },
+        { label: 'Пополнение', value: 'deposit' satisfies Operation },
         { label: 'Вывод', value: 'withdrawal' satisfies Operation },
       ]}
     />

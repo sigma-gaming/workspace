@@ -17,6 +17,14 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
               commissionRate: 0.02,
             },
           },
+          {
+            provider: PaymentProvider.Test,
+            entry: {
+              minAmount: 1000,
+              maxAmount: 10000000,
+              commissionRate: 0.05,
+            },
+          },
         ],
       },
       {

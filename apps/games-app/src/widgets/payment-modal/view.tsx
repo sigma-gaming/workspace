@@ -1,9 +1,11 @@
 import { useMedia } from '@core/ui'
 import { Button, Modal } from '@mantine/core'
+import { IconCoins, IconWallet } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
 import { memo, useEffect, useRef } from 'react'
 import {
   $operation,
+  $requiredFieldsFilled,
   depositMutation,
   fields,
   form,
@@ -43,14 +45,19 @@ export const PaymentModal = memo(() => {
               <FormStart />
             </Modal.Body>
           </div>
-          <div className="flex flex-col rounded-2xl bg-[#25273e]">
+          <div className="relative flex flex-col rounded-2xl bg-[#25273e]">
             <Modal.Header className="bg-[#25273e]">
-              <Modal.Title>
+              <Modal.Title className="flex items-center gap-2">
+                {operation === 'deposit' ? (
+                  <IconWallet className="size-6" />
+                ) : (
+                  <IconCoins className="size-6" />
+                )}
                 {operation === 'deposit' ? 'Пополнение' : 'Вывод'}
               </Modal.Title>
               {isDesktop && <Modal.CloseButton />}
             </Modal.Header>
-            <Modal.Body className="grow flex flex-col">
+            <Modal.Body className="mt-auto md:sticky bottom-0 flex flex-col">
               <FormFinish />
             </Modal.Body>
           </div>
@@ -94,6 +101,7 @@ const FormStart = memo(() => {
 })
 
 const FormFinish = memo(() => {
+  const requiredFieldsFilled = useUnit($requiredFieldsFilled)
   const { pending: depositPending } = useUnit(depositMutation)
   const { pending: withdrawPending } = useUnit(withdrawMutation)
   const pending = depositPending || withdrawPending
@@ -101,7 +109,7 @@ const FormFinish = memo(() => {
   return (
     <div className="grow flex flex-col gap-4 justify-end">
       <TotalAmount />
-      <Button type="submit" loading={pending}>
+      <Button type="submit" loading={pending} disabled={!requiredFieldsFilled}>
         Продолжить
       </Button>
     </div>

@@ -1,7 +1,7 @@
 import { Icons } from '@core/ui'
 import { Currency } from '@dbs/games-types'
 import { useUnit } from 'effector-react'
-import { ReactNode } from 'react'
+import { memo, ReactNode } from 'react'
 import {
   $exchangeRateMissing,
   $exchangeRates,
@@ -71,7 +71,7 @@ const currencyIconMap: Partial<Record<Currency, ReactNode>> = {
   [Currency.TON]: <Icons.Ton className="size-6" />,
 }
 
-export const TotalAmount = () => {
+export const TotalAmount = memo(() => {
   const totalAmount = useUnit($totalAmount)
   const selectedCurrency = useUnit(fields.currency.$value)
   const exchangeRates = useUnit($exchangeRates)
@@ -81,11 +81,13 @@ export const TotalAmount = () => {
     return null
   }
 
+  const icon = currencyIconMap[selectedCurrency]
+
   if (exchangeRateMissing) {
     return (
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <div className="shrink-0">{currencyIconMap[selectedCurrency]}</div>
+          {icon && <div className="shrink-0">{icon}</div>}
           <p className="text-4xl font-[450] truncate">?</p>
         </div>
         <p className="text-sm leading-tight text-dimmed opacity-80">
@@ -99,7 +101,7 @@ export const TotalAmount = () => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <div className="shrink-0">{currencyIconMap[selectedCurrency]}</div>
+        {icon && <div className="shrink-0">{icon}</div>}
         <p className="text-4xl font-[450] truncate">
           {currencyFormatterMap[selectedCurrency](totalAmount)}
         </p>
@@ -110,4 +112,4 @@ export const TotalAmount = () => {
       </p>
     </div>
   )
-}
+})

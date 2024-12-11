@@ -72,8 +72,8 @@ const $winInfo = createStore<WinInfo | null>(null)
 
 const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
 
-const MIN_BET = gemInt(1)
-const MAX_BET = gemInt(5000)
+export const MIN_BET = gemInt(1)
+export const MAX_BET = gemInt(5000)
 
 const fields = {
   bet: createField({
