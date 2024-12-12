@@ -659,6 +659,13 @@
       "when": 1733835614968,
       "tag": "0093_icy_madame_web",
       "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1734018382528,
+      "tag": "0094_short_micromax",
+      "breakpoints": true
     }
   ]
 }

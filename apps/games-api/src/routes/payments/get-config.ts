@@ -6,5 +6,5 @@ export const getConfigRoute = createRouter().get('/', async (ctx) => {
   const deposit = await paymentService.getDepositConfigList()
   const withdrawal = await paymentService.getWithdrawalConfigList()
 
-  return ctx.json<PaymentConfigLists>({ deposit, withdrawal })
+  return ctx.json<PaymentConfigLists>({ deposit, withdrawal }, 200)
 })

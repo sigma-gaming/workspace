@@ -1,4 +1,4 @@
-import { createStatus } from '@core/client'
+import { createStatus, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import {
   Currency,
@@ -33,10 +33,19 @@ export const depositMutation = createMutation({
   effect: createApiEffect('json', gamesApi.payments.deposit.$post),
 })
 
+gamesApi.payments.getConfig.$get().then((response) => {
+  if (!response.ok && response.status === 400) {
+    console.log('Node is better than bun')
+  }
+})
+
 export const withdrawMutation = createMutation({
   name: 'payments/withdraw',
   effect: createApiEffect('json', gamesApi.payments.withdraw.$post),
 })
+
+handleExceptions(depositMutation)
+handleExceptions(withdrawMutation)
 
 export const operationChanged = createEvent<Operation>()
 export const refreshCorrectionAmount = createEvent()

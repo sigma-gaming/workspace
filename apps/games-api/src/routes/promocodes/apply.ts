@@ -2,7 +2,7 @@ import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { zValidator } from '@core/server'
 import { PromocodeBonusType } from '@dbs/games-types'
 import {
-  PromocodeActivationResult,
+  PromocodeActivationOutcome,
   promocodeService,
   sessionService,
 } from '@games/services'
@@ -10,22 +10,22 @@ import { z } from 'zod'
 import { createRouter } from '../../hono'
 
 type FailureActivationResult = Exclude<
-  PromocodeActivationResult,
-  | PromocodeActivationResult.AppliedPayout
-  | PromocodeActivationResult.AppliedDeposit
+  PromocodeActivationOutcome,
+  | PromocodeActivationOutcome.AppliedPayout
+  | PromocodeActivationOutcome.AppliedDeposit
 >
 
 const MessageMap: Record<FailureActivationResult, string> = {
-  [PromocodeActivationResult.NotFound]: 'Промокод не найден',
-  [PromocodeActivationResult.Expired]: 'Срок действия промокода истёк',
-  [PromocodeActivationResult.WrongUsage]: '{{instruction}}',
-  [PromocodeActivationResult.UsageExceeded]:
+  [PromocodeActivationOutcome.NotFound]: 'Промокод не найден',
+  [PromocodeActivationOutcome.Expired]: 'Срок действия промокода истёк',
+  [PromocodeActivationOutcome.WrongUsage]: '{{instruction}}',
+  [PromocodeActivationOutcome.UsageExceeded]:
     'Достигнут лимит использования промокода',
-  [PromocodeActivationResult.AlreadyUsed]: 'Вы уже использовали этот промокод',
-  [PromocodeActivationResult.Inactive]: 'Промокод не активен',
-  [PromocodeActivationResult.Failed]:
+  [PromocodeActivationOutcome.AlreadyUsed]: 'Вы уже использовали этот промокод',
+  [PromocodeActivationOutcome.Inactive]: 'Промокод не активен',
+  [PromocodeActivationOutcome.Failed]:
     'Не удалось применить промокод. Попробуйте ещё раз или напишите в поддержку',
-  [PromocodeActivationResult.Blocked]:
+  [PromocodeActivationOutcome.Blocked]:
     'Не удалось применить промокод. Попробуйте ещё раз или напишите в поддержку',
 }
 
@@ -41,26 +41,26 @@ export const applyRoute = createRouter().post(
     const payload = ctx.req.valid('json')
     const { userId } = await sessionService.getHonoSession(ctx)
 
-    const application = await promocodeService.applyPayout({
+    const result = await promocodeService.applyPayout({
       userId,
       code: payload.code,
     })
 
-    if (application.result === PromocodeActivationResult.AppliedPayout) {
+    if (result.outcome === PromocodeActivationOutcome.AppliedPayout) {
       return ctx.json({
         status: 'success',
         bonusType: PromocodeBonusType.Payout,
-        payout: application.payout,
-        updatedBalance: application.updatedBalance.available,
+        payout: result.payout,
+        updatedBalance: result.updatedBalance.available,
       })
     }
 
-    if (application.result === PromocodeActivationResult.AppliedDeposit) {
+    if (result.outcome === PromocodeActivationOutcome.AppliedDeposit) {
       const cause = new Error('Unreachable')
       throw new InternalServerException({ cause })
     }
 
-    if (application.result === PromocodeActivationResult.WrongUsage) {
+    if (result.outcome === PromocodeActivationOutcome.WrongUsage) {
       const map: Record<PromocodeBonusType, string> = {
         [PromocodeBonusType.DepositFixed]:
           'Данный промокод нужно использовать при пополнении',
@@ -71,15 +71,15 @@ export const applyRoute = createRouter().post(
       }
 
       throw new BadRequestException({
-        message: MessageMap[application.result].replace(
+        message: MessageMap[result.outcome].replace(
           '{{instruction}}',
-          map[application.bonusType],
+          map[result.bonusType],
         ),
       })
     }
 
     throw new BadRequestException({
-      message: MessageMap[application.result],
+      message: MessageMap[result.outcome],
     })
   },
 )

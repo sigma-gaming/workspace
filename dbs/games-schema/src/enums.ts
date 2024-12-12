@@ -3,6 +3,7 @@ import {
   ChatMessageType,
   Currency,
   DepositMethod,
+  DepositType,
   FraudRisk,
   Game,
   GameOutcome,
@@ -84,6 +85,8 @@ export const paymentStatusEnum = pgEnum(
 )
 
 export const currencyEnum = pgEnum('Currency', enumValues(Currency))
+
+export const depositTypeEnum = pgEnum('DepositType', enumValues(DepositType))
 
 export const depositMethodEnum = pgEnum(
   'DepositMethod',

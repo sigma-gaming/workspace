@@ -70,16 +70,18 @@ const scrollbarPlugin = plugin(({ addUtilities }) => {
   })
 })
 
+type Features = {
+  mantine?: boolean
+  screens?: boolean
+  fonts?: boolean
+  colors?: boolean
+}
+
 export function createConfig(options: {
   content: string[]
-  features?: {
-    mantine?: boolean
-    screens?: boolean
-    fonts?: boolean
-    colors?: boolean
-  }
+  features?: Features
 }): Config {
-  const defaultFeatures = {
+  const defaultFeatures: Features = {
     mantine: true,
     screens: true,
     fonts: true,

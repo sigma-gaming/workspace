@@ -1,15 +1,15 @@
-export enum AuthenticateResult {
+export enum AuthenticateOutcome {
   SignedIn = 'signed-in',
   SignedUp = 'signed-up',
   Connected = 'connected',
   NotAuthenticated = 'not-authenticated',
 }
 
-export type AuthenticateResponse =
-  | { result: AuthenticateResult.Connected }
-  | { result: AuthenticateResult.NotAuthenticated }
+export type AuthenticateOutput =
+  | { outcome: AuthenticateOutcome.Connected }
+  | { outcome: AuthenticateOutcome.NotAuthenticated }
   | {
-      result: AuthenticateResult.SignedIn | AuthenticateResult.SignedUp
+      outcome: AuthenticateOutcome.SignedIn | AuthenticateOutcome.SignedUp
       code: string
     }
 

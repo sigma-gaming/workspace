@@ -1,11 +1,15 @@
+import { DepositSelect, WithdrawalSelect } from '@dbs/games-schema'
 import {
   Currency,
   DepositMethod,
+  DepositPayload,
+  DepositType,
   PaymentProvider,
+  PaymentStatus,
   WithdrawalMethod,
 } from '@dbs/games-types'
 
-export enum PaymentResult {
+export enum PaymentOutcome {
   Success = 'Success',
   InsufficientFunds = 'InsufficientFunds',
   InvalidAmount = 'InvalidAmount',
@@ -17,75 +21,70 @@ export enum PaymentResult {
 
 export type DepositOutput =
   | {
-      result: PaymentResult.Success
-      transactionId: string
-      redirectUrl?: string
-      amount: number
-      currency: Currency
+      outcome: PaymentOutcome.Success
+      deposit: DepositSelect
     }
   | {
-      result: PaymentResult.InvalidAmount
+      outcome: PaymentOutcome.InvalidAmount
       minAmount?: number
       maxAmount?: number
       currency: Currency
     }
   | {
-      result: PaymentResult.UnsupportedMethod
+      outcome: PaymentOutcome.UnsupportedMethod
       method: DepositMethod
       provider: PaymentProvider
     }
   | {
-      result: PaymentResult.UnsupportedCurrency
+      outcome: PaymentOutcome.UnsupportedCurrency
       currency: Currency
       method: DepositMethod
     }
   | {
-      result: PaymentResult.ProviderError
+      outcome: PaymentOutcome.ProviderError
       error: string
     }
   | {
-      result: PaymentResult.Failed
+      outcome: PaymentOutcome.Failed
       error: string
     }
 
 export type WithdrawalOutput =
   | {
-      result: PaymentResult.Success
-      transactionId: string
-      amount: number
-      currency: Currency
+      outcome: PaymentOutcome.Success
+      withdrawal: WithdrawalSelect
     }
   | {
-      result: PaymentResult.InsufficientFunds
+      outcome: PaymentOutcome.InsufficientFunds
       available: number
       currency: Currency
     }
   | {
-      result: PaymentResult.InvalidAmount
+      outcome: PaymentOutcome.InvalidAmount
       minAmount?: number
       maxAmount?: number
       currency: Currency
     }
   | {
-      result: PaymentResult.UnsupportedMethod
+      outcome: PaymentOutcome.UnsupportedMethod
       method: WithdrawalMethod
       provider: PaymentProvider
     }
   | {
-      result: PaymentResult.UnsupportedCurrency
+      outcome: PaymentOutcome.UnsupportedCurrency
       currency: Currency
       method: WithdrawalMethod
     }
   | {
-      result: PaymentResult.ProviderError
+      outcome: PaymentOutcome.ProviderError
       error: string
     }
   | {
-      result: PaymentResult.Failed
+      outcome: PaymentOutcome.Failed
       error: string
     }
 
-export type DepositParams = {
+export type DepositOptions = {
   userId: string
   amount: number
   provider: PaymentProvider
@@ -143,31 +142,23 @@ export type PaymentResponse = {
   transactionId: string
   providerTransactionId: string
   status: PaymentStatus
-  amount: number
+  providerAmount: string
   currency: Currency
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }
 
-export type DepositResponse = {
-  redirectUrl: string
-} & PaymentResponse
+export type DepositResponse = PaymentResponse & {
+  type: DepositType
+  payload: DepositPayload
+}
 
 export type WithdrawalResponse = PaymentResponse
 
 export type PayoutResponse = {
   transactionId: string
   status: PaymentStatus
-  createdAt: Date
-}
-
-export enum PaymentStatus {
-  Pending = 'pending',
-  Processing = 'processing',
-  Completed = 'completed',
-  Failed = 'failed',
-  Timeout = 'timeout',
-  Rejected = 'rejected',
+  createdAt: string
 }
 
 export type PaymentProviderService = {

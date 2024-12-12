@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm'
 import { NotificationTable } from './notification'
-import { UserTable } from './user'
+import { UserTable } from './user/user'
 
 export const NotificationRelations = relations(
   NotificationTable,

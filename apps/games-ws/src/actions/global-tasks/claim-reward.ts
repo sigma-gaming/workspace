@@ -3,7 +3,10 @@ import {
   NotAuthenticatedException,
 } from '@core/exceptions'
 import { TaskStatus } from '@dbs/games-types'
-import { GlobalTaskClaimRewardResult, globalTaskService } from '@games/services'
+import {
+  GlobalTaskClaimRewardOutcome,
+  globalTaskService,
+} from '@games/services'
 import { userRoom } from '../../shared/rooms/user'
 import { createWsAction } from '../../ws-action'
 import {
@@ -26,7 +29,7 @@ export const GlobalTasksClaimRewardAction = createWsAction({
       taskKey: payload.taskKey,
     })
 
-    if (completion.result === GlobalTaskClaimRewardResult.Claimed) {
+    if (completion.outcome === GlobalTaskClaimRewardOutcome.Claimed) {
       const { updatedBalance, payout } = completion
       const { available } = updatedBalance
 
@@ -44,11 +47,11 @@ export const GlobalTasksClaimRewardAction = createWsAction({
       return { updatedBalance: available, payout }
     }
 
-    if (completion.result === GlobalTaskClaimRewardResult.AlreadyClaimed) {
+    if (completion.outcome === GlobalTaskClaimRewardOutcome.AlreadyClaimed) {
       throw new BadRequestException({ message: 'Награда уже получена' })
     }
 
-    if (completion.result === GlobalTaskClaimRewardResult.NotCompleted) {
+    if (completion.outcome === GlobalTaskClaimRewardOutcome.NotCompleted) {
       throw new BadRequestException({ message: 'Задание еще не выполнено' })
     }
 

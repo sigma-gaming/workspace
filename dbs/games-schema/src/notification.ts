@@ -7,7 +7,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { notificationKindEnum } from './enums'
-import { UserTable } from './user'
+import { UserTable } from './user/user'
 
 export const NotificationTable = pgTable('Notification', {
   id: uuid('id').primaryKey().defaultRandom(),

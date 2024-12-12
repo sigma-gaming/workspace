@@ -7,7 +7,7 @@ import { AccountProvider, GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import {
   gamesDb,
   GlobalTaskChecker,
-  GlobalTaskCompleteResult,
+  GlobalTaskCompleteOutcome,
   globalTaskService,
   RepostStatus,
   telegramBotService,
@@ -168,7 +168,7 @@ export const GlobalTasksCompleteAction = createWsAction({
       checker: checkers[payload.taskKey],
     })
 
-    if (completion.result === GlobalTaskCompleteResult.Completed) {
+    if (completion.outcome === GlobalTaskCompleteOutcome.Completed) {
       ctx.socket
         .to(userRoom(session.userId))
         .emit('global-tasks/status-updated', {
@@ -179,11 +179,11 @@ export const GlobalTasksCompleteAction = createWsAction({
       return
     }
 
-    if (completion.result === GlobalTaskCompleteResult.AlreadyCompleted) {
+    if (completion.outcome === GlobalTaskCompleteOutcome.AlreadyCompleted) {
       throw new BadRequestException({ message: 'Задание уже выполнено' })
     }
 
-    if (completion.result === GlobalTaskCompleteResult.NotCompleted) {
+    if (completion.outcome === GlobalTaskCompleteOutcome.NotCompleted) {
       throw new BadRequestException({
         message: completion.message ?? 'Задание еще не выполнено',
       })

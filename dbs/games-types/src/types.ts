@@ -1,10 +1,10 @@
 import {
   ChatMessageAttachmentType,
   DepositMethod,
+  DepositType,
   Game,
   GlobalTaskKey,
   PromocodeBonusType,
-  WithdrawalMethod,
 } from './enums-raw'
 
 export type GameSnapshotDice = {
@@ -64,12 +64,20 @@ export type GlobalTaskRequirements =
       postId: number
     }
 
-export type DepositProviderPayload = {
+export type DepositInstructions = {
   method: DepositMethod.SBP
-  example: string
+  phoneNumber: string
+  providerAmount: string
+  recipientName?: string
+  expiresAt?: number
 }
 
-export type WithdrawalProviderPayload = {
-  method: WithdrawalMethod.SBP
-  example: string
-}
+export type DepositPayload =
+  | {
+      type: DepositType.Redirect
+      redirectUrl: string
+    }
+  | {
+      type: DepositType.WhiteLabel
+      instructions: DepositInstructions
+    }

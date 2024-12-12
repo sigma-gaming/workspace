@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import { boolean, integer, pgTable, timestamp } from 'drizzle-orm/pg-core'
 
 export const ConfigTable = pgTable('Config', {
@@ -7,7 +8,8 @@ export const ConfigTable = pgTable('Config', {
     .defaultNow(),
   updatedAt: timestamp('updatedAt', { withTimezone: true, mode: 'string' })
     .notNull()
-    .defaultNow(),
+    .defaultNow()
+    .$onUpdate(() => sql`now()`),
   maintenanceEnabled: boolean('maintenanceEnabled').notNull().default(false),
 })
 

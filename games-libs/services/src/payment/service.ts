@@ -1,24 +1,19 @@
-import { sleep } from '@core/utils'
-import {
-  Currency,
-  DepositMethod,
-  PaymentProvider,
-  WithdrawalMethod,
-} from '@dbs/games-types'
+import { sleep, takeFirstOrThrow } from '@core/utils'
+import { DepositTable, WithdrawalTable } from '@dbs/games-schema'
+import { Currency, DepositMethod, PaymentProvider } from '@dbs/games-types'
+import { DepositConfigEntry } from '@games/model'
+import { gamesDb } from '../db'
 import { bovapayService } from './bovapay.service'
 import { DEPOSIT_CONFIG_LIST, DEPOSIT_CONFIG_TREE } from './deposit.config'
 import {
+  DepositOptions,
   DepositOutput,
-  DepositParams,
+  PaymentOutcome,
   PaymentProviderService,
-  PaymentResult,
   WithdrawalOutput,
   WithdrawalParams,
 } from './types'
-import {
-  WITHDRAWAL_CONFIG_LIST,
-  WITHDRAWAL_CONFIG_TREE,
-} from './withdrawal.config'
+import { WITHDRAWAL_CONFIG_LIST } from './withdrawal.config'
 
 export class PaymentService {
   private providerServices: Map<PaymentProvider, PaymentProviderService> =
@@ -50,150 +45,202 @@ export class PaymentService {
     method: DepositMethod,
     provider: PaymentProvider,
     currency: Currency,
-  ) {
+  ): { output: DepositOutput } | { bundle: DepositConfigEntry } {
     const methodConfig = DEPOSIT_CONFIG_TREE[method]
     if (!methodConfig) {
       return {
-        result: PaymentResult.UnsupportedMethod,
-        method,
-        provider,
-      } as const
+        output: {
+          outcome: PaymentOutcome.UnsupportedMethod,
+          method,
+          provider,
+        },
+      }
     }
 
     const currencyConfig = methodConfig[currency]
     if (!currencyConfig) {
       return {
-        result: PaymentResult.UnsupportedMethod,
-        method,
-        provider,
-      } as const
+        output: {
+          outcome: PaymentOutcome.UnsupportedCurrency,
+          method,
+          currency,
+        },
+      }
     }
 
     const depositBundle = currencyConfig[provider]
     if (!depositBundle) {
       return {
-        result: PaymentResult.UnsupportedCurrency,
-        currency,
-        method,
-      } as const
-    }
-
-    return { result: PaymentResult.Success, bundle: depositBundle } as const
-  }
-
-  private validateWithdrawalBundle(
-    method: WithdrawalMethod,
-    provider: PaymentProvider,
-    currency: Currency,
-  ) {
-    const methodConfig = WITHDRAWAL_CONFIG_TREE[method]
-    if (!methodConfig) {
-      return {
-        result: PaymentResult.UnsupportedMethod,
-        method,
-        provider,
-      } as const
-    }
-
-    const currencyConfig = methodConfig[currency]
-    if (!currencyConfig) {
-      return {
-        result: PaymentResult.UnsupportedMethod,
-        method,
-        provider,
-      } as const
-    }
-
-    const withdrawalBundle = currencyConfig[provider]
-    if (!withdrawalBundle) {
-      return {
-        result: PaymentResult.UnsupportedCurrency,
-        currency,
-        method,
-      } as const
-    }
-
-    return { result: PaymentResult.Success, bundle: withdrawalBundle } as const
-  }
-
-  async createDeposit(params: DepositParams): Promise<DepositOutput> {
-    const validation = this.validateDepositBundle(
-      params.method,
-      params.provider,
-      params.currency,
-    )
-
-    if (validation.result !== PaymentResult.Success) {
-      return validation
-    }
-
-    const { bundle } = validation
-
-    // Validate amount
-    if (bundle.minAmount && params.amount < bundle.minAmount) {
-      return {
-        result: PaymentResult.InvalidAmount,
-        minAmount: bundle.minAmount,
-        currency: params.currency,
+        output: {
+          outcome: PaymentOutcome.UnsupportedCurrency,
+          currency,
+          method,
+        },
       }
     }
 
-    if (bundle.maxAmount && params.amount > bundle.maxAmount) {
+    return { bundle: depositBundle }
+  }
+
+  // private validateWithdrawalBundle(
+  //   method: WithdrawalMethod,
+  //   provider: PaymentProvider,
+  //   currency: Currency,
+  // ) {
+  //   const methodConfig = WITHDRAWAL_CONFIG_TREE[method]
+  //   if (!methodConfig) {
+  //     return {
+  //       result: PaymentOutcome.UnsupportedMethod,
+  //       method,
+  //       provider,
+  //     } as const
+  //   }
+
+  //   const currencyConfig = methodConfig[currency]
+  //   if (!currencyConfig) {
+  //     return {
+  //       result: PaymentOutcome.UnsupportedMethod,
+  //       method,
+  //       provider,
+  //     } as const
+  //   }
+
+  //   const withdrawalBundle = currencyConfig[provider]
+  //   if (!withdrawalBundle) {
+  //     return {
+  //       result: PaymentOutcome.UnsupportedCurrency,
+  //       currency,
+  //       method,
+  //     } as const
+  //   }
+
+  //   return { result: PaymentOutcome.Success, bundle: withdrawalBundle } as const
+  // }
+
+  async createDeposit(options: DepositOptions): Promise<DepositOutput> {
+    const { userId, amount, provider, method, currency } = options
+
+    const methodConfig = DEPOSIT_CONFIG_TREE[method]
+
+    if (!methodConfig) {
       return {
-        result: PaymentResult.InvalidAmount,
-        maxAmount: bundle.maxAmount,
-        currency: params.currency,
+        outcome: PaymentOutcome.UnsupportedMethod,
+        method,
+        provider,
+      }
+    }
+
+    const currencyConfig = methodConfig[currency]
+
+    if (!currencyConfig) {
+      return {
+        outcome: PaymentOutcome.UnsupportedCurrency,
+        method,
+        currency,
+      }
+    }
+
+    const config = currencyConfig[provider]
+
+    if (!config) {
+      return {
+        outcome: PaymentOutcome.UnsupportedCurrency,
+        currency,
+        method,
+      }
+    }
+
+    const { minAmount, maxAmount } = config
+
+    if (minAmount && amount < minAmount) {
+      return {
+        outcome: PaymentOutcome.InvalidAmount,
+        minAmount,
+        currency,
+      }
+    }
+
+    if (maxAmount && amount > maxAmount) {
+      return {
+        outcome: PaymentOutcome.InvalidAmount,
+        maxAmount,
+        currency,
       }
     }
 
     try {
-      const service = this.getProviderService(params.provider)
-      const response = await service.createDeposit(params)
+      const providerService = this.getProviderService(provider)
+
+      const { type, status, providerAmount, providerTransactionId, payload } =
+        await providerService.createDeposit(options)
+
+      const deposit = await gamesDb
+        .insert(DepositTable)
+        .values({
+          type,
+          status,
+          userId,
+          method,
+          currency,
+          provider,
+          userAmount: amount,
+          providerAmount,
+          providerTransactionId,
+          payload,
+        })
+        .returning()
+        .then(takeFirstOrThrow)
 
       return {
-        result: PaymentResult.Success,
-        transactionId: response.transactionId,
-        redirectUrl: response.redirectUrl,
-        amount: params.amount,
-        currency: params.currency,
+        outcome: PaymentOutcome.Success,
+        deposit,
       }
     } catch (error) {
       if (error instanceof Error) {
         return {
-          result: PaymentResult.ProviderError,
+          outcome: PaymentOutcome.ProviderError,
           error: error.message,
         }
       }
+
       return {
-        result: PaymentResult.Failed,
+        outcome: PaymentOutcome.Failed,
         error: 'Unknown error occurred',
       }
     }
   }
 
-  async createWithdrawal(params: WithdrawalParams): Promise<WithdrawalOutput> {
+  async createWithdrawal(options: WithdrawalParams): Promise<WithdrawalOutput> {
+    const { userId, amount, provider, method, currency } = options
+
     try {
-      const service = this.getProviderService(params.provider)
-      const response = await service.createWithdrawal({
-        userId: params.userId,
-        amount: params.amount,
-        provider: params.provider,
-        method: params.method,
-        currency: params.currency,
-        userIp: params.userIp,
-        email: params.email,
-        customerName: params.customerName,
-      })
+      const providerService = this.getProviderService(provider)
+
+      const { status, providerAmount, providerTransactionId } =
+        await providerService.createWithdrawal(options)
+
+      const withdrawal = await gamesDb
+        .insert(WithdrawalTable)
+        .values({
+          status,
+          userId,
+          method,
+          currency,
+          provider,
+          userAmount: amount,
+          providerAmount,
+          providerTransactionId,
+        })
+        .returning()
+        .then(takeFirstOrThrow)
 
       return {
-        result: PaymentResult.Success,
-        transactionId: response.transactionId,
-        amount: response.amount,
-        currency: response.currency,
+        outcome: PaymentOutcome.Success,
+        withdrawal,
       }
     } catch (error) {
       return {
-        result: PaymentResult.Failed,
+        outcome: PaymentOutcome.Failed,
         error: error instanceof Error ? error.message : String(error),
       }
     }

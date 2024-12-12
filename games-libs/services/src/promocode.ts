@@ -26,7 +26,7 @@ function randomChar(alphabet: string) {
   return alphabet[crypto.randomInt(alphabet.length)]
 }
 
-export enum PromocodeActivationResult {
+export enum PromocodeActivationOutcome {
   AppliedPayout = 'AppliedPayout',
   AppliedDeposit = 'AppliedDeposit',
   Blocked = 'Blocked',
@@ -41,27 +41,27 @@ export enum PromocodeActivationResult {
 
 type ActivationOutput =
   | {
-      result: PromocodeActivationResult.AppliedPayout
+      outcome: PromocodeActivationOutcome.AppliedPayout
       payout: number
       updatedBalance: BalanceSelect
       updatedPromocode: PromocodeSelect
       wageringRequired: number
     }
   | {
-      result: PromocodeActivationResult.AppliedDeposit
+      outcome: PromocodeActivationOutcome.AppliedDeposit
       payout: number
       wageringRequired: number
     }
   | {
-      result: PromocodeActivationResult.WrongUsage
+      outcome: PromocodeActivationOutcome.WrongUsage
       bonusType: PromocodeBonusType
     }
   | {
-      result: Exclude<
-        PromocodeActivationResult,
-        | PromocodeActivationResult.AppliedPayout
-        | PromocodeActivationResult.AppliedDeposit
-        | PromocodeActivationResult.WrongUsage
+      outcome: Exclude<
+        PromocodeActivationOutcome,
+        | PromocodeActivationOutcome.AppliedPayout
+        | PromocodeActivationOutcome.AppliedDeposit
+        | PromocodeActivationOutcome.WrongUsage
       >
     }
 
@@ -146,51 +146,51 @@ export class PromocodeService {
             .for('update')
 
           if (!promocode) {
-            return { result: PromocodeActivationResult.NotFound }
+            return { outcome: PromocodeActivationOutcome.NotFound }
           }
 
           if (promocode.bonusType !== PromocodeBonusType.Payout) {
             return {
-              result: PromocodeActivationResult.WrongUsage,
+              outcome: PromocodeActivationOutcome.WrongUsage,
               bonusType: promocode.bonusType,
             }
           }
 
           if (promocode.bonus.type !== PromocodeBonusType.Payout) {
             return {
-              result: PromocodeActivationResult.WrongUsage,
+              outcome: PromocodeActivationOutcome.WrongUsage,
               bonusType: promocode.bonus.type,
             }
           }
 
           if (promocode.userId && promocode.userId !== userId) {
-            return { result: PromocodeActivationResult.NotFound }
+            return { outcome: PromocodeActivationOutcome.NotFound }
           }
 
           if (await this.isUsed(promocode.id, userId)) {
-            return { result: PromocodeActivationResult.AlreadyUsed }
+            return { outcome: PromocodeActivationOutcome.AlreadyUsed }
           }
 
           if (!promocode.isActive) {
-            return { result: PromocodeActivationResult.Inactive }
+            return { outcome: PromocodeActivationOutcome.Inactive }
           }
 
           if (promocode.expiresAt) {
             const expiresAt = new Date(promocode.expiresAt)
 
             if (new Date() >= expiresAt) {
-              return { result: PromocodeActivationResult.Expired }
+              return { outcome: PromocodeActivationOutcome.Expired }
             }
           }
 
           if (promocode.usages >= promocode.maxUsages) {
-            return { result: PromocodeActivationResult.UsageExceeded }
+            return { outcome: PromocodeActivationOutcome.UsageExceeded }
           }
 
           const risk = await fraudService.actualizeRisk(userId)
 
           if (risk === FraudRisk.High || risk === FraudRisk.Medium) {
-            return { result: PromocodeActivationResult.Blocked }
+            return { outcome: PromocodeActivationOutcome.Blocked }
           }
 
           const wageringChange = Math.ceil(
@@ -227,7 +227,7 @@ export class PromocodeService {
           })
 
           return {
-            result: PromocodeActivationResult.AppliedPayout,
+            outcome: PromocodeActivationOutcome.AppliedPayout,
             payout: promocode.bonus.payout,
             updatedBalance,
             updatedPromocode,
@@ -240,7 +240,7 @@ export class PromocodeService {
 
       if (
         gamesCache.ready &&
-        apply.result === PromocodeActivationResult.AppliedPayout
+        apply.outcome === PromocodeActivationOutcome.AppliedPayout
       ) {
         await gamesCache.balance.set(userId, apply.updatedBalance)
         await gamesCache.promocode.set(code, apply.updatedPromocode)
@@ -250,7 +250,7 @@ export class PromocodeService {
     } catch (error) {
       console.error(error)
       this.logger.error('Failed to apply Payout', error)
-      return { result: PromocodeActivationResult.Failed }
+      return { outcome: PromocodeActivationOutcome.Failed }
     }
   }
 }

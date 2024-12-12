@@ -4,7 +4,7 @@ import { zValidator } from '@core/server'
 import { AccountProvider } from '@dbs/games-types'
 import {
   AuthenticatePayload,
-  AuthResult,
+  AuthOutcome,
   authService,
   fraudService,
   gamesCache,
@@ -15,7 +15,7 @@ import { Hono } from 'hono'
 import { getCookie } from 'hono/cookie'
 import { z } from 'zod'
 import { serverEnv } from '../../shared/env/server'
-import { AuthenticateResponse, AuthenticateResult } from '../types'
+import { AuthenticateOutcome, AuthenticateOutput } from '../types'
 
 const LATIN_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 const CODE_ALPHABET = `${LATIN_ALPHABET}${LATIN_ALPHABET.toLowerCase()}0123456789`
@@ -109,8 +109,8 @@ export const authenticateRoute = new Hono().post(
       userId = sessionVariant.session?.userId
 
       if (!userId) {
-        return ctx.json<AuthenticateResponse>({
-          result: AuthenticateResult.NotAuthenticated,
+        return ctx.json<AuthenticateOutput>({
+          outcome: AuthenticateOutcome.NotAuthenticated,
         })
       }
     }
@@ -210,32 +210,32 @@ export const authenticateRoute = new Hono().post(
 
     const label = labelMap[integration]
 
-    const outcome = await authService.authenticate(authenticatePayload)
+    const authentication = await authService.authenticate(authenticatePayload)
 
-    if (outcome.result === AuthResult.ConnectedToAnotherUser) {
+    if (authentication.outcome === AuthOutcome.ConnectedToAnotherUser) {
       throw new BadRequestException({
         message: `Аккаунт ${label} уже привязан к другому пользователю`,
       })
     }
 
-    if (outcome.result === AuthResult.AnotherAccountConnected) {
+    if (authentication.outcome === AuthOutcome.AnotherAccountConnected) {
       throw new BadRequestException({
         message: `Другой аккаунт ${label} уже привязан к вашему профилю`,
       })
     }
 
-    if (outcome.result === AuthResult.Connected) {
-      return ctx.json<AuthenticateResponse>({
-        result: AuthenticateResult.Connected,
+    if (authentication.outcome === AuthOutcome.Connected) {
+      return ctx.json<AuthenticateOutput>({
+        outcome: AuthenticateOutcome.Connected,
       })
     }
 
-    userId = outcome.user.id
+    userId = authentication.user.id
 
     const session = await sessionService.createSession({
       userId,
-      referrerId: outcome.user.referrerId,
-      referralCampaignId: outcome.user.referralCampaignId,
+      referrerId: authentication.user.referrerId,
+      referralCampaignId: authentication.user.referralCampaignId,
       provider: AccountProvider.VK,
     })
 
@@ -246,11 +246,11 @@ export const authenticateRoute = new Hono().post(
 
     fraudService.actualizeRisk(userId)
 
-    return ctx.json<AuthenticateResponse>({
-      result:
-        outcome.result === AuthResult.SignedIn
-          ? AuthenticateResult.SignedIn
-          : AuthenticateResult.SignedUp,
+    return ctx.json<AuthenticateOutput>({
+      outcome:
+        authentication.outcome === AuthOutcome.SignedIn
+          ? AuthenticateOutcome.SignedIn
+          : AuthenticateOutcome.SignedUp,
       code,
     })
   },

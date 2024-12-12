@@ -12,7 +12,7 @@ import { and, eq } from 'drizzle-orm'
 import { balanceService } from './balance'
 import { gamesCache } from './cache'
 
-export enum GlobalTaskCompleteResult {
+export enum GlobalTaskCompleteOutcome {
   AlreadyCompleted = 'AlreadyCompleted',
   NotCompleted = 'NotCompleted',
   Completed = 'Completed',
@@ -22,18 +22,18 @@ export enum GlobalTaskCompleteResult {
 
 type GlobalTaskCompleteOutput =
   | {
-      result: GlobalTaskCompleteResult.NotCompleted
+      outcome: GlobalTaskCompleteOutcome.NotCompleted
       message?: string
     }
-  | { result: GlobalTaskCompleteResult.Completed; updatedStatus: TaskStatus }
+  | { outcome: GlobalTaskCompleteOutcome.Completed; updatedStatus: TaskStatus }
   | {
-      result:
-        | GlobalTaskCompleteResult.AlreadyCompleted
-        | GlobalTaskCompleteResult.NotActive
-        | GlobalTaskCompleteResult.Failed
+      outcome:
+        | GlobalTaskCompleteOutcome.AlreadyCompleted
+        | GlobalTaskCompleteOutcome.NotActive
+        | GlobalTaskCompleteOutcome.Failed
     }
 
-export enum GlobalTaskClaimRewardResult {
+export enum GlobalTaskClaimRewardOutcome {
   AlreadyClaimed = 'AlreadyClaimed',
   NotCompleted = 'NotCompleted',
   Claimed = 'Claimed',
@@ -42,15 +42,15 @@ export enum GlobalTaskClaimRewardResult {
 
 type GlobalTaskClaimRewardOutput =
   | {
-      result: GlobalTaskClaimRewardResult.Claimed
+      outcome: GlobalTaskClaimRewardOutcome.Claimed
       updatedBalance: BalanceSelect
       payout: number
       updatedStatus: TaskStatus
     }
   | {
-      result: Exclude<
-        GlobalTaskClaimRewardResult,
-        GlobalTaskClaimRewardResult.Claimed
+      outcome: Exclude<
+        GlobalTaskClaimRewardOutcome,
+        GlobalTaskClaimRewardOutcome.Claimed
       >
     }
 
@@ -179,24 +179,24 @@ export class GlobalTaskService {
           const status = statusEntity?.status ?? TaskStatus.Pending
 
           if (status !== TaskStatus.Pending) {
-            return { result: GlobalTaskCompleteResult.AlreadyCompleted }
+            return { outcome: GlobalTaskCompleteOutcome.AlreadyCompleted }
           }
 
           const task = await this.getTask(taskKey)
 
           if (!task) {
-            return { result: GlobalTaskCompleteResult.Failed }
+            return { outcome: GlobalTaskCompleteOutcome.Failed }
           }
 
           if (!task.isActive) {
-            return { result: GlobalTaskCompleteResult.NotActive }
+            return { outcome: GlobalTaskCompleteOutcome.NotActive }
           }
 
           const check = await checker(task)
 
           if (!check.completed)
             return {
-              result: GlobalTaskCompleteResult.NotCompleted,
+              outcome: GlobalTaskCompleteOutcome.NotCompleted,
               message: check.message,
             }
 
@@ -215,18 +215,18 @@ export class GlobalTaskService {
           ])
 
           return {
-            result: GlobalTaskCompleteResult.Completed,
+            outcome: GlobalTaskCompleteOutcome.Completed,
             updatedStatus: TaskStatus.Completed,
           }
         } catch (error) {
           this.logger.error(error)
-          return { result: GlobalTaskCompleteResult.Failed }
+          return { outcome: GlobalTaskCompleteOutcome.Failed }
         }
       },
     )
 
     if (
-      completion.result === GlobalTaskCompleteResult.Completed &&
+      completion.outcome === GlobalTaskCompleteOutcome.Completed &&
       gamesCache.ready
     ) {
       const cacheKey = `${userId}:${taskKey}`
@@ -262,17 +262,17 @@ export class GlobalTaskService {
         const status = statusEntity?.status ?? TaskStatus.Pending
 
         if (status === TaskStatus.Claimed) {
-          return { result: GlobalTaskClaimRewardResult.AlreadyClaimed }
+          return { outcome: GlobalTaskClaimRewardOutcome.AlreadyClaimed }
         }
 
         if (status !== TaskStatus.Completed) {
-          return { result: GlobalTaskClaimRewardResult.NotCompleted }
+          return { outcome: GlobalTaskClaimRewardOutcome.NotCompleted }
         }
 
         const task = await this.getTask(taskKey)
 
         if (!task) {
-          return { result: GlobalTaskClaimRewardResult.Failed }
+          return { outcome: GlobalTaskClaimRewardOutcome.Failed }
         }
 
         const balance = await tx
@@ -317,7 +317,7 @@ export class GlobalTaskService {
         ])
 
         return {
-          result: GlobalTaskClaimRewardResult.Claimed,
+          outcome: GlobalTaskClaimRewardOutcome.Claimed,
           updatedBalance,
           payout: task.payout,
           updatedStatus: TaskStatus.Claimed,
@@ -326,7 +326,7 @@ export class GlobalTaskService {
     )
 
     if (
-      claim.result === GlobalTaskClaimRewardResult.Claimed &&
+      claim.outcome === GlobalTaskClaimRewardOutcome.Claimed &&
       gamesCache.ready
     ) {
       const cacheKey = `${userId}:${taskKey}`

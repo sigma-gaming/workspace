@@ -1,0 +1,62 @@
+# Detailed Code Style and Structure Guidelines
+
+1. **Variable Naming:**
+   - Use `camelCase` for naming variables, functions, and methods.
+   - Ensure names are descriptive and convey the purpose of the variable or function.
+
+2. **TypeScript/JavaScript Naming:**
+   - Use `PascalCase` for types, interfaces, enums, classes, and enum keys.
+   - Use `UPPER_SNAKE_CASE` for constants to differentiate them from variables.
+   - Use `kebab-case` for file names to maintain consistency across the project.
+
+3. **File Extensions:**
+   - Use `.tsx` for files containing React components.
+   - Use `.ts` for regular TypeScript files.
+
+4. **File Organization:**
+   - Organize files in feature-based directories to group related functionality.
+   - Follow a consistent directory structure to enhance readability and maintainability.
+
+5. **Import and Export Practices:**
+   - Use path aliases as defined in `tsconfig.base.json` for cleaner imports.
+   - Import only from package entry points (e.g., `index.ts`) to maintain encapsulation.
+   - Avoid accessing internal package files directly.
+   - Use named exports (`export const`) to facilitate tree shaking and maintain consistency.
+   - Use default exports only when required by specific frameworks (e.g., Next.js, Astro).
+
+6. **Import Grouping:**
+   - Group imports by their source:
+     1. External dependencies
+     2. Internal modules
+     3. Relative imports
+   - Use absolute imports for modules from the project root.
+   - Maintain one line break between different import groups for clarity.
+
+7. **Package Boundaries:**
+   - Maintain clear boundaries between packages to avoid tight coupling.
+   - Avoid circular dependencies by adhering to a strict dependency hierarchy: `apps → games-libs → core`.
+
+8. **Type Definitions:**
+   - Prefer interfaces for public APIs to allow for future extensions.
+   - Use types for internal constructs where flexibility is not required.
+   - Include type annotations for function parameters and return types to ensure type safety.
+
+9. **React Components:**
+   - Use functional components with hooks for building React components.
+   - Export components as named exports to enhance readability and facilitate testing.
+   - Define prop interfaces near the component for better organization.
+   - Make props optional when they have default values, and use descriptive names.
+
+10. **Styling:**
+    - Use Tailwind CSS for layout and spacing to leverage utility-first design.
+    - Use CSS Modules for complex styling to avoid global scope pollution.
+    - Follow a consistent styling configuration and maintain consistent spacing.
+
+11. **Testing and Quality:**
+    - Implement component tests to ensure functionality and catch regressions.
+    - Validate cross-browser compatibility and responsive behavior.
+    - Use meaningful error messages and write self-documenting code.
+
+12. **State Management:**
+    - Follow Effector guidelines for state management implementation.
+    - Keep state management close to where it is used to reduce complexity.

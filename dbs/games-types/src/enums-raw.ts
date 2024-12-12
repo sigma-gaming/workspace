@@ -90,10 +90,12 @@ export enum TaskStatus {
 
 export enum PaymentStatus {
   Pending = 'Pending',
+  Processing = 'Processing',
   Completed = 'Completed',
   Failed = 'Failed',
-  Expired = 'Expired',
+  Rejected = 'Rejected',
   Cancelled = 'Cancelled',
+  Expired = 'Expired',
 }
 
 export enum Currency {
@@ -114,6 +116,11 @@ export enum Currency {
   ETH = 'ETH',
   BNB = 'BNB',
   DOGE = 'DOGE',
+}
+
+export enum DepositType {
+  Redirect = 'Redirect',
+  WhiteLabel = 'WhiteLabel',
 }
 
 export enum DepositMethod {

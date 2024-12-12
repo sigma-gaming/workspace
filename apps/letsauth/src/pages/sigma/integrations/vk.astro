@@ -26,7 +26,7 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 
 <script>
   import { BadRequestException, recreateException } from '@core/exceptions'
-  import { AuthenticateResult } from '../../../api/types'
+  import { AuthenticateOutcome } from '../../../api/types'
   import { authApi } from '../../../shared/api/auth'
 
   class VkIntegration extends HTMLElement {
@@ -63,12 +63,12 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 
       const authentication = await response.json()
 
-      if (authentication.result === AuthenticateResult.Connected) {
+      if (authentication.outcome === AuthenticateOutcome.Connected) {
         window.location.replace(returnUrl)
         return
       }
 
-      if (authentication.result === AuthenticateResult.NotAuthenticated) {
+      if (authentication.outcome === AuthenticateOutcome.NotAuthenticated) {
         const url = `/sigma/errors/not-authenticated?returnUrl=${returnUrl}`
         window.location.replace(url)
         return

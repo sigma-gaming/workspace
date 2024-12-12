@@ -18,7 +18,7 @@ import { affiliateService } from './affiliate'
 import { gamesCache } from './cache'
 import { userService } from './user'
 
-export enum AuthResult {
+export enum AuthOutcome {
   SignedIn = 'signed-in',
   SignedUp = 'signed-up',
   Connected = 'connected',
@@ -37,12 +37,12 @@ export type AuthenticatePayload = {
   referralCampaignCode?: string
 }
 
-type AuthenticateOutcome =
-  | { result: AuthResult.SignedIn; user: UserSelect; account: AccountSelect }
-  | { result: AuthResult.SignedUp; user: UserSelect; account: AccountSelect }
-  | { result: AuthResult.Connected }
-  | { result: AuthResult.ConnectedToAnotherUser }
-  | { result: AuthResult.AnotherAccountConnected }
+type AuthenticateOutput =
+  | { outcome: AuthOutcome.SignedIn; user: UserSelect; account: AccountSelect }
+  | { outcome: AuthOutcome.SignedUp; user: UserSelect; account: AccountSelect }
+  | { outcome: AuthOutcome.Connected }
+  | { outcome: AuthOutcome.ConnectedToAnotherUser }
+  | { outcome: AuthOutcome.AnotherAccountConnected }
 
 export class AuthService {
   async authenticate({
@@ -54,7 +54,7 @@ export class AuthService {
     providerUserLastName,
     providerUserImage,
     referralCampaignCode,
-  }: AuthenticatePayload): Promise<AuthenticateOutcome> {
+  }: AuthenticatePayload): Promise<AuthenticateOutput> {
     const account = await gamesDb.query.AccountTable.findFirst({
       where: and(
         eq(AccountTable.provider, provider),
@@ -90,7 +90,7 @@ export class AuthService {
         connectedAccount &&
         connectedAccount.providerUserId !== providerUserId
       ) {
-        return { result: AuthResult.AnotherAccountConnected }
+        return { outcome: AuthOutcome.AnotherAccountConnected }
       }
 
       if (account) {
@@ -98,7 +98,7 @@ export class AuthService {
          * Account is already connected, but to another user
          */
         if (userId !== account.userId) {
-          return { result: AuthResult.ConnectedToAnotherUser }
+          return { outcome: AuthOutcome.ConnectedToAnotherUser }
         }
 
         /**
@@ -113,7 +113,7 @@ export class AuthService {
           throw new InternalServerException({ cause })
         }
 
-        return { result: AuthResult.SignedIn, user, account }
+        return { outcome: AuthOutcome.SignedIn, user, account }
       }
 
       /**
@@ -128,7 +128,7 @@ export class AuthService {
 
       await gamesCache.detailedProfile.del(userId)
 
-      return { result: AuthResult.Connected }
+      return { outcome: AuthOutcome.Connected }
     }
 
     /**
@@ -144,7 +144,7 @@ export class AuthService {
         throw new InternalServerException({ cause })
       }
 
-      return { result: AuthResult.SignedIn, user, account }
+      return { outcome: AuthOutcome.SignedIn, user, account }
     }
 
     /**
@@ -213,7 +213,7 @@ export class AuthService {
     await gamesCache.user.set(createdUser.id, createdUser)
 
     return {
-      result: AuthResult.SignedUp,
+      outcome: AuthOutcome.SignedUp,
       user: createdUser,
       account: createdAccount,
     }

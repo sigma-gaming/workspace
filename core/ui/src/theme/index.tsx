@@ -86,7 +86,7 @@ export const theme = createTheme({
       classNames: notificationClassNames,
     }),
     Notifications: Notifications.extend({
-      defaultProps: { zIndex: 150 },
+      defaultProps: { zIndex: 350 },
     }),
     Title: Title.extend({
       classNames: titleClassNames,

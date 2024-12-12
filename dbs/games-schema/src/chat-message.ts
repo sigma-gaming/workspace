@@ -12,8 +12,8 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { chatMessageTypeEnum, userRoleEnum } from './enums'
-import { ProfileTable } from './profile'
-import { UserTable } from './user'
+import { ProfileTable } from './user/profile'
+import { UserTable } from './user/user'
 
 export const ChatMessageTable = pgTable(
   'ChatMessage',
