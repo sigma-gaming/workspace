@@ -1,7 +1,6 @@
 import { sleep, takeFirstOrThrow } from '@core/utils'
 import { DepositTable, WithdrawalTable } from '@dbs/games-schema'
-import { Currency, DepositMethod, PaymentProvider } from '@dbs/games-types'
-import { DepositConfigEntry } from '@games/model'
+import { PaymentProvider } from '@dbs/games-types'
 import { gamesDb } from '../db'
 import { bovapayService } from './bovapay.service'
 import { DEPOSIT_CONFIG_LIST, DEPOSIT_CONFIG_TREE } from './deposit.config'
@@ -40,82 +39,6 @@ export class PaymentService {
 
     return service
   }
-
-  private validateDepositBundle(
-    method: DepositMethod,
-    provider: PaymentProvider,
-    currency: Currency,
-  ): { output: DepositOutput } | { bundle: DepositConfigEntry } {
-    const methodConfig = DEPOSIT_CONFIG_TREE[method]
-    if (!methodConfig) {
-      return {
-        output: {
-          outcome: PaymentOutcome.UnsupportedMethod,
-          method,
-          provider,
-        },
-      }
-    }
-
-    const currencyConfig = methodConfig[currency]
-    if (!currencyConfig) {
-      return {
-        output: {
-          outcome: PaymentOutcome.UnsupportedCurrency,
-          method,
-          currency,
-        },
-      }
-    }
-
-    const depositBundle = currencyConfig[provider]
-    if (!depositBundle) {
-      return {
-        output: {
-          outcome: PaymentOutcome.UnsupportedCurrency,
-          currency,
-          method,
-        },
-      }
-    }
-
-    return { bundle: depositBundle }
-  }
-
-  // private validateWithdrawalBundle(
-  //   method: WithdrawalMethod,
-  //   provider: PaymentProvider,
-  //   currency: Currency,
-  // ) {
-  //   const methodConfig = WITHDRAWAL_CONFIG_TREE[method]
-  //   if (!methodConfig) {
-  //     return {
-  //       result: PaymentOutcome.UnsupportedMethod,
-  //       method,
-  //       provider,
-  //     } as const
-  //   }
-
-  //   const currencyConfig = methodConfig[currency]
-  //   if (!currencyConfig) {
-  //     return {
-  //       result: PaymentOutcome.UnsupportedMethod,
-  //       method,
-  //       provider,
-  //     } as const
-  //   }
-
-  //   const withdrawalBundle = currencyConfig[provider]
-  //   if (!withdrawalBundle) {
-  //     return {
-  //       result: PaymentOutcome.UnsupportedCurrency,
-  //       currency,
-  //       method,
-  //     } as const
-  //   }
-
-  //   return { result: PaymentOutcome.Success, bundle: withdrawalBundle } as const
-  // }
 
   async createDeposit(options: DepositOptions): Promise<DepositOutput> {
     const { userId, amount, provider, method, currency } = options
