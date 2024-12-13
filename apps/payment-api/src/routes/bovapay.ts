@@ -1,6 +1,7 @@
 import { BadRequestException, UnauthorizedException } from '@core/exceptions'
 import { zValidator } from '@core/server'
-import { bovapayService } from '@games/services'
+import { PaymentStatus } from '@dbs/games-types'
+import { bovapayService, paymentService } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../hono'
 
@@ -8,16 +9,18 @@ function withOrder<Schema extends z.ZodObject<z.ZodRawShape>>(schema: Schema) {
   return z.custom((value) => schema.safeParse(value).success) as Schema
 }
 
+enum BovapayStatus {
+  Successed = 'successed',
+  AcceptedSuccessed = 'accepted_successed',
+  Failed = 'failed',
+  ClosedFailed = 'closed_failed',
+}
+
 const PayloadSchema = withOrder(
   z.object({
     id: z.string().uuid(),
     merchant_id: z.string(),
-    status: z.enum([
-      'successed',
-      'accepted_successed',
-      'failed',
-      'closed_failed',
-    ]),
+    status: z.nativeEnum(BovapayStatus),
     message: z.string(),
     currency: z.string(),
     payment_method: z.string(),
@@ -32,6 +35,14 @@ const PayloadSchema = withOrder(
     recipient_card_number_type: z.enum(['card', 'phone_number']),
   }),
 )
+
+function mapStatus(status: BovapayStatus): PaymentStatus {
+  if (status === BovapayStatus.Successed) return PaymentStatus.Completed
+  if (status === BovapayStatus.AcceptedSuccessed) return PaymentStatus.Completed
+  if (status === BovapayStatus.Failed) return PaymentStatus.Failed
+  if (status === BovapayStatus.ClosedFailed) return PaymentStatus.Failed
+  throw new Error('Unknown bovapay status')
+}
 
 export const bovapayRoute = createRouter().post(
   '/',
@@ -48,43 +59,26 @@ export const bovapayRoute = createRouter().post(
     }
 
     const isValidSignature = bovapayService.verifySignature(payload, signature)
+
     if (!isValidSignature) {
       throw new UnauthorizedException()
     }
 
-    console.log(payload)
+    const deposit = await paymentService.getDepositByProviderTransactionId(
+      payload.id,
+    )
 
-    // Handle different payment statuses
-    switch (payload.status) {
-      case 'successed':
-      case 'accepted_successed':
-        // TODO: Handle successful payment
-        return ctx.json({
-          status: 'success',
-          message: 'Payment processed successfully',
-          transactionId: payload.id,
-        })
-
-      case 'failed':
-        // TODO: Handle failed payment
-        return ctx.json({
-          status: 'error',
-          message: `Payment failed: ${payload.message}`,
-          transactionId: payload.id,
-        })
-
-      case 'closed_failed':
-        // TODO: Handle rejected after appeal
-        return ctx.json({
-          status: 'error',
-          message: `Payment rejected after appeal: ${payload.message}`,
-          transactionId: payload.id,
-        })
-
-      default:
-        throw new BadRequestException({
-          message: 'Unknown payment status',
-        })
+    if (!deposit) {
+      throw new BadRequestException({
+        message: 'Deposit not found',
+      })
     }
+
+    const newStatus = mapStatus(payload.status)
+
+    await paymentService.handleDepositStatusUpdate(deposit.id, newStatus)
+
+    ctx.status(200)
+    return ctx.text('Payment processed successfully')
   },
 )

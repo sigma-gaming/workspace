@@ -1,4 +1,8 @@
-import { DepositSelect, WithdrawalSelect } from '@dbs/games-schema'
+import {
+  DepositSelect,
+  UserStatsSelect,
+  WithdrawalSelect,
+} from '@dbs/games-schema'
 import {
   Currency,
   DepositMethod,
@@ -8,6 +12,7 @@ import {
   PaymentStatus,
   WithdrawalMethod,
 } from '@dbs/games-types'
+import { ProfileDetailed } from '@games/model'
 
 export enum PaymentOutcome {
   Success = 'Success',
@@ -86,7 +91,7 @@ export type WithdrawalOutput =
 
 export type DepositOptions = {
   userId: string
-  amount: number
+  gemAmount: number
   provider: PaymentProvider
   method: DepositMethod
   currency: Currency
@@ -96,9 +101,9 @@ export type DepositOptions = {
   customerName?: string
 }
 
-export type WithdrawalParams = {
+export type WithdrawalOptions = {
   userId: string
-  amount: number
+  gemAmount: number
   provider: PaymentProvider
   method: WithdrawalMethod
   currency: Currency
@@ -117,12 +122,13 @@ export type PaymentSystemConfig = {
 
 export type PaymentRequest = {
   userId: string
-  amount: number
+  userIp: string
+  gemAmount: number
+  currencyAmount: number
   provider: PaymentProvider
   currency: Currency
-  userIp: string
-  email?: string
-  customerName?: string
+  userProfile: ProfileDetailed
+  userStats: UserStatsSelect
 }
 
 export type DepositRequest = {
@@ -139,7 +145,6 @@ export type PayoutRequest = {
 } & PaymentRequest
 
 export type PaymentResponse = {
-  transactionId: string
   providerTransactionId: string
   status: PaymentStatus
   providerAmount: string

@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { loggerService } from '@core/logger'
 
 export type BovapayConfig = {
   apiKey: string
@@ -21,6 +22,8 @@ export function generateSignature(
   return crypto.createHmac('sha256', apiKey).update(signString).digest('hex')
 }
 
+const logger = loggerService.logger.child('BovapayAPI')
+
 export const request = async <T>({
   method,
   endpoint,
@@ -28,25 +31,28 @@ export const request = async <T>({
   config,
 }: RequestParams): Promise<T> => {
   const signature = data ? generateSignature(data, config.apiKey) : ''
+
+  const url = `${config.apiUrl}${endpoint}`
+  const body = JSON.stringify(data)
+
   const headers = {
     'Content-Type': 'application/json',
     'X-Signature': signature,
   }
 
-  const response = await fetch(`${config.apiUrl}${endpoint}`, {
-    method,
-    body: JSON.stringify(data),
-    headers,
-  })
+  logger.info(`${method} ${url} ${body}`)
+
+  const response = await fetch(url, { method, body, headers })
 
   const json = await response.json()
 
   if (!response.ok) {
-    console.error('[Bovapay API] Request failed', json)
+    logger.error(`Request failed: ${JSON.stringify(json)}`)
     throw json
   }
 
   if (json.status === 'error') {
+    logger.error(`Payment provider error: ${JSON.stringify(json)}`)
     throw new Error('Payment provider error')
   }
 

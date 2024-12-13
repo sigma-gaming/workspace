@@ -28,7 +28,7 @@ services:
     ports:
       - "443:443"
     volumes:
-      - "./ssl:/ssl"
+      - "../ssl:/ssl"
       - "./auth-proxy.traefik.yaml:/etc/traefik/config/auth-proxy.traefik.yaml"
 
 volumes:

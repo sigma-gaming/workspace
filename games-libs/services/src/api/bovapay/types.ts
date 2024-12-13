@@ -10,7 +10,8 @@ export type BovapayPaymentMethod =
 export type BovapayPayoutMethod = 'bank_transfer' | 'card'
 
 export type BovapayPayeerType = 'ftd' | 'trust'
-export type BovapayBankName = 'sberbank' | 'tinkoff'
+export type BovapayCurrency = 'crypto' | 'rub' | 'uzs' | 'krw' | 'kgs'
+export type BovapayBankName = 'sberbank' | 'tinkoff' | 'alfabank' | 'vtb'
 export type BovapayStatus =
   | 'paid'
   | 'processing'
@@ -47,7 +48,7 @@ export type BovapayCreateDepositRequest = {
   payeer_identifier: string
   payeer_ip: string
   payeer_type: BovapayPayeerType
-  currency: Lowercase<Currency>
+  currency: BovapayCurrency
   payment_method: BovapayPaymentMethod
   payeer_bank_name?: BovapayBankName
   amount: number

@@ -191,12 +191,13 @@ export const $totalAmount = combine(
       commissionRate = providerConfig.entry.commissionRate
     }
 
-    const gemsAmount =
-      operation === 'deposit'
-        ? Math.round(correctedAmount * (1 + commissionRate))
-        : Math.round(correctedAmount * (1 - commissionRate))
+    const currencyAmount = correctedAmount / exchangeRate
 
-    return gemsAmount / exchangeRate
+    return Math.round(
+      operation === 'deposit'
+        ? currencyAmount * (1 + commissionRate)
+        : currencyAmount * (1 - commissionRate),
+    )
   },
 )
 
@@ -280,7 +281,7 @@ sample({
 const finalValuesSubmitted = sample({
   clock: form.submitted,
   source: $correctedAmount,
-  fn: (amount, values) => ({ ...values, amount }),
+  fn: (gemAmount, { amount, ...values }) => ({ ...values, gemAmount }),
 })
 
 condition({

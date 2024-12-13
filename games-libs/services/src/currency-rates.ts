@@ -92,6 +92,34 @@ export class CurrencyRatesService {
     const rates = await this.getLatestRates()
     await gamesCache.currencyRates.set(rates)
   }
+
+  async convert(amount: number, from: Currency, to: Currency): Promise<number> {
+    const rates = await this.getRates()
+
+    if (!rates) {
+      throw new Error('Currency rates not available')
+    }
+
+    if (!rates[from] || !rates[to]) {
+      throw new Error('Specified currency rates not available')
+    }
+
+    return (amount * rates[from]) / rates[to]
+  }
+
+  async convertGems(amount: number, to: Currency): Promise<number> {
+    const rates = await this.getRates()
+
+    if (!rates) {
+      throw new Error('Currency rates not available')
+    }
+
+    if (!rates[to]) {
+      throw new Error('Specified currency rates not available')
+    }
+
+    return amount / rates[to]
+  }
 }
 
 export const currencyRatesService = createLazyInstance(CurrencyRatesService)

@@ -12,7 +12,7 @@
     "node": "20"
   },
   "scripts": {
-    "dev:compose": "docker compose -f local.docker-compose.yml",
+    "dev:compose": "docker compose -f ./local-compose/docker-compose.yml",
     "dev:docker": "pnpm dev:compose up -d",
     "dev:docker:reset": "pnpm dev:compose down -v && pnpm dev:docker",
     "dev:games-app": "nx run @apps/games-app:dev",

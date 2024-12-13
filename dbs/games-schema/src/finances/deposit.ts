@@ -31,11 +31,12 @@ export const DepositTable = pgTable('Deposit', {
     .$onUpdate(() => sql`now()`),
 
   status: paymentStatusEnum('status').notNull(),
-  userAmount: bigint('userAmount', { mode: 'number' }).notNull(),
-  providerAmount: numeric('providerAmount', {
+  gemAmount: bigint('gemAmount', { mode: 'number' }).notNull(),
+  currencyAmount: numeric('currencyAmount', {
     precision: 20,
     scale: 18,
   }).notNull(),
+  providerAmount: text('providerAmount').notNull(),
   type: depositTypeEnum('type').notNull(),
   method: depositMethodEnum('method').notNull(),
   currency: currencyEnum('currency').notNull(),
