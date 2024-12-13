@@ -13,7 +13,7 @@ export const createDeposit = async (
 ): Promise<BovapayCreateDepositResponse> => {
   return request<BovapayCreateDepositResponse>({
     method: 'POST',
-    endpoint: '/deposits/create',
+    endpoint: '/merchant/v1/deposits',
     data,
     config,
   })
@@ -36,7 +36,7 @@ export const createPayout = async (
 ): Promise<BovapayCreatePayoutResponse> => {
   return request<BovapayCreatePayoutResponse>({
     method: 'POST',
-    endpoint: '/payouts/create',
+    endpoint: '/v1/mass_transactions',
     data,
     config,
   })

@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { createRouter } from '../../hono'
 
 const PayloadSchema = z.object({
-  amount: z.number().min(gemInt(1)),
+  gemAmount: z.number().min(gemInt(1)),
   provider: z.nativeEnum(PaymentProvider),
   method: z.nativeEnum(DepositMethod),
   currency: z.nativeEnum(Currency),
@@ -18,18 +18,18 @@ export const depositRoute = createRouter().post(
   zValidator('json', PayloadSchema),
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)
-    const { amount, provider, method, currency } = ctx.req.valid('json')
+    const { gemAmount, provider, method, currency } = ctx.req.valid('json')
     const host = ctx.req.header('x-forwarded-host') ?? ctx.req.header('host')
 
     if (!host) {
       throw new InternalServerException()
     }
 
-    const redirectUrl = host
+    const redirectUrl = `https://${host}`
 
     const result = await paymentService.createDeposit({
       userId,
-      amount,
+      gemAmount,
       provider,
       method,
       currency,

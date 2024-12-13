@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { createRouter } from '../../hono'
 
 const PayloadSchema = z.object({
-  amount: z.number().min(gemInt(1)),
+  gemAmount: z.number().min(gemInt(1)),
   provider: z.nativeEnum(PaymentProvider),
   method: z.nativeEnum(WithdrawalMethod),
   currency: z.nativeEnum(Currency),
@@ -18,11 +18,11 @@ export const withdrawRoute = createRouter().post(
   zValidator('json', PayloadSchema),
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)
-    const { amount, provider, method, currency } = ctx.req.valid('json')
+    const { gemAmount, provider, method, currency } = ctx.req.valid('json')
 
     const result = await paymentService.createWithdrawal({
       userId,
-      amount,
+      gemAmount,
       provider,
       method,
       currency,

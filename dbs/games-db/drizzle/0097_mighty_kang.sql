@@ -1,0 +1,1 @@
+ALTER TABLE "Deposit" RENAME COLUMN "providerAmount" TO "currencyAmount";

@@ -1,11 +1,21 @@
 import crypto from 'crypto'
 import { createLazyInstance, resolveOptions } from '@core/di'
-import { DepositType, PaymentProvider, PaymentStatus } from '@dbs/games-types'
+import { UserStatsSelect } from '@dbs/games-schema'
+import {
+  Currency,
+  DepositMethod,
+  DepositType,
+  PaymentProvider,
+  PaymentStatus,
+} from '@dbs/games-types'
 import { BovapayOptions, BovapayOptionsToken } from '@games/options'
 import { bovapayApi, generateSignature } from '../api/bovapay'
 import {
   BovapayCreateDepositRequest,
   BovapayCreatePayoutRequest,
+  BovapayCurrency,
+  BovapayPayeerType,
+  BovapayPaymentMethod,
   BovapayStatus,
 } from '../api/bovapay/types'
 import {
@@ -28,6 +38,15 @@ export class BovapayService implements PaymentProviderService {
     this.options = resolveOptions(BovapayOptionsToken)
   }
 
+  verifySignature(data: Record<string, any>, signature: string): boolean {
+    const expectedSignature = generateSignature(data, this.options.apiKey)
+
+    return crypto.timingSafeEqual(
+      encoder.encode(signature),
+      encoder.encode(expectedSignature),
+    )
+  }
+
   private mapBovapayStatus(status: BovapayStatus): PaymentStatus {
     if (status === 'paid') return PaymentStatus.Completed
     if (status === 'processing') return PaymentStatus.Processing
@@ -38,107 +57,128 @@ export class BovapayService implements PaymentProviderService {
     return PaymentStatus.Failed
   }
 
-  verifySignature(data: Record<string, any>, signature: string): boolean {
-    const expectedSignature = generateSignature(data, this.options.apiKey)
+  private calculatePayeerType(userStats: UserStatsSelect): BovapayPayeerType {
+    if (userStats.depositCount < 3) return 'ftd'
+    if (userStats.withdrawCount < 2) return 'ftd'
+    return 'trust'
+  }
 
-    return crypto.timingSafeEqual(
-      encoder.encode(signature),
-      encoder.encode(expectedSignature),
-    )
+  private mapToBovapayRequest(
+    request: DepositRequest,
+  ): BovapayCreateDepositRequest {
+    let currency: BovapayCurrency
+    let paymentMethod: BovapayPaymentMethod
+
+    if (request.currency === Currency.RUB) {
+      currency = 'rub'
+
+      if (request.method === DepositMethod.SBP) {
+        paymentMethod = 'sbp'
+      } else if (request.method === DepositMethod.CreditCard) {
+        paymentMethod = 'card'
+      } else {
+        throw new Error('Unsupported deposit method')
+      }
+    } else if (request.currency === Currency.KGS) {
+      currency = 'kgs'
+
+      if (request.method === DepositMethod.CreditCard) {
+        paymentMethod = 'card'
+      } else {
+        throw new Error('Unsupported deposit method')
+      }
+    } else if (request.currency === Currency.UZS) {
+      currency = 'uzs'
+
+      if (request.method === DepositMethod.CreditCard) {
+        paymentMethod = 'card'
+      } else {
+        throw new Error('Unsupported deposit method')
+      }
+    } else {
+      throw new Error('Unsupported currency')
+    }
+
+    return {
+      user_uuid: request.userId,
+      merchant_id: crypto.randomUUID(),
+      payeer_identifier: request.userId,
+      payeer_ip: request.userIp,
+      payeer_type: this.calculatePayeerType(request.userStats),
+      amount: Math.ceil(request.currencyAmount),
+      callback_url: this.options.callbackUrl,
+      redirect_url: request.redirectUrl,
+      customer_name: request.userProfile.name,
+      currency,
+      payment_method: paymentMethod,
+    }
   }
 
   async createDeposit(request: DepositRequest): Promise<DepositResponse> {
-    try {
-      const depositRequest: BovapayCreateDepositRequest = {
-        user_uuid: request.userId,
-        merchant_id: crypto.randomUUID(),
-        payeer_identifier: request.userId,
-        payeer_ip: request.userIp,
-        payeer_type: 'trust', // TODO: Determine based on user history
-        currency: request.currency.toLowerCase() as any,
-        payment_method: request.method.toLowerCase() as any,
-        amount: request.amount,
-        callback_url: this.options.callbackUrl,
-        redirect_url: request.redirectUrl,
-        email: request.email,
-        customer_name: request.customerName,
-      }
+    const depositRequest = this.mapToBovapayRequest(request)
 
-      const response = await bovapayApi.createDeposit(depositRequest, {
-        apiKey: this.options.apiKey,
-        apiUrl: this.options.apiUrl,
-      })
+    const response = await bovapayApi.createDeposit(depositRequest, {
+      apiKey: this.options.apiKey,
+      apiUrl: this.options.apiUrl,
+    })
 
-      return {
+    return {
+      type: DepositType.Redirect,
+      providerTransactionId: response.data.uuid,
+      status: this.mapBovapayStatus(response.data.state),
+      providerAmount: response.data.source_transaction.fiat_amount,
+      currency: request.currency,
+      createdAt: response.data.created_at,
+      updatedAt: response.data.updated_at,
+      payload: {
         type: DepositType.Redirect,
-        transactionId: response.data.uuid,
-        providerTransactionId: response.data.uuid,
-        status: this.mapBovapayStatus(response.data.state),
-        providerAmount: response.data.source_transaction.fiat_amount,
-        currency: request.currency,
-        createdAt: response.data.created_at,
-        updatedAt: response.data.updated_at,
-        payload: {
-          type: DepositType.Redirect,
-          redirectUrl: response.data.form_url,
-        },
-      }
-    } catch (error) {
-      throw new Error('Failed to create deposit')
+        redirectUrl: response.data.form_url,
+      },
     }
   }
 
   async createPayout(request: PayoutRequest): Promise<PayoutResponse> {
-    try {
-      const payoutRequest: BovapayCreatePayoutRequest = {
-        user_id: request.userId,
-        amount: request.amount,
-        currency: request.currency.toLowerCase() as any,
-        method: request.method as any,
-      }
+    const payoutRequest: BovapayCreatePayoutRequest = {
+      user_id: request.userId,
+      amount: request.currencyAmount,
+      currency: request.currency.toLowerCase() as any,
+      method: request.method as any,
+    }
 
-      const response = await bovapayApi.createPayout(payoutRequest, {
-        apiKey: this.options.apiKey,
-        apiUrl: this.options.apiUrl,
-      })
+    const response = await bovapayApi.createPayout(payoutRequest, {
+      apiKey: this.options.apiKey,
+      apiUrl: this.options.apiUrl,
+    })
 
-      return {
-        transactionId: response.data.payout_id,
-        status: this.mapBovapayStatus(response.data.status),
-        createdAt: response.data.created_at,
-      }
-    } catch (error) {
-      throw new Error('Failed to create payout')
+    return {
+      transactionId: response.data.payout_id,
+      status: this.mapBovapayStatus(response.data.status),
+      createdAt: response.data.created_at,
     }
   }
 
   async createWithdrawal(
     request: WithdrawalRequest,
   ): Promise<WithdrawalResponse> {
-    try {
-      const payoutRequest: BovapayCreatePayoutRequest = {
-        user_id: request.userId,
-        amount: request.amount,
-        currency: request.currency.toLowerCase() as any,
-        method: request.method as any,
-      }
+    const payoutRequest: BovapayCreatePayoutRequest = {
+      user_id: request.userId,
+      amount: request.currencyAmount,
+      currency: request.currency.toLowerCase() as any,
+      method: request.method as any,
+    }
 
-      const response = await bovapayApi.createPayout(payoutRequest, {
-        apiKey: this.options.apiKey,
-        apiUrl: this.options.apiUrl,
-      })
+    const response = await bovapayApi.createPayout(payoutRequest, {
+      apiKey: this.options.apiKey,
+      apiUrl: this.options.apiUrl,
+    })
 
-      return {
-        transactionId: response.data.payout_id,
-        providerTransactionId: response.data.payout_id,
-        status: this.mapBovapayStatus(response.data.status),
-        providerAmount: '666', // TODO: replace with actual amount
-        currency: request.currency,
-        createdAt: response.data.created_at,
-        updatedAt: response.data.created_at,
-      }
-    } catch (error) {
-      throw new Error('Failed to create withdrawal')
+    return {
+      providerTransactionId: response.data.payout_id,
+      status: this.mapBovapayStatus(response.data.status),
+      providerAmount: '666', // TODO: replace with actual amount
+      currency: request.currency,
+      createdAt: response.data.created_at,
+      updatedAt: response.data.created_at,
     }
   }
 
@@ -147,6 +187,7 @@ export class BovapayService implements PaymentProviderService {
       apiKey: this.options.apiKey,
       apiUrl: this.options.apiUrl,
     })
+
     return this.mapBovapayStatus(response.payload.state)
   }
 }

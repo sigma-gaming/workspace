@@ -27,11 +27,12 @@ export const WithdrawalTable = pgTable('Withdrawal', {
     .notNull()
     .$onUpdate(() => sql`now()`),
 
-  userAmount: bigint('userAmount', { mode: 'number' }).notNull(),
-  providerAmount: numeric('providerAmount', {
+  gemAmount: bigint('gemAmount', { mode: 'number' }).notNull(),
+  currencyAmount: numeric('currencyAmount', {
     precision: 20,
     scale: 18,
   }).notNull(),
+  providerAmount: text('providerAmount').notNull(),
   status: paymentStatusEnum('status').notNull(),
   currency: currencyEnum('currency').notNull(),
   method: withdrawalMethodEnum('method').notNull(),

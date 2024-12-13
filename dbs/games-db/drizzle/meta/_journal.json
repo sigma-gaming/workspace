@@ -666,6 +666,34 @@
       "when": 1734018382528,
       "tag": "0094_short_micromax",
       "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1734091769944,
+      "tag": "0095_brainy_marvel_zombies",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1734098628779,
+      "tag": "0096_deep_madripoor",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1734098767073,
+      "tag": "0097_mighty_kang",
+      "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1734099243488,
+      "tag": "0098_curvy_romulus",
+      "breakpoints": true
     }
   ]
 }

@@ -12,28 +12,7 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
           {
             provider: PaymentProvider.Bovapay,
             entry: {
-              minAmount: 1000,
-              maxAmount: 10000000,
-              commissionRate: 0.02,
-            },
-          },
-          {
-            provider: PaymentProvider.Test,
-            entry: {
-              minAmount: 1000,
-              maxAmount: 10000000,
-              commissionRate: 0.05,
-            },
-          },
-        ],
-      },
-      {
-        currency: Currency.KZT,
-        providers: [
-          {
-            provider: PaymentProvider.Test,
-            entry: {
-              minAmount: 1000,
+              minAmount: 10000,
               maxAmount: 10000000,
               commissionRate: 0.02,
             },
@@ -52,8 +31,34 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
           {
             provider: PaymentProvider.Bovapay,
             entry: {
-              minAmount: 100,
-              maxAmount: 100000,
+              minAmount: 10000,
+              maxAmount: 10000000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
+      },
+      {
+        currency: Currency.KGS,
+        providers: [
+          {
+            provider: PaymentProvider.Bovapay,
+            entry: {
+              minAmount: 10000,
+              maxAmount: 10000000,
+              commissionRate: 0.02,
+            },
+          },
+        ],
+      },
+      {
+        currency: Currency.UZS,
+        providers: [
+          {
+            provider: PaymentProvider.Bovapay,
+            entry: {
+              minAmount: 10000,
+              maxAmount: 10000000,
               commissionRate: 0.02,
             },
           },
