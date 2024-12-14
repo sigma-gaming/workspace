@@ -20,5 +20,3 @@ condition({
   then: initialize,
   else: destroy,
 })
-
-openDeposit()
