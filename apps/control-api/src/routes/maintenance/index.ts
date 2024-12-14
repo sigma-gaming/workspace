@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
-import { getMaintenanceRoute } from './get-maintenance'
-import { updateMaintenanceRoute } from './update-maintenance'
+import { getStateRoute } from './get-state'
+import { updateStateRoute } from './update-state'
 
 export const maintenanceRouter = new Hono()
-  .route('/get', getMaintenanceRoute)
-  .route('/update', updateMaintenanceRoute)
+  .route('/getState', getStateRoute)
+  .route('/updateState', updateStateRoute)

@@ -11,6 +11,9 @@ export const ConfigTable = pgTable('Config', {
     .defaultNow()
     .$onUpdate(() => sql`now()`),
   maintenanceEnabled: boolean('maintenanceEnabled').notNull().default(false),
+  backgroundJobsEnabled: boolean('backgroundJobsEnabled')
+    .notNull()
+    .default(true),
 })
 
 export type ConfigSelect = typeof ConfigTable.$inferSelect

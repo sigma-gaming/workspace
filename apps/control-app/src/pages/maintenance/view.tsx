@@ -3,8 +3,18 @@ import { useUnit } from 'effector-react'
 import { $$maintenancePage } from './model'
 
 export const MaintenancePageView = () => {
-  const maintenance = useUnit($$maintenancePage.fields.maintenance.$value)
-  const updateMaintenance = useUnit($$maintenancePage.fields.maintenance.update)
+  const maintenanceEnabled = useUnit(
+    $$maintenancePage.fields.maintenanceEnabled.$value,
+  )
+  const updateMaintenance = useUnit(
+    $$maintenancePage.fields.maintenanceEnabled.update,
+  )
+  const backgroundJobsEnabled = useUnit(
+    $$maintenancePage.fields.backgroundJobsEnabled.$value,
+  )
+  const updateBackgroundJobs = useUnit(
+    $$maintenancePage.fields.backgroundJobsEnabled.update,
+  )
   const loading = useUnit($$maintenancePage.$loading)
   const submitting = useUnit($$maintenancePage.$submitting)
   const submit = useUnit($$maintenancePage.form.submit)
@@ -25,9 +35,17 @@ export const MaintenancePageView = () => {
 
       <Skeleton className="sm:w-fit" visible={loading}>
         <Switch
-          checked={maintenance}
+          checked={maintenanceEnabled}
           onChange={(event) => updateMaintenance(event.target.checked)}
           label="Режим технических работ"
+        />
+      </Skeleton>
+
+      <Skeleton className="sm:w-fit" visible={loading}>
+        <Switch
+          checked={backgroundJobsEnabled}
+          onChange={(event) => updateBackgroundJobs(event.target.checked)}
+          label="Фоновые задачи"
         />
       </Skeleton>
 

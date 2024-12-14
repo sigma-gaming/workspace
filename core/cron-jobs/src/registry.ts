@@ -9,8 +9,9 @@ type Job = {
 export class CronJobRegistry {
   jobs: Job[] = []
 
-  register(name: string, cronJob: CronJob) {
-    this.jobs.push({ name, instance: cronJob })
+  register(options: { name: string; job: CronJob }) {
+    const { name, job } = options
+    this.jobs.push({ name, instance: job })
     return this
   }
 

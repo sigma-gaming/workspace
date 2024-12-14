@@ -9,57 +9,65 @@ import { routes } from '../../routing'
 import { controlApi } from '../../shared/api/control'
 import { createApiEffect } from '../../shared/api/effects'
 
-const getMaintenanceQuery = createQuery({
+const getStateQuery = createQuery({
   name: 'maintenance/get',
-  effect: createApiEffect('query', controlApi.maintenance.get.$get),
+  effect: createApiEffect('query', controlApi.maintenance.getState.$get),
 })
 
-const updateMaintenanceMutation = createMutation({
+const updateStateMutation = createMutation({
   name: 'maintenance/update',
-  handler: createApiEffect('json', controlApi.maintenance.update.$post),
+  handler: createApiEffect('json', controlApi.maintenance.updateState.$post),
 })
 
-const $loading = getMaintenanceQuery.$pending
-const $submitting = updateMaintenanceMutation.$pending
+const $loading = getStateQuery.$pending
+const $submitting = updateStateMutation.$pending
 
 const fields = {
-  maintenance: createField({
+  maintenanceEnabled: createField({
     emptyValue: false,
+  }),
+  backgroundJobsEnabled: createField({
+    emptyValue: true,
   }),
 }
 
 const form = createForm({
   fields,
   schema: z.object({
-    maintenance: z.boolean(),
+    maintenanceEnabled: z.boolean(),
+    backgroundJobsEnabled: z.boolean(),
   }),
 })
 
 sample({
-  source: getMaintenanceQuery.finished.success,
-  fn: ({ result }) => ({ maintenance: result.maintenanceMode }),
+  source: getStateQuery.finished.success,
+  fn: ({ result }) => ({
+    maintenanceEnabled: result.maintenanceEnabled,
+    backgroundJobsEnabled: result.backgroundJobsEnabled,
+  }),
   target: form.initialize,
 })
 
 sample({
   source: form.submitted,
-  fn: ({ maintenance }) => ({ value: maintenance }),
-  target: updateMaintenanceMutation.start,
+  fn: ({ maintenanceEnabled, backgroundJobsEnabled }) => ({
+    maintenanceEnabled,
+    backgroundJobsEnabled,
+  }),
+  target: updateStateMutation.start,
 })
 
 sample({
   clock: routes.maintenance.opened,
   fn: noop,
-  target: getMaintenanceQuery.start,
+  target: getStateQuery.start,
 })
 
 sample({
-  source: updateMaintenanceMutation.finished.success,
-  fn: ({ result }): NotificationData => ({
-    title: 'Значение обновлено',
-    message: result.maintenanceMode
-      ? 'Режим технических работ включен'
-      : 'Режим технических работ выключен',
+  source: updateStateMutation.finished.success,
+  fn: (): NotificationData => ({
+    title: 'Успех',
+    message: 'Настройки успешно обновлены',
   }),
   target: $$notifications.show,
 })

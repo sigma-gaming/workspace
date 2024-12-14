@@ -1,0 +1,1 @@
+ALTER TABLE "Config" ADD COLUMN "backgroundJobsEnabled" boolean DEFAULT true NOT NULL;

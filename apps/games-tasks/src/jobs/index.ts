@@ -7,9 +7,10 @@ import { updateCurrencyRatesJob } from './update-currency-rates'
 const registry = new CronJobRegistry()
 
 export function initializeCronJobs() {
-  registry.register('initializeChatMessages', initializeChatMessagesJob)
-  registry.register('syncBudget', syncBudgetJob)
-  registry.register('processReferrerPayouts', processReferrerPayoutsJob)
-  registry.register('updateCurrencyRates', updateCurrencyRatesJob)
+  registry.register(initializeChatMessagesJob)
+  registry.register(syncBudgetJob)
+  registry.register(processReferrerPayoutsJob)
+  registry.register(updateCurrencyRatesJob)
+
   registry.start()
 }

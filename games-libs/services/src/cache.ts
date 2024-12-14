@@ -37,6 +37,7 @@ type LastReferrerTransactions = {
 
 export class GamesCacheRegistry {
   maintenance: GlobalBooleanEntityService
+  backgroundJobsEnabled: GlobalBooleanEntityService
   budget: GlobalJsonEntityService<BudgetSelect>
   budgetAvailable: GlobalNumberEntityService
   detailedProfile: KeyJsonEntityService<ProfileDetailed>
@@ -66,6 +67,12 @@ export class GamesCacheRegistry {
       redis,
       redlock,
       key: `global:maintenance`,
+    })
+
+    this.backgroundJobsEnabled = new GlobalBooleanEntityService({
+      redis,
+      redlock,
+      key: `global:backgroundJobsEnabled`,
     })
 
     this.budget = new GlobalJsonEntityService<BudgetSelect>({

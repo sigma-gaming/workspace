@@ -48,6 +48,28 @@ export class MaintenanceService {
     await gamesCache.maintenance.set(state)
     return state
   }
+
+  async queryBackgroundJobsEnabled() {
+    const config = await gamesDb.query.ConfigTable.findFirst()
+    if (!config) throw new Error('Config not found')
+    return config.backgroundJobsEnabled
+  }
+
+  async areBackgroundJobsEnabled() {
+    if (!gamesCache.ready) return this.queryBackgroundJobsEnabled()
+    const cached = await gamesCache.backgroundJobsEnabled.get()
+    if (cached !== null) return cached
+    const enabled = await this.queryBackgroundJobsEnabled()
+    await gamesCache.backgroundJobsEnabled.set(enabled)
+    return enabled
+  }
+
+  async setBackgroundJobsEnabled(state: boolean) {
+    await gamesDb.update(ConfigTable).set({ backgroundJobsEnabled: state })
+    if (!gamesCache.ready) return state
+    await gamesCache.backgroundJobsEnabled.set(state)
+    return state
+  }
 }
 
 export const maintenanceService = createLazyInstance(MaintenanceService)
