@@ -7,8 +7,8 @@ const EnvSchema = z
 
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-    PUBLIC_PAYMENT_API_URL: z.string(),
-    PUBLIC_PAYMENT_API_VERSION: z.string().default('unknown'),
+    PAYMENT_API_URL: z.string(),
+    PAYMENT_API_VERSION: z.string().default('unknown'),
 
     GAMES_DB_URL: z.string(),
     GAMES_CACHE_HOST: z.string(),
@@ -40,8 +40,8 @@ const EnvSchema = z
     },
 
     paymentApi: {
-      url: raw.PUBLIC_PAYMENT_API_URL,
-      version: raw.PUBLIC_PAYMENT_API_VERSION,
+      url: raw.PAYMENT_API_URL,
+      version: raw.PAYMENT_API_VERSION,
     },
 
     bovapay: {
