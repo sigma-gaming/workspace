@@ -4,7 +4,6 @@ import { env } from './env'
 import { createRouter } from './hono'
 import { sentryMiddleware } from './middlewares/sentry'
 import { affiliateRouter } from './routes/affiliate'
-import { balanceRouter } from './routes/balance'
 import { chatRouter } from './routes/chat'
 import { gameHistoryRouter } from './routes/game-history'
 import { healthyRoute, readyRoute } from './routes/health'
@@ -37,7 +36,6 @@ export const app = createRouter()
   .route('/chat', chatRouter)
   .route('/me', meRouter)
   .route('/settings', settingsRouter)
-  .route('/balance', balanceRouter)
   .route('/payments', paymentsRouter)
   .route('/gameHistory', gameHistoryRouter)
   .route('/promocodes', promocodesRouter)

@@ -1,6 +1,5 @@
-import { $$notifications, handleExceptions } from '@core/client'
 import { subscriptionFactory } from '@core/io-client'
-import { createMutation, Mutation } from '@farfetched/core'
+import { Mutation } from '@farfetched/core'
 import { BalanceDetailed } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
@@ -8,22 +7,11 @@ import { previous, status } from 'patronum'
 import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
-import { $$audio, Sound } from '../audio'
 
 const getDetailedBalanceFx = createApiEffect(
   'query',
   gamesApi.me.getDetailedBalance.$get,
 )
-
-const depositMutation = createMutation({
-  name: 'balance/deposit',
-  effect: createApiEffect('json', gamesApi.balance.deposit.$post),
-})
-
-const withdrawMutation = createMutation({
-  name: 'balance/withdraw',
-  effect: createApiEffect('json', gamesApi.balance.withdraw.$post),
-})
 
 const { receivedData: balanceUpdated } = invoke(() =>
   subscriptionFactory({
@@ -34,8 +22,6 @@ const { receivedData: balanceUpdated } = invoke(() =>
 
 const request = createEvent()
 const reset = createEvent()
-const deposit = createEvent()
-const withdraw = createEvent()
 const loaded = createEvent()
 
 const $balance = createStore<BalanceDetailed | null>(null).reset(reset)
@@ -59,8 +45,6 @@ function receiveUpdates<T>(
 
 const $loading = $status.map((status) => status === 'pending')
 const $loaded = $status.map((status) => status === 'done')
-const $depositing = depositMutation.$pending
-const $withdrawing = withdrawMutation.$pending
 
 const $available = $balance.map((balance) => balance?.available ?? 0)
 const $previousAvailable = previous($available)
@@ -80,55 +64,14 @@ sample({
   target: $balance,
 })
 
-receiveUpdates(depositMutation, (data) => data.updatedBalance)
-receiveUpdates(withdrawMutation, (data) => data.updatedBalance)
-
 sample({
   clock: balanceUpdated,
   target: $balance,
 })
 
-sample({
-  clock: deposit,
-  target: depositMutation.start,
-})
-
-sample({
-  clock: withdraw,
-  target: withdrawMutation.start,
-})
-
-sample({
-  clock: depositMutation.finished.success,
-  target: [
-    $$notifications.show.prepend(() => ({
-      color: 'green',
-      title: 'Баланс обновлен',
-      message: `Деньги зачислены на ваш счёт`,
-    })),
-    $$audio.play.prepend(() => Sound.TopUp),
-  ],
-})
-
-sample({
-  clock: withdrawMutation.finished.success,
-  target: [
-    $$notifications.show.prepend(() => ({
-      color: 'green',
-      title: 'Баланс обновлен',
-      message: `Деньги успешно выведены`,
-    })),
-    $$audio.play.prepend(() => Sound.Withdraw),
-  ],
-})
-
-handleExceptions(withdrawMutation)
-
 export const $$balance = {
   receiveUpdates,
   request,
-  deposit,
-  withdraw,
   loaded,
   reset,
   $balance,
@@ -136,6 +79,4 @@ export const $$balance = {
   $loaded,
   $available,
   $previousAvailable,
-  $depositing,
-  $withdrawing,
 }

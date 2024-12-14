@@ -2,14 +2,7 @@ import { sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 
-const psql = postgres({
-  host: String(process.env.GAMES_DB_HOST),
-  port: 5432,
-  user: String(process.env.GAMES_DB_USER),
-  password: String(process.env.GAMES_DB_PASSWORD),
-  database: String(process.env.GAMES_DB_DATABASE),
-  max: 1,
-})
+const psql = postgres(process.env.GAMES_DB_URL, { max: 1 })
 
 const db = drizzle(psql)
 

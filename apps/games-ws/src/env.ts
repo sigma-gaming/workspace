@@ -13,10 +13,7 @@ const EnvSchema = z
     PUBLIC_GAMES_WS_VERSION: z.string().default('unknown'),
     JWT_SECRET: z.string(),
 
-    GAMES_DB_HOST: z.string(),
-    GAMES_DB_DATABASE: z.string().default('postgres'),
-    GAMES_DB_USER: z.string(),
-    GAMES_DB_PASSWORD: z.string(),
+    GAMES_DB_URL: z.string(),
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
 
@@ -33,7 +30,7 @@ const EnvSchema = z
     domain: raw.PUBLIC_DOMAIN,
 
     gamesDb: {
-      url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
+      url: raw.GAMES_DB_URL,
     },
 
     gamesCache: {
