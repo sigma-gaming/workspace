@@ -14,7 +14,6 @@
       "{workspaceRoot}/.npmrc"
     ],
     "ci": [
-      "{workspaceRoot}/stacks/dev.docker-compose.yml",
       "{workspaceRoot}/.github/workflows/deploy-dev-stacks.yml"
     ],
     "env": [
