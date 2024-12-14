@@ -21,7 +21,7 @@ export class PubSubService {
   constructor(options: { redis: Redis; subRedis: Redis }) {
     this.redis = options.redis
     this.subRedis = options.subRedis
-    this.logger = loggerService.logger.child('GamesPubSub')
+    this.logger = loggerService.logger.child('PubSub')
   }
 
   get pub() {

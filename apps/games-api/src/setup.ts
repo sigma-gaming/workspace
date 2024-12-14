@@ -3,6 +3,7 @@ import {
   BovapayOptionsToken,
   GamesCacheOptionsToken,
   GamesDbOptionsToken,
+  GamesNatsOptionsToken,
   GamesRedisOptionsToken,
   SessionOptionsToken,
 } from '@games/options'
@@ -16,6 +17,12 @@ registerOptions(GamesDbOptionsToken, {
 registerOptions(GamesRedisOptionsToken, {
   host: env.gamesCache.host,
   password: env.gamesCache.password,
+})
+
+registerOptions(GamesNatsOptionsToken, {
+  servers: env.gamesNats.host,
+  user: env.gamesNats.user,
+  pass: env.gamesNats.password,
 })
 
 registerOptions(GamesCacheOptionsToken, {

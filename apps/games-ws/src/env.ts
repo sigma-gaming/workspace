@@ -17,8 +17,13 @@ const EnvSchema = z
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
+
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
+
+    GAMES_NATS_HOST: z.string(),
+    GAMES_NATS_USER: z.string(),
+    GAMES_NATS_PASSWORD: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
@@ -39,6 +44,12 @@ const EnvSchema = z
     gamesCache: {
       host: raw.GAMES_CACHE_HOST,
       password: raw.GAMES_CACHE_PASSWORD,
+    },
+
+    gamesNats: {
+      host: raw.GAMES_NATS_HOST,
+      user: raw.GAMES_NATS_USER,
+      password: raw.GAMES_NATS_PASSWORD,
     },
 
     gamesApp: {

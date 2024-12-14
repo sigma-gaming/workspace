@@ -121,6 +121,9 @@ importers:
       js-cookie:
         specifier: ^3.0.5
         version: 3.0.5
+      nats:
+        specifier: ^2.28.2
+        version: 2.28.2
       patronum:
         specifier: ^2.2.0
         version: 2.2.0(effector@23.2.1)
@@ -812,6 +815,24 @@ importers:
       '@core/utils':
         specifier: workspace:*
         version: link:../../core/utils
+
+  games-libs/nats:
+    dependencies:
+      '@core/di':
+        specifier: workspace:*
+        version: link:../../core/di
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../../core/logger
+      '@dbs/games-schema':
+        specifier: workspace:*
+        version: link:../../dbs/games-schema
+      '@games/model':
+        specifier: workspace:*
+        version: link:../model
+      nats:
+        specifier: ^2.19.0
+        version: 2.28.2
 
   games-libs/options:
     dependencies:
@@ -7362,6 +7383,10 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nats@2.28.2:
+    resolution: {integrity: sha512-02cvR8EPach+0BfVaQjPgsbPFn6uMjEQAuvXS2ppg8jiWEm2KYdfmeFmtshiU9b2+kFh3LSEKMEaIfRgk3K8tw==}
+    engines: {node: '>= 14.0.0'}
+
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
@@ -7375,6 +7400,10 @@ packages:
   neotraverse@0.6.18:
     resolution: {integrity: sha512-Z4SmBUweYa09+o6pG+eASabEpP6QkQ70yHj351pQoEXIs8uHbaU2DWVmzBANKgflPa47A50PtB2+NgRpQvr7vA==}
     engines: {node: '>= 10'}
+
+  nkeys.js@1.1.0:
+    resolution: {integrity: sha512-tB/a0shZL5UZWSwsoeyqfTszONTt4k2YS0tuQioMOD180+MbombYVgzDUYHlx+gejYK6rgf08n/2Df99WY0Sxg==}
+    engines: {node: '>=10.0.0'}
 
   nlcst-to-string@4.0.0:
     resolution: {integrity: sha512-YKLBCcUYKAg0FNlOBT6aI91qFmSiFKiluk655WzPF+DDMA02qIyy8uiRqI8QXtcFpEvll12LpL5MXqEmAZ+dcA==}
@@ -8829,6 +8858,9 @@ packages:
 
   turbo-stream@2.4.0:
     resolution: {integrity: sha512-FHncC10WpBd2eOmGwpmQsWLDoK4cqsA/UT/GqNoaKOQnT8uzhtCbg3EoUDMvqpOSAI0S26mr0rkjzbOO6S3v1g==}
+
+  tweetnacl@1.0.3:
+    resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -17264,6 +17296,10 @@ snapshots:
 
   nanoid@3.3.8: {}
 
+  nats@2.28.2:
+    dependencies:
+      nkeys.js: 1.1.0
+
   natural-compare@1.4.0: {}
 
   negotiator@0.6.3: {}
@@ -17271,6 +17307,10 @@ snapshots:
   neo-async@2.6.2: {}
 
   neotraverse@0.6.18: {}
+
+  nkeys.js@1.1.0:
+    dependencies:
+      tweetnacl: 1.0.3
 
   nlcst-to-string@4.0.0:
     dependencies:
@@ -19047,6 +19087,8 @@ snapshots:
       yargs: 17.7.2
 
   turbo-stream@2.4.0: {}
+
+  tweetnacl@1.0.3: {}
 
   type-check@0.4.0:
     dependencies:

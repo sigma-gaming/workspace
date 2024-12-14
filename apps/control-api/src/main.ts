@@ -2,6 +2,7 @@ import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
+import { gamesPubsubs } from '@games/services'
 import { app } from './app'
 import { env } from './env'
 
@@ -34,6 +35,9 @@ server.listen(5051, (token) => {
 
   logger.info(`🚀 Server ready at ${env.controlApi.url}`)
 })
+
+// Prepare services
+void gamesPubsubs.ready
 
 process.on('uncaughtException', (error) => {
   logger.info('Uncaught exception')

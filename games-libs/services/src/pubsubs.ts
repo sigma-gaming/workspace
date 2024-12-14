@@ -1,16 +1,12 @@
 import { createLazyInstance, resolveOptions, Shutdownable } from '@core/di'
-import { logger } from '@core/logger'
 import { NotificationSelect } from '@dbs/games-schema'
 import { ChatMessageDetailed } from '@games/model'
-import { GamesRedisOptionsToken } from '@games/options'
-import { PubSub, PubSubService, RedisService } from '@games/redis'
-import { Redis } from 'ioredis'
-import { GamesRedis, gamesRedis } from './redis'
+import { NatsService, PubSub, PubSubService } from '@games/nats'
+import { GamesNatsOptionsToken } from '@games/options'
 
 export class GamesPubSubRegistry extends Shutdownable {
-  pub: Redis
-  sub: Redis
-  service: PubSubService
+  private nats: NatsService
+  private service: PubSubService
 
   notifications: PubSub<NotificationSelect>
   chatMessages: PubSub<ChatMessageDetailed>
@@ -19,48 +15,32 @@ export class GamesPubSubRegistry extends Shutdownable {
   constructor() {
     super()
 
-    const { host, password } = resolveOptions(GamesRedisOptionsToken)
+    const options = resolveOptions(GamesNatsOptionsToken)
 
-    const { redis: subRedis } = new RedisService({
-      host,
-      password,
-    })
+    const nats = new NatsService(options)
+    this.nats = nats
 
-    const { redis } = gamesRedis
-
-    this.pub = redis
-    this.sub = subRedis
-
-    this.service = new PubSubService({ redis, subRedis })
+    this.service = new PubSubService({ nats })
 
     this.notifications = this.service.create<NotificationSelect>({
-      channelName: 'notifications',
+      subject: 'notification',
     })
 
     this.chatMessages = this.service.create<ChatMessageDetailed>({
-      channelName: 'chat-messages',
+      subject: 'chat-message',
     })
 
     this.maintenanceStarted = this.service.create<void>({
-      channelName: 'maintenance-started',
+      subject: 'maintenance-started',
     })
   }
 
   get ready() {
-    return this.pub.status === 'ready'
+    return this.service.ready
   }
 
-  shutdownBefore = [GamesRedis]
-
   async shutdown() {
-    if (!this.ready) {
-      logger.info('PubSub is not ready, skipping shutdown')
-      return
-    }
-
-    logger.info('Unsubscribing from all channels...')
-    await this.service.unsubscribeAll()
-    logger.info('Successfully unsubscribed from all channels')
+    await this.nats.close()
   }
 }
 

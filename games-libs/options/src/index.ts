@@ -1,4 +1,6 @@
 import { createOptionsToken } from '@core/di'
+import { NatsOptions } from '@games/nats'
+import { RedisOptions } from '@games/redis'
 
 export type GamesCacheOptions = {
   version: string
@@ -15,13 +17,11 @@ export type GamesDbOptions = {
 export const GamesDbOptionsToken =
   createOptionsToken<GamesDbOptions>('GamesDbOptions')
 
-export type GamesRedisOptions = {
-  host: string
-  password: string
-}
-
 export const GamesRedisOptionsToken =
-  createOptionsToken<GamesRedisOptions>('GamesRedisOptions')
+  createOptionsToken<RedisOptions>('GamesRedisOptions')
+
+export const GamesNatsOptionsToken =
+  createOptionsToken<NatsOptions>('GamesNatsOptions')
 
 export type SessionOptions = {
   domain: string
