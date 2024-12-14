@@ -102,6 +102,7 @@ jobs:
           cat <<EOF > cloudbuild.yaml
           steps:
             - name: "gcr.io/cloud-builders/docker"
+              id: "Build ${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}"
               env:
                 - "DOCKER_BUILDKIT=1"
               args:

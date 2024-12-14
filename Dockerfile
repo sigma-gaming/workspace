@@ -116,6 +116,9 @@ RUN pnpm nx run @apis/referral-redirect-api:build
 FROM prebuild AS access-api-build
 RUN pnpm nx run @apis/access-api:build
 
+FROM prebuild AS payment-api-build
+RUN pnpm nx run @apis/payment-api:build
+
 FROM prebuild AS letsauth-build
 RUN pnpm nx run @apis/letsauth:build
 
@@ -138,6 +141,10 @@ CMD [ "node", "--max_semi_space_size=64", "apps/referral-redirect-api/dist/main.
 FROM api-base AS access-api
 COPY --from=access-api-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/access-api/dist/main.js" ]
+
+FROM api-base AS payment-api
+COPY --from=payment-api-build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/payment-api/dist/main.js" ]
 
 FROM api-base AS letsauth
 COPY --from=letsauth-build /build ./
