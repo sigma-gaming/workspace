@@ -12,12 +12,12 @@ const EnvSchema = z
 
 loadEnv({ root: process.cwd() })
 
-const { url } = parseEnv({
+const env = parseEnv({
   source: process.env,
   schema: EnvSchema,
   exitProcessOnFail: true,
 })
 
-migrateGamesDB(url).then(() => {
+migrateGamesDB(env.url).then(() => {
   console.info('🚀 Migration finished')
 })
