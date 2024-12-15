@@ -3,6 +3,11 @@ name: Build development images with Google Cloud Build
 on:
   push:
     branches: ['main']
+  workflow_dispatch:
+    inputs:
+      games-db-migration:
+        type: boolean
+        default: false
 
 env:
   DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
@@ -58,7 +63,18 @@ jobs:
 
       - name: Output affected apps
         id: affected
-        run: echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            apps=""
+
+            if [ "${{ github.event.inputs.games-db-migration }}" == "true" ]; then
+              apps+="@migrations/games-db-migration,"
+            fi
+
+            echo "apps=${apps%,}" >> $GITHUB_OUTPUT
+          else
+            echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
+          fi
 
   build:
     name: Build
