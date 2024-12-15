@@ -65,13 +65,14 @@ jobs:
         id: affected
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            apps=""
+            apps=()
 
             if [ "${{ github.event.inputs.games-db-migration }}" == "true" ]; then
-              apps+="@migrations/games-db-migration,"
+              apps+=("@migrations/games-db-migration")
             fi
 
-            echo "apps=${apps%,}" >> $GITHUB_OUTPUT
+            apps_json=$(printf '%s\n' "${apps[@]}" | jq -R . | jq -s .)
+            echo "apps=$apps_json" >> $GITHUB_OUTPUT
           else
             echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
           fi
