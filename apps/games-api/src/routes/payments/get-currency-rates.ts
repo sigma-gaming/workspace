@@ -1,6 +1,6 @@
 import { CurrencyExchangeRates } from '@games/model'
 import { currencyRatesService } from '@games/services'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const getCurrencyRatesRoute = createRouter().get('/', async (ctx) => {
   const rates = await currencyRatesService.getRates()

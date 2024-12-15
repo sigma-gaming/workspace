@@ -1,8 +1,8 @@
 import { zValidator } from '@core/server'
 import { sessionService } from '@games/services'
 import { z } from 'zod'
+import { createRouter } from '../app/router'
 import { env } from '../env'
-import { createRouter } from '../hono'
 
 export const logoutRoute = createRouter().get(
   '/',

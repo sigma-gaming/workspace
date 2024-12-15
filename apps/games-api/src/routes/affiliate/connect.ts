@@ -1,7 +1,7 @@
 import { BadRequestException } from '@core/exceptions'
 import { ReferrerBalanceTable, ReferrerSettingsTable } from '@dbs/games-schema'
 import { affiliateService, gamesDb, sessionService } from '@games/services'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const connectRoute = createRouter().post('/', async (ctx) => {
   const { userId } = await sessionService.getHonoSession(ctx)

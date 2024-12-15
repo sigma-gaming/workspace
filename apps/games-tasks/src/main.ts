@@ -2,24 +2,16 @@ import './setup'
 import './shared/sentry/init'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { createErrorHandler, createServer } from '@core/server'
+import { createServer, HonoUwsEnv } from '@core/server'
 import { gamesRedis } from '@games/services'
+import { Hono } from 'hono'
 import { env } from './env'
-import { createRouter } from './hono'
 import { healthyRoute, readyRoute } from './routes/health'
 import { sentry } from './shared/sentry'
 
-const app = createRouter()
+const app = new Hono<HonoUwsEnv>()
   .route('/healthy', healthyRoute)
   .route('/ready', readyRoute)
-
-app.onError(
-  createErrorHandler({
-    onInternalError: (error) => {
-      logger.child('Request').error(error)
-    },
-  }),
-)
 
 const server = createServer({
   app,

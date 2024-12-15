@@ -3,29 +3,26 @@ import {
   DefaultLoggerLevel,
   Logger as NeodxLogger,
 } from '@neodx/log'
-import { json, pretty } from '@neodx/log/node'
-import { IncomingMessage } from 'node:http'
-import { v4 as uuid } from 'uuid'
+import { json, JsonTargetParams, pretty } from '@neodx/log/node'
 
 export type Logger = NeodxLogger<DefaultLoggerLevel>
 
+const serializers: JsonTargetParams['serializers'] = {
+  req: (json) => json,
+  res: (json) => json,
+  err: (json) => json,
+}
+
 export class LoggerService {
+  isPretty = process.env.NODE_ENV !== 'production'
   logger: Logger
 
   constructor() {
     this.logger = createNeodxLogger({
-      target: process.env.NODE_ENV === 'development' ? pretty() : json(),
+      target: this.isPretty ? pretty({ serializers }) : json({ serializers }),
     })
   }
 }
 
 export const loggerService = new LoggerService()
 export const logger = loggerService.logger
-
-function _generateReqId(req: IncomingMessage) {
-  const existingID = req.headers['x-trace-id']
-  if (existingID) return existingID.toString()
-  const id = uuid()
-  req.headers['x-trace-id'] = id
-  return id
-}

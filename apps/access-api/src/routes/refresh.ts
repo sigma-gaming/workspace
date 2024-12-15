@@ -1,7 +1,7 @@
 import { BadRequestException } from '@core/exceptions'
 import { SessionState } from '@games/model'
 import { sessionService } from '@games/services'
-import { createRouter } from '../hono'
+import { createRouter } from '../app/router'
 
 export const refreshRoute = createRouter().post('/', async (ctx) => {
   const sessionId = sessionService.getHonoSessionId(ctx)

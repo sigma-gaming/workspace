@@ -22,8 +22,6 @@ import {
   DepositRequest,
   DepositResponse,
   PaymentProviderService,
-  PayoutRequest,
-  PayoutResponse,
   WithdrawalRequest,
   WithdrawalResponse,
 } from './types'
@@ -137,25 +135,13 @@ export class BovapayService implements PaymentProviderService {
     }
   }
 
-  async createPayout(request: PayoutRequest): Promise<PayoutResponse> {
-    const payoutRequest: BovapayCreatePayoutRequest = {
-      user_id: request.userId,
-      amount: request.currencyAmount,
-      currency: request.currency.toLowerCase() as any,
-      method: request.method as any,
-    }
-
-    const response = await bovapayApi.createPayout(payoutRequest, {
-      apiKey: this.options.apiKey,
-      apiUrl: this.options.apiUrl,
-    })
-
-    return {
-      transactionId: response.data.payout_id,
-      status: this.mapBovapayStatus(response.data.status),
-      createdAt: response.data.created_at,
-    }
+  async getDepositStatus(
+    _providerTransactionId: string,
+  ): Promise<PaymentStatus> {
+    return PaymentStatus.Pending
   }
+
+  async cancelDeposit(_providerTransactionId: string): Promise<void> {}
 
   async createWithdrawal(
     request: WithdrawalRequest,
@@ -181,6 +167,14 @@ export class BovapayService implements PaymentProviderService {
       updatedAt: response.data.created_at,
     }
   }
+
+  async getWithdrawalStatus(
+    _providerTransactionId: string,
+  ): Promise<PaymentStatus> {
+    return PaymentStatus.Pending
+  }
+
+  async cancelWithdrawal(_providerTransactionId: string): Promise<void> {}
 
   async getTransactionStatus(transactionId: string): Promise<PaymentStatus> {
     const response = await bovapayApi.getTransactionStatus(transactionId, {

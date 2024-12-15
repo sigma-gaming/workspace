@@ -1,4 +1,4 @@
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 import { depositRoute } from './deposit'
 import { getConfigRoute } from './get-config'
 import { getCurrencyRatesRoute } from './get-currency-rates'

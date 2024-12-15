@@ -1,6 +1,6 @@
 import { BadRequestException } from '@core/exceptions'
 import { affiliateService, sessionService } from '@games/services'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const getBalanceRoute = createRouter().get('/', async (ctx) => {
   const { userId } = await sessionService.getHonoSession(ctx)

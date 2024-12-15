@@ -1,6 +1,6 @@
 import { UserRole } from '@dbs/games-types'
 import { promocodeService, roleService, userService } from '@games/services'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const generateRoute = createRouter().post('/', async (ctx) => {
   const session = ctx.get('session')

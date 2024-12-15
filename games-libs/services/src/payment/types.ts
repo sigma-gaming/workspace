@@ -58,11 +58,11 @@ export type WithdrawalOutput =
   | {
       outcome: PaymentOutcome.Success
       withdrawal: WithdrawalSelect
+      updatedBalance: number
     }
   | {
       outcome: PaymentOutcome.InsufficientFunds
       available: number
-      currency: Currency
     }
   | {
       outcome: PaymentOutcome.InvalidAmount
@@ -140,10 +140,6 @@ export type WithdrawalRequest = {
   method: WithdrawalMethod
 } & PaymentRequest
 
-export type PayoutRequest = {
-  method: WithdrawalMethod
-} & PaymentRequest
-
 export type PaymentResponse = {
   providerTransactionId: string
   status: PaymentStatus
@@ -160,15 +156,13 @@ export type DepositResponse = PaymentResponse & {
 
 export type WithdrawalResponse = PaymentResponse
 
-export type PayoutResponse = {
-  transactionId: string
-  status: PaymentStatus
-  createdAt: string
-}
-
 export type PaymentProviderService = {
   readonly provider: PaymentProvider
   createDeposit(request: DepositRequest): Promise<DepositResponse>
+  getDepositStatus(providerTransactionId: string): Promise<PaymentStatus>
+  cancelDeposit(providerTransactionId: string): Promise<void>
   createWithdrawal(request: WithdrawalRequest): Promise<WithdrawalResponse>
+  getWithdrawalStatus(providerTransactionId: string): Promise<PaymentStatus>
+  cancelWithdrawal(providerTransactionId: string): Promise<void>
   getTransactionStatus(transactionId: string): Promise<PaymentStatus>
 }

@@ -13,7 +13,7 @@ import {
 } from '@games/services'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 const reservedUsernames = [
   'sigma',

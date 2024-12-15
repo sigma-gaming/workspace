@@ -2,7 +2,7 @@ import { zValidator } from '@core/server'
 import { UserRole } from '@dbs/games-types'
 import { fraudService, roleService, userService } from '@games/services'
 import { z } from 'zod'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const whitelistUserRoute = createRouter().post(
   '/',

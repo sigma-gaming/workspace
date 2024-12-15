@@ -3,7 +3,7 @@ import { zValidator } from '@core/server'
 import { PaymentStatus } from '@dbs/games-types'
 import { bovapayService, paymentService } from '@games/services'
 import { z } from 'zod'
-import { createRouter } from '../hono'
+import { createRouter } from '../app/router'
 
 function withOrder<Schema extends z.ZodObject<z.ZodRawShape>>(schema: Schema) {
   return z.custom((value) => schema.safeParse(value).success) as Schema

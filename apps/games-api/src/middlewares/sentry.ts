@@ -1,15 +1,17 @@
 import * as Sentry from '@sentry/node'
-import { MiddlewareHandler } from 'hono'
-import { GamesApiEnv } from '../hono'
+import { createMiddleware } from 'hono/factory'
 import { sentry } from '../shared/sentry'
 
 type Options = {
   enabled?: boolean
 }
 
-export const sentryMiddleware =
-  (options: Options): MiddlewareHandler<GamesApiEnv> =>
-  async (ctx, next) => {
+export const sentryMiddleware = (options: Options) =>
+  createMiddleware<{
+    Variables: {
+      requestId?: string
+    }
+  }>(async (ctx, next) => {
     if (!options.enabled) {
       return next()
     }
@@ -30,6 +32,7 @@ export const sentryMiddleware =
           op: 'http.server',
           attributes: {
             'http.query': url.search,
+            'http.request.id': ctx.get('requestId'),
             'http.request.method': ctx.req.method,
             'server.address': url.hostname,
           },
@@ -45,4 +48,4 @@ export const sentryMiddleware =
         },
       )
     })
-  }
+  })

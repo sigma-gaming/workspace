@@ -9,8 +9,10 @@ import { sentry } from './shared/sentry'
 
 app.onError(
   createErrorHandler({
-    onInternalError: (error) => {
-      logger.child('Request').error(error)
+    showOriginalError: env.isDev,
+    onInternalError: (error, ctx) => {
+      const logger = ctx.get('logger')
+      logger.error('Internal error', error)
     },
   }),
 )

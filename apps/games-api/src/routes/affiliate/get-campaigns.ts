@@ -5,7 +5,7 @@ import { ReferralCampaignTable } from '@dbs/games-schema'
 import { affiliateService, gamesDb, sessionService } from '@games/services'
 import { count, desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const getCampaingsRoute = createRouter().get(
   '/',

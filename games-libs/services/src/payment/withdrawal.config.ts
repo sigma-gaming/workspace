@@ -23,3 +23,8 @@ export const WITHDRAWAL_CONFIG_LIST: WithdrawalConfigList = [
 ]
 
 export const WITHDRAWAL_CONFIG_TREE = toConfigTree(WITHDRAWAL_CONFIG_LIST)
+
+export const WITHDRAWAL_STALE_TIMEOUTS: Record<PaymentProvider, number> = {
+  [PaymentProvider.Bovapay]: 30 * 60 * 1000, // 30 minutes
+  [PaymentProvider.Test]: 30 * 60 * 1000, // 30 minutes
+}

@@ -1,6 +1,9 @@
 import './setup'
-import { logger } from '@core/logger'
-import { createErrorHandler } from '@core/server'
+import {
+  createErrorHandler,
+  loggerMiddleware,
+  requestIdMiddleware,
+} from '@core/server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serverEnv } from '../shared/env/server'
@@ -15,13 +18,16 @@ export const api = new Hono()
       allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
     }),
   )
+  .use(requestIdMiddleware)
+  .use(loggerMiddleware)
   .route('/authenticate', authenticateRoute)
 
 api.onError(
   createErrorHandler({
     showOriginalError: serverEnv.isDev,
-    onInternalError: (error) => {
-      logger.child('Request').error(error)
+    onInternalError: (error, ctx) => {
+      const logger = ctx.get('logger')
+      logger.error('Internal error', error)
     },
   }),
 )

@@ -8,8 +8,9 @@ import { env } from './env'
 app.onError(
   createErrorHandler({
     showOriginalError: env.isDev,
-    onInternalError: (error) => {
-      logger.child('Request').error(error)
+    onInternalError: (error, ctx) => {
+      const logger = ctx.get('logger')
+      logger.error(error)
     },
   }),
 )

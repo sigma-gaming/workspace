@@ -132,3 +132,8 @@ export const DEPOSIT_CONFIG_LIST: DepositConfigList = [
 ]
 
 export const DEPOSIT_CONFIG_TREE = toConfigTree(DEPOSIT_CONFIG_LIST)
+
+export const DEPOSIT_STALE_TIMEOUTS: Record<PaymentProvider, number> = {
+  [PaymentProvider.Bovapay]: 30 * 60 * 1000, // 30 minutes
+  [PaymentProvider.Test]: 30 * 60 * 1000, // 30 minutes
+}

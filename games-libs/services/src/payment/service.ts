@@ -1,6 +1,7 @@
-import { logger } from '@core/logger'
+import { logger as globalLogger } from '@core/logger'
 import { sleep, takeFirstOrNull, takeFirstOrThrow } from '@core/utils'
 import {
+  BalanceTable,
   DepositTable,
   TransactionTable,
   UserStatsTable,
@@ -13,7 +14,8 @@ import {
   TransactionType,
 } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, lt, or, sql } from 'drizzle-orm'
+import { balanceService } from '../balance'
 import { currencyRatesService } from '../currency-rates'
 import { gamesDb } from '../db'
 import { notificationService } from '../notification'
@@ -21,7 +23,11 @@ import { profileService } from '../profile'
 import { dayjs } from '../shared/dayjs'
 import { userStatsService } from '../user-stats'
 import { bovapayService } from './bovapay.service'
-import { DEPOSIT_CONFIG_LIST, DEPOSIT_CONFIG_TREE } from './deposit.config'
+import {
+  DEPOSIT_CONFIG_LIST,
+  DEPOSIT_CONFIG_TREE,
+  DEPOSIT_STALE_TIMEOUTS,
+} from './deposit.config'
 import {
   DepositOptions,
   DepositOutput,
@@ -30,11 +36,21 @@ import {
   WithdrawalOptions,
   WithdrawalOutput,
 } from './types'
-import { WITHDRAWAL_CONFIG_LIST } from './withdrawal.config'
+import {
+  WITHDRAWAL_CONFIG_LIST,
+  WITHDRAWAL_STALE_TIMEOUTS,
+} from './withdrawal.config'
 
 export class PaymentService {
-  private providerServices: Map<PaymentProvider, PaymentProviderService> =
-    new Map([[PaymentProvider.Bovapay, bovapayService]])
+  private readonly logger = globalLogger.child('Payment')
+
+  private readonly providerServices: Record<
+    PaymentProvider,
+    PaymentProviderService
+  > = {
+    [PaymentProvider.Bovapay]: bovapayService,
+    [PaymentProvider.Test]: bovapayService,
+  }
 
   async getDepositConfigList() {
     await sleep(500)
@@ -49,7 +65,7 @@ export class PaymentService {
   private getProviderService(
     provider: PaymentProvider,
   ): PaymentProviderService {
-    const service = this.providerServices.get(provider)
+    const service = this.providerServices[provider]
 
     if (!service) {
       throw new Error(`Payment provider ${provider} not initialized`)
@@ -139,30 +155,36 @@ export class PaymentService {
           userStats: await userStatsService.getStats(userId),
         })
 
-      const deposit = await gamesDb
-        .insert(DepositTable)
-        .values({
-          type,
-          status,
-          userId,
-          method,
-          currency,
-          provider,
-          gemAmount,
-          currencyAmount: String(currencyAmount),
-          providerAmount,
-          providerTransactionId,
-          payload,
-        })
-        .returning()
-        .then(takeFirstOrThrow)
+      try {
+        const deposit = await gamesDb
+          .insert(DepositTable)
+          .values({
+            type,
+            status,
+            userId,
+            method,
+            currency,
+            provider,
+            gemAmount,
+            currencyAmount: String(currencyAmount),
+            providerAmount,
+            providerTransactionId,
+            payload,
+          })
+          .returning()
+          .then(takeFirstOrThrow)
 
-      return {
-        outcome: PaymentOutcome.Success,
-        deposit,
+        return {
+          outcome: PaymentOutcome.Success,
+          deposit,
+        }
+      } catch (error) {
+        this.logger.error('Failed to insert deposit')
+        await providerService.cancelDeposit(providerTransactionId)
+        throw error
       }
     } catch (error) {
-      logger.error(error)
+      this.logger.error(error)
 
       if (error instanceof Error) {
         return {
@@ -191,39 +213,80 @@ export class PaymentService {
         currency,
       )
 
-      const { status, providerAmount, providerTransactionId } =
-        await providerService.createWithdrawal({
-          userId,
-          userIp,
-          gemAmount,
-          currencyAmount,
-          method,
-          currency,
-          provider,
-          userProfile: await profileService.getDetailedProfile(userId),
-          userStats: await userStatsService.getStats(userId),
-        })
+      return await gamesDb.transaction(
+        async (tx): Promise<WithdrawalOutput> => {
+          const balance = await tx
+            .select()
+            .from(BalanceTable)
+            .where(eq(BalanceTable.userId, userId))
+            .for('update')
+            .then(takeFirstOrThrow)
 
-      const withdrawal = await gamesDb
-        .insert(WithdrawalTable)
-        .values({
-          status,
-          userId,
-          method,
-          currency,
-          provider,
-          gemAmount,
-          currencyAmount: String(currencyAmount),
-          providerAmount,
-          providerTransactionId,
-        })
-        .returning()
-        .then(takeFirstOrThrow)
+          if (balance.available < gemAmount) {
+            return {
+              outcome: PaymentOutcome.InsufficientFunds,
+              available: balance.available,
+            }
+          }
 
-      return {
-        outcome: PaymentOutcome.Success,
-        withdrawal,
-      }
+          const { status, providerAmount, providerTransactionId } =
+            await providerService.createWithdrawal({
+              userId,
+              userIp,
+              gemAmount,
+              currencyAmount,
+              method,
+              currency,
+              provider,
+              userProfile: await profileService.getDetailedProfile(userId),
+              userStats: await userStatsService.getStats(userId),
+            })
+
+          try {
+            const transaction = await balanceService.createTransaction({
+              tx,
+              payload: {
+                userId,
+                type: TransactionType.Withdrawal,
+                amount: -gemAmount,
+              },
+            })
+
+            const withdrawal = await tx
+              .insert(WithdrawalTable)
+              .values({
+                status,
+                userId,
+                method,
+                currency,
+                provider,
+                gemAmount,
+                currencyAmount: String(currencyAmount),
+                providerAmount,
+                providerTransactionId,
+                transactionId: transaction.id,
+              })
+              .returning()
+              .then(takeFirstOrThrow)
+
+            const updatedBalance = await balanceService.updateBalance({
+              tx,
+              balance,
+              transaction,
+            })
+
+            return {
+              outcome: PaymentOutcome.Success,
+              withdrawal,
+              updatedBalance: updatedBalance.available,
+            }
+          } catch (error) {
+            this.logger.error('Failed to insert withdrawal')
+            await providerService.cancelWithdrawal(providerTransactionId)
+            throw error
+          }
+        },
+      )
     } catch (error) {
       return {
         outcome: PaymentOutcome.Failed,
@@ -279,9 +342,7 @@ export class PaymentService {
 
         await tx
           .update(UserStatsTable)
-          .set({
-            depositCount: sql`${UserStatsTable.depositCount} + 1`,
-          })
+          .set({ depositCount: sql`${UserStatsTable.depositCount} + 1` })
           .where(eq(UserStatsTable.userId, deposit.userId))
 
         notificationService.send({
@@ -301,6 +362,142 @@ export class PaymentService {
           .where(eq(DepositTable.id, depositId))
       }
     })
+  }
+
+  async handleWithdrawalStatusUpdate(
+    withdrawalId: number,
+    newStatus: PaymentStatus,
+  ) {
+    await gamesDb.transaction(async (tx) => {
+      const withdrawal = await gamesDb
+        .select()
+        .from(WithdrawalTable)
+        .where(eq(WithdrawalTable.id, withdrawalId))
+        .for('update')
+        .then(takeFirstOrNull)
+
+      if (!withdrawal) {
+        throw new Error(`Withdrawal with ID ${withdrawalId} not found`)
+      }
+
+      await tx
+        .update(WithdrawalTable)
+        .set({ status: newStatus })
+        .where(eq(WithdrawalTable.id, withdrawalId))
+
+      if (newStatus === PaymentStatus.Completed) {
+        await tx
+          .update(UserStatsTable)
+          .set({ withdrawCount: sql`${UserStatsTable.withdrawCount} + 1` })
+          .where(eq(UserStatsTable.userId, withdrawal.userId))
+
+        notificationService.send({
+          kind: NotificationKind.Success,
+          userId: withdrawal.userId,
+          title: 'Вывод произведен',
+          message: `Ваша заявка на вывод ${formatGem(gemFloat(withdrawal.gemAmount))}g выполнена`,
+          autoClose: true,
+          autoCloseMs: 3000,
+          expiresAt: dayjs().add(1, 'day').toISOString(),
+          withCloseButton: true,
+        })
+      }
+
+      if (
+        newStatus === PaymentStatus.Failed ||
+        newStatus === PaymentStatus.Expired ||
+        newStatus === PaymentStatus.Rejected ||
+        newStatus === PaymentStatus.Cancelled
+      ) {
+        const balance = await tx
+          .select()
+          .from(BalanceTable)
+          .where(eq(BalanceTable.userId, withdrawal.userId))
+          .for('update')
+          .then(takeFirstOrThrow)
+
+        const transaction = await balanceService.createTransaction({
+          tx,
+          payload: {
+            userId: withdrawal.userId,
+            type: TransactionType.Refund,
+            amount: withdrawal.gemAmount,
+          },
+        })
+
+        await balanceService.updateBalance({
+          tx,
+          balance,
+          transaction,
+        })
+      }
+    })
+  }
+
+  async processStaleDeposits() {
+    let provider: PaymentProvider
+    for (provider in DEPOSIT_STALE_TIMEOUTS) {
+      const providerService = this.getProviderService(provider)
+      const timeout = DEPOSIT_STALE_TIMEOUTS[provider]
+
+      const deposits = await gamesDb
+        .select()
+        .from(DepositTable)
+        .where(
+          and(
+            eq(DepositTable.provider, provider),
+            or(
+              eq(DepositTable.status, PaymentStatus.Pending),
+              eq(DepositTable.status, PaymentStatus.Processing),
+            ),
+            lt(
+              DepositTable.createdAt,
+              dayjs().subtract(timeout, 'minute').toISOString(),
+            ),
+          ),
+        )
+
+      for (const deposit of deposits) {
+        const status = await providerService.getDepositStatus(
+          deposit.providerTransactionId,
+        )
+
+        await this.handleDepositStatusUpdate(deposit.id, status)
+      }
+    }
+  }
+
+  async processStaleWithdrawals() {
+    let provider: PaymentProvider
+    for (provider in WITHDRAWAL_STALE_TIMEOUTS) {
+      const providerService = this.getProviderService(provider)
+      const timeout = WITHDRAWAL_STALE_TIMEOUTS[provider]
+
+      const withdrawals = await gamesDb
+        .select()
+        .from(WithdrawalTable)
+        .where(
+          and(
+            eq(WithdrawalTable.provider, provider),
+            or(
+              eq(WithdrawalTable.status, PaymentStatus.Pending),
+              eq(WithdrawalTable.status, PaymentStatus.Processing),
+            ),
+            lt(
+              WithdrawalTable.createdAt,
+              dayjs().subtract(timeout, 'minute').toISOString(),
+            ),
+          ),
+        )
+
+      for (const withdrawal of withdrawals) {
+        const status = await providerService.getWithdrawalStatus(
+          withdrawal.providerTransactionId,
+        )
+
+        await this.handleWithdrawalStatusUpdate(withdrawal.id, status)
+      }
+    }
   }
 }
 

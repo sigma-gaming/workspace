@@ -12,7 +12,7 @@ import {
 } from '@games/services'
 import { count, inArray } from 'drizzle-orm'
 import { z } from 'zod'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const createRoute = createRouter().post(
   '/',

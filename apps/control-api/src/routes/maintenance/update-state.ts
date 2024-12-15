@@ -7,7 +7,7 @@ import {
   userService,
 } from '@games/services'
 import { z } from 'zod'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const updateStateRoute = createRouter().post(
   '/',

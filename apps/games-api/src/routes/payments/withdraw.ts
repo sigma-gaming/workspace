@@ -4,7 +4,7 @@ import { Currency, PaymentProvider, WithdrawalMethod } from '@dbs/games-types'
 import { gemInt } from '@games/model'
 import { PaymentOutcome, paymentService, sessionService } from '@games/services'
 import { z } from 'zod'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 const PayloadSchema = z.object({
   gemAmount: z.number().min(gemInt(1)),

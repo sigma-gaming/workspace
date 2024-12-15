@@ -10,7 +10,7 @@ import {
   sessionService,
 } from '@games/services'
 import { eq } from 'drizzle-orm'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const withdrawRoute = createRouter().post('/', async (ctx) => {
   const { userId } = await sessionService.getHonoSession(ctx)

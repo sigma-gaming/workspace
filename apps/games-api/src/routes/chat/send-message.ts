@@ -1,7 +1,7 @@
 import { zValidator } from '@core/server'
 import { ChatValidation } from '@games/model'
 import { chatService, sessionService } from '@games/services'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const sendMessageRoute = createRouter().post(
   '/',

@@ -3,7 +3,7 @@ import { UserSecurityTable } from '@dbs/games-schema'
 import { gamesDb } from '@games/services'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const getInfoRoute = createRouter().post(
   '/',

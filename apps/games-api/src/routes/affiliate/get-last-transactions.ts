@@ -12,7 +12,7 @@ import {
   sessionService,
 } from '@games/services'
 import { and, desc, eq, getTableColumns } from 'drizzle-orm'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
   const { userId } = await sessionService.getHonoSession(ctx)

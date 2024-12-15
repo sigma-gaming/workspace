@@ -7,7 +7,7 @@ import {
   sessionService,
 } from '@games/services'
 import { z } from 'zod'
-import { createRouter } from '../../hono'
+import { createRouter } from '../../app/router'
 
 type FailureActivationResult = Exclude<
   PromocodeActivationOutcome,
