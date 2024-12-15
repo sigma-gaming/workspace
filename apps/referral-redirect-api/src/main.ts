@@ -108,7 +108,7 @@ app.get('/r/:code', async (res, req) => {
 
   wrapReply(() => {
     res.writeStatus('302 Found')
-    res.writeHeader('Location', `https://${domain.domain}/?r=${code}`)
+    res.writeHeader('Location', `https://${domain.host}/?r=${code}`)
     res.end()
   })
 })

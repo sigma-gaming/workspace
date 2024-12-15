@@ -1,0 +1,1 @@
+ALTER TABLE "Domain" RENAME COLUMN "domain" TO "host";

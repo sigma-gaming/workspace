@@ -60,8 +60,8 @@ export class DomainService {
     const domains = this.getDomains(apps)
     const host = origin.replace('https://', '')
 
-    return domains.some(({ domain }) => {
-      return host === domain
+    return domains.some((domain) => {
+      return host === domain.host
     })
   }
 }

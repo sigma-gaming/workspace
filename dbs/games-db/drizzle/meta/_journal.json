@@ -715,6 +715,13 @@
       "when": 1734299063243,
       "tag": "0101_serious_miracleman",
       "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1734306322360,
+      "tag": "0102_wealthy_franklin_richards",
+      "breakpoints": true
     }
   ]
 }
