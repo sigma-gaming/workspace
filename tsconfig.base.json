@@ -61,6 +61,9 @@
       "@dbs/games-types": [
         "dbs/games-types/src/index.ts"
       ],
+      "@dbs/games-types-private": [
+        "dbs/games-types-private/src/index.ts"
+      ],
       "@games/model": [
         "games-libs/model/src/index.ts"
       ],

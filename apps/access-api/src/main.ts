@@ -2,6 +2,7 @@ import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
+import { domainService } from '@games/services'
 import { app } from './app'
 import { env } from './env'
 
@@ -18,7 +19,6 @@ app.onError(
 const server = createServer({
   app,
   trustProxy: true,
-  origin: env.access.apiUrl,
   uwsOptions: env.isDev
     ? {
         key_file_name: '../../ssl/local.key',
@@ -26,6 +26,9 @@ const server = createServer({
       }
     : {},
 })
+
+// Initialize lazy services
+domainService.waitForInitialization()
 
 server.listen(5055, (token) => {
   if (!token) {

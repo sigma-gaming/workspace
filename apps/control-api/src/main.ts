@@ -2,6 +2,7 @@ import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
+import { domainService } from '@games/services'
 import { app } from './app'
 import { env } from './env'
 
@@ -18,7 +19,6 @@ app.onError(
 const server = createServer({
   app,
   trustProxy: true,
-  origin: env.controlApi.url,
   uwsOptions: env.isDev
     ? {
         key_file_name: '../../ssl/local.key',
@@ -35,6 +35,9 @@ server.listen(5051, (token) => {
 
   logger.info(`🚀 Server ready at ${env.controlApi.url}`)
 })
+
+// Initialize lazy services
+domainService.waitForInitialization()
 
 process.on('uncaughtException', (error) => {
   logger.info('Uncaught exception')

@@ -20,23 +20,16 @@ export type HonoUwsContext = Context<HonoUwsEnv>
 export type HonoUwsApp = Hono<HonoUwsEnv>
 
 export function createServer<E extends HonoUwsEnv>({
-  origin,
   trustProxy,
   app,
   uwsOptions = {},
 }: {
-  origin?: string
   trustProxy?: boolean
   uwsOptions?: AppOptions
   app: Hono<E>
 }) {
-  let { protocol, host } = origin
-    ? new URL(origin)
-    : ({} as Record<string, undefined>)
-
-  if (protocol) {
-    protocol = protocol.slice(0, -1)
-  }
+  let protocol: string | null = null
+  let host: string | null = null
 
   const isSSL = 'cert_file_name' in uwsOptions
 
@@ -79,7 +72,7 @@ export function createServer<E extends HonoUwsEnv>({
       host ||
       (trustProxy && getForwardedHeader('host')) ||
       headers.get('host') ||
-      void 0
+      null
 
     if (!host) {
       console.warn(

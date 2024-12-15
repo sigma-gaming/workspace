@@ -20,6 +20,7 @@ import {
   UserRole,
   WithdrawalMethod,
 } from '@dbs/games-types'
+import { DomainApp } from '@dbs/games-types-private'
 import { pgEnum } from 'drizzle-orm/pg-core'
 import { enumValues } from './lib/enums'
 
@@ -27,6 +28,8 @@ import { enumValues } from './lib/enums'
  * Fix quotes manually in migration file:
  * https://github.com/drizzle-team/drizzle-orm/issues/1680
  */
+
+export const domainAppEnum = pgEnum('DomainApp', enumValues(DomainApp))
 
 export const userRoleEnum = pgEnum('UserRole', enumValues(UserRole))
 

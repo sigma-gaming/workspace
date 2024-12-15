@@ -5,7 +5,6 @@ import { createRouter } from '../../app/router'
 export const getConfigRoute = createRouter().get('/', async (ctx) => {
   const deposit = await paymentService.getDepositConfigList()
   const withdrawal = await paymentService.getWithdrawalConfigList()
-  throw new Error('test')
 
   return ctx.json<PaymentConfigLists>({ deposit, withdrawal }, 200)
 })

@@ -1,7 +1,12 @@
 import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { affiliateService, maintenanceService } from '@games/services'
+import { DomainApp } from '@dbs/games-types-private'
+import {
+  affiliateService,
+  domainService,
+  maintenanceService,
+} from '@games/services'
 import { App, SSLApp } from 'uWebSockets.js'
 import { env } from './env'
 
@@ -91,12 +96,25 @@ app.get('/r/:code', async (res, req) => {
     await affiliateService.incrementCampaignVisits({ campaignId: campaign.id })
   }
 
+  const domain = domainService.getLatestDomain(DomainApp.GamesApp)
+
+  if (!domain) {
+    wrapReply(() => {
+      res.writeStatus('503 Service Unavailable').end()
+    })
+
+    return
+  }
+
   wrapReply(() => {
     res.writeStatus('302 Found')
-    res.writeHeader('Location', `${env.gamesApp.url}/?r=${code}`)
+    res.writeHeader('Location', `https://${domain}/?r=${code}`)
     res.end()
   })
 })
+
+// Initialize lazy services
+domainService.waitForInitialization()
 
 app.listen(5054, (token) => {
   if (!token) {

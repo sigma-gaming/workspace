@@ -3,6 +3,7 @@ import './shared/sentry/init'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
+import { domainService } from '@games/services'
 import { app } from './app'
 import { env } from './env'
 import { sentry } from './shared/sentry'
@@ -20,7 +21,6 @@ app.onError(
 
 const server = createServer({
   app,
-  origin: env.gamesApp.url,
   trustProxy: true,
   uwsOptions: env.isDev
     ? {
@@ -29,6 +29,9 @@ const server = createServer({
       }
     : {},
 })
+
+// Initialize lazy services
+domainService.waitForInitialization()
 
 server.listen(5050, (token) => {
   if (!token) {

@@ -776,8 +776,13 @@ importers:
       '@dbs/games-types':
         specifier: workspace:*
         version: link:../games-types
+      '@dbs/games-types-private':
+        specifier: workspace:*
+        version: link:../games-types-private
 
   dbs/games-types: {}
+
+  dbs/games-types-private: {}
 
   games-libs/engine:
     dependencies:

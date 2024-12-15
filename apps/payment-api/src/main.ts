@@ -19,7 +19,6 @@ app.onError(
 const server = createServer({
   app,
   trustProxy: true,
-  origin: env.paymentApi.url,
 })
 
 server.listen(5070, (token) => {
