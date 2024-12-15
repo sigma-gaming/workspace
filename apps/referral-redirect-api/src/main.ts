@@ -130,7 +130,7 @@ async function handleExit() {
   logger.info('Shutting down services..')
   await shutdownAll()
 
-  console.info('Exiting..')
+  logger.info('Exiting..')
   process.exit(0)
 }
 

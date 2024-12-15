@@ -41,8 +41,8 @@ export function createJob({
       if (result.succeeded) {
         logger.info('Job executed successfully')
       } else {
-        logger.error('Failed to execute job', result.error)
-        console.error(result.error)
+        logger.error('Failed to execute job')
+        logger.error(result.error)
       }
     },
   })

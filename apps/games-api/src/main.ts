@@ -12,7 +12,8 @@ app.onError(
     showOriginalError: env.isDev,
     onInternalError: (error, ctx) => {
       const logger = ctx.get('logger')
-      logger.error('Internal error', error)
+      logger.error('Internal error')
+      logger.error(error)
     },
   }),
 )

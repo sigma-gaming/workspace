@@ -73,9 +73,6 @@
       "@games/redis": [
         "games-libs/redis/src/index.ts"
       ],
-      "@games/queue": [
-        "games-libs/queue/src/index.ts"
-      ],
       "@games/engine": [
         "games-libs/engine/src/index.ts"
       ],

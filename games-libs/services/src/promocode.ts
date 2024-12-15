@@ -248,8 +248,8 @@ export class PromocodeService {
 
       return apply
     } catch (error) {
-      console.error(error)
-      this.logger.error('Failed to apply Payout', error)
+      this.logger.error('Failed to apply Payout')
+      this.logger.error(error)
       return { outcome: PromocodeActivationOutcome.Failed }
     }
   }

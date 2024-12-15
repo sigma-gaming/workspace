@@ -1,4 +1,4 @@
-import { Logger, loggerService } from '@core/logger'
+import { loggerService } from '@core/logger'
 import { takeFirstOrThrow } from '@core/utils'
 import { UserSecuritySelect, UserSecurityTable } from '@dbs/games-schema'
 import { FraudRisk } from '@dbs/games-types'
@@ -39,11 +39,7 @@ const SCORE_RELATIONS: ScoreRelation[] = [
 ]
 
 export class FraudService {
-  private logger: Logger
-
-  constructor() {
-    this.logger = loggerService.logger.child('Fraud')
-  }
+  private logger = loggerService.logger.child('Fraud')
 
   private calculateRisk(score: number): FraudRisk {
     if (score >= 75) return FraudRisk.High
@@ -143,7 +139,8 @@ export class FraudService {
 
       return this.calculateRisk(totalScore)
     } catch (error) {
-      this.logger.error('Failed to actualize risk', error)
+      this.logger.error('Failed to actualize risk')
+      this.logger.error(error)
       return FraudRisk.Unknown
     }
   }

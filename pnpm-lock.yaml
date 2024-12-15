@@ -744,6 +744,9 @@ importers:
       '@core/exceptions':
         specifier: workspace:*
         version: link:../exceptions
+      '@core/logger':
+        specifier: workspace:*
+        version: link:../logger
       '@core/utils':
         specifier: workspace:*
         version: link:../utils
@@ -821,15 +824,6 @@ importers:
       '@core/logger':
         specifier: workspace:*
         version: link:../../core/logger
-      '@dbs/games-schema':
-        specifier: workspace:*
-        version: link:../../dbs/games-schema
-      '@games/model':
-        specifier: workspace:*
-        version: link:../model
-
-  games-libs/queue:
-    dependencies:
       '@dbs/games-schema':
         specifier: workspace:*
         version: link:../../dbs/games-schema

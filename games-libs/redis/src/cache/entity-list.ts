@@ -52,7 +52,8 @@ export class GlobalEntityListService<TValue> {
       if (length > this.max) await this.redis.ltrim(this.key, 1, this.max)
       return length
     } catch (error) {
-      this.logger.error('Failed to push', error)
+      this.logger.error('Failed to push')
+      this.logger.error(error)
       throw error
     }
   }
@@ -64,7 +65,8 @@ export class GlobalEntityListService<TValue> {
       if (length > this.max) await this.redis.ltrim(this.key, 0, this.max - 1)
       return length
     } catch (error) {
-      this.logger.error('Failed to unshift', error)
+      this.logger.error('Failed to unshift')
+      this.logger.error(error)
       throw error
     }
   }
@@ -80,7 +82,8 @@ export class GlobalEntityListService<TValue> {
       if (length > this.max) await this.redis.ltrim(this.key, 0, this.max - 1)
       return length
     } catch (error) {
-      this.logger.error('Failed to pushMany', error)
+      this.logger.error('Failed to pushMany')
+      this.logger.error(error)
       throw error
     }
   }
@@ -107,7 +110,8 @@ export class GlobalEntityListService<TValue> {
 
       return length
     } catch (error) {
-      this.logger.error('Failed to set', error)
+      this.logger.error('Failed to set')
+      this.logger.error(error)
       throw error
     }
   }
@@ -172,7 +176,8 @@ export class KeyEntityListService<TValue> {
 
       return length
     } catch (error) {
-      this.parentLogger.error('Failed to push', error)
+      this.parentLogger.error('Failed to push')
+      this.parentLogger.error(error)
       throw error
     }
   }
@@ -192,7 +197,8 @@ export class KeyEntityListService<TValue> {
 
       return length
     } catch (error) {
-      this.parentLogger.error('Failed to unshift', error)
+      this.parentLogger.error('Failed to unshift')
+      this.parentLogger.error(error)
       throw error
     }
   }
@@ -212,7 +218,8 @@ export class KeyEntityListService<TValue> {
 
       return length
     } catch (error) {
-      this.parentLogger.error('Failed to pushMany', error)
+      this.parentLogger.error('Failed to pushMany')
+      this.parentLogger.error(error)
       throw error
     }
   }
@@ -241,7 +248,8 @@ export class KeyEntityListService<TValue> {
 
       return length
     } catch (error) {
-      this.parentLogger.error('Failed to set', error)
+      this.parentLogger.error('Failed to set')
+      this.parentLogger.error(error)
       throw error
     }
   }

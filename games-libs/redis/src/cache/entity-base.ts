@@ -43,7 +43,8 @@ export class GlobalEntityBaseService<TValue> {
       await this.redis.set(this.key, this.stringify(value))
       if (this.ttl !== Infinity) await this.redis.expire(this.key, this.ttl)
     } catch (error) {
-      this.logger.error('Failed to set', error)
+      this.logger.error('Failed to set')
+      this.logger.error(error)
     }
 
     return value

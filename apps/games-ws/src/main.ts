@@ -164,7 +164,7 @@ async function handleExit() {
   logger.info('Closing WebSocket server server..')
   io.close(() => app.close())
 
-  console.info('Exiting..')
+  logger.info('Exiting..')
   process.exit(0)
 }
 

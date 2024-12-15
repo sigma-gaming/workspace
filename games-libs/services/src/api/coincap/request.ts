@@ -1,8 +1,12 @@
+import { loggerService } from '@core/logger'
+
 type RequestParams = {
   method: 'GET'
   endpoint: string
   query?: Record<string, any>
 }
+
+const logger = loggerService.logger.child('CoincapAPI')
 
 export const request = async <T>({
   method,
@@ -22,7 +26,8 @@ export const request = async <T>({
   const json = await response.json()
 
   if (!response.ok) {
-    console.error('[Coincap API] Request failed', json)
+    logger.error('Request failed')
+    logger.error(json)
     throw json
   }
 
