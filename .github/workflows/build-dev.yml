@@ -71,8 +71,7 @@ jobs:
               apps+=("@migrations/games-db-migration")
             fi
 
-            apps_json=$(printf '%s\n' "${apps[@]}" | jq -R . | jq -s .)
-            echo "apps=$apps_json" >> $GITHUB_OUTPUT
+            echo "apps=$(printf '%s\n' "${apps[@]}" | jq -R . | jq -s -c .)" >> $GITHUB_OUTPUT
           else
             echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
           fi
