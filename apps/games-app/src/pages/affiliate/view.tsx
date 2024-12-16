@@ -293,7 +293,7 @@ const LastTransactionsView = ({
     <Skeleton visible={loading}>
       <Card className="gap-4 min-h-full">
         <h2 className="text-lg font-medium leading-tight">
-          Транзакции рефералов
+          Действия рефералов
         </h2>
 
         {transactions.length > 0 ? (
