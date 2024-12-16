@@ -10,6 +10,7 @@ export const GamesCacheOptionsToken =
 export type GamesDbOptions = {
   url: string
   logger?: boolean
+  poolSize?: number
 }
 
 export const GamesDbOptionsToken =

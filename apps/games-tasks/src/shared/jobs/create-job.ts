@@ -1,7 +1,13 @@
 import { retry } from '@core/flow'
 import { logger as coreLogger } from '@core/logger'
 import { maintenanceService } from '@games/services'
-import { CronJob } from 'cron'
+
+export type Job = {
+  name: string
+  cronTime: string
+  runOnInit: boolean
+  onTick: () => Promise<void>
+}
 
 export function createJob({
   name,
@@ -17,35 +23,31 @@ export function createJob({
   maxAttempts?: number
   delay?: number
   handler: () => Promise<void>
-}) {
+}): Job {
   const logger = coreLogger.child('Jobs').child(name)
 
-  const job = CronJob.from({
-    cronTime,
-    runOnInit,
-    onTick: async () => {
-      const backgroundJobsEnabled =
-        await maintenanceService.areBackgroundJobsEnabled()
+  const onTick = async () => {
+    const backgroundJobsEnabled =
+      await maintenanceService.areBackgroundJobsEnabled()
 
-      if (!backgroundJobsEnabled) {
-        logger.info('Background jobs disabled, skipping')
-        return
-      }
+    if (!backgroundJobsEnabled) {
+      logger.info('Background jobs disabled, skipping')
+      return
+    }
 
-      const result = await retry({
-        fn: handler,
-        maxAttempts,
-        delay,
-      })
+    const result = await retry({
+      fn: handler,
+      maxAttempts,
+      delay,
+    })
 
-      if (result.succeeded) {
-        logger.info('Job executed successfully')
-      } else {
-        logger.error('Failed to execute job')
-        logger.error(result.error)
-      }
-    },
-  })
+    if (result.succeeded) {
+      logger.info('Job executed successfully')
+    } else {
+      logger.error('Failed to execute job')
+      logger.error(result.error)
+    }
+  }
 
-  return { name, job }
+  return { name, cronTime, runOnInit, onTick }
 }

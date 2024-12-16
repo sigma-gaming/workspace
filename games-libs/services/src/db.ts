@@ -1,17 +1,28 @@
-import { resolveOptions } from '@core/di'
+import { resolveOptions, Shutdownable } from '@core/di'
+import { loggerService } from '@core/logger'
 import * as schema from '@dbs/games-schema'
 import { GamesDbOptionsToken } from '@games/options'
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
+import postgres, { Sql } from 'postgres'
 
-export class GamesDbService {
+export class GamesDbService extends Shutdownable {
+  private readonly logger = loggerService.logger.child('GamesDb')
+  client: Sql
   db: PostgresJsDatabase<typeof schema>
 
   constructor() {
-    const { url, logger } = resolveOptions(GamesDbOptionsToken)
-    const client = postgres(url, { max: 10 })
-    this.db = drizzle(client, { schema, logger })
+    super()
+    const { url, logger, poolSize = 10 } = resolveOptions(GamesDbOptionsToken)
+    this.client = postgres(url, { max: poolSize })
+    this.db = drizzle(this.client, { schema, logger })
+  }
+
+  shutdown() {
+    this.logger.info('Shutting down')
+    return this.client.end()
   }
 }
 
-export const gamesDb = new GamesDbService().db
+const service = new GamesDbService()
+export const gamesDb = service.db
+export const gamesDbClient = service.client

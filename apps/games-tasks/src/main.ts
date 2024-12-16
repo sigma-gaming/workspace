@@ -5,33 +5,51 @@ import { logger } from '@core/logger'
 import { createServer, HonoUwsEnv } from '@core/server'
 import { gamesRedis } from '@games/services'
 import { Hono } from 'hono'
+import { TemplatedApp } from 'uWebSockets.js'
 import { env } from './env'
+import { executeJob, startCronJobs } from './jobs'
 import { healthyRoute, readyRoute } from './routes/health'
 import { sentry } from './shared/sentry'
 
-const app = new Hono<HonoUwsEnv>()
-  .route('/healthy', healthyRoute)
-  .route('/ready', readyRoute)
+let server: TemplatedApp | null = null
 
-const server = createServer({
-  app,
-  trustProxy: true,
-})
+if (env.gamesTasks.mode === 'server') {
+  const app = new Hono<HonoUwsEnv>()
+    .route('/healthy', healthyRoute)
+    .route('/ready', readyRoute)
 
-const port = 5053
+  server = createServer({
+    app,
+    trustProxy: true,
+  })
 
-server.listen(port, (token) => {
-  if (!token) {
-    logger.error('Failed to start server')
-    process.exit(1)
-  }
+  const port = 5053
 
-  logger.info(`🚀 Server ready at :${port}`)
-})
+  server.listen(port, (token) => {
+    if (!token) {
+      logger.error('Failed to start server')
+      process.exit(1)
+    }
 
-gamesRedis.redis.once('ready', () => {
-  import('./jobs').then((module) => module.initializeCronJobs())
-})
+    logger.info(`🚀 Server ready at :${port}`)
+  })
+
+  gamesRedis.redis.once('ready', () => {
+    startCronJobs()
+  })
+}
+
+if (env.gamesTasks.mode === 'task') {
+  gamesRedis.redis.once('ready', async () => {
+    if (!env.gamesTasks.job) {
+      logger.error('No job specified')
+      process.exit(1)
+    }
+
+    await executeJob(env.gamesTasks.job)
+    await shutdownAll()
+  })
+}
 
 process.on('uncaughtException', (error) => {
   logger.info('Uncaught exception')
@@ -64,8 +82,10 @@ async function handleExit() {
     process.exit(0)
   }, 5000)
 
-  server.close()
-  logger.info('Server closed')
+  if (server) {
+    server.close()
+    logger.info('Server closed')
+  }
 
   await sentry?.close(3000)
 

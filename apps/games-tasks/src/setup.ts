@@ -10,6 +10,7 @@ import { env } from './env'
 registerOptions(GamesDbOptionsToken, {
   url: env.gamesDb.url,
   logger: env.isDev,
+  poolSize: 5,
 })
 
 registerOptions(GamesRedisOptionsToken, {
