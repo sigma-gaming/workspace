@@ -3,6 +3,7 @@ import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
 import { app } from './app'
+import { internalApp } from './app/internal'
 import { env } from './env'
 
 app.onError(
@@ -21,13 +22,27 @@ const server = createServer({
   trustProxy: true,
 })
 
-server.listen(5070, (token) => {
+const internalServer = createServer({
+  app: internalApp,
+  trustProxy: true,
+})
+
+server.listen(env.ports.public, (token) => {
   if (!token) {
-    logger.error('Failed to start server')
+    logger.error('Failed to start API')
     process.exit(1)
   }
 
-  logger.info(`🚀 Server ready at ${env.paymentApi.url}`)
+  logger.info(`🚀 API ready at ${env.paymentApi.url}`)
+})
+
+internalServer.listen(env.ports.internal, (token) => {
+  if (!token) {
+    logger.error('Failed to start Internal API')
+    process.exit(1)
+  }
+
+  logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
 })
 
 process.on('uncaughtException', (error) => {
@@ -48,10 +63,10 @@ async function handleExit() {
 
   logger.info('Exit signal received')
 
-  logger.info('Shutting down services..')
-  await shutdownAll()
-
   if (env.isDev) {
+    logger.info('Shutting down services..')
+    await shutdownAll()
+
     logger.info('Exiting..')
     process.exit(0)
   }
@@ -61,8 +76,13 @@ async function handleExit() {
     process.exit(0)
   }, 5000)
 
+  logger.info('Closing servers..')
   server.close()
-  logger.info('Server closed')
+  internalServer.close()
+  logger.info('Servers closed')
+
+  logger.info('Shutting down services..')
+  await shutdownAll()
 
   logger.info('Exiting..')
   process.exit(0)

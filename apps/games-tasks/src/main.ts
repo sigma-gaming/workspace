@@ -11,27 +11,29 @@ import { executeJob, startCronJobs } from './jobs'
 import { healthyRoute, readyRoute } from './routes/health'
 import { sentry } from './shared/sentry'
 
-let server: TemplatedApp | null = null
+let internalServer: TemplatedApp | null = null
 
 if (env.gamesTasks.mode === 'server') {
-  const app = new Hono<HonoUwsEnv>()
+  const internalApp = new Hono<HonoUwsEnv>()
     .route('/healthy', healthyRoute)
     .route('/ready', readyRoute)
 
-  server = createServer({
-    app,
+  internalServer = createServer({
+    app: internalApp,
     trustProxy: true,
   })
 
-  const port = 5053
+  if (!env.ports.internal) {
+    throw new Error('Internal port is required in server mode')
+  }
 
-  server.listen(port, (token) => {
+  internalServer.listen(env.ports.internal, (token) => {
     if (!token) {
-      logger.error('Failed to start server')
+      logger.error('Failed to start Internal API')
       process.exit(1)
     }
 
-    logger.info(`🚀 Server ready at :${port}`)
+    logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
   })
 
   gamesRedis.redis.once('ready', () => {
@@ -82,8 +84,9 @@ async function handleExit() {
     process.exit(0)
   }, 5000)
 
-  if (server) {
-    server.close()
+  if (internalServer) {
+    logger.info('Closing server..')
+    internalServer.close()
     logger.info('Server closed')
   }
 

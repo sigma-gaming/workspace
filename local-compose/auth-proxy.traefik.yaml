@@ -7,20 +7,16 @@ entryPoints:
   web:
     address: ":443"
     http:
-      tls:
-        certResolver: default
-        domains:
-          - main: auth.local
+      tls: {}
 
 http:
   routers:
-    myapp:
+    auth-app:
       rule: "Host(`auth.local`)"
       entryPoints:
         - web
       service: auth-app
-      tls:
-        certResolver: myresolver
+      tls: {}
 
   services:
     auth-app:

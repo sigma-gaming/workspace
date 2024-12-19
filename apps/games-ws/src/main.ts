@@ -88,16 +88,18 @@ gamesPubsubs.maintenanceStarted.subscribe(() => {
 })
 
 /**
- * Setup
+ * Internal API
  */
 
-app.get('/healthy', (res) => {
+const internalApp = App()
+
+internalApp.get('/healthy', (res) => {
   res.cork(() => {
     res.writeStatus('200 OK').end('Yes')
   })
 })
 
-app.get('/ready', async (res) => {
+internalApp.get('/ready', async (res) => {
   let replied = false
 
   res.onAborted(() => {
@@ -131,13 +133,22 @@ app.get('/ready', async (res) => {
   })
 })
 
-app.listen(5052, (token) => {
+app.listen(env.ports.public, (token) => {
   if (!token) {
     logger.error('Failed to start WebSocket server')
     process.exit(1)
   }
 
   logger.info(`🚀 WebSocket server ready at ${env.gamesWs.url}`)
+})
+
+internalApp.listen(env.ports.internal, (token) => {
+  if (!token) {
+    logger.error('Failed to start Internal API')
+    process.exit(1)
+  }
+
+  logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
 })
 
 process.on('uncaughtException', (error) => {
@@ -158,11 +169,26 @@ async function handleExit() {
 
   logger.info('Exit signal received')
 
+  if (env.isDev) {
+    logger.info('Shutting down services..')
+    await shutdownAll()
+
+    logger.info('Exiting..')
+    process.exit(0)
+  }
+
+  setTimeout(() => {
+    logger.info('Timeout, exiting..')
+    process.exit(0)
+  }, 5000)
+
+  logger.info('Closing servers..')
+  io.close(() => app.close())
+  internalApp.close()
+  logger.info('Servers closed')
+
   logger.info('Shutting down services..')
   await shutdownAll()
-
-  logger.info('Closing WebSocket server server..')
-  io.close(() => app.close())
 
   logger.info('Exiting..')
   process.exit(0)

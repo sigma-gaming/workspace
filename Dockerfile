@@ -149,7 +149,7 @@ CMD [ "node", "--max_semi_space_size=64", "apps/payment-api/dist/main.js" ]
 FROM api-base AS letsauth
 COPY --from=letsauth-build /build ./
 ENV HOST=0.0.0.0
-ENV PORT=4321
+# PORT is set from outside
 CMD [ "node", "--max_semi_space_size=64", "apps/letsauth/dist/server/entry.mjs" ]
 
 # WS APIs

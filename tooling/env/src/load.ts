@@ -32,6 +32,7 @@ export function loadEnv({ root, files = createDefaultFiles(root) }: Options) {
   for (const { path, condition = () => true } of files) {
     if (!condition()) continue
     const dotenv = require('dotenv')
-    dotenv.config({ path, override: true })
+    const dotenvExpand = require('dotenv-expand')
+    dotenvExpand.expand(dotenv.config({ path, override: true }))
   }
 }

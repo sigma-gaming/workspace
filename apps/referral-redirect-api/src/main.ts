@@ -17,49 +17,11 @@ const app = env.isDev
     })
   : App()
 
+const internalApp = App()
+
 /**
  * Setup
  */
-
-app.get('/healthy', (res) => {
-  res.cork(() => {
-    res.writeStatus('200 OK').end('Yes')
-  })
-})
-
-app.get('/ready', async (res) => {
-  let replied = false
-
-  res.onAborted(() => {
-    res.writeStatus('503 Service Unavailable').end()
-    replied = true
-  })
-
-  const wrapReply = (callback: () => void) => {
-    if (replied) {
-      return
-    }
-
-    res.cork(() => {
-      callback()
-      replied = true
-    })
-  }
-
-  const maintenanceMode = await maintenanceService.isMaintenanceMode()
-
-  if (maintenanceMode) {
-    wrapReply(() => {
-      res.writeStatus('503 Service Unavailable').end()
-    })
-
-    return
-  }
-
-  wrapReply(() => {
-    res.writeStatus('200 OK').end('Yes')
-  })
-})
 
 app.get('/r/:code', async (res, req) => {
   let replied = false
@@ -113,18 +75,65 @@ app.get('/r/:code', async (res, req) => {
   })
 })
 
+internalApp.get('/healthy', (res) => {
+  res.cork(() => {
+    res.writeStatus('200 OK').end('Yes')
+  })
+})
+
+internalApp.get('/ready', async (res) => {
+  let replied = false
+
+  res.onAborted(() => {
+    res.writeStatus('503 Service Unavailable').end()
+    replied = true
+  })
+
+  const wrapReply = (callback: () => void) => {
+    if (replied) {
+      return
+    }
+
+    res.cork(() => {
+      callback()
+      replied = true
+    })
+  }
+
+  const maintenanceMode = await maintenanceService.isMaintenanceMode()
+
+  if (maintenanceMode) {
+    wrapReply(() => {
+      res.writeStatus('503 Service Unavailable').end()
+    })
+
+    return
+  }
+
+  wrapReply(() => {
+    res.writeStatus('200 OK').end('Yes')
+  })
+})
+
 // Initialize lazy services
 domainService.waitForInitialization()
 
-app.listen(5054, (token) => {
+app.listen(env.ports.public, (token) => {
   if (!token) {
-    logger.error('Failed to start Referral Redirect server')
+    logger.error('Failed to start API')
     process.exit(1)
   }
 
-  logger.info(
-    `🚀 Referral Redirect server ready at ${env.referralRedirectApi.url}`,
-  )
+  logger.info(`🚀 API ready at ${env.referralRedirectApi.url}`)
+})
+
+internalApp.listen(env.ports.internal, (token) => {
+  if (!token) {
+    logger.error('Failed to start Internal API')
+    process.exit(1)
+  }
+
+  logger.info(`🚀 Internal API ready at :${env.ports.internal}$`)
 })
 
 process.on('uncaughtException', (error) => {
@@ -144,6 +153,24 @@ async function handleExit() {
   exited = true
 
   logger.info('Exit signal received')
+
+  if (env.isDev) {
+    logger.info('Shutting down services..')
+    await shutdownAll()
+
+    logger.info('Exiting..')
+    process.exit(0)
+  }
+
+  setTimeout(() => {
+    logger.info('Timeout, exiting..')
+    process.exit(0)
+  }, 5000)
+
+  logger.info('Closing servers..')
+  app.close()
+  internalApp.close()
+  logger.info('Servers closed')
 
   logger.info('Shutting down services..')
   await shutdownAll()

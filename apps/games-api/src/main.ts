@@ -5,6 +5,7 @@ import { logger } from '@core/logger'
 import { createErrorHandler, createServer } from '@core/server'
 import { domainService } from '@games/services'
 import { app } from './app'
+import { internalApp } from './app/internal'
 import { env } from './env'
 import { sentry } from './shared/sentry'
 
@@ -30,16 +31,30 @@ const server = createServer({
     : {},
 })
 
+const internalServer = createServer({
+  app: internalApp,
+  trustProxy: true,
+})
+
 // Initialize lazy services
 domainService.waitForInitialization()
 
-server.listen(5050, (token) => {
+server.listen(env.ports.public, (token) => {
   if (!token) {
-    logger.error('Failed to start server')
+    logger.error('Failed to start API')
     process.exit(1)
   }
 
-  logger.info(`🚀 Server ready at ${env.gamesApi.url}`)
+  logger.info(`🚀 API ready at ${env.gamesApi.url}`)
+})
+
+internalServer.listen(env.ports.internal, (token) => {
+  if (!token) {
+    logger.error('Failed to start internal API')
+    process.exit(1)
+  }
+
+  logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
 })
 
 process.on('uncaughtException', (error) => {
@@ -60,10 +75,10 @@ async function handleExit() {
 
   logger.info('Exit signal received')
 
-  logger.info('Shutting down services..')
-  await shutdownAll()
-
   if (env.isDev) {
+    logger.info('Shutting down services..')
+    await shutdownAll()
+
     logger.info('Exiting..')
     process.exit(0)
   }
@@ -73,8 +88,13 @@ async function handleExit() {
     process.exit(0)
   }, 5000)
 
-  logger.info('Closing server..')
+  logger.info('Closing servers..')
   server.close()
+  internalServer.close()
+  logger.info('Servers closed')
+
+  logger.info('Shutting down services..')
+  await shutdownAll()
 
   await sentry?.close(3000)
 

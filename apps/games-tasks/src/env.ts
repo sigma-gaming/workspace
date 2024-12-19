@@ -5,6 +5,7 @@ const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
     PUBLIC_STAGE: z.string(),
+    GAMES_TASKS_INTERNAL_PORT: z.coerce.number().optional(),
 
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
     GAMES_TASKS_MODE: z.enum(['server', 'task']).default('server'),
@@ -12,7 +13,10 @@ const EnvSchema = z
     GAMES_TASKS_VERSION: z.string().default('unknown'),
     JWT_SECRET: z.string(),
 
-    GAMES_DB_URL: z.string(),
+    GAMES_DB_HOST: z.string(),
+    GAMES_DB_DATABASE: z.string().default('postgres'),
+    GAMES_DB_USER: z.string(),
+    GAMES_DB_PASSWORD: z.string(),
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
 
@@ -25,8 +29,12 @@ const EnvSchema = z
     isProd: raw.NODE_ENV === 'production',
     stage: raw.PUBLIC_STAGE,
 
+    ports: {
+      internal: raw.GAMES_TASKS_INTERNAL_PORT,
+    },
+
     gamesDb: {
-      url: raw.GAMES_DB_URL,
+      url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
     },
 
     gamesCache: {

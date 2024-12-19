@@ -11,7 +11,7 @@ export default defineConfig({
   adapter: node({ mode: 'standalone' }),
   server: {
     host: 'auth.local',
-    port: 4321,
+    port: Number(process.env.AUTH_API_PORT),
   },
   vite: {
     optimizeDeps: {
