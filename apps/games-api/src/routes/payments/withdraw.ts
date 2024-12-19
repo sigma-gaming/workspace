@@ -1,5 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
-import { zValidator } from '@core/server'
+import { limitByIp, zValidator } from '@core/server'
 import { Currency, PaymentProvider, WithdrawalMethod } from '@dbs/games-types'
 import { gemInt } from '@games/model'
 import { PaymentOutcome, paymentService, sessionService } from '@games/services'
@@ -15,6 +15,7 @@ const PayloadSchema = z.object({
 
 export const withdrawRoute = createRouter().post(
   '/',
+  limitByIp({ limit: 5, windowMs: 60 * 1000 }),
   zValidator('json', PayloadSchema),
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)

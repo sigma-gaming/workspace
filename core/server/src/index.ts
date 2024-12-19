@@ -1,5 +1,6 @@
 export * from './error-handler'
 export * from './infer-env'
+export * from './limit-by-ip'
 export * from './logger'
 export * from './request-id'
 export * from './uws'

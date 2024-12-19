@@ -118,6 +118,9 @@ importers:
       hono:
         specifier: ^4.4.7
         version: 4.4.7
+      hono-rate-limiter:
+        specifier: ^0.4.2
+        version: 0.4.2(hono@4.4.7)
       ioredis:
         specifier: ^5.3.2
         version: 5.4.1
@@ -6486,6 +6489,11 @@ packages:
 
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
+
+  hono-rate-limiter@0.4.2:
+    resolution: {integrity: sha512-AAtFqgADyrmbDijcRTT/HJfwqfvhalya2Zo+MgfdrMPas3zSMD8SU03cv+ZsYwRU1swv7zgVt0shwN059yzhjw==}
+    peerDependencies:
+      hono: ^4.1.1
 
   hono@4.4.7:
     resolution: {integrity: sha512-WoQWFQyVFEVRtIzP5sHPv7nvIw+RYL/HRnvnOCDxj6A+BtrwuC9S0vryZbV4IyFcNgOJ87r/phDiC1x2eEo4Gg==}
@@ -16288,6 +16296,10 @@ snapshots:
   hoist-non-react-statics@3.3.2:
     dependencies:
       react-is: 16.13.1
+
+  hono-rate-limiter@0.4.2(hono@4.4.7):
+    dependencies:
+      hono: 4.4.7
 
   hono@4.4.7: {}
 

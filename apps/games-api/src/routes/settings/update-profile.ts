@@ -1,5 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
-import { zValidator } from '@core/server'
+import { limitByIp, zValidator } from '@core/server'
 import { AccountTable, ProfileTable, ProfileUpdate } from '@dbs/games-schema'
 import { AccountProvider, UserRole } from '@dbs/games-types'
 import { getUserFullName, ProfileValidation } from '@games/model'
@@ -108,6 +108,7 @@ const reservedUsernames = [
 
 export const updateProfileRoute = createRouter().post(
   '/',
+  limitByIp({ limit: 10, windowMs: 60 * 1000 }),
   zValidator(
     'json',
     z.object({

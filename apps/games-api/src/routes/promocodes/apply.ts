@@ -1,5 +1,5 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
-import { zValidator } from '@core/server'
+import { limitByIp, zValidator } from '@core/server'
 import { PromocodeBonusType } from '@dbs/games-types'
 import {
   PromocodeActivationOutcome,
@@ -31,6 +31,7 @@ const MessageMap: Record<FailureActivationResult, string> = {
 
 export const applyRoute = createRouter().post(
   '/',
+  limitByIp({ limit: 5, windowMs: 60 * 1000 }),
   zValidator(
     'json',
     z.object({

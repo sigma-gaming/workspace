@@ -1,4 +1,4 @@
-import { zValidator } from '@core/server'
+import { limitByIp, zValidator } from '@core/server'
 import { SessionState } from '@games/model'
 import { gamesCache, sessionService } from '@games/services'
 import { z } from 'zod'
@@ -7,6 +7,7 @@ import { env } from '../env'
 
 export const exchangeRoute = createRouter().get(
   '/',
+  limitByIp({ limit: 5, windowMs: 60 * 1000 }),
   zValidator(
     'query',
     z.object({

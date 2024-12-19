@@ -1,10 +1,11 @@
+import { randomUUID } from 'crypto'
 import {
   InternalServerException,
   RouteException,
   ValidationException,
 } from '@core/exceptions'
 import { WsAction, WsActionHandler } from '@core/io-client'
-import { logger } from '@core/logger'
+import { Logger, logger as globalLogger, loggerService } from '@core/logger'
 import { createDefer } from '@core/utils'
 import * as Sentry from '@sentry/node'
 import { Schema } from 'zod'
@@ -23,39 +24,69 @@ export function createWsAction<
 >(options: {
   name: TName
   schema?: Schema<TInput>
-  handler: (ctx: Context, input: TInput) => Promise<TOutput>
+  log?: boolean
+  handler: (
+    ctx: Context & { logger: Logger },
+    input: TInput,
+  ) => Promise<TOutput>
 }): WsActionGenerator<TName, TInput, TOutput> {
-  const { name, schema, handler } = options
+  const { name, schema, log = true, handler } = options
 
   return (ctx) => {
     const actionHandler: WsActionHandler<TInput, TOutput> = async (
       input,
       ack,
     ) => {
-      let parsed = undefined as TInput
+      const requestId = randomUUID()
 
-      if (schema) {
-        const validation = schema.safeParse(input)
+      const logger = globalLogger.child(
+        'WsAction',
+        loggerService.isPretty ? {} : { meta: { request_id: requestId } },
+      )
 
-        if (!validation.success) {
-          const { formErrors, issues } = validation.error
-          const { fieldErrors } = formErrors
+      const meta: Record<string, any> = {
+        user_id: ctx.session?.userId,
+        req: { path: name },
+      }
 
-          const exception = new ValidationException({
-            issues,
-            fieldErrors,
-          })
+      const start = Date.now()
+      let logLevel: 'info' | 'error' = 'info'
 
-          return ack([0, exception])
+      if (log) {
+        if (loggerService.isPretty) {
+          logger.info(`-> ${name}`)
+        } else {
+          logger.info(meta, 'WsAction started')
         }
-
-        parsed = validation.data
       }
 
       try {
-        const output = await handler(ctx, parsed)
+        let parsed = undefined as TInput
+
+        if (schema) {
+          const validation = schema.safeParse(input)
+
+          if (!validation.success) {
+            const { formErrors, issues } = validation.error
+            const { fieldErrors } = formErrors
+
+            throw new ValidationException({
+              issues,
+              fieldErrors,
+            })
+          }
+
+          parsed = validation.data
+        }
+
+        const output = await handler({ ...ctx, logger }, parsed)
+        meta.res = { status: 'success' }
+
         return ack([1, output])
       } catch (error) {
+        logLevel = 'error'
+        meta.res = { status: 'failure' }
+
         if (error instanceof RouteException) {
           return ack([0, error])
         }
@@ -64,6 +95,23 @@ export function createWsAction<
         logger.child('WsAction').child(name).error(error)
         const exception = new InternalServerException()
         return ack([0, exception])
+      } finally {
+        const responseTime = Date.now() - start
+
+        meta.responseTime = responseTime
+
+        if (log) {
+          if (loggerService.isPretty) {
+            const time =
+              responseTime < 1000
+                ? responseTime + 'ms'
+                : Math.round(responseTime / 1000) + 's'
+
+            logger[logLevel](`<- ${name} ${time}`)
+          } else {
+            logger[logLevel](meta, 'WsAction completed')
+          }
+        }
       }
     }
 
