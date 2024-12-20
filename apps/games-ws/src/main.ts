@@ -2,6 +2,7 @@ import './setup'
 import './shared/sentry/init'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
+import { UpdateMode } from '@games/model'
 import {
   gamesPubsubs,
   maintenanceService,
@@ -13,7 +14,7 @@ import { env } from './env'
 import { io } from './io'
 import { startLastWinsBroadcast } from './processes/last-wins'
 import { userRoom } from './shared/rooms/user'
-import { sendToAllLocal, sendToUser } from './shared/send'
+import { sendToAllLocal, sendToUser, sendToUserOptimized } from './shared/send'
 
 const app = env.isDev
   ? SSLApp({
@@ -55,12 +56,22 @@ gamesPubsubs.maintenanceStarted.subscribe(() => {
   sendToAllLocal('maintenance/started')
 })
 
-gamesPubsubs.balanceUpdated.subscribe((payload) => {
-  sendToUser(payload.userId, 'balance/updated', payload.update)
+gamesPubsubs.balanceUpdated.subscribe(({ userId, update }) => {
+  if (update.mode === UpdateMode.Optimized) {
+    sendToUserOptimized(userId, 'balance/updated', update)
+    return
+  }
+
+  sendToUser(userId, 'balance/updated', update)
 })
 
-gamesPubsubs.globalTaskUpdated.subscribe((payload) => {
-  sendToUser(payload.userId, 'global-tasks/updated', payload.update)
+gamesPubsubs.globalTaskUpdated.subscribe(({ userId, update }) => {
+  if (update.mode === UpdateMode.Optimized) {
+    sendToUserOptimized(userId, 'global-tasks/updated', update)
+    return
+  }
+
+  sendToUser(userId, 'global-tasks/updated', update)
 })
 
 /**

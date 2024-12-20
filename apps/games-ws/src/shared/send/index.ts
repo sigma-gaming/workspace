@@ -10,6 +10,17 @@ export function sendToUser<K extends keyof ServerToClientEvents>(
   io.to(userRoom(userId)).emit(event, ...payload)
 }
 
+export function sendToUserOptimized<K extends keyof ServerToClientEvents>(
+  userId: string,
+  event: K,
+  ...payload: Parameters<ServerToClientEvents[K]>
+) {
+  const rooms = io._nsps.get('/')?.adapter.rooms
+  const connections = rooms?.get(userRoom(userId))?.size
+  if (connections === 1) return
+  io.to(userRoom(userId)).emit(event, ...payload)
+}
+
 export function sendToAllGlobal<K extends keyof ServerToClientEvents>(
   event: K,
   ...payload: Parameters<ServerToClientEvents[K]>

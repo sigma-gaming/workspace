@@ -3,7 +3,7 @@ import { limitByIp } from '@core/server'
 import { takeFirstOrThrow } from '@core/utils'
 import { BalanceTable, ReferrerBalanceTable } from '@dbs/games-schema'
 import { TransactionType } from '@dbs/games-types'
-import { BalanceUpdate } from '@games/model'
+import { BalanceUpdate, UpdateMode } from '@games/model'
 import {
   affiliateService,
   balanceService,
@@ -87,10 +87,11 @@ export const withdrawRoute = createRouter().post(
       await gamesCache.referrerBalance.set(userId, updatedReferrerBalance)
     }
 
-    const updateTime = Date.now()
+    const time = Date.now()
 
     const balance: BalanceUpdate = {
-      updateTime,
+      time,
+      mode: UpdateMode.Optimized,
       available: updatedBalance.available,
     }
 
@@ -102,7 +103,7 @@ export const withdrawRoute = createRouter().post(
     return ctx.json({
       balance,
       referrerBalance: {
-        updateTime,
+        time,
         available: updatedReferrerBalance.available,
       },
     })

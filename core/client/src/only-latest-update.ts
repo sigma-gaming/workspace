@@ -1,6 +1,6 @@
 import { createStore, Event, sample } from 'effector'
 
-export function onlyLatestUpdate<U extends { updateTime: number }>(
+export function onlyLatestUpdate<U extends { time: number }>(
   received: Event<U>,
 ) {
   const $updateTime = createStore(0)
@@ -8,13 +8,13 @@ export function onlyLatestUpdate<U extends { updateTime: number }>(
   const actualReceived: Event<U> = sample({
     clock: received,
     source: $updateTime,
-    filter: (time, update) => update.updateTime > time,
+    filter: (time, update) => update.time > time,
     fn: (_, update) => update,
   })
 
   sample({
     clock: actualReceived,
-    fn: ({ updateTime }) => updateTime,
+    fn: (update) => update.time,
     target: $updateTime,
   })
 

@@ -1,7 +1,7 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { limitByIp, zValidator } from '@core/server'
 import { PromocodeBonusType } from '@dbs/games-types'
-import { BalanceUpdate } from '@games/model'
+import { BalanceUpdate, UpdateMode } from '@games/model'
 import {
   gamesPubsubs,
   PromocodeActivationOutcome,
@@ -51,7 +51,8 @@ export const applyRoute = createRouter().post(
 
     if (result.outcome === PromocodeActivationOutcome.AppliedPayout) {
       const balance: BalanceUpdate = {
-        updateTime: Date.now(),
+        time: Date.now(),
+        mode: UpdateMode.Optimized,
         available: result.updatedBalance.available,
       }
 

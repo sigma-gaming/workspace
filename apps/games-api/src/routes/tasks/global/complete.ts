@@ -2,7 +2,7 @@ import { BadRequestException } from '@core/exceptions'
 import { limitByIp, zValidator } from '@core/server'
 import { AccountTable } from '@dbs/games-schema'
 import { AccountProvider, GlobalTaskKey, TaskStatus } from '@dbs/games-types'
-import { GlobalTaskUpdate } from '@games/model'
+import { GlobalTaskUpdate, UpdateMode } from '@games/model'
 import {
   gamesDb,
   gamesPubsubs,
@@ -170,7 +170,8 @@ export const completeRoute = createRouter().post(
 
     if (completion.outcome === GlobalTaskCompleteOutcome.Completed) {
       const task: GlobalTaskUpdate = {
-        updateTime: Date.now(),
+        time: Date.now(),
+        mode: UpdateMode.Optimized,
         key: taskKey,
         status: TaskStatus.Completed,
       }

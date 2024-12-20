@@ -1,6 +1,6 @@
 import { limitByIp, zValidator } from '@core/server'
 import { DicePayloadSchema, Engine } from '@games/engine'
-import { BalanceUpdate } from '@games/model'
+import { BalanceUpdate, UpdateMode } from '@games/model'
 import { gamesPubsubs, sessionService } from '@games/services'
 import { createRouter } from '../../app/router'
 
@@ -18,7 +18,8 @@ export const playDice = createRouter().post(
     })
 
     const balance: BalanceUpdate = {
-      updateTime: Date.now(),
+      time: Date.now(),
+      mode: UpdateMode.Optimized,
       available: updatedBalance,
     }
 
