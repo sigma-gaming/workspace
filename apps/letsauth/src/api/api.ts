@@ -16,6 +16,7 @@ export const api = new Hono()
       origin: [serverEnv.authApi.url],
       credentials: true,
       allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
+      maxAge: 86400,
     }),
   )
   .use(requestIdMiddleware)

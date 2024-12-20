@@ -23,6 +23,7 @@ export const baseApp = new Hono<HonoUwsEnv>()
       },
       credentials: true,
       allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
+      maxAge: 86400,
     }),
   )
   .use(requestIdMiddleware)
