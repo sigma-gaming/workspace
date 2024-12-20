@@ -42,7 +42,7 @@ server.listen(env.ports.public, (token) => {
     process.exit(1)
   }
 
-  logger.info(`🚀 API ready at ${env.access.apiUrl}`)
+  logger.info(`🚀 API ready at :${env.ports.public}`)
 })
 
 internalServer.listen(env.ports.internal, (token) => {

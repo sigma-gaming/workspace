@@ -25,7 +25,6 @@ export const GamesRedisOptionsToken =
   createOptionsToken<GamesRedisOptions>('GamesRedisOptions')
 
 export type SessionOptions = {
-  domain: string
   jwt: { secret: string }
   cookie?: {
     idKey?: string

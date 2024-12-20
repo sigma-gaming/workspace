@@ -22,6 +22,5 @@ registerOptions(GamesCacheOptionsToken, {
 })
 
 registerOptions(SessionOptionsToken, {
-  domain: env.access.domain,
   jwt: { secret: env.jwt.secret },
 })

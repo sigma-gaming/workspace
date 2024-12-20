@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { BadRequestException } from '@core/exceptions'
-import { limitByIp, zValidator } from '@core/server'
+import { getIpFromProxy, limitByIp, zValidator } from '@core/server'
 import { AccountProvider } from '@dbs/games-types'
 import {
   AuthenticatePayload,
@@ -77,7 +77,7 @@ const TgAuthResultSchema = z.object({
 
 export const authenticateRoute = new Hono().post(
   '/',
-  limitByIp({ limit: 5, windowMs: 60 * 1000 }),
+  limitByIp({ limit: 5, windowMs: 60 * 1000, generator: 'proxy' }),
   zValidator(
     'json',
     z.object({
@@ -245,7 +245,9 @@ export const authenticateRoute = new Hono().post(
     await gamesCache.sessionCodeToSessionId.set(code, session.id)
     sessionService.attachHonoSession(ctx, session)
 
-    fraudService.actualizeRisk(userId)
+    fraudService.actualizeRisk(userId, {
+      ip: getIpFromProxy(ctx),
+    })
 
     return ctx.json<AuthenticateOutput>({
       outcome:

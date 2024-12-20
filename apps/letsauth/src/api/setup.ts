@@ -22,7 +22,6 @@ registerOptions(GamesCacheOptionsToken, {
 })
 
 registerOptions(SessionOptionsToken, {
-  domain: serverEnv.authApi.domain,
   jwt: { secret: serverEnv.jwt.secret },
   cookie: {
     idKey: 'sigma_sessionId',

@@ -34,12 +34,10 @@ export type SessionOptions = {
 export class SessionService {
   private cookieIdKey: string
   private cookieExpiresKey: string
-  private domain: string
 
   constructor() {
-    const { domain, cookie } = resolveOptions(SessionOptionsToken)
+    const { cookie } = resolveOptions(SessionOptionsToken)
 
-    this.domain = domain
     this.cookieIdKey = cookie?.idKey ?? 'session_id'
     this.cookieExpiresKey = cookie?.expiresKey ?? 'session_expires_at'
   }
@@ -192,11 +190,19 @@ export class SessionService {
     return session
   }
 
+  getBaseDomain(ctx: HonoContext) {
+    const { hostname } = new URL(ctx.req.url)
+    const parts = hostname.split('.')
+    return parts.slice(-2).join('.')
+  }
+
   attachHonoSession(ctx: HonoContext, session: SessionSelect) {
+    const domain = this.getBaseDomain(ctx)
+    console.log(domain)
     const expires = new Date(session.expiresAt)
 
     setCookie(ctx, this.cookieIdKey, session.id, {
-      domain: this.domain,
+      domain,
       path: '/',
       expires,
       httpOnly: true,
@@ -205,7 +211,7 @@ export class SessionService {
     })
 
     setCookie(ctx, this.cookieExpiresKey, session.expiresAt, {
-      domain: this.domain,
+      domain,
       path: '/',
       expires,
       sameSite: 'lax',
@@ -214,15 +220,17 @@ export class SessionService {
   }
 
   detachHonoSession(ctx: HonoContext) {
+    const domain = this.getBaseDomain(ctx)
+
     deleteCookie(ctx, this.cookieIdKey, {
-      domain: this.domain,
+      domain,
       path: '/',
       sameSite: 'lax',
       httpOnly: true,
     })
 
     deleteCookie(ctx, this.cookieExpiresKey, {
-      domain: this.domain,
+      domain,
       path: '/',
       sameSite: 'lax',
     })

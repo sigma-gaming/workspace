@@ -6,7 +6,7 @@ import { gamesDb } from '@games/services'
 import { and, count, eq, lt } from 'drizzle-orm'
 
 type ActualizeRiskOptions = {
-  ip?: string
+  ip?: string | null
   updateIP?: boolean
 }
 

@@ -2,7 +2,6 @@ import { limitByIp, zValidator } from '@core/server'
 import { sessionService } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../app/router'
-import { env } from '../env'
 
 export const logoutRoute = createRouter().get(
   '/',
@@ -13,12 +12,11 @@ export const logoutRoute = createRouter().get(
     const { session } = await sessionService.getSessionSafe(sessionId)
 
     const { returnUrl } = ctx.req.valid('query')
-    const { hostname } = new URL(returnUrl)
 
-    if (
-      hostname !== env.access.domain &&
-      !hostname.endsWith('.' + env.access.domain)
-    ) {
+    const { hostname } = new URL(returnUrl)
+    const domain = sessionService.getBaseDomain(ctx)
+
+    if (hostname !== domain && !hostname.endsWith('.' + domain)) {
       ctx.status(400)
       return ctx.text('Invalid return URL')
     }

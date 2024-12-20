@@ -3,7 +3,6 @@ import { SessionState } from '@games/model'
 import { gamesCache, sessionService } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../app/router'
-import { env } from '../env'
 
 export const exchangeRoute = createRouter().get(
   '/',
@@ -38,11 +37,9 @@ export const exchangeRoute = createRouter().get(
     }
 
     const { hostname } = new URL(returnUrl)
+    const domain = sessionService.getBaseDomain(ctx)
 
-    if (
-      hostname !== env.access.domain &&
-      !hostname.endsWith('.' + env.access.domain)
-    ) {
+    if (hostname !== domain && !hostname.endsWith('.' + domain)) {
       ctx.status(400)
       return ctx.text('Некорретный URL возврата')
     }

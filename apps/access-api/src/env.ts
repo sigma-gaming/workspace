@@ -7,12 +7,7 @@ const EnvSchema = z
     ACCESS_API_PORT: z.coerce.number(),
     ACCESS_API_INTERNAL_PORT: z.coerce.number(),
 
-    PUBLIC_GAMES_APP_URL: z.string(),
-    PUBLIC_CONTROL_APP_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-
-    PUBLIC_ACCESS_API_URL: z.string(),
-    PUBLIC_ACCESS_DOMAIN: z.string(),
 
     JWT_SECRET: z.string(),
 
@@ -42,21 +37,8 @@ const EnvSchema = z
       password: raw.GAMES_CACHE_PASSWORD,
     },
 
-    gamesApp: {
-      url: raw.PUBLIC_GAMES_APP_URL,
-    },
-
-    controlApp: {
-      url: raw.PUBLIC_CONTROL_APP_URL,
-    },
-
     gamesApi: {
       version: raw.PUBLIC_GAMES_API_VERSION,
-    },
-
-    access: {
-      apiUrl: raw.PUBLIC_ACCESS_API_URL,
-      domain: raw.PUBLIC_ACCESS_DOMAIN,
     },
 
     jwt: {
