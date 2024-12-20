@@ -22,6 +22,12 @@ const EnvSchema = z
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
 
+    PUBLIC_TELEGRAM_BOT_ID: z.string(),
+    TELEGRAM_BOT_TOKEN: z.string(),
+
+    VK_SERVICE_TOKEN: z.string(),
+    VK_GROUP_TOKEN: z.string(),
+
     BOVAPAY_API_URL: z.string(),
     BOVAPAY_API_KEY: z.string(),
     BOVAPAY_CALLBACK_URL: z.string(),
@@ -57,6 +63,15 @@ const EnvSchema = z
 
     jwt: {
       secret: raw.JWT_SECRET,
+    },
+
+    telegram: {
+      botToken: raw.TELEGRAM_BOT_TOKEN,
+    },
+
+    vk: {
+      serviceToken: raw.VK_SERVICE_TOKEN,
+      groupToken: raw.VK_GROUP_TOKEN,
     },
 
     bovapay: {

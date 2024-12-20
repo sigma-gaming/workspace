@@ -1,6 +1,7 @@
 import { affiliateRouter } from '../routes/affiliate'
 import { chatRouter } from '../routes/chat'
 import { gameHistoryRouter } from '../routes/game-history'
+import { gamesRouter } from '../routes/games'
 import { meRouter } from '../routes/me'
 import { notificationsRouter } from '../routes/notifications'
 import { paymentsRouter } from '../routes/payments'
@@ -19,5 +20,6 @@ export const app = baseApp
   .route('/promocodes', promocodesRouter)
   .route('/tasks', tasksRouter)
   .route('/affiliate', affiliateRouter)
+  .route('/games', gamesRouter)
 
 export type ApiType = typeof app

@@ -1,7 +1,5 @@
-import {
-  BadRequestException,
-  NotAuthenticatedException,
-} from '@core/exceptions'
+import { BadRequestException } from '@core/exceptions'
+import { limitByIp, zValidator } from '@core/server'
 import { AccountTable } from '@dbs/games-schema'
 import { AccountProvider, GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import {
@@ -10,26 +8,26 @@ import {
   GlobalTaskCompleteOutcome,
   globalTaskService,
   RepostStatus,
+  sessionService,
   telegramBotService,
   vkService,
 } from '@games/services'
 import { and, eq } from 'drizzle-orm'
-import { userRoom } from '../../shared/rooms/user'
-import { createWsAction } from '../../ws-action'
-import {
-  GlobalTasksCompleteOutput,
-  GlobalTasksCompletePayloadSchema,
-} from './contracts'
+import { z } from 'zod'
+import { createRouter } from '../../../app/router'
 
-export const GlobalTasksCompleteAction = createWsAction({
-  name: 'global-tasks/complete',
-  schema: GlobalTasksCompletePayloadSchema,
-  handler: async (ctx, payload): Promise<GlobalTasksCompleteOutput> => {
-    const { session } = ctx
-
-    if (!session) {
-      throw new NotAuthenticatedException()
-    }
+export const completeRoute = createRouter().post(
+  '/',
+  limitByIp({ limit: 5, windowMs: 60 * 1000 }),
+  zValidator(
+    'json',
+    z.object({
+      taskKey: z.nativeEnum(GlobalTaskKey),
+    }),
+  ),
+  async (ctx) => {
+    const { userId } = await sessionService.getHonoSession(ctx)
+    const { taskKey } = ctx.req.valid('json')
 
     const checkers: Record<GlobalTaskKey, GlobalTaskChecker> = {
       [GlobalTaskKey.TelegramGroupSubscribe]: async ({ requirements }) => {
@@ -44,7 +42,7 @@ export const GlobalTasksCompleteAction = createWsAction({
         const account = await gamesDb.query.AccountTable.findFirst({
           where: and(
             eq(AccountTable.provider, AccountProvider.Telegram),
-            eq(AccountTable.userId, session.userId),
+            eq(AccountTable.userId, userId),
           ),
         })
 
@@ -75,7 +73,7 @@ export const GlobalTasksCompleteAction = createWsAction({
         const account = await gamesDb.query.AccountTable.findFirst({
           where: and(
             eq(AccountTable.provider, AccountProvider.VK),
-            eq(AccountTable.userId, session.userId),
+            eq(AccountTable.userId, userId),
           ),
         })
 
@@ -106,7 +104,7 @@ export const GlobalTasksCompleteAction = createWsAction({
         const account = await gamesDb.query.AccountTable.findFirst({
           where: and(
             eq(AccountTable.provider, AccountProvider.VK),
-            eq(AccountTable.userId, session.userId),
+            eq(AccountTable.userId, userId),
           ),
         })
 
@@ -163,20 +161,18 @@ export const GlobalTasksCompleteAction = createWsAction({
     }
 
     const completion = await globalTaskService.completeTask({
-      userId: session.userId,
-      taskKey: payload.taskKey,
-      checker: checkers[payload.taskKey],
+      userId,
+      taskKey,
+      checker: checkers[taskKey],
     })
 
     if (completion.outcome === GlobalTaskCompleteOutcome.Completed) {
-      ctx.socket
-        .to(userRoom(session.userId))
-        .emit('global-tasks/status-updated', {
-          taskKey: payload.taskKey,
-          status: TaskStatus.Completed,
-        })
+      // ctx.socket.to(userRoom(userId)).emit('global-tasks/status-updated', {
+      //   taskKey,
+      //   status: TaskStatus.Completed,
+      // })
 
-      return
+      return ctx.json({ taskKey, status: TaskStatus.Completed })
     }
 
     if (completion.outcome === GlobalTaskCompleteOutcome.AlreadyCompleted) {
@@ -194,4 +190,4 @@ export const GlobalTasksCompleteAction = createWsAction({
         'Не удалось проверить задание. Попробуйте ещё раз или напишите в поддержку',
     })
   },
-})
+)

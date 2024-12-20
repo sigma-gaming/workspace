@@ -1,4 +1,4 @@
-import { Hono } from 'hono'
+import { createRouter } from '../../app/router'
 import { connectRoute } from './connect'
 import { getBalanceRoute } from './get-balance'
 import { getCampaingsRoute } from './get-campaigns'
@@ -7,7 +7,7 @@ import { getSettingsRoute } from './get-settings'
 import { isConnectedRoute } from './is-connected'
 import { withdrawRoute } from './withdraw'
 
-export const affiliateRouter = new Hono()
+export const affiliateRouter = createRouter()
   .route('/connect', connectRoute)
   .route('/withdraw', withdrawRoute)
   .route('/isConnected', isConnectedRoute)

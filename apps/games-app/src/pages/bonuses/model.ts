@@ -1,11 +1,9 @@
 import { $$notifications, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { createWsEffect, subscriptionFactory } from '@core/io-client'
 import { noop } from '@core/utils'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { createMutation, createQuery } from '@farfetched/core'
 import { formatGem, gemFloat } from '@games/model'
-import { invoke } from '@withease/factories'
 import { createEvent, createStore, EffectResult, sample } from 'effector'
 import { status } from 'patronum'
 import { z } from 'zod'
@@ -15,7 +13,6 @@ import { $$session } from '../../entities/session'
 import { routes } from '../../routing'
 import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
-import { gamesWs } from '../../shared/api/games-ws'
 
 const completeGlobalTask = createEvent<GlobalTaskKey>()
 const claimGlobalTaskReward = createEvent<GlobalTaskKey>()
@@ -46,20 +43,25 @@ const INITIAL_GLOBAL_TASK_STATUSES: GlobalTaskStatuses = {
 
 const completeGlobalTaskMutation = createMutation({
   name: 'bonuses/completeGlobalTask',
-  effect: createWsEffect(gamesWs, 'global-tasks/complete'),
+  effect: createApiEffect('json', gamesApi.tasks.global.complete.$post),
 })
 
 const claimGlobalTaskRewardMutation = createMutation({
   name: 'bonuses/claimGlobalTaskReward',
-  effect: createWsEffect(gamesWs, 'global-tasks/claim-reward'),
+  effect: createApiEffect('json', gamesApi.tasks.global.claimReward.$post),
 })
 
-const { receivedData: globalTaskStatusUpdated } = invoke(() =>
-  subscriptionFactory({
-    ws: gamesWs,
-    event: 'global-tasks/status-updated',
-  }),
-)
+const globalTaskStatusUpdated = createEvent<{
+  taskKey: GlobalTaskKey
+  status: TaskStatus
+}>()
+
+// const { receivedData: globalTaskStatusUpdated } = invoke(() =>
+//   subscriptionFactory({
+//     ws: gamesWs,
+//     event: 'global-tasks/status-updated',
+//   }),
+// )
 
 const promocodeFields = {
   code: createField({
@@ -125,13 +127,6 @@ sample({
 })
 
 sample({
-  clock: globalTaskStatusUpdated,
-  source: $globalTaskStatuses,
-  fn: (statuses, { taskKey, status }) => ({ ...statuses, [taskKey]: status }),
-  target: $globalTaskStatuses,
-})
-
-sample({
   source: promocodeForm.submitted,
   target: applyPromocodeMutation.start,
 })
@@ -174,12 +169,21 @@ sample({
 })
 
 sample({
-  clock: completeGlobalTaskMutation.finished.success,
-  source: $globalTaskStatuses,
-  fn: (statuses, { params }) => ({
-    ...statuses,
-    [params.taskKey]: TaskStatus.Completed,
+  clock: [
+    completeGlobalTaskMutation.finished.success,
+    claimGlobalTaskRewardMutation.finished.success,
+  ],
+  fn: ({ result }) => ({
+    taskKey: result.taskKey,
+    status: result.status,
   }),
+  target: globalTaskStatusUpdated,
+})
+
+sample({
+  clock: globalTaskStatusUpdated,
+  source: $globalTaskStatuses,
+  fn: (statuses, { taskKey, status }) => ({ ...statuses, [taskKey]: status }),
   target: $globalTaskStatuses,
 })
 
@@ -187,16 +191,6 @@ sample({
   clock: claimGlobalTaskReward,
   fn: (taskKey) => ({ taskKey }),
   target: claimGlobalTaskRewardMutation.start,
-})
-
-sample({
-  clock: claimGlobalTaskRewardMutation.finished.success,
-  source: $globalTaskStatuses,
-  fn: (statuses, { params }) => ({
-    ...statuses,
-    [params.taskKey]: TaskStatus.Claimed,
-  }),
-  target: $globalTaskStatuses,
 })
 
 sample({

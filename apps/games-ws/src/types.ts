@@ -1,23 +1,10 @@
-import { WsActionHandler } from '@core/io-client'
 import {
   ChatMessageSelect,
   GameRecordSelect,
   NotificationSelect,
 } from '@dbs/games-schema'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
-import {
-  DicePayload,
-  PincodePayload,
-  PlayDiceOutput,
-  PlayPincodeOutput,
-} from '@games/engine'
 import { BalanceDetailed } from '@games/model'
-import {
-  GlobalTasksClaimRewardOutput,
-  GlobalTasksClaimRewardPayload,
-  GlobalTasksCompleteOutput,
-  GlobalTasksCompletePayload,
-} from './actions/global-tasks/contracts'
 
 export type ServerToClientEvents = {
   'chat/message': (message: ChatMessageSelect) => void
@@ -33,16 +20,4 @@ export type ServerToClientEvents = {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export type ClientToServerEvents = {
-  'ping': WsActionHandler<void, 'pong'>
-  'games/pincode': WsActionHandler<PincodePayload, PlayPincodeOutput>
-  'games/dice': WsActionHandler<DicePayload, PlayDiceOutput>
-  'global-tasks/complete': WsActionHandler<
-    GlobalTasksCompletePayload,
-    GlobalTasksCompleteOutput
-  >
-  'global-tasks/claim-reward': WsActionHandler<
-    GlobalTasksClaimRewardPayload,
-    GlobalTasksClaimRewardOutput
-  >
-}
+export type ClientToServerEvents = Record<string, never>

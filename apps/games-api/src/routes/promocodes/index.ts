@@ -1,4 +1,4 @@
-import { Hono } from 'hono'
+import { createRouter } from '../../app/router'
 import { applyRoute } from './apply'
 
-export const promocodesRouter = new Hono().route('/apply', applyRoute)
+export const promocodesRouter = createRouter().route('/apply', applyRoute)

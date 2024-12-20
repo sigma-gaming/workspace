@@ -1,27 +1,13 @@
 import './setup'
 import './shared/sentry/init'
 import { shutdownAll } from '@core/di'
-import { EventNames, WsActionInput, WsActionOutput } from '@core/io-client'
 import { logger } from '@core/logger'
-import {
-  gamesPubsubs,
-  maintenanceService,
-  sessionService,
-} from '@games/services'
-import { parse } from 'cookie'
+import { gamesPubsubs, maintenanceService } from '@games/services'
 import { App, SSLApp } from 'uWebSockets.js'
-import { GamesDiceAction } from './actions/games/dice'
-import { GamesPincodeAction } from './actions/games/pincode'
-import { GlobalTasksClaimRewardAction } from './actions/global-tasks/claim-reward'
-import { GlobalTasksCompleteAction } from './actions/global-tasks/complete'
-import { PingAction } from './actions/ping'
-import { Context } from './context'
 import { env } from './env'
 import { io } from './io'
 import { startLastWinsBroadcast } from './processes/last-wins'
 import { sendToAllLocal, sendToUser } from './shared/send'
-import { ClientToServerEvents } from './types'
-import { WsActionGenerator } from './ws-action'
 
 const app = env.isDev
   ? SSLApp({
@@ -31,39 +17,6 @@ const app = env.isDev
   : App()
 
 io.attachApp(app)
-
-io.on('connection', async (socket) => {
-  const cookie = parse(socket.handshake.headers.cookie ?? '')
-  const { session } = await sessionService.getSessionSafe(cookie.session_id)
-
-  const context: Context = {
-    url: new URL(env.gamesWs.url),
-    headers: socket.handshake.headers,
-    socket,
-    session,
-  }
-
-  /**
-   * Actions
-   */
-
-  function registerAction<E extends EventNames<ClientToServerEvents>>(
-    generator: WsActionGenerator<
-      E,
-      WsActionInput<ClientToServerEvents, E>,
-      WsActionOutput<ClientToServerEvents, E>
-    >,
-  ) {
-    const action = generator(context)
-    socket.on(action.name, action.handler as any)
-  }
-
-  registerAction(PingAction)
-  registerAction(GamesPincodeAction)
-  registerAction(GamesDiceAction)
-  registerAction(GlobalTasksCompleteAction)
-  registerAction(GlobalTasksClaimRewardAction)
-})
 
 /**
  * Business logic

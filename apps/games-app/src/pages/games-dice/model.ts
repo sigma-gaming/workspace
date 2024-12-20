@@ -1,6 +1,5 @@
 import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { createWsEffect } from '@core/io-client'
 import { GameRecordSelect } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
@@ -18,11 +17,12 @@ import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { $$gameHistory } from '../../features/game-history'
 import { routes } from '../../routing'
-import { gamesWs } from '../../shared/api/games-ws'
+import { createApiEffect } from '../../shared/api/effects'
+import { gamesApi } from '../../shared/api/games'
 
 const playGameMutation = createMutation({
   name: 'games/dice/play',
-  effect: createWsEffect(gamesWs, 'games/dice'),
+  effect: createApiEffect('json', gamesApi.games.playDice.$post),
 })
 
 $$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)

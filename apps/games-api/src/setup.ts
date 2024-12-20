@@ -5,6 +5,8 @@ import {
   GamesDbOptionsToken,
   GamesRedisOptionsToken,
   SessionOptionsToken,
+  TelegramBotOptionsToken,
+  VkOptionsToken,
 } from '@games/options'
 import { env } from './env'
 
@@ -30,4 +32,13 @@ registerOptions(BovapayOptionsToken, {
   apiKey: env.bovapay.apiKey,
   apiUrl: env.bovapay.apiUrl,
   callbackUrl: env.bovapay.callbackUrl,
+})
+
+registerOptions(TelegramBotOptionsToken, {
+  token: env.telegram.botToken,
+})
+
+registerOptions(VkOptionsToken, {
+  groupToken: env.vk.groupToken,
+  serviceToken: env.vk.serviceToken,
 })

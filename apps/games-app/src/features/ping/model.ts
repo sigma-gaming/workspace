@@ -1,13 +1,14 @@
-import { createWsEffect } from '@core/io-client'
 import { createEffect, createEvent, restore, sample } from 'effector'
 import { interval } from 'patronum'
+import { createApiEffect } from '../../shared/api/effects'
+import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
 
-const pingFx = createWsEffect(gamesWs, 'ping')
+const pingFx = createApiEffect('query', gamesApi.games.ping.$get)
 
 const measurePingFx = createEffect(async () => {
   const startTime = performance.now()
-  await pingFx()
+  await pingFx(0)
   return performance.now() - startTime
 })
 

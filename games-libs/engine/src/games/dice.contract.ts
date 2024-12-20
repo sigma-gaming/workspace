@@ -2,7 +2,7 @@ import { GameRecordSelect } from '@dbs/games-schema'
 import { gemInt } from '@games/model'
 import { z } from 'zod'
 
-export const DicePayloadSchema = z.object({
+export const DicePayloadSchema = z.strictObject({
   bet: z
     .number()
     .int()

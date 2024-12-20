@@ -2,7 +2,7 @@ import { GameRecordSelect } from '@dbs/games-schema'
 import { gemInt, PincodeMode } from '@games/model'
 import { z } from 'zod'
 
-export const PincodePayloadSchema = z.object({
+export const PincodePayloadSchema = z.strictObject({
   bet: z
     .number()
     .int()

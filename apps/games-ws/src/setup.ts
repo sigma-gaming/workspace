@@ -4,8 +4,6 @@ import {
   GamesDbOptionsToken,
   GamesRedisOptionsToken,
   SessionOptionsToken,
-  TelegramBotOptionsToken,
-  VkOptionsToken,
 } from '@games/options'
 import { env } from './env'
 
@@ -25,13 +23,4 @@ registerOptions(GamesCacheOptionsToken, {
 
 registerOptions(SessionOptionsToken, {
   jwt: { secret: env.jwt.secret },
-})
-
-registerOptions(TelegramBotOptionsToken, {
-  token: env.telegram.botToken,
-})
-
-registerOptions(VkOptionsToken, {
-  groupToken: env.vk.groupToken,
-  serviceToken: env.vk.serviceToken,
 })

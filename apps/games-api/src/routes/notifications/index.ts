@@ -1,7 +1,7 @@
-import { Hono } from 'hono'
+import { createRouter } from '../../app/router'
 import { getActualRoute } from './get-actual'
 
-export const notificationsRouter = new Hono().route(
+export const notificationsRouter = createRouter().route(
   '/getActual',
   getActualRoute,
 )

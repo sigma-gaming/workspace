@@ -1,7 +1,7 @@
-import { Hono } from 'hono'
+import { createRouter } from '../../app/router'
 import { updateProfileRoute } from './update-profile'
 
-export const settingsRouter = new Hono().route(
+export const settingsRouter = createRouter().route(
   '/updateProfile',
   updateProfileRoute,
 )
