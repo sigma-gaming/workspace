@@ -1,6 +1,7 @@
 import { limitByIp, zValidator } from '@core/server'
 import { Engine, PincodePayloadSchema } from '@games/engine'
-import { sessionService } from '@games/services'
+import { BalanceUpdate } from '@games/model'
+import { gamesPubsubs, sessionService } from '@games/services'
 import { createRouter } from '../../app/router'
 
 export const playPincode = createRouter().post(
@@ -16,10 +17,19 @@ export const playPincode = createRouter().post(
       payload,
     })
 
-    // ctx.socket.to(userRoom(session.userId)).emit('balance/updated', {
-    //   available: updatedBalance,
-    // })
+    const balance: BalanceUpdate = {
+      updateTime: Date.now(),
+      available: updatedBalance,
+    }
 
-    return ctx.json({ record, updatedBalance })
+    gamesPubsubs.balanceUpdated.publish({
+      userId,
+      update: balance,
+    })
+
+    return ctx.json({
+      record,
+      balance,
+    })
   },
 )

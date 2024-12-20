@@ -1,9 +1,15 @@
-import { $$notifications, handleExceptions } from '@core/client'
+import {
+  $$notifications,
+  handleExceptions,
+  onlyLatestUpdate,
+} from '@core/client'
 import { createField, createForm } from '@core/forms'
+import { subscriptionFactory } from '@core/io-client'
 import { noop } from '@core/utils'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { createMutation, createQuery } from '@farfetched/core'
-import { formatGem, gemFloat } from '@games/model'
+import { formatGem, gemFloat, GlobalTaskUpdate } from '@games/model'
+import { invoke } from '@withease/factories'
 import { createEvent, createStore, EffectResult, sample } from 'effector'
 import { status } from 'patronum'
 import { z } from 'zod'
@@ -13,6 +19,7 @@ import { $$session } from '../../entities/session'
 import { routes } from '../../routing'
 import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
+import { gamesWs } from '../../shared/api/games-ws'
 
 const completeGlobalTask = createEvent<GlobalTaskKey>()
 const claimGlobalTaskReward = createEvent<GlobalTaskKey>()
@@ -51,17 +58,14 @@ const claimGlobalTaskRewardMutation = createMutation({
   effect: createApiEffect('json', gamesApi.tasks.global.claimReward.$post),
 })
 
-const globalTaskStatusUpdated = createEvent<{
-  taskKey: GlobalTaskKey
-  status: TaskStatus
-}>()
+const globalTaskUpdateReceived = createEvent<GlobalTaskUpdate>()
 
-// const { receivedData: globalTaskStatusUpdated } = invoke(() =>
-//   subscriptionFactory({
-//     ws: gamesWs,
-//     event: 'global-tasks/status-updated',
-//   }),
-// )
+const { receivedData: globalTaskUpdated } = invoke(() =>
+  subscriptionFactory({
+    ws: gamesWs,
+    event: 'global-tasks/updated',
+  }),
+)
 
 const promocodeFields = {
   code: createField({
@@ -80,10 +84,10 @@ handleExceptions(applyPromocodeMutation, { form: promocodeForm })
 handleExceptions(completeGlobalTaskMutation)
 handleExceptions(claimGlobalTaskRewardMutation)
 
-$$balance.receiveUpdates(applyPromocodeMutation, (data) => data.updatedBalance)
+$$balance.receiveUpdates(applyPromocodeMutation, ({ balance }) => balance)
 $$balance.receiveUpdates(
   claimGlobalTaskRewardMutation,
-  (data) => data.updatedBalance,
+  ({ balance }) => balance,
 )
 
 const $globalTasks = getGlobalTasksQuery.$data
@@ -173,17 +177,19 @@ sample({
     completeGlobalTaskMutation.finished.success,
     claimGlobalTaskRewardMutation.finished.success,
   ],
-  fn: ({ result }) => ({
-    taskKey: result.taskKey,
-    status: result.status,
-  }),
-  target: globalTaskStatusUpdated,
+  fn: ({ result }) => result.task,
+  target: globalTaskUpdateReceived,
 })
 
 sample({
-  clock: globalTaskStatusUpdated,
+  source: globalTaskUpdated,
+  target: globalTaskUpdateReceived,
+})
+
+sample({
+  clock: onlyLatestUpdate(globalTaskUpdateReceived),
   source: $globalTaskStatuses,
-  fn: (statuses, { taskKey, status }) => ({ ...statuses, [taskKey]: status }),
+  fn: (statuses, { key, status }) => ({ ...statuses, [key]: status }),
   target: $globalTaskStatuses,
 })
 

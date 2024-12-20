@@ -2,11 +2,17 @@ import './setup'
 import './shared/sentry/init'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { gamesPubsubs, maintenanceService } from '@games/services'
+import {
+  gamesPubsubs,
+  maintenanceService,
+  sessionService,
+} from '@games/services'
+import { parse } from 'cookie'
 import { App, SSLApp } from 'uWebSockets.js'
 import { env } from './env'
 import { io } from './io'
 import { startLastWinsBroadcast } from './processes/last-wins'
+import { userRoom } from './shared/rooms/user'
 import { sendToAllLocal, sendToUser } from './shared/send'
 
 const app = env.isDev
@@ -17,6 +23,15 @@ const app = env.isDev
   : App()
 
 io.attachApp(app)
+
+io.on('connection', async (socket) => {
+  const cookie = parse(socket.handshake.headers.cookie ?? '')
+  const { session } = await sessionService.getSessionSafe(cookie.session_id)
+
+  if (session) {
+    socket.join(userRoom(session.userId))
+  }
+})
 
 /**
  * Business logic
@@ -38,6 +53,14 @@ gamesPubsubs.notifications.subscribe((payload) => {
 
 gamesPubsubs.maintenanceStarted.subscribe(() => {
   sendToAllLocal('maintenance/started')
+})
+
+gamesPubsubs.balanceUpdated.subscribe((payload) => {
+  sendToUser(payload.userId, 'balance/updated', payload.update)
+})
+
+gamesPubsubs.globalTaskUpdated.subscribe((payload) => {
+  sendToUser(payload.userId, 'global-tasks/updated', payload.update)
 })
 
 /**

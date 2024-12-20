@@ -1,7 +1,9 @@
 import { BadRequestException } from '@core/exceptions'
 import { limitByIp, zValidator } from '@core/server'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
+import { BalanceUpdate, GlobalTaskUpdate } from '@games/model'
 import {
+  gamesPubsubs,
   GlobalTaskClaimRewardOutcome,
   globalTaskService,
   sessionService,
@@ -31,18 +33,33 @@ export const claimRewardRoute = createRouter().post(
       const { updatedBalance, payout } = completion
       const { available } = updatedBalance
 
-      // ctx.socket.to(userRoom(userId)).emit('balance/updated', { available })
+      const updateTime = Date.now()
 
-      // ctx.socket.to(userRoom(userId)).emit('global-tasks/status-updated', {
-      //   taskKey,
-      //   status: TaskStatus.Claimed,
-      // })
+      const task: GlobalTaskUpdate = {
+        updateTime,
+        key: taskKey,
+        status: TaskStatus.Claimed,
+      }
+
+      const balance: BalanceUpdate = {
+        updateTime,
+        available,
+      }
+
+      gamesPubsubs.balanceUpdated.publish({
+        userId,
+        update: balance,
+      })
+
+      gamesPubsubs.globalTaskUpdated.publish({
+        userId,
+        update: task,
+      })
 
       return ctx.json({
-        taskKey,
-        status: TaskStatus.Claimed,
-        updatedBalance: available,
         payout,
+        task,
+        balance,
       })
     }
 

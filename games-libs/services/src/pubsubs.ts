@@ -1,7 +1,11 @@
 import { createLazyInstance, resolveOptions, Shutdownable } from '@core/di'
 import { logger } from '@core/logger'
 import { NotificationSelect } from '@dbs/games-schema'
-import { ChatMessageDetailed } from '@games/model'
+import {
+  BalanceUpdate,
+  ChatMessageDetailed,
+  GlobalTaskUpdate,
+} from '@games/model'
 import { GamesRedisOptionsToken } from '@games/options'
 import { PubSub, PubSubService, RedisService } from '@games/redis'
 import { Redis } from 'ioredis'
@@ -15,6 +19,8 @@ export class GamesPubSubRegistry extends Shutdownable {
   notifications: PubSub<NotificationSelect>
   chatMessages: PubSub<ChatMessageDetailed>
   maintenanceStarted: PubSub<void>
+  balanceUpdated: PubSub<{ userId: string; update: BalanceUpdate }>
+  globalTaskUpdated: PubSub<{ userId: string; update: GlobalTaskUpdate }>
 
   constructor() {
     super()
@@ -43,6 +49,20 @@ export class GamesPubSubRegistry extends Shutdownable {
 
     this.maintenanceStarted = this.service.create<void>({
       channelName: 'maintenance-started',
+    })
+
+    this.balanceUpdated = this.service.create<{
+      userId: string
+      update: BalanceUpdate
+    }>({
+      channelName: 'balance-updated',
+    })
+
+    this.globalTaskUpdated = this.service.create<{
+      userId: string
+      update: GlobalTaskUpdate
+    }>({
+      channelName: 'global-tasks-updated',
     })
   }
 

@@ -1,6 +1,7 @@
+import { onlyLatestUpdate } from '@core/client'
 import { subscriptionFactory } from '@core/io-client'
 import { Mutation } from '@farfetched/core'
-import { BalanceDetailed } from '@games/model'
+import { BalanceDetailed, BalanceUpdate } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
 import { previous, status } from 'patronum'
@@ -23,25 +24,32 @@ const { receivedData: balanceUpdated } = invoke(() =>
 const request = createEvent()
 const reset = createEvent()
 const loaded = createEvent()
+const updateReceived = createEvent<BalanceUpdate>()
 
 const $balance = createStore<BalanceDetailed | null>(null).reset(reset)
 const $status = status(getDetailedBalanceFx).reset(reset)
 
 function receiveUpdates<T>(
   mutation: Mutation<any, T, any>,
-  selector: (data: T) => number,
+  selector: (data: T) => BalanceUpdate,
 ) {
   sample({
-    clock: mutation.finished.success,
-    source: $balance,
-    filter: Boolean,
-    fn: (balance, { result }) => ({
-      ...balance,
-      available: selector(result),
-    }),
-    target: $balance,
+    source: mutation.finished.success,
+    fn: ({ result }) => selector(result),
+    target: updateReceived,
   })
 }
+
+sample({
+  clock: onlyLatestUpdate(updateReceived),
+  source: $balance,
+  filter: Boolean,
+  fn: (balance, { available }) => ({
+    ...balance,
+    available,
+  }),
+  target: $balance,
+})
 
 const $loading = $status.map((status) => status === 'pending')
 const $loaded = $status.map((status) => status === 'done')
@@ -66,7 +74,7 @@ sample({
 
 sample({
   clock: balanceUpdated,
-  target: $balance,
+  target: updateReceived,
 })
 
 export const $$balance = {

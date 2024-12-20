@@ -1,7 +1,9 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { limitByIp, zValidator } from '@core/server'
 import { PromocodeBonusType } from '@dbs/games-types'
+import { BalanceUpdate } from '@games/model'
 import {
+  gamesPubsubs,
   PromocodeActivationOutcome,
   promocodeService,
   sessionService,
@@ -48,11 +50,20 @@ export const applyRoute = createRouter().post(
     })
 
     if (result.outcome === PromocodeActivationOutcome.AppliedPayout) {
+      const balance: BalanceUpdate = {
+        updateTime: Date.now(),
+        available: result.updatedBalance.available,
+      }
+
+      gamesPubsubs.balanceUpdated.publish({
+        userId,
+        update: balance,
+      })
+
       return ctx.json({
-        status: 'success',
         bonusType: PromocodeBonusType.Payout,
         payout: result.payout,
-        updatedBalance: result.updatedBalance.available,
+        balance,
       })
     }
 

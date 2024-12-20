@@ -3,11 +3,13 @@ import { limitByIp } from '@core/server'
 import { takeFirstOrThrow } from '@core/utils'
 import { BalanceTable, ReferrerBalanceTable } from '@dbs/games-schema'
 import { TransactionType } from '@dbs/games-types'
+import { BalanceUpdate } from '@games/model'
 import {
   affiliateService,
   balanceService,
   gamesCache,
   gamesDb,
+  gamesPubsubs,
   sessionService,
 } from '@games/services'
 import { eq } from 'drizzle-orm'
@@ -74,7 +76,10 @@ export const withdrawRoute = createRouter().post(
             available: 0,
           })
 
-        return { updatedBalance, updatedReferrerBalance }
+        return {
+          updatedBalance,
+          updatedReferrerBalance,
+        }
       })
 
     if (gamesCache.ready) {
@@ -82,9 +87,24 @@ export const withdrawRoute = createRouter().post(
       await gamesCache.referrerBalance.set(userId, updatedReferrerBalance)
     }
 
+    const updateTime = Date.now()
+
+    const balance: BalanceUpdate = {
+      updateTime,
+      available: updatedBalance.available,
+    }
+
+    gamesPubsubs.balanceUpdated.publish({
+      userId,
+      update: balance,
+    })
+
     return ctx.json({
-      updatedBalance: updatedBalance.available,
-      updatedReferrerBalance: updatedReferrerBalance.available,
+      balance,
+      referrerBalance: {
+        updateTime,
+        available: updatedReferrerBalance.available,
+      },
     })
   },
 )

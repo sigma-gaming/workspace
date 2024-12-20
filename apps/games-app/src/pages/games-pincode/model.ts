@@ -31,7 +31,7 @@ const playGameMutation = createMutation({
   effect: createApiEffect('json', gamesApi.games.playPincode.$post),
 })
 
-$$balance.receiveUpdates(playGameMutation, (data) => data.updatedBalance)
+$$balance.receiveUpdates(playGameMutation, ({ balance }) => balance)
 
 const betDoubled = createEvent()
 const betHalved = createEvent()

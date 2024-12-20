@@ -2,8 +2,10 @@ import { BadRequestException } from '@core/exceptions'
 import { limitByIp, zValidator } from '@core/server'
 import { AccountTable } from '@dbs/games-schema'
 import { AccountProvider, GlobalTaskKey, TaskStatus } from '@dbs/games-types'
+import { GlobalTaskUpdate } from '@games/model'
 import {
   gamesDb,
+  gamesPubsubs,
   GlobalTaskChecker,
   GlobalTaskCompleteOutcome,
   globalTaskService,
@@ -167,12 +169,20 @@ export const completeRoute = createRouter().post(
     })
 
     if (completion.outcome === GlobalTaskCompleteOutcome.Completed) {
-      // ctx.socket.to(userRoom(userId)).emit('global-tasks/status-updated', {
-      //   taskKey,
-      //   status: TaskStatus.Completed,
-      // })
+      const task: GlobalTaskUpdate = {
+        updateTime: Date.now(),
+        key: taskKey,
+        status: TaskStatus.Completed,
+      }
 
-      return ctx.json({ taskKey, status: TaskStatus.Completed })
+      gamesPubsubs.globalTaskUpdated.publish({
+        userId,
+        update: task,
+      })
+
+      return ctx.json({
+        task,
+      })
     }
 
     if (completion.outcome === GlobalTaskCompleteOutcome.AlreadyCompleted) {

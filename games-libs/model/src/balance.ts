@@ -4,6 +4,11 @@ export type BalanceDetailed = {
   available: number
 }
 
+export type BalanceUpdate = {
+  updateTime: number
+  available: number
+}
+
 export function gemInt(amount: number) {
   return amount * 100
 }

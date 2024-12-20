@@ -3,8 +3,7 @@ import {
   GameRecordSelect,
   NotificationSelect,
 } from '@dbs/games-schema'
-import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
-import { BalanceDetailed } from '@games/model'
+import { BalanceUpdate, GlobalTaskUpdate } from '@games/model'
 
 export type ServerToClientEvents = {
   'chat/message': (message: ChatMessageSelect) => void
@@ -12,11 +11,8 @@ export type ServerToClientEvents = {
   'gameHistory/lastWins': (lastWins: GameRecordSelect[]) => void
   'gameHistory/bigWins': (bigWins: GameRecordSelect[]) => void
   'maintenance/started': () => void
-  'balance/updated': (balance: BalanceDetailed) => void
-  'global-tasks/status-updated': (payload: {
-    taskKey: GlobalTaskKey
-    status: TaskStatus
-  }) => void
+  'balance/updated': (update: BalanceUpdate) => void
+  'global-tasks/updated': (update: GlobalTaskUpdate) => void
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

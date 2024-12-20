@@ -39,10 +39,7 @@ const withdrawMutation = createMutation({
   effect: createApiEffect('json', gamesApi.affiliate.withdraw.$post),
 })
 
-$$balance.receiveUpdates(
-  withdrawMutation,
-  ({ updatedBalance }) => updatedBalance,
-)
+$$balance.receiveUpdates(withdrawMutation, ({ balance }) => balance)
 
 const $settings = getSettingsQuery.$data
 const $settingsLoaded = getSettingsQuery.$succeeded
@@ -114,7 +111,7 @@ sample({
   filter: Boolean,
   fn: (balance, { result }) => ({
     ...balance,
-    available: result.updatedReferrerBalance,
+    available: result.balance.available,
   }),
   target: $balanceDetailed,
 })
