@@ -1,8 +1,12 @@
-import { createEffect, createEvent, restore, sample } from 'effector'
+import { createEffect, createEvent, createStore, sample } from 'effector'
 import { interval } from 'patronum'
 import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
+
+const ALPHA = 0.25 // Smoothing factor
+const OUTLIER_MULTIPLIER = 0.4
+const SPIKE_LIMIT = 2
 
 const pingFx = createApiEffect('query', gamesApi.games.ping.$get)
 
@@ -15,7 +19,9 @@ const measurePingFx = createEffect(async () => {
 const initialize = createEvent()
 const reset = createEvent()
 
-const $ping = restore(measurePingFx, -1)
+const $ping = createStore(-1).reset(reset)
+const $minPing = createStore(-1).reset(reset)
+const $spikeCount = createStore(0).reset(reset)
 
 const { tick } = interval({
   start: initialize,
@@ -27,6 +33,55 @@ const { tick } = interval({
 sample({
   clock: tick,
   target: measurePingFx,
+})
+
+const updated = sample({
+  clock: measurePingFx.doneData,
+  source: {
+    ping: $ping,
+    minPing: $minPing,
+    spikeCount: $spikeCount,
+  },
+  fn: ({ ping, minPing, spikeCount }, nextPing) => {
+    if (ping === -1) {
+      return { ping: nextPing, minPing: nextPing, spikeCount }
+    }
+
+    const upperThreshold = ping * OUTLIER_MULTIPLIER
+    const lowerThreshold = minPing * OUTLIER_MULTIPLIER
+    const diff = Math.abs(nextPing - ping)
+
+    if (diff > Math.max(upperThreshold, lowerThreshold)) {
+      spikeCount += 1
+    } else {
+      spikeCount = 0
+    }
+
+    if (spikeCount >= SPIKE_LIMIT) {
+      ping = nextPing
+      spikeCount = 0
+    } else if (diff > Math.max(upperThreshold, lowerThreshold) * 2) {
+      ping = nextPing
+    } else {
+      ping = nextPing * ALPHA + (1 - ALPHA) * ping
+    }
+
+    minPing = Math.min(minPing, nextPing)
+
+    return { ping, minPing, spikeCount }
+  },
+})
+
+sample({
+  source: updated,
+  fn: (updates) => updates.ping,
+  target: $ping,
+})
+
+sample({
+  source: updated,
+  fn: (updates) => updates.spikeCount,
+  target: $spikeCount,
 })
 
 gamesWs.on('connect', () => initialize())
