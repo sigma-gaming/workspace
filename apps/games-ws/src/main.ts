@@ -9,11 +9,13 @@ import {
   sessionService,
 } from '@games/services'
 import { parse } from 'cookie'
+import { Socket } from 'socket.io'
 import { App, SSLApp } from 'uWebSockets.js'
 import { env } from './env'
 import { io } from './io'
+import { metrics, registry, UserType } from './metrics'
 import { startLastWinsBroadcast } from './processes/last-wins'
-import { userRoom } from './shared/rooms/user'
+import { ipRoom, userRoom } from './shared/rooms'
 import { sendToAllLocal, sendToUser, sendToUserOptimized } from './shared/send'
 
 const app = env.isDev
@@ -25,13 +27,48 @@ const app = env.isDev
 
 io.attachApp(app)
 
+function getUserIp(socket: Socket) {
+  const cfIp = socket.handshake.headers['cf-connecting-ip']
+  if (cfIp) return String(cfIp)
+  const forwardedFor = socket.handshake.headers['x-forwarded-for']
+  if (forwardedFor) {
+    const first = String(forwardedFor).split(',', 1)[0]?.trim()
+    if (first) return first
+  }
+  return socket.handshake.address
+}
+
 io.on('connection', async (socket) => {
   const cookie = parse(socket.handshake.headers.cookie ?? '')
   const { session } = await sessionService.getSessionSafe(cookie.session_id)
 
-  if (session) {
-    socket.join(userRoom(session.userId))
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const user_type = session ? UserType.Authenticated : UserType.Guest
+
+  /**
+   * For guests we use IP room to track unique guest count
+   */
+  const room = session ? userRoom(session.userId) : ipRoom(getUserIp(socket))
+
+  socket.join(room)
+
+  metrics.connectionsGauge.inc({ user_type })
+
+  const members = io.sockets.adapter.rooms.get(room)?.size ?? 0
+
+  if (members === 1) {
+    metrics.onlineUsersGauge.inc({ user_type })
   }
+
+  socket.on('disconnect', () => {
+    metrics.connectionsGauge.dec({ user_type })
+
+    const members = io.sockets.adapter.rooms.get(room)?.size ?? 0
+
+    if (members === 0) {
+      metrics.onlineUsersGauge.dec({ user_type })
+    }
+  })
 })
 
 /**
@@ -118,6 +155,43 @@ internalApp.get('/ready', async (res) => {
   wrapReply(() => {
     res.writeStatus('200 OK').end('Yes')
   })
+})
+
+internalApp.get('/metrics', async (res) => {
+  let replied = false
+
+  res.onAborted(() => {
+    res.writeStatus('503 Service Unavailable').end()
+    replied = true
+  })
+
+  const wrapReply = (callback: () => void) => {
+    if (replied) {
+      return
+    }
+
+    res.cork(() => {
+      callback()
+      replied = true
+    })
+  }
+
+  try {
+    // Получаем метрики из prom-client
+    const metrics = await registry.metrics()
+
+    wrapReply(() => {
+      res.writeHeader('Content-Type', registry.contentType).end(metrics)
+    })
+  } catch (error) {
+    logger.error('Error generating metrics:', error)
+
+    wrapReply(() => {
+      res
+        .writeStatus('500 Internal Server Error')
+        .end('Failed to generate metrics')
+    })
+  }
 })
 
 app.listen(env.ports.public, (token) => {

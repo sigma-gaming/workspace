@@ -116,7 +116,7 @@ export const form = createForm({
 const $possibleWinAmount = combine(
   fields.bet.$value,
   fields.sides.$value.map((sides) => sides.map(Number)),
-  (bet, sides) => calculateDiceFullWinAmount(bet, sides),
+  (bet, sides) => calculateDiceFullWinAmount(bet, new Set(sides)),
 )
 
 sample({

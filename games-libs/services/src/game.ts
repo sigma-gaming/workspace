@@ -8,6 +8,7 @@ import {
   Game,
   GameOutcome,
   GameSnapshot,
+  SnapshotByGame,
   TransactionType,
 } from '@dbs/games-types'
 import { gamesDb } from '@games/services'
@@ -29,10 +30,11 @@ type SaveGamePayload = {
   balance: BalanceSelect
 }
 
-type GameRunnerResult = {
-  snapshot: GameSnapshot
-  outcome: GameOutcome
+type GameRunnerResult<T extends Game> = {
+  game: T
   payout: number
+  outcome: GameOutcome
+  snapshot: SnapshotByGame<T>
 }
 
 const outcomeToTypeMap: Record<GameOutcome, TransactionType> = {
@@ -49,13 +51,16 @@ export class GameService {
     return record ?? null
   }
 
-  runGame = async ({
+  runGame = async <
+    G extends Game,
+    R extends GameRunnerResult<G> = GameRunnerResult<G>,
+  >({
     runner,
     minPayout = 0,
   }: {
-    runner: () => GameRunnerResult | Promise<GameRunnerResult>
+    runner: () => R | Promise<R>
     minPayout?: number
-  }): Promise<GameRunnerResult> => {
+  }): Promise<R> => {
     const availableBudget = await budgetService.getAvailable()
 
     if (minPayout > availableBudget) {

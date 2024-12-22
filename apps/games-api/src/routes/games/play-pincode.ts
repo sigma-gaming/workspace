@@ -3,6 +3,7 @@ import { Engine, PincodePayloadSchema } from '@games/engine'
 import { BalanceUpdate, UpdateMode } from '@games/model'
 import { gamesPubsubs, sessionService } from '@games/services'
 import { createRouter } from '../../app/router'
+import { updateBetMetrics } from '../../metrics'
 
 export const playPincode = createRouter().post(
   '/',
@@ -16,6 +17,8 @@ export const playPincode = createRouter().post(
       userId,
       payload,
     })
+
+    updateBetMetrics(record)
 
     const balance: BalanceUpdate = {
       time: Date.now(),

@@ -38,6 +38,7 @@ export async function playPincode({
         const payout = outcome === GameOutcome.Win ? winAmount : -bet
 
         return {
+          game: Game.Pincode,
           outcome,
           payout,
           snapshot: {

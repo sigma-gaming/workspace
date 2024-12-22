@@ -1,8 +1,10 @@
 import { limitByIp, zValidator } from '@core/server'
+import { GameSnapshotDice } from '@dbs/games-types'
 import { DicePayloadSchema, Engine } from '@games/engine'
 import { BalanceUpdate, UpdateMode } from '@games/model'
 import { gamesPubsubs, sessionService } from '@games/services'
 import { createRouter } from '../../app/router'
+import { metrics, updateBetMetrics } from '../../metrics'
 
 export const playDice = createRouter().post(
   '/',
@@ -16,6 +18,12 @@ export const playDice = createRouter().post(
       userId,
       payload,
     })
+
+    updateBetMetrics(record)
+
+    metrics.diceSidesHistogram.observe(
+      (record.snapshot as GameSnapshotDice).inputSides.length,
+    )
 
     const balance: BalanceUpdate = {
       time: Date.now(),

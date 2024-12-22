@@ -20,6 +20,11 @@ export type GameSnapshotPincode = {
 
 export type GameSnapshot = GameSnapshotDice | GameSnapshotPincode
 
+export type SnapshotByGame<T extends Game> = {
+  [Game.Dice]: GameSnapshotDice
+  [Game.Pincode]: GameSnapshotPincode
+}[T]
+
 export type ChatMessageAttachmentGame = {
   type: ChatMessageAttachmentType.Game
   gameRecordId: number

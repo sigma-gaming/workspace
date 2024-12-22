@@ -2,7 +2,7 @@ import { BadRequestException } from '@core/exceptions'
 import { takeFirstOrThrow } from '@core/utils'
 import { BalanceTable } from '@dbs/games-schema'
 import { Game, GameOutcome } from '@dbs/games-types'
-import { calculateDiceWinAmount } from '@games/model'
+import { calculateDiceMultiplier, calculateDiceWinAmount } from '@games/model'
 import { gamesDb, gameService } from '@games/services'
 import { eq } from 'drizzle-orm'
 import crypto from 'node:crypto'
@@ -12,7 +12,7 @@ export async function playDice({
   userId,
   payload,
 }: PlayDiceInput): Promise<PlayDiceOutput> {
-  const { bet, sides } = payload
+  const { bet, sides: sidesRaw } = payload
 
   return gamesDb.transaction(async (tx) => {
     const balance = await tx
@@ -31,21 +31,25 @@ export async function playDice({
 
     const { payout, outcome, snapshot } = await gameService.runGame({
       runner: () => {
-        const uniqueSides = new Set(sides)
-        const winAmount = calculateDiceWinAmount(bet, sides)
+        const sides = new Set(sidesRaw)
+        const multiplier = calculateDiceMultiplier(sides)
+        const winAmount = calculateDiceWinAmount(bet, sides, multiplier)
 
         const side = crypto.randomInt(1, 7)
 
-        const outcome = uniqueSides.has(side)
-          ? GameOutcome.Win
-          : GameOutcome.Loss
+        const outcome = sides.has(side) ? GameOutcome.Win : GameOutcome.Loss
 
         const payout = outcome === GameOutcome.Win ? winAmount : -bet
 
         return {
+          game: Game.Dice,
           outcome,
           payout,
-          snapshot: { game: Game.Dice, inputSides: sides, outputSide: side },
+          snapshot: {
+            game: Game.Dice,
+            inputSides: Array.from(sides),
+            outputSide: side,
+          },
         }
       },
     })
