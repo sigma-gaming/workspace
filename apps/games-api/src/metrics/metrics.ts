@@ -25,7 +25,14 @@ export const diceSidesHistogram = new Histogram({
   buckets: [1, 2, 3, 4, 5],
 })
 
+export const pincodeGamesCounter = new Counter({
+  name: 'games_api_pincode_games',
+  help: 'Amount of pincode games',
+  labelNames: ['mode'],
+})
+
 registry.registerMetric(betsAmountCounter)
 registry.registerMetric(winsAmountCounter)
 registry.registerMetric(lossesAmountCounter)
 registry.registerMetric(diceSidesHistogram)
+registry.registerMetric(pincodeGamesCounter)
