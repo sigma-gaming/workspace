@@ -9,6 +9,7 @@ import { serverEnv } from '../shared/env/server'
 
 registerOptions(GamesDbOptionsToken, {
   url: serverEnv.gamesDb.url,
+  healthUrl: serverEnv.gamesDb.healthUrl,
   logger: serverEnv.isDev,
 })
 

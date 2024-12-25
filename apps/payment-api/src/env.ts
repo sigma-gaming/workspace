@@ -13,6 +13,7 @@ const EnvSchema = z
     PAYMENT_API_VERSION: z.string().default('unknown'),
 
     GAMES_DB_HOST: z.string(),
+    GAMES_DB_HEALTH_HOST: z.string(),
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
@@ -34,6 +35,7 @@ const EnvSchema = z
 
     gamesDb: {
       url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
+      healthUrl: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HEALTH_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
     },
 
     gamesCache: {

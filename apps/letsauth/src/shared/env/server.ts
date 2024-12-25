@@ -14,6 +14,7 @@ const ServerEnvSchema = z
     JWT_SECRET: z.string(),
 
     GAMES_DB_HOST: z.string(),
+    GAMES_DB_HEALTH_HOST: z.string(),
     GAMES_DB_DATABASE: z.string().default('postgres'),
     GAMES_DB_USER: z.string(),
     GAMES_DB_PASSWORD: z.string(),
@@ -33,6 +34,7 @@ const ServerEnvSchema = z
 
     gamesDb: {
       url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
+      healthUrl: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HEALTH_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
     },
 
     gamesCache: {
