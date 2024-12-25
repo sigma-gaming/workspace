@@ -13,7 +13,7 @@ export class GamesDbService extends Shutdownable {
   constructor() {
     super()
     const { url, logger, poolSize = 10 } = resolveOptions(GamesDbOptionsToken)
-    this.client = postgres(url, { max: poolSize })
+    this.client = postgres(url, { max: poolSize, prepare: false })
     this.db = drizzle(this.client, { schema, logger })
   }
 
