@@ -12,7 +12,7 @@ const EnvSchema = z
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-    JWT_SECRET: z.string(),
+    GAMES_API_GAMES_DB_MAX_POOL_SIZE: z.coerce.number(),
 
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
@@ -22,6 +22,8 @@ const EnvSchema = z
 
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
+
+    JWT_SECRET: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
@@ -47,6 +49,7 @@ const EnvSchema = z
     gamesDb: {
       url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
       healthUrl: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HEALTH_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
+      maxPoolSize: raw.GAMES_API_GAMES_DB_MAX_POOL_SIZE,
     },
 
     gamesCache: {
