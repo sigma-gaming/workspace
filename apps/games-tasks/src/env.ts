@@ -24,7 +24,7 @@ const EnvSchema = z
     BOVAPAY_API_KEY: z.string(),
     BOVAPAY_CALLBACK_URL: z.string(),
 
-    PUSHGATEWAY_URL: z.string().optional(),
+    METRICS_PUSHGATEWAY_URL: z.string().optional(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
@@ -65,7 +65,7 @@ const EnvSchema = z
     },
 
     metrics: {
-      pushgatewayUrl: raw.PUSHGATEWAY_URL,
+      pushgatewayUrl: raw.METRICS_PUSHGATEWAY_URL,
     },
   }))
 
