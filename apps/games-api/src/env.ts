@@ -12,7 +12,7 @@ const EnvSchema = z
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-    GAMES_API_GAMES_DB_MAX_POOL_SIZE: z.coerce.number(),
+    GAMES_API_GAMES_DB_MAX_POOL_SIZE: z.coerce.number().default(10),
 
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),

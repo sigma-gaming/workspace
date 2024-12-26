@@ -232,8 +232,3 @@ export function getPincodeHighlight(mode: PincodeMode, code: number) {
     hasBit(bitmask, 3),
   ] as const
 }
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export const __ = {
-  config,
-}

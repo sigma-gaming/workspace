@@ -1,5 +1,5 @@
 import { retry } from '@core/flow'
-import { logger as coreLogger } from '@core/logger'
+import { Logger, logger as coreLogger } from '@core/logger'
 import { maintenanceService } from '@games/services'
 
 export type Job = {
@@ -22,7 +22,7 @@ export function createJob({
   runOnInit?: boolean
   maxAttempts?: number
   delay?: number
-  handler: () => Promise<void>
+  handler: (context: { logger: Logger }) => Promise<void>
 }): Job {
   const logger = coreLogger.child('Jobs').child(name)
 
@@ -36,7 +36,7 @@ export function createJob({
     }
 
     const result = await retry({
-      fn: handler,
+      fn: () => handler({ logger }),
       maxAttempts,
       delay,
     })
