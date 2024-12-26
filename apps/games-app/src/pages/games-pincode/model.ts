@@ -1,15 +1,9 @@
 import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { GameRecordSelect } from '@dbs/games-schema'
-import { Game, GameOutcome } from '@dbs/games-types'
+import { Game, GameOutcome, PincodeMode } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import {
-  clampBet,
-  gemFloat,
-  gemInt,
-  getPincodeCombination,
-  PincodeMode,
-} from '@games/model'
+import { clampBet, gemFloat, gemInt, getPincodeCombination } from '@games/model'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'

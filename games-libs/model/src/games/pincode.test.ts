@@ -1,5 +1,6 @@
+import { PincodeMode } from '@dbs/games-types'
 import { describe, expect, test } from 'vitest'
-import { __, getPincodeMultiplier, PincodeMode } from './pincode'
+import { __, getPincodeMultiplier } from './pincode'
 
 function calculateTotalMultiplier(mode: PincodeMode) {
   let total = 0

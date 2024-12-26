@@ -18,6 +18,137 @@ import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { createRouter } from '../../../app/router'
 
+const checkers: Record<GlobalTaskKey, GlobalTaskChecker> = {
+  [GlobalTaskKey.TelegramGroupSubscribe]: async (userId, { requirements }) => {
+    if (requirements.type !== GlobalTaskKey.TelegramGroupSubscribe)
+      return {
+        completed: false,
+        message:
+          'Не удалось проверить задание.' +
+          ' Попробуйте ещё раз или напишите в поддержку',
+      }
+
+    const account = await gamesDb.query.AccountTable.findFirst({
+      where: and(
+        eq(AccountTable.provider, AccountProvider.Telegram),
+        eq(AccountTable.userId, userId),
+      ),
+    })
+
+    if (!account)
+      return {
+        completed: false,
+        message: 'Для начала нужно привязать аккаунт Telegram',
+      }
+
+    const { providerUserId } = account
+
+    const subscribed = await telegramBotService.checkSubscription(
+      Number(providerUserId),
+      requirements.groupId,
+    )
+
+    return { completed: subscribed }
+  },
+  [GlobalTaskKey.VkGroupSubscribe]: async (userId, { requirements }) => {
+    if (requirements.type !== GlobalTaskKey.VkGroupSubscribe)
+      return {
+        completed: false,
+        message:
+          'Не удалось проверить задание.' +
+          ' Попробуйте ещё раз или напишите в поддержку',
+      }
+
+    const account = await gamesDb.query.AccountTable.findFirst({
+      where: and(
+        eq(AccountTable.provider, AccountProvider.VK),
+        eq(AccountTable.userId, userId),
+      ),
+    })
+
+    if (!account)
+      return {
+        completed: false,
+        message: 'Для начала нужно привязать аккаунт VK',
+      }
+
+    const { providerUserId } = account
+
+    const subscribed = await vkService.checkSubscription(
+      Number(providerUserId),
+      requirements.groupId,
+    )
+
+    return { completed: subscribed }
+  },
+  [GlobalTaskKey.VkPinnedRepost]: async (userId, { requirements }) => {
+    if (requirements.type !== GlobalTaskKey.VkPinnedRepost)
+      return {
+        completed: false,
+        message:
+          'Не удалось проверить задание.' +
+          ' Попробуйте ещё раз или напишите в поддержку',
+      }
+
+    const account = await gamesDb.query.AccountTable.findFirst({
+      where: and(
+        eq(AccountTable.provider, AccountProvider.VK),
+        eq(AccountTable.userId, userId),
+      ),
+    })
+
+    if (!account)
+      return {
+        completed: false,
+        message: 'Для начала нужно привязать аккаунт VK',
+      }
+
+    const { providerUserId } = account
+
+    const repostStatus = await vkService.getRepostStatus(
+      Number(providerUserId),
+      requirements.groupId,
+      requirements.postId,
+    )
+
+    if (repostStatus === RepostStatus.Reposted) {
+      return { completed: true }
+    }
+
+    if (repostStatus === RepostStatus.NotFound) {
+      return { completed: false }
+    }
+
+    if (repostStatus === RepostStatus.WallNotAvailable) {
+      return {
+        completed: false,
+        message: 'Ваш профиль VK и/или стена закрыты',
+      }
+    }
+
+    if (repostStatus === RepostStatus.TooManyRequests) {
+      return {
+        completed: false,
+        message: 'Сейчас мы не можем проверить задание, попробуйте позже',
+      }
+    }
+
+    if (repostStatus === RepostStatus.ProfileDeleted) {
+      return {
+        completed: false,
+        message: 'Ваша страница VK удалена или заморожена',
+      }
+    }
+
+    return {
+      completed: false,
+      message:
+        'Не удалось проверить задание.' +
+        ' Попробуйте ещё раз или напишите в поддержку',
+    }
+  },
+}
+
 export const completeRoute = createRouter().post(
   '/',
   limitByIp({ limit: 5, windowMs: 60 * 1000 }),
@@ -30,137 +161,6 @@ export const completeRoute = createRouter().post(
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)
     const { taskKey } = ctx.req.valid('json')
-
-    const checkers: Record<GlobalTaskKey, GlobalTaskChecker> = {
-      [GlobalTaskKey.TelegramGroupSubscribe]: async ({ requirements }) => {
-        if (requirements.type !== GlobalTaskKey.TelegramGroupSubscribe)
-          return {
-            completed: false,
-            message:
-              'Не удалось проверить задание.' +
-              ' Попробуйте ещё раз или напишите в поддержку',
-          }
-
-        const account = await gamesDb.query.AccountTable.findFirst({
-          where: and(
-            eq(AccountTable.provider, AccountProvider.Telegram),
-            eq(AccountTable.userId, userId),
-          ),
-        })
-
-        if (!account)
-          return {
-            completed: false,
-            message: 'Для начала нужно привязать аккаунт Telegram',
-          }
-
-        const { providerUserId } = account
-
-        const subscribed = await telegramBotService.checkSubscription(
-          Number(providerUserId),
-          requirements.groupId,
-        )
-
-        return { completed: subscribed }
-      },
-      [GlobalTaskKey.VkGroupSubscribe]: async ({ requirements }) => {
-        if (requirements.type !== GlobalTaskKey.VkGroupSubscribe)
-          return {
-            completed: false,
-            message:
-              'Не удалось проверить задание.' +
-              ' Попробуйте ещё раз или напишите в поддержку',
-          }
-
-        const account = await gamesDb.query.AccountTable.findFirst({
-          where: and(
-            eq(AccountTable.provider, AccountProvider.VK),
-            eq(AccountTable.userId, userId),
-          ),
-        })
-
-        if (!account)
-          return {
-            completed: false,
-            message: 'Для начала нужно привязать аккаунт VK',
-          }
-
-        const { providerUserId } = account
-
-        const subscribed = await vkService.checkSubscription(
-          Number(providerUserId),
-          requirements.groupId,
-        )
-
-        return { completed: subscribed }
-      },
-      [GlobalTaskKey.VkPinnedRepost]: async ({ requirements }) => {
-        if (requirements.type !== GlobalTaskKey.VkPinnedRepost)
-          return {
-            completed: false,
-            message:
-              'Не удалось проверить задание.' +
-              ' Попробуйте ещё раз или напишите в поддержку',
-          }
-
-        const account = await gamesDb.query.AccountTable.findFirst({
-          where: and(
-            eq(AccountTable.provider, AccountProvider.VK),
-            eq(AccountTable.userId, userId),
-          ),
-        })
-
-        if (!account)
-          return {
-            completed: false,
-            message: 'Для начала нужно привязать аккаунт VK',
-          }
-
-        const { providerUserId } = account
-
-        const repostStatus = await vkService.getRepostStatus(
-          Number(providerUserId),
-          requirements.groupId,
-          requirements.postId,
-        )
-
-        if (repostStatus === RepostStatus.Reposted) {
-          return { completed: true }
-        }
-
-        if (repostStatus === RepostStatus.NotFound) {
-          return { completed: false }
-        }
-
-        if (repostStatus === RepostStatus.WallNotAvailable) {
-          return {
-            completed: false,
-            message: 'Ваш профиль VK и/или стена закрыты',
-          }
-        }
-
-        if (repostStatus === RepostStatus.TooManyRequests) {
-          return {
-            completed: false,
-            message: 'Сейчас мы не можем проверить задание, попробуйте позже',
-          }
-        }
-
-        if (repostStatus === RepostStatus.ProfileDeleted) {
-          return {
-            completed: false,
-            message: 'Ваша страница VK удалена или заморожена',
-          }
-        }
-
-        return {
-          completed: false,
-          message:
-            'Не удалось проверить задание.' +
-            ' Попробуйте ещё раз или напишите в поддержку',
-        }
-      },
-    }
 
     const completion = await globalTaskService.completeTask({
       userId,

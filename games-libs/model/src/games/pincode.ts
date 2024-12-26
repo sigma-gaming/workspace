@@ -1,10 +1,7 @@
-export const PINCODE_RTP = 0.95
-
 /* eslint-disable no-bitwise */
-export enum PincodeMode {
-  Easy = 'easy',
-  Hardcore = 'hardcore',
-}
+import { PincodeMode } from '@dbs/games-types'
+
+export const PINCODE_RTP = 0.95
 
 type PincodeConfig = {
   [Mode in PincodeMode]: {

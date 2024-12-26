@@ -54,7 +54,10 @@ type GlobalTaskClaimRewardOutput =
       >
     }
 
-export type GlobalTaskChecker = (task: GlobalTaskSelect) => Promise<
+export type GlobalTaskChecker = (
+  userId: string,
+  task: GlobalTaskSelect,
+) => Promise<
   | {
       completed: true
     }
@@ -192,7 +195,7 @@ export class GlobalTaskService {
             return { outcome: GlobalTaskCompleteOutcome.NotActive }
           }
 
-          const check = await checker(task)
+          const check = await checker(userId, task)
 
           if (!check.completed)
             return {

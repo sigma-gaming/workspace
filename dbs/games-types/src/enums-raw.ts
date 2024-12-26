@@ -36,6 +36,11 @@ export enum GameOutcome {
   Loss = 'Loss',
 }
 
+export enum PincodeMode {
+  Easy = 'easy',
+  Hardcore = 'hardcore',
+}
+
 export enum NotificationKind {
   Success = 'Success',
   Info = 'Info',

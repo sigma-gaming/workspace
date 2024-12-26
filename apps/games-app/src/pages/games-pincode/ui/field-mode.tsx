@@ -1,4 +1,4 @@
-import { PincodeMode } from '@games/model'
+import { PincodeMode } from '@dbs/games-types'
 import { Input, SegmentedControl, SegmentedControlItem } from '@mantine/core'
 import { IconBabyCarriage, IconFlame } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'

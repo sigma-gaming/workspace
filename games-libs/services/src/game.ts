@@ -8,6 +8,7 @@ import {
   Game,
   GameOutcome,
   GameSnapshot,
+  PincodeMode,
   SnapshotByGame,
   TransactionType,
 } from '@dbs/games-types'
@@ -49,6 +50,25 @@ export class GameService {
     })
 
     return record ?? null
+  }
+
+  calculateWageringMultiplier = (snapshot: GameSnapshot): number => {
+    if (snapshot.game === Game.Dice) {
+      const sides = snapshot.inputSides.length
+      return (6 / sides - 1) / 5
+    }
+
+    if (snapshot.game === Game.Pincode) {
+      return snapshot.mode === PincodeMode.Easy ? 0.75 : 1
+    }
+
+    return 1
+  }
+
+  calculateWageringChange = (bet: number, snapshot: GameSnapshot): number => {
+    const multiplier = this.calculateWageringMultiplier(snapshot)
+
+    return Math.ceil(-bet * multiplier)
   }
 
   runGame = async <
@@ -120,12 +140,14 @@ export class GameService {
         .returning()
         .then(takeFirstOrThrow)
 
+      const wageringChange = this.calculateWageringChange(bet, snapshot)
+
       const updatedBalance = await balanceService.updateBalance({
         tx,
         balance,
         transaction,
         gameRecord,
-        wageringChange: -bet,
+        wageringChange,
       })
 
       await tx

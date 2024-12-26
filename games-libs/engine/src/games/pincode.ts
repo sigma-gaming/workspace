@@ -43,6 +43,7 @@ export async function playPincode({
           payout,
           snapshot: {
             game: Game.Pincode,
+            mode,
             outputNumber: number,
           },
         }

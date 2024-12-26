@@ -1,5 +1,6 @@
 import { GameRecordSelect } from '@dbs/games-schema'
-import { gemInt, PincodeMode } from '@games/model'
+import { PincodeMode } from '@dbs/games-types'
+import { gemInt } from '@games/model'
 import { z } from 'zod'
 
 export const PincodePayloadSchema = z.strictObject({

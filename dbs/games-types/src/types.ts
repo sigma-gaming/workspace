@@ -4,6 +4,7 @@ import {
   DepositType,
   Game,
   GlobalTaskKey,
+  PincodeMode,
   PromocodeBonusType,
 } from './enums-raw'
 
@@ -15,6 +16,7 @@ export type GameSnapshotDice = {
 
 export type GameSnapshotPincode = {
   game: Game.Pincode
+  mode: PincodeMode
   outputNumber: number
 }
 
