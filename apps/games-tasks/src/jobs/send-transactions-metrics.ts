@@ -58,10 +58,15 @@ export const sendTransactionsMetricsJob = createJob({
       labelNames: ['game'],
     })
 
+    logger.info(`Budget: ${budget}`)
     budgetGauge.set(budget)
 
     for (const { game, maxAmount, totalAmount, count } of stats) {
       if (!game) continue
+      logger.info(`Setting metrics for game ${game}`)
+      logger.info(`Max amount: ${maxAmount}`)
+      logger.info(`Total amount: ${totalAmount}`)
+      logger.info(`Count: ${count}`)
       maxAmountGauge.set({ game }, maxAmount)
       totalAmountGauge.set({ game }, totalAmount)
       transactionsCountGauge.set({ game }, count)
