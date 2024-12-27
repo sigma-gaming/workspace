@@ -4,6 +4,7 @@ import { maintenanceService } from '@games/services'
 
 export type Job = {
   name: string
+  enabled: boolean
   cronTime: string
   runOnInit: boolean
   onTick: () => Promise<void>
@@ -11,6 +12,7 @@ export type Job = {
 
 export function createJob({
   name,
+  enabled = true,
   cronTime,
   runOnInit = true,
   maxAttempts = 5,
@@ -18,6 +20,7 @@ export function createJob({
   handler,
 }: {
   name: string
+  enabled?: boolean
   cronTime: string
   runOnInit?: boolean
   maxAttempts?: number
@@ -49,5 +52,5 @@ export function createJob({
     }
   }
 
-  return { name, cronTime, runOnInit, onTick }
+  return { name, enabled, cronTime, runOnInit, onTick }
 }

@@ -4,6 +4,7 @@ import { Redis } from 'ioredis'
 export type RedisOptions = {
   host: string
   password: string
+  port?: number
   lazyConnect?: boolean
 }
 
@@ -15,6 +16,7 @@ export class RedisService {
     this.redis = new Redis({
       host: options.host,
       password: options.password,
+      port: options.port ?? 6379,
       lazyConnect: options.lazyConnect,
     })
 

@@ -24,6 +24,7 @@ const EnvSchema = z
     GAMES_CACHE_PASSWORD: z.string(),
 
     JWT_SECRET: z.string(),
+    BYPASS_RATE_LIMIT_TOKEN: z.string().optional(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
@@ -68,6 +69,10 @@ const EnvSchema = z
 
     jwt: {
       secret: raw.JWT_SECRET,
+    },
+
+    rateLimit: {
+      bypassToken: raw.BYPASS_RATE_LIMIT_TOKEN,
     },
 
     telegram: {

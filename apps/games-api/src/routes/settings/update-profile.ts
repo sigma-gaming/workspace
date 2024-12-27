@@ -1,5 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { AccountTable, ProfileTable, ProfileUpdate } from '@dbs/games-schema'
 import { AccountProvider, UserRole } from '@dbs/games-types'
 import { getUserFullName, ProfileValidation } from '@games/model'
@@ -14,6 +14,7 @@ import {
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { createRouter } from '../../app/router'
+import { limitByIp } from '../../middlewares/rate-limit'
 
 const reservedUsernames = [
   'sigma',

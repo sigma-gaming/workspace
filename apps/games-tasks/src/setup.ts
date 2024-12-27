@@ -11,6 +11,7 @@ registerOptions(GamesDbOptionsToken, {
   url: env.gamesDb.url,
   logger: env.isDev,
   poolSize: 5,
+  mode: env.isDev ? 'session' : 'transaction',
 })
 
 registerOptions(GamesRedisOptionsToken, {

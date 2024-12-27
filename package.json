@@ -99,7 +99,6 @@
     "@anatine/esbuild-decorators": "^0.2.19",
     "@astrojs/tailwind": "^5.1.2",
     "@changesets/cli": "^2.27.1",
-    "@fastify/vite": "^5.0.4",
     "@floating-ui/react": "^0.26.20",
     "@nx/js": "17.0.2",
     "@nx/workspace": "17.0.2",

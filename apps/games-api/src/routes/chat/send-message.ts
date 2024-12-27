@@ -1,7 +1,8 @@
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { ChatValidation } from '@games/model'
 import { chatService, sessionService } from '@games/services'
 import { createRouter } from '../../app/router'
+import { limitByIp } from '../../middlewares/rate-limit'
 
 export const sendMessageRoute = createRouter().post(
   '/',

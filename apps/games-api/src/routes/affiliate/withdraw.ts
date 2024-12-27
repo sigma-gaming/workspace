@@ -1,5 +1,4 @@
 import { BadRequestException } from '@core/exceptions'
-import { limitByIp } from '@core/server'
 import { takeFirstOrThrow } from '@core/utils'
 import { BalanceTable, ReferrerBalanceTable } from '@dbs/games-schema'
 import { TransactionType } from '@dbs/games-types'
@@ -14,6 +13,7 @@ import {
 } from '@games/services'
 import { eq } from 'drizzle-orm'
 import { createRouter } from '../../app/router'
+import { limitByIp } from '../../middlewares/rate-limit'
 
 export const withdrawRoute = createRouter().post(
   '/',

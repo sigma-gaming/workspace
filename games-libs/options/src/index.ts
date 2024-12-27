@@ -21,6 +21,7 @@ export const GamesDbOptionsToken =
 export type GamesRedisOptions = {
   host: string
   password: string
+  port?: number
 }
 
 export const GamesRedisOptionsToken =

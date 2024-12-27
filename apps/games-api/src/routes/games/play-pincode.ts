@@ -1,9 +1,10 @@
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { Engine, PincodePayloadSchema } from '@games/engine'
 import { BalanceUpdate, UpdateMode } from '@games/model'
 import { gamesPubsubs, sessionService } from '@games/services'
 import { createRouter } from '../../app/router'
 import { metrics, updateBetMetrics } from '../../metrics'
+import { limitByIp } from '../../middlewares/rate-limit'
 
 export const playPincode = createRouter().post(
   '/',

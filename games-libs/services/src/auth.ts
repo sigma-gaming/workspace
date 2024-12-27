@@ -35,6 +35,7 @@ export type AuthenticatePayload = {
   providerUserLastName?: string
   providerUserImage?: string
   referralCampaignCode?: string
+  virtual?: boolean
 }
 
 type AuthenticateOutput =
@@ -54,6 +55,7 @@ export class AuthService {
     providerUserLastName,
     providerUserImage,
     referralCampaignCode,
+    virtual,
   }: AuthenticatePayload): Promise<AuthenticateOutput> {
     const account = await gamesDb.query.AccountTable.findFirst({
       where: and(
@@ -167,7 +169,7 @@ export class AuthService {
       async (tx) => {
         const createdUser = await tx
           .insert(UserTable)
-          .values({ referrerId, referralCampaignId })
+          .values({ referrerId, referralCampaignId, virtual })
           .returning()
           .then(takeFirstOrThrow)
 

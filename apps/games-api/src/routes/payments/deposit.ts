@@ -1,10 +1,11 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { Currency, DepositMethod, PaymentProvider } from '@dbs/games-types'
 import { gemInt } from '@games/model'
 import { PaymentOutcome, paymentService, sessionService } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../../app/router'
+import { limitByIp } from '../../middlewares/rate-limit'
 
 const PayloadSchema = z.object({
   gemAmount: z.number().min(gemInt(1)),

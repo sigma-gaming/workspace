@@ -9,6 +9,7 @@ import { env } from './env'
 registerOptions(GamesDbOptionsToken, {
   url: env.gamesDb.url,
   healthUrl: env.gamesDb.healthUrl,
+  mode: env.isDev ? 'session' : 'transaction',
   logger: env.isDev,
 })
 

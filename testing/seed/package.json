@@ -1,0 +1,28 @@
+{
+  "name": "@testing/seed",
+  "version": "0.0.0-internal",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "users": "tsx src/users.ts",
+    "sessions": "tsx src/sessions.ts",
+    "balances": "tsx src/balances.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint:fix": "pnpm lint --fix"
+  },
+  "dependencies": {
+    "@games/options": "workspace:*",
+    "@dbs/games-db": "workspace:*",
+    "@dbs/games-schema": "workspace:*",
+    "@games/model": "workspace:*",
+    "@games/redis": "workspace:*",
+    "@core/di": "workspace:*",
+    "@core/logger": "workspace:*",
+    "@games/services": "workspace:*"
+  },
+  "devDependencies": {
+    "@core/server": "workspace:*",
+    "@faker-js/faker": "9.3.0"
+  }
+}

@@ -7,8 +7,13 @@ import { createJob } from '../shared/jobs'
 
 export const sendTransactionsMetricsJob = createJob({
   name: 'SendTransactionsMetrics',
+  enabled: Boolean(env.metrics.pushgatewayUrl),
   cronTime: '*/5 * * * *', // every 5 minutes
   handler: async ({ logger }) => {
+    if (!env.metrics.pushgatewayUrl) {
+      return
+    }
+
     const lock = await gamesCache.lastMetricsTransactionId.lock(10_000)
 
     const lastProcessedTransactionId =
@@ -72,23 +77,19 @@ export const sendTransactionsMetricsJob = createJob({
       transactionsCountGauge.set({ game }, count)
     }
 
-    if (env.metrics.pushgatewayUrl) {
-      logger.info('Pushing metrics to pushgateway')
+    logger.info('Pushing metrics to pushgateway')
 
-      const pushGateway = new Pushgateway(
-        env.metrics.pushgatewayUrl,
-        { timeout: 5_000 },
-        register,
-      )
+    const pushGateway = new Pushgateway(
+      env.metrics.pushgatewayUrl,
+      { timeout: 5_000 },
+      register,
+    )
 
-      await pushGateway.pushAdd({
-        jobName: 'send-transactions-metrics',
-      })
+    await pushGateway.pushAdd({
+      jobName: 'send-transactions-metrics',
+    })
 
-      logger.info('Metrics pushed to pushgateway')
-    } else {
-      logger.info('Pushgateway url not set, skipping')
-    }
+    logger.info('Metrics pushed to pushgateway')
 
     const maxId = stats.reduce((acc, stat) => {
       return Math.max(acc, stat.maxId)

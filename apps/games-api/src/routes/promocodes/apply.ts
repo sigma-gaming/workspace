@@ -1,5 +1,5 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { PromocodeBonusType } from '@dbs/games-types'
 import { BalanceUpdate, UpdateMode } from '@games/model'
 import {
@@ -10,6 +10,7 @@ import {
 } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../../app/router'
+import { limitByIp } from '../../middlewares/rate-limit'
 
 type FailureActivationResult = Exclude<
   PromocodeActivationOutcome,

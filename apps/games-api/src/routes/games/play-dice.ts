@@ -1,10 +1,11 @@
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { GameSnapshotDice } from '@dbs/games-types'
 import { DicePayloadSchema, Engine } from '@games/engine'
 import { BalanceUpdate, UpdateMode } from '@games/model'
 import { gamesPubsubs, sessionService } from '@games/services'
 import { createRouter } from '../../app/router'
 import { metrics, updateBetMetrics } from '../../metrics'
+import { limitByIp } from '../../middlewares/rate-limit'
 
 export const playDice = createRouter().post(
   '/',

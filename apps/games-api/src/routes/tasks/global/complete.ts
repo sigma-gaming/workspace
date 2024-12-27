@@ -1,5 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { AccountTable } from '@dbs/games-schema'
 import { AccountProvider, GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { GlobalTaskUpdate, UpdateMode } from '@games/model'
@@ -17,6 +17,7 @@ import {
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { createRouter } from '../../../app/router'
+import { limitByIp } from '../../../middlewares/rate-limit'
 
 const checkers: Record<GlobalTaskKey, GlobalTaskChecker> = {
   [GlobalTaskKey.TelegramGroupSubscribe]: async (userId, { requirements }) => {

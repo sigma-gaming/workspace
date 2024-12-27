@@ -1,0 +1,67 @@
+config:
+  target: https://api.sigma1.games
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      rampTo: 5
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 10
+      name: Ramp up load
+    - duration: 30
+      arrivalRate: 10
+      rampTo: 30
+      name: Spike phase
+  plugins:
+    apdex: {}
+  apdex:
+    threshold: 100
+  processor: "./games.ts"
+  http:
+    defaults:
+      headers:
+        x-bypass-waf: "SECRET_REMOVED"
+        x-bypass-rate-limit: "SECRET_REMOVED"
+      cookie:
+        session_id: "{{ sessionId }}"
+
+scenarios:
+  - flow:
+      - function: setSessionId
+      - parallel:
+          - get:
+              url: "/me/getUser"
+              cookie:
+                session_id: "{{ sessionId }}"
+          - get:
+              url: "/me/getDetailedBalance"
+              cookie:
+                session_id: "{{ sessionId }}"
+          - get:
+              url: "/me/getDetailedProfile"
+              cookie:
+                session_id: "{{ sessionId }}"
+          - get:
+              url: "/chat/getLastMessages"
+              cookie:
+                session_id: "{{ sessionId }}"
+          - get:
+              url: "/affiliate/isConnected"
+              cookie:
+                session_id: "{{ sessionId }}"
+          - get:
+              url: "/notifications/getActual"
+              cookie:
+                session_id: "{{ sessionId }}"
+      - loop:
+          - post:
+              url: "/games/playDice"
+              json:
+                bet: 1000
+                sides:
+                  - 1
+              cookie:
+                session_id: "{{ sessionId }}"
+          - think: 800ms
+        count: 100

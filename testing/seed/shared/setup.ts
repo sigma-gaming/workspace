@@ -9,14 +9,15 @@ import { env } from './env'
 
 registerOptions(GamesDbOptionsToken, {
   url: env.gamesDb.url,
-  healthUrl: env.gamesDb.healthUrl,
-  mode: env.isDev ? 'session' : 'transaction',
-  logger: env.isDev,
+  mode: 'transaction',
+  poolSize: 50,
+  logger: false,
 })
 
 registerOptions(GamesRedisOptionsToken, {
   host: env.gamesCache.host,
   password: env.gamesCache.password,
+  port: env.gamesCache.port,
 })
 
 registerOptions(GamesCacheOptionsToken, {
@@ -25,4 +26,8 @@ registerOptions(GamesCacheOptionsToken, {
 
 registerOptions(SessionOptionsToken, {
   jwt: { secret: env.jwt.secret },
+  cookie: {
+    idKey: 'sessionId',
+    expiresKey: 'sessionExpiresAt',
+  },
 })

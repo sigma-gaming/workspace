@@ -1,5 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { BalanceUpdate, GlobalTaskUpdate, UpdateMode } from '@games/model'
 import {
@@ -10,6 +10,7 @@ import {
 } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../../../app/router'
+import { limitByIp } from '../../../middlewares/rate-limit'
 
 export const claimRewardRoute = createRouter().post(
   '/',

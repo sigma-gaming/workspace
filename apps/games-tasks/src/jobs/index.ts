@@ -22,7 +22,17 @@ registry.register(sendTransactionsMetricsJob)
 export function startCronJobs() {
   const cronRegistry = new CronJobRegistry()
 
-  for (const { name, cronTime, runOnInit, onTick } of registry.getAll()) {
+  for (const {
+    name,
+    enabled,
+    cronTime,
+    runOnInit,
+    onTick,
+  } of registry.getAll()) {
+    if (!enabled) {
+      continue
+    }
+
     const job = CronJob.from({
       cronTime,
       runOnInit,
@@ -40,6 +50,10 @@ export function executeJob(name: string) {
 
   if (!job) {
     throw new Error(`Job "${name}" not found`)
+  }
+
+  if (!job.enabled) {
+    throw new Error(`Job "${name}" is not enabled`)
   }
 
   return job.onTick()

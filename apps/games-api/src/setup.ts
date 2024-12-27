@@ -14,6 +14,7 @@ registerOptions(GamesDbOptionsToken, {
   url: env.gamesDb.url,
   healthUrl: env.gamesDb.healthUrl,
   poolSize: env.gamesDb.maxPoolSize,
+  mode: env.isDev ? 'session' : 'transaction',
   logger: env.isDev,
 })
 

@@ -1,6 +1,7 @@
 packages:
-  - 'apps/*'
-  - 'dbs/*'
-  - 'tooling/*'
-  - 'core/*'
-  - 'games-libs/*'
+  - "apps/*"
+  - "dbs/*"
+  - "tooling/*"
+  - "core/*"
+  - "games-libs/*"
+  - "testing/*"

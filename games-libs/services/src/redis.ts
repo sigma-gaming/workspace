@@ -14,9 +14,9 @@ export class GamesRedis extends Shutdownable {
   constructor() {
     super()
 
-    const { host, password } = resolveOptions(GamesRedisOptionsToken)
+    const { host, password, port } = resolveOptions(GamesRedisOptionsToken)
 
-    this.redisService = new RedisService({ host, password })
+    this.redisService = new RedisService({ host, password, port })
     this.redis = this.redisService.redis
 
     const { redlock } = new RedlockService(this.redis)
