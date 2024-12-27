@@ -722,6 +722,13 @@
       "when": 1734306322360,
       "tag": "0102_wealthy_franklin_richards",
       "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1735315660836,
+      "tag": "0103_exotic_stature",
+      "breakpoints": true
     }
   ]
 }

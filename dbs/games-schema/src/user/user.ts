@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm'
 import {
+  boolean,
   foreignKey,
   integer,
   pgTable,
@@ -23,6 +24,8 @@ export const UserTable = pgTable(
       .array()
       .notNull()
       .default(sql`'{"User"}'`),
+
+    virtual: boolean('virtual').notNull().default(false),
 
     referrerId: uuid('referrerId'),
     referralCampaignId: integer('referralCampaignId'),
