@@ -31,7 +31,13 @@ export const baseApp = new Hono<BaseEnv>()
         return origin
       },
       credentials: true,
-      allowHeaders: ['content-type', 'sentry-trace', 'baggage'],
+      allowHeaders: [
+        'content-type',
+        'sentry-trace',
+        'baggage',
+        'x-bypass-rate-limit',
+        'x-bypass-waf',
+      ],
       maxAge: 86400,
     }),
   )
