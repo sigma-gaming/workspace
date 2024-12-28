@@ -10,17 +10,16 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
-    "@games/options": "workspace:*",
+    "@core/di": "workspace:*",
+    "@core/logger": "workspace:*",
     "@dbs/games-db": "workspace:*",
     "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",
+    "@games/options": "workspace:*",
     "@games/redis": "workspace:*",
-    "@core/di": "workspace:*",
-    "@core/logger": "workspace:*",
     "@games/services": "workspace:*"
   },
   "devDependencies": {
-    "@core/server": "workspace:*",
-    "artillery": "^2.0.21"
+    "@core/server": "workspace:*"
   }
 }
