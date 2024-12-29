@@ -15,11 +15,13 @@ const serializers: JsonTargetParams['serializers'] = {
 
 export class LoggerService {
   isPretty = process.env.NODE_ENV !== 'production'
+  isVerbose = process.env.NODE_ENV === 'development'
   logger: Logger
 
   constructor() {
     this.logger = createNeodxLogger({
       target: this.isPretty ? pretty({ serializers }) : json({ serializers }),
+      level: this.isVerbose ? 'verbose' : 'done',
     })
   }
 }

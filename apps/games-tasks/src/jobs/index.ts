@@ -5,7 +5,7 @@ import { initializeChatMessagesJob } from './initialize-chat-messages'
 import { processReferrerPayoutsJob } from './process-referrer-payouts'
 import { processStaleDepositsJob } from './process-stale-deposits'
 import { processStaleWithdrawalsJob } from './process-stale-withdrawals'
-import { sendTransactionsMetricsJob } from './send-transactions-metrics'
+import { sendAdvancedGamesMetricsJob } from './send-advanced-games-metrics'
 import { syncBudgetJob } from './sync-budget'
 import { updateCurrencyRatesJob } from './update-currency-rates'
 
@@ -17,7 +17,7 @@ registry.register(processReferrerPayoutsJob)
 registry.register(updateCurrencyRatesJob)
 registry.register(processStaleDepositsJob)
 registry.register(processStaleWithdrawalsJob)
-registry.register(sendTransactionsMetricsJob)
+registry.register(sendAdvancedGamesMetricsJob)
 
 export function startCronJobs() {
   const cronRegistry = new CronJobRegistry()
