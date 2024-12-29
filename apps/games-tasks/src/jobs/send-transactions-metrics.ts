@@ -1,7 +1,7 @@
 import { TransactionTable } from '@dbs/games-schema'
 import { budgetService, gamesCache, gamesDb } from '@games/services'
 import { and, count, gt, isNotNull, max, sum } from 'drizzle-orm'
-import { Gauge, Pushgateway, register } from 'prom-client'
+import { Gauge, Pushgateway, Registry } from 'prom-client'
 import { env } from '../env'
 import { createJob } from '../shared/jobs'
 
@@ -40,27 +40,37 @@ export const sendTransactionsMetricsJob = createJob({
       )
       .groupBy(TransactionTable.game)
 
+    const register = new Registry()
+
+    register.setDefaultLabels({
+      namespace: env.metrics.namespace,
+    })
+
     const budgetGauge = new Gauge({
       name: 'games_available_budget',
       help: 'Available budget',
+      registers: [register],
     })
 
     const maxAmountGauge = new Gauge({
       name: 'games_max_transaction_amount',
       help: 'Maximum game transaction amount in the period',
       labelNames: ['game'],
+      registers: [register],
     })
 
     const totalAmountGauge = new Gauge({
       name: 'games_total_transactions_amount',
       help: 'Total amount of game transactions in the period',
       labelNames: ['game'],
+      registers: [register],
     })
 
     const transactionsCountGauge = new Gauge({
       name: 'games_transactions_count',
       help: 'Number of game transactions in the period',
       labelNames: ['game'],
+      registers: [register],
     })
 
     logger.info(`Budget: ${budget}`)

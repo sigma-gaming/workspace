@@ -24,6 +24,7 @@ const EnvSchema = z
     BOVAPAY_API_KEY: z.string(),
     BOVAPAY_CALLBACK_URL: z.string(),
 
+    METRICS_NAMESPACE: z.string().optional(),
     METRICS_PUSHGATEWAY_URL: z.string().optional(),
   })
   .transform((raw) => ({
@@ -65,6 +66,7 @@ const EnvSchema = z
     },
 
     metrics: {
+      namespace: raw.METRICS_NAMESPACE,
       pushgatewayUrl: raw.METRICS_PUSHGATEWAY_URL,
     },
   }))
