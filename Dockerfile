@@ -19,6 +19,7 @@ COPY ./core ./core
 COPY ./dbs ./dbs
 COPY ./games-libs ./games-libs
 COPY ./apps ./apps
+COPY ./testing ./testing
 
 FROM dependencies-tree AS dependencies-prod
 RUN pnpm install --offline --prod

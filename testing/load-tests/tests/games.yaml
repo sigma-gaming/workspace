@@ -29,31 +29,23 @@ config:
 scenarios:
   - flow:
       - function: setSessionId
+      - post:
+          url: "/access/refresh"
+          cookie:
+            session_id: "{{ sessionId }}"
       - parallel:
           - get:
               url: "/me/getUser"
-              cookie:
-                session_id: "{{ sessionId }}"
           - get:
               url: "/me/getDetailedBalance"
-              cookie:
-                session_id: "{{ sessionId }}"
           - get:
               url: "/me/getDetailedProfile"
-              cookie:
-                session_id: "{{ sessionId }}"
           - get:
               url: "/chat/getLastMessages"
-              cookie:
-                session_id: "{{ sessionId }}"
           - get:
               url: "/affiliate/isConnected"
-              cookie:
-                session_id: "{{ sessionId }}"
           - get:
               url: "/notifications/getActual"
-              cookie:
-                session_id: "{{ sessionId }}"
       - loop:
           - post:
               url: "/games/playDice"
@@ -61,7 +53,5 @@ scenarios:
                 bet: 1000
                 sides:
                   - 1
-              cookie:
-                session_id: "{{ sessionId }}"
           - think: 800ms
         count: 100

@@ -10,14 +10,9 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
-    "@core/di": "workspace:*",
     "@core/logger": "workspace:*",
-    "@dbs/games-db": "workspace:*",
     "@dbs/games-schema": "workspace:*",
-    "@games/model": "workspace:*",
-    "@games/options": "workspace:*",
-    "@games/redis": "workspace:*",
-    "@games/services": "workspace:*"
+    "@games/model": "workspace:*"
   },
   "devDependencies": {
     "@core/server": "workspace:*"
