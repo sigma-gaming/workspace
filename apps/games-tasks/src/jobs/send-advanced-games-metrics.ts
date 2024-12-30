@@ -100,14 +100,24 @@ export const sendAdvancedGamesMetricsJob = createJob({
     logger.info(`Budget: ${budget}`)
     budgetGauge.set(budget)
 
-    for (const { game, type, maxAmount, totalAmount, count } of stats) {
+    for (const {
+      game,
+      type,
+      maxAmount,
+      minAmount,
+      totalAmount,
+      count,
+    } of stats) {
       if (!game) continue
       logger.info(`Setting metrics for type ${type} and game ${game}`)
       logger.info(`Max amount: ${maxAmount}`)
       logger.info(`Total amount: ${totalAmount}`)
       logger.info(`Count: ${count}`)
-      maxAmountGauge.set({ type, game }, maxAmount)
-      totalAmountGauge.set({ type, game }, totalAmount)
+      maxAmountGauge.set(
+        { type, game },
+        type === TransactionType.Win ? maxAmount : -minAmount,
+      )
+      totalAmountGauge.set({ type, game }, Math.abs(totalAmount))
       gamesCountGauge.set({ type, game }, count)
     }
 
