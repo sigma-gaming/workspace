@@ -12,6 +12,16 @@ export const sendAdvancedGamesMetricsJob = createJob({
   handler: async ({ logger }) => {
     const lock = await gamesCache.lastMetricsTransactionId.lock(10_000)
 
+    async function updateLastId(id: number) {
+      if (id === 0) {
+        logger.info('skipping lastMetricsTransactionId update (maxId === 0)')
+        return
+      }
+
+      await gamesCache.lastMetricsTransactionId.set(id)
+      logger.info(`Updated lastMetricsTransactionId to ${id}`)
+    }
+
     const lastProcessedTransactionId =
       await gamesCache.lastMetricsTransactionId.get()
 
@@ -44,7 +54,12 @@ export const sendAdvancedGamesMetricsJob = createJob({
 
     logger.debug(stats)
 
+    const maxId = stats.reduce((acc, stat) => {
+      return Math.max(acc, stat.maxId)
+    }, 0)
+
     if (!env.metrics.pushgatewayUrl) {
+      await updateLastId(maxId)
       logger.info('Pushgateway URL is not set, skipping')
       return
     }
@@ -110,12 +125,7 @@ export const sendAdvancedGamesMetricsJob = createJob({
 
     logger.info('Metrics pushed to pushgateway')
 
-    const maxId = stats.reduce((acc, stat) => {
-      return Math.max(acc, stat.maxId)
-    }, 0)
-
-    await gamesCache.lastMetricsTransactionId.set(maxId)
-
+    await updateLastId(maxId)
     await lock.release()
   },
 })
