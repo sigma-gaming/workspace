@@ -3,6 +3,8 @@ WORKDIR /workspace
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+RUN apt-get update
+RUN apt-get install ca-certificates
 
 FROM base AS dependencies-base
 WORKDIR /build

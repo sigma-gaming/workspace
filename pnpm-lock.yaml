@@ -353,6 +353,9 @@ importers:
       '@core/server':
         specifier: workspace:*
         version: link:../../core/server
+      '@core/server-bun':
+        specifier: workspace:*
+        version: link:../../core/server-bun
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db
@@ -639,6 +642,9 @@ importers:
       '@core/io-client':
         specifier: workspace:*
         version: link:../../core/io-client
+      '@core/server':
+        specifier: workspace:*
+        version: link:../../core/server
       '@core/ui':
         specifier: workspace:*
         version: link:../../core/ui
@@ -676,6 +682,9 @@ importers:
       '@core/logger':
         specifier: workspace:*
         version: link:../../core/logger
+      '@core/server':
+        specifier: workspace:*
+        version: link:../../core/server
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db
@@ -703,6 +712,9 @@ importers:
       '@core/logger':
         specifier: workspace:*
         version: link:../../core/logger
+      '@core/server':
+        specifier: workspace:*
+        version: link:../../core/server
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db

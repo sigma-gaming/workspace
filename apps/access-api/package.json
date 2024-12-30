@@ -27,6 +27,7 @@
     "@core/exceptions": "workspace:*",
     "@core/logger": "workspace:*",
     "@core/server": "workspace:*",
+    "@core/server-bun": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }

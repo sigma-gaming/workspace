@@ -198,7 +198,6 @@ export class SessionService {
 
   attachHonoSession(ctx: HonoContext, session: SessionSelect) {
     const domain = this.getBaseDomain(ctx)
-    console.log(domain)
     const expires = new Date(session.expiresAt)
 
     setCookie(ctx, this.cookieIdKey, session.id, {

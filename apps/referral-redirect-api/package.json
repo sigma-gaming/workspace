@@ -23,6 +23,7 @@
     "@games/options": "workspace:*",
     "@core/di": "workspace:*",
     "@core/logger": "workspace:*",
+    "@core/server": "workspace:*",
     "@tooling/env": "workspace:*"
   }
 }
