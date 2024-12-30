@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { BadRequestException } from '@core/exceptions'
-import { getIpFromProxy, limitByIp, zValidator } from '@core/server'
+import { getIpFromProxy, zValidator } from '@core/server'
 import { AccountProvider } from '@dbs/games-types'
 import {
   AuthenticatePayload,
@@ -15,6 +15,7 @@ import { Hono } from 'hono'
 import { getCookie } from 'hono/cookie'
 import { z } from 'zod'
 import { serverEnv } from '../../shared/env/server'
+import { limitByIp } from '../middlewares/limit-by-ip'
 import { AuthenticateOutcome, AuthenticateOutput } from '../types'
 
 const LATIN_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -77,7 +78,7 @@ const TgAuthResultSchema = z.object({
 
 export const authenticateRoute = new Hono().post(
   '/',
-  limitByIp({ limit: 5, windowMs: 60 * 1000, generator: 'proxy' }),
+  limitByIp({ limit: 5, windowMs: 60 * 1000 }),
   zValidator(
     'json',
     z.object({

@@ -1,7 +1,7 @@
 import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { createErrorHandler, createServer } from '@core/server'
+import { createErrorHandler } from '@core/server'
 import { app } from './app'
 import { internalApp } from './app/internal'
 import { env } from './env'
@@ -17,33 +17,24 @@ app.onError(
   }),
 )
 
-const server = createServer({
-  app,
-  trustProxy: true,
+const server = Bun.serve({
+  port: env.ports.public,
+  fetch: app.fetch,
+  tls: env.isDev
+    ? {
+        key: Bun.file('../../ssl/local.key'),
+        cert: Bun.file('../../ssl/local.crt'),
+      }
+    : undefined,
 })
 
-const internalServer = createServer({
-  app: internalApp,
-  trustProxy: true,
+const internalServer = Bun.serve({
+  port: env.ports.internal,
+  fetch: internalApp.fetch,
 })
 
-server.listen(env.ports.public, (token) => {
-  if (!token) {
-    logger.error('Failed to start API')
-    process.exit(1)
-  }
-
-  logger.info(`🚀 API ready at ${env.paymentApi.url}`)
-})
-
-internalServer.listen(env.ports.internal, (token) => {
-  if (!token) {
-    logger.error('Failed to start Internal API')
-    process.exit(1)
-  }
-
-  logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
-})
+logger.info(`🚀 API ready at ${env.paymentApi.url}`)
+logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
 
 process.on('uncaughtException', (error) => {
   logger.info('Uncaught exception')
@@ -77,8 +68,8 @@ async function handleExit() {
   }, 5000)
 
   logger.info('Closing servers..')
-  server.close()
-  internalServer.close()
+  await server.stop()
+  await internalServer.stop()
   logger.info('Servers closed')
 
   logger.info('Shutting down services..')

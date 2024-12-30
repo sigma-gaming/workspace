@@ -1,4 +1,5 @@
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
+import { limitByIp } from '@core/server-bun'
 import { sessionService } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../app/router'

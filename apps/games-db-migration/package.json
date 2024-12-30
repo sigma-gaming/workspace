@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "scripts": {
     "copy-env": "copy-env",
-    "build:dev": "NODE_ENV=development webpack",
-    "dev": "pnpm build:dev && dotenv -e .env.development -- node dist/main.js",
-    "build": "NODE_ENV=production webpack",
-    "start": "node dist/main.js",
+    "dev": "NODE_ENV=development bun run src/main.ts",
+    "build": "NODE_ENV=production bun run build.mjs",
+    "start": "bun run dist/main.js",
+    "preview": "dotenv -e .env.development -- bun run dist/main.js",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"
   },

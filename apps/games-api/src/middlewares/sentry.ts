@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node'
+import * as Sentry from '@sentry/bun'
 import { createMiddleware } from 'hono/factory'
 import { sentry } from '../shared/sentry'
 

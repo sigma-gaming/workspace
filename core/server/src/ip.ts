@@ -5,5 +5,5 @@ export function getIpFromProxy(ctx: Context) {
   if (cfIp) return cfIp
   const forwardedFor = ctx.req.header('x-forwarded-for')
   if (!forwardedFor) return null
-  return forwardedFor.split(',', 1)[0]?.trim()
+  return forwardedFor.split(',', 1)[0]?.trim() ?? null
 }

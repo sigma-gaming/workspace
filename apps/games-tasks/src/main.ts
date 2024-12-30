@@ -2,40 +2,12 @@ import './setup'
 import './shared/sentry/init'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { createServer, HonoUwsEnv } from '@core/server'
 import { gamesRedis } from '@games/services'
-import { Hono } from 'hono'
-import { TemplatedApp } from 'uWebSockets.js'
 import { env } from './env'
 import { executeJob, startCronJobs } from './jobs'
-import { healthyRoute, readyRoute } from './routes/health'
 import { sentry } from './shared/sentry'
 
-let internalServer: TemplatedApp | null = null
-
 if (env.gamesTasks.mode === 'server') {
-  const internalApp = new Hono<HonoUwsEnv>()
-    .route('/healthy', healthyRoute)
-    .route('/ready', readyRoute)
-
-  internalServer = createServer({
-    app: internalApp,
-    trustProxy: true,
-  })
-
-  if (!env.ports.internal) {
-    throw new Error('Internal port is required in server mode')
-  }
-
-  internalServer.listen(env.ports.internal, (token) => {
-    if (!token) {
-      logger.error('Failed to start Internal API')
-      process.exit(1)
-    }
-
-    logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
-  })
-
   gamesRedis.redis.once('ready', () => {
     startCronJobs()
   })
@@ -83,12 +55,6 @@ async function handleExit() {
     logger.info('Timeout, exiting..')
     process.exit(0)
   }, 5000)
-
-  if (internalServer) {
-    logger.info('Closing server..')
-    internalServer.close()
-    logger.info('Server closed')
-  }
 
   await sentry?.close(3000)
 

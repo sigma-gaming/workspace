@@ -1,15 +1,10 @@
-import {
-  HonoUwsEnv,
-  inferEnv,
-  loggerMiddleware,
-  requestIdMiddleware,
-} from '@core/server'
+import { inferEnv, loggerMiddleware, requestIdMiddleware } from '@core/server'
 import { DomainApp } from '@dbs/games-types-private'
 import { domainService } from '@games/services'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
-export const baseApp = new Hono<HonoUwsEnv>()
+export const baseApp = new Hono()
   .use(
     '*',
     cors({
