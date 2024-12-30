@@ -104,8 +104,8 @@ export const sendAdvancedGamesMetricsJob = createJob({
       register,
     )
 
-    await pushGateway.pushAdd({
-      jobName: 'send-transactions-metrics',
+    await pushGateway.push({
+      jobName: 'send-advanced-games-metrics',
     })
 
     logger.info('Metrics pushed to pushgateway')

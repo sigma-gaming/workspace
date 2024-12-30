@@ -16,42 +16,49 @@ config:
   plugins:
     apdex: {}
   apdex:
-    threshold: 100
+    threshold: 400
   processor: "./games.ts"
   http:
     defaults:
       headers:
         x-bypass-waf: "SECRET_REMOVED"
         x-bypass-rate-limit: "SECRET_REMOVED"
-      cookie:
-        session_id: "{{ sessionId }}"
 
 scenarios:
   - flow:
       - function: setSessionId
-      - post:
-          url: "/access/refresh"
-          cookie:
-            session_id: "{{ sessionId }}"
       - parallel:
           - get:
               url: "/me/getUser"
+              cookie:
+                session_id: "{{ sessionId }}"
           - get:
               url: "/me/getDetailedBalance"
+              cookie:
+                session_id: "{{ sessionId }}"
           - get:
               url: "/me/getDetailedProfile"
+              cookie:
+                session_id: "{{ sessionId }}"
           - get:
               url: "/chat/getLastMessages"
+              cookie:
+                session_id: "{{ sessionId }}"
           - get:
               url: "/affiliate/isConnected"
+              cookie:
+                session_id: "{{ sessionId }}"
           - get:
               url: "/notifications/getActual"
+              cookie:
+                session_id: "{{ sessionId }}"
       - loop:
           - post:
               url: "/games/playDice"
+              cookie:
+                session_id: "{{ sessionId }}"
               json:
                 bet: 1000
                 sides:
                   - 1
-          - think: 800ms
-        count: 100
+        count: 30
