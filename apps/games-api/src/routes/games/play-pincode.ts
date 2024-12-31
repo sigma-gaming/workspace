@@ -1,32 +1,15 @@
-import { PincodeMode } from '@dbs/games-types'
-import { Engine } from '@games/engine'
-import { BalanceUpdate, gemInt, UpdateMode } from '@games/model'
+import { zValidator } from '@core/server'
+import { Engine, PincodePayloadSchema } from '@games/engine'
+import { BalanceUpdate, UpdateMode } from '@games/model'
 import { gamesPubsubs, sessionService } from '@games/services'
-import { tbValidator } from '@hono/typebox-validator'
-import { Type as T } from '@sinclair/typebox'
 import { createRouter } from '../../app/router'
 import { metrics, updateBetMetrics } from '../../metrics'
 import { limitByIp } from '../../middlewares/rate-limit'
 
-export const PincodePayloadSchema = T.Object(
-  {
-    bet: T.Integer({
-      minimum: gemInt(1),
-      maximum: gemInt(5000),
-      errorMessage: {
-        minimum: 'Минимальная ставка - 1 гем',
-        maximum: 'Максимальная ставка - 5000 гемов',
-      },
-    }),
-    mode: T.Enum(PincodeMode),
-  },
-  { additionalProperties: false },
-)
-
 export const playPincode = createRouter().post(
   '/',
   limitByIp({ limit: 15, windowMs: 10 * 1000 }),
-  tbValidator('json', PincodePayloadSchema),
+  zValidator('json', PincodePayloadSchema),
   async (ctx) => {
     const payload = ctx.req.valid('json')
     const { userId } = await sessionService.getHonoSession(ctx)
