@@ -1,16 +1,41 @@
-import { zValidator } from '@core/server'
 import { GameSnapshotDice } from '@dbs/games-types'
-import { DicePayloadSchema, Engine } from '@games/engine'
-import { BalanceUpdate, UpdateMode } from '@games/model'
+import { Engine } from '@games/engine'
+import { BalanceUpdate, gemInt, UpdateMode } from '@games/model'
 import { gamesPubsubs, sessionService } from '@games/services'
+import { tbValidator } from '@hono/typebox-validator'
+import { Type as T } from '@sinclair/typebox'
 import { createRouter } from '../../app/router'
 import { metrics, updateBetMetrics } from '../../metrics'
 import { limitByIp } from '../../middlewares/rate-limit'
 
+const DicePayloadSchema = T.Object(
+  {
+    bet: T.Integer({
+      minimum: gemInt(1),
+      maximum: gemInt(5000),
+      errorMessage: {
+        minimum: 'Минимальная ставка - 1 гем',
+        maximum: 'Максимальная ставка - 5000 гемов',
+      },
+    }),
+    sides: T.Array(
+      T.Integer({
+        minimum: 1,
+        maximum: 6,
+      }),
+      {
+        minItems: 1,
+        maxItems: 5,
+      },
+    ),
+  },
+  { additionalProperties: false },
+)
+
 export const playDice = createRouter().post(
   '/',
   limitByIp({ limit: 15, windowMs: 10 * 1000 }),
-  zValidator('json', DicePayloadSchema),
+  tbValidator('json', DicePayloadSchema),
   async (ctx) => {
     const payload = ctx.req.valid('json')
     const { userId } = await sessionService.getHonoSession(ctx)

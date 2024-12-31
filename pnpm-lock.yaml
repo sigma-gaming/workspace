@@ -22,6 +22,9 @@ importers:
       '@farfetched/core':
         specifier: ^0.11.2
         version: 0.11.4(effector@23.2.1)
+      '@hono/typebox-validator':
+        specifier: ^0.3.0
+        version: 0.3.0(@sinclair/typebox@0.34.13)(hono@4.4.7)
       '@mantine/core':
         specifier: ^7.13.4
         version: 7.13.4(@mantine/hooks@7.13.4(react@18.3.1))(@types/react@18.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -61,6 +64,9 @@ importers:
       '@sesamecare-oss/redlock':
         specifier: ^1.2.0
         version: 1.2.1(ioredis@5.4.1)
+      '@sinclair/typebox':
+        specifier: ^0.34.13
+        version: 0.34.13
       '@socket.io/redis-adapter':
         specifier: ^8.3.0
         version: 8.3.0(socket.io-adapter@2.5.5)
@@ -3123,6 +3129,12 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  '@hono/typebox-validator@0.3.0':
+    resolution: {integrity: sha512-L8pJmkO9x7VT0tWRqI+tnxxBshsCN7HIMVaCNDH7mXyPRrDIhEYo3eizQPynw1J50vGyzd7b2TfVRMiHleR5Vw==}
+    peerDependencies:
+      '@sinclair/typebox': '>=0.31.15 <1'
+      hono: '>=3.9.0'
+
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
@@ -4335,6 +4347,9 @@ packages:
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
+
+  '@sinclair/typebox@0.34.13':
+    resolution: {integrity: sha512-ceVKqyCEgC355Kw0s/0tyfY9MzMQINSykJ/pG2w6YnaZyrcjV48svZpr8lVZrYgWjzOmrIPBhQRAtr/7eJpA5g==}
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
@@ -12096,6 +12111,11 @@ snapshots:
       protobufjs: 7.3.2
       yargs: 17.7.2
 
+  '@hono/typebox-validator@0.3.0(@sinclair/typebox@0.34.13)(hono@4.4.7)':
+    dependencies:
+      '@sinclair/typebox': 0.34.13
+      hono: 4.4.7
+
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
@@ -13456,6 +13476,8 @@ snapshots:
   '@shikijs/vscode-textmate@9.3.0': {}
 
   '@sinclair/typebox@0.27.8': {}
+
+  '@sinclair/typebox@0.34.13': {}
 
   '@socket.io/component-emitter@3.1.2': {}
 
