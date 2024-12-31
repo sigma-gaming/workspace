@@ -1,4 +1,4 @@
-FROM imbios/bun-node:1.1.42-20.18-slim AS base
+FROM node:20-alpine AS base
 WORKDIR /workspace
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -23,6 +23,9 @@ COPY ./games-libs ./games-libs
 COPY ./apps ./apps
 COPY ./testing ./testing
 
+FROM dependencies-tree AS dependencies-prod
+RUN pnpm install --offline --prod
+
 FROM dependencies-tree AS dependencies-dev
 RUN pnpm install --offline
 
@@ -34,7 +37,7 @@ COPY ./ssl ./ssl
 
 # Apps
 
-FROM node:20.18-alpine AS app-base
+FROM base AS app-base
 WORKDIR /app
 ENV NODE_ENV=production
 RUN apk update
@@ -79,13 +82,9 @@ RUN chmod -R 755 /app
 
 # API Base
 
-FROM oven/bun:1.1.42-slim AS api-base-bun
+FROM base AS api-base
 ENV NODE_ENV=production
-WORKDIR /workspace
-
-FROM node:20.18-slim AS api-base-node
-ENV NODE_ENV=production
-WORKDIR /workspace
+RUN apk add --no-cache gcompat
 
 # APIs
 
@@ -126,31 +125,31 @@ RUN pnpm nx run @apis/payment-api:build
 FROM prebuild AS letsauth-build
 RUN pnpm nx run @apis/letsauth:build
 
-FROM api-base-bun AS games-api
+FROM api-base AS games-api
 COPY --from=games-api-build /build ./
-CMD [ "bun", "run", "apps/games-api/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
 
-FROM api-base-bun AS games-tasks
+FROM api-base AS games-tasks
 COPY --from=games-tasks-build /build ./
-CMD [ "bun", "run", "apps/games-tasks/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/games-tasks/dist/main.js" ]
 
-FROM api-base-bun AS control-api
+FROM api-base AS control-api
 COPY --from=control-api-build /build ./
-CMD [ "bun", "run", "apps/control-api/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]
 
-FROM api-base-bun AS referral-redirect-api
+FROM api-base AS referral-redirect-api
 COPY --from=referral-redirect-api-build /build ./
-CMD [ "bun", "run", "apps/referral-redirect-api/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/referral-redirect-api/dist/main.js" ]
 
-FROM api-base-bun AS access-api
+FROM api-base AS access-api
 COPY --from=access-api-build /build ./
-CMD [ "bun", "run", "apps/access-api/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/access-api/dist/main.js" ]
 
-FROM api-base-bun AS payment-api
+FROM api-base AS payment-api
 COPY --from=payment-api-build /build ./
-CMD [ "bun", "run", "apps/payment-api/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/payment-api/dist/main.js" ]
 
-FROM api-base-node AS letsauth
+FROM api-base AS letsauth
 COPY --from=letsauth-build /build ./
 ENV HOST=0.0.0.0
 # PORT is set from outside
@@ -169,7 +168,7 @@ RUN pnpm nx run @apis/games-ws:build && \
   pnpm sentry-cli sourcemaps inject /build/apps/games-ws/dist && \
   pnpm sentry-cli sourcemaps upload /build/apps/games-ws/dist --release ${sentry_release}
 
-FROM api-base-node AS games-ws
+FROM api-base AS games-ws
 WORKDIR /workspace
 COPY --from=games-ws-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
@@ -182,12 +181,12 @@ RUN pnpm nx run @migrations/games-db-migration:build
 FROM base AS games-db-migration
 WORKDIR /workspace
 COPY --from=games-db-migration-build /build ./
-CMD [ "bun", "run", "apps/games-db-migration/dist/main.js" ]
+CMD [ "node", "apps/games-db-migration/dist/main.js" ]
 
 # GCR Cleaner
 
 FROM base AS gcloud-sdk-base
-# RUN apk add --update curl bash which python3
+RUN apk add --update curl bash which python3
 RUN curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/root
 ENV PATH $PATH:/root/google-cloud-sdk/bin
 

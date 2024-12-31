@@ -7,10 +7,10 @@
   "types": "./src/client.ts",
   "scripts": {
     "copy-env": "copy-env",
-    "dev": "NODE_ENV=development bun run --hot src/main.ts",
-    "build": "NODE_ENV=production bun run build.mjs",
-    "start": "NODE_ENV=production bun run dist/main.js",
-    "preview": "dotenv -e .env.development -- bun run dist/main.js",
+    "dev": "NODE_ENV=development tsx watch src/main.ts",
+    "build": "NODE_ENV=production webpack",
+    "start": "NODE_ENV=production node dist/main.js",
+    "preview": "NODE_ENV=development nodemon dist/main.js --inspect",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"

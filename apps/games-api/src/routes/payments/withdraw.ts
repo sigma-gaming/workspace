@@ -1,6 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
 import { zValidator } from '@core/server'
-import { getIpFromBun } from '@core/server-bun'
 import { Currency, PaymentProvider, WithdrawalMethod } from '@dbs/games-types'
 import { gemInt } from '@games/model'
 import { PaymentOutcome, paymentService, sessionService } from '@games/services'
@@ -29,7 +28,7 @@ export const withdrawRoute = createRouter().post(
       provider,
       method,
       currency,
-      userIp: getIpFromBun(ctx),
+      userIp: ctx.env.ip,
     })
 
     switch (result.outcome) {

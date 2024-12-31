@@ -1,7 +1,7 @@
 import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { createErrorHandler } from '@core/server'
+import { createErrorHandler, createServer } from '@core/server'
 import { domainService } from '@games/services'
 import { app } from './app'
 import { internalApp } from './app/internal'
@@ -17,24 +17,39 @@ app.onError(
   }),
 )
 
-const server = Bun.serve({
-  port: env.ports.public,
-  fetch: app.fetch,
-  tls: env.isDev
+const server = createServer({
+  app,
+  trustProxy: true,
+  uwsOptions: env.isDev
     ? {
-        key: Bun.file('../../ssl/local.key'),
-        cert: Bun.file('../../ssl/local.crt'),
+        key_file_name: '../../ssl/local.key',
+        cert_file_name: '../../ssl/local.crt',
       }
-    : undefined,
+    : {},
 })
 
-const internalServer = Bun.serve({
-  port: env.ports.internal,
-  fetch: internalApp.fetch,
+const internalServer = createServer({
+  app: internalApp,
+  trustProxy: true,
 })
 
-logger.info(`🚀 API ready at ${env.controlApi.url}`)
-logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
+server.listen(env.ports.public, (token) => {
+  if (!token) {
+    logger.error('Failed to start API')
+    process.exit(1)
+  }
+
+  logger.info(`🚀 API ready at ${env.controlApi.url}`)
+})
+
+internalServer.listen(env.ports.internal, (token) => {
+  if (!token) {
+    logger.error('Failed to start Internal API')
+    process.exit(1)
+  }
+
+  logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
+})
 
 // Initialize lazy services
 domainService.waitForInitialization()
@@ -71,8 +86,8 @@ async function handleExit() {
   }, 5000)
 
   logger.info('Closing servers..')
-  await server.stop()
-  await internalServer.stop()
+  server.close()
+  internalServer.close()
   logger.info('Servers closed')
 
   logger.info('Shutting down services..')

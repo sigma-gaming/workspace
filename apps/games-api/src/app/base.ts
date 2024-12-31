@@ -1,4 +1,9 @@
-import { inferEnv, loggerMiddleware, requestIdMiddleware } from '@core/server'
+import {
+  HonoUwsEnv,
+  inferEnv,
+  loggerMiddleware,
+  requestIdMiddleware,
+} from '@core/server'
 import { DomainApp } from '@dbs/games-types-private'
 import { SessionVariant } from '@games/model'
 import { domainService } from '@games/services'
@@ -7,10 +12,9 @@ import { cors } from 'hono/cors'
 import { env } from '../env'
 import { sentryMiddleware } from '../middlewares/sentry'
 
-type BaseEnv = {
+type BaseEnv = HonoUwsEnv & {
   Variables: {
     sessionVariant?: SessionVariant
-    userIp?: string
   }
 }
 

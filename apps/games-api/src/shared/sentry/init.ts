@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/bun'
+import * as Sentry from '@sentry/node'
 import { env } from '../../env'
 
 export const sentry = Sentry.init({

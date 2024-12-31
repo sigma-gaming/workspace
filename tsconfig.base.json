@@ -49,12 +49,6 @@
       "@core/server": [
         "core/server/src/index.ts"
       ],
-      "@core/server-uws": [
-        "core/server-uws/src/index.ts"
-      ],
-      "@core/server-bun": [
-        "core/server-bun/src/index.ts"
-      ],
       "@core/exceptions": [
         "core/exceptions/src/index.ts"
       ],

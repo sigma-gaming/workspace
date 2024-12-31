@@ -1,15 +1,13 @@
 import { createRateLimiter } from '@core/server'
-import { getIpFromBun } from '@core/server-bun'
 import { Context } from 'hono'
+import { AppEnv } from '../app/base'
 import { env } from '../env'
 
-const IpSymbol = Symbol('userIp')
-
 export const limitByIp = createRateLimiter({
-  keyGenerator: (ctx: Context) => {
-    return ctx.get(IpSymbol) ?? getIpFromBun(ctx)
+  keyGenerator: (ctx: Context<AppEnv>) => {
+    return ctx.env.ip
   },
-  skip: (ctx: Context) => {
+  skip: (ctx: Context<AppEnv>) => {
     if (process.env.NODE_ENV === 'development') return true
 
     if (env.rateLimit.bypassToken) {
@@ -17,8 +15,6 @@ export const limitByIp = createRateLimiter({
       if (token === env.rateLimit.bypassToken) return true
     }
 
-    const ip = getIpFromBun(ctx)
-    ctx.set(IpSymbol, ip)
-    return !ip
+    return !ctx.env.ip
   },
 })

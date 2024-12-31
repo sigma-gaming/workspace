@@ -1,6 +1,5 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { zValidator } from '@core/server'
-import { getIpFromBun } from '@core/server-bun'
 import { Currency, DepositMethod, PaymentProvider } from '@dbs/games-types'
 import { gemInt } from '@games/model'
 import { PaymentOutcome, paymentService, sessionService } from '@games/services'
@@ -37,7 +36,7 @@ export const depositRoute = createRouter().post(
       method,
       currency,
       redirectUrl,
-      userIp: getIpFromBun(ctx),
+      userIp: ctx.env.ip,
     })
 
     switch (result.outcome) {

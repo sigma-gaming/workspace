@@ -1,5 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
-import { limitByIp } from '@core/server-bun'
+import { limitByIp } from '@core/server'
 import { SessionState } from '@games/model'
 import { sessionService } from '@games/services'
 import { createRouter } from '../app/router'
