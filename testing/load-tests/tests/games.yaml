@@ -7,11 +7,11 @@ config:
       name: Warm up phase
     - duration: 60
       arrivalRate: 5
-      rampTo: 10
+      rampTo: 15
       name: Ramp up load
     - duration: 30
-      arrivalRate: 10
-      rampTo: 30
+      arrivalRate: 15
+      rampTo: 50
       name: Spike phase
   plugins:
     apdex: {}
