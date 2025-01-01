@@ -4,6 +4,7 @@
   "license": "UNLICENSED",
   "private": true,
   "sideEffects": false,
+  "type": "module",
   "bin": {
     "copy-env": "./bin/copy-env.js"
   },
@@ -14,6 +15,10 @@
     ".": {
       "import": "./dist/index.mjs",
       "default": "./dist/index.js"
+    },
+    "./client": {
+      "import": "./dist/client.mjs",
+      "default": "./dist/client.js"
     }
   },
   "scripts": {

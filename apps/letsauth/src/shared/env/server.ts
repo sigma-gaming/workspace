@@ -1,4 +1,4 @@
-import { loadEsmEnv, parseEnv } from '@tooling/env'
+import { loadEnv, parseEnv } from '@tooling/env'
 import { z } from 'zod'
 
 const ServerEnvSchema = z
@@ -68,7 +68,7 @@ const ServerEnvSchema = z
     },
   }))
 
-await loadEsmEnv({ root: process.cwd() })
+loadEnv({ root: process.cwd() })
 
 export const serverEnv = parseEnv({
   source: process.env,

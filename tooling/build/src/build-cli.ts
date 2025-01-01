@@ -22,7 +22,7 @@ export async function buildCLI({
 
   await bundle.write({
     file: output,
-    format: 'cjs',
+    format: 'es',
     banner: '#!/usr/bin/env node',
   })
 }

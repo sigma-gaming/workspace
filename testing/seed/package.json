@@ -3,6 +3,7 @@
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "scripts": {
     "users": "tsx src/users.ts",
     "sessions": "tsx src/sessions.ts",

@@ -2,15 +2,16 @@
   "name": "@apis/referral-redirect-api",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "main": "./src/client.ts",
   "module": "./src/client.ts",
   "types": "./src/client.ts",
   "scripts": {
     "copy-env": "copy-env",
     "dev": "NODE_ENV=development tsx watch src/main.ts",
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production bun build.mjs",
     "start": "NODE_ENV=production node dist/main.js",
-    "preview": "NODE_ENV=development nodemon dist/main.js --inspect",
+    "preview": "dotenv -e .env.development -- node dist/main.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"

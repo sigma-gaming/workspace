@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('../dist/bin/copy-env.js')
+import '../dist/bin/copy-env.js'

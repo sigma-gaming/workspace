@@ -96,7 +96,7 @@ importers:
         version: 12.0.1
       drizzle-orm:
         specifier: ^0.32.1
-        version: 0.32.1(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.2)(bun-types@1.1.17)(postgres@3.4.4)(react@18.3.1)
+        version: 0.32.1(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.2)(bun-types@1.1.37)(postgres@3.4.4)(react@18.3.1)
       effector:
         specifier: ^23.0.0
         version: 23.2.1
@@ -155,8 +155,8 @@ importers:
         specifier: ^4.7.5
         version: 4.7.5
       uWebSockets.js:
-        specifier: github:uNetworking/uWebSockets.js#v20.43.0
-        version: https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/1977b5039938ad863d42fc4958d48c17e5a1fa06
+        specifier: github:uNetworking/uWebSockets.js#v20.51.0
+        version: https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/6609a88ffa9a16ac5158046761356ce03250a0df
       uuid:
         specifier: ^9.0.1
         version: 9.0.1
@@ -200,6 +200,9 @@ importers:
       '@sentry/vite-plugin':
         specifier: ^2.21.1
         version: 2.21.1(encoding@0.1.13)
+      '@types/bun':
+        specifier: ^1.1.14
+        version: 1.1.14
       '@types/cookie':
         specifier: ^0.5.4
         version: 0.5.4
@@ -344,9 +347,6 @@ importers:
       '@core/server':
         specifier: workspace:*
         version: link:../../core/server
-      '@core/server-bun':
-        specifier: workspace:*
-        version: link:../../core/server-bun
       '@dbs/games-db':
         specifier: workspace:*
         version: link:../../dbs/games-db
@@ -4175,6 +4175,9 @@ packages:
   '@types/body-parser@1.19.5':
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
 
+  '@types/bun@1.1.14':
+    resolution: {integrity: sha512-opVYiFGtO2af0dnWBdZWlioLBoxSdDO5qokaazLhq8XQtGZbY4pY3/JxY8Zdf/hEwGubbp7ErZXoN1+h2yesxA==}
+
   '@types/caseless@0.12.5':
     resolution: {integrity: sha512-hWtVTC2q7hc7xZ/RLbxapMvDMgUnDvKvMOpKal4DrMyfGBUfB1oKaZlIRr6mJL+If3bAP6sV/QneGzF6tJjZDg==}
 
@@ -4991,8 +4994,8 @@ packages:
     resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==}
     engines: {node: '>=6'}
 
-  bun-types@1.1.17:
-    resolution: {integrity: sha512-Z4+OplcSd/YZq7ZsrfD00DKJeCwuNY96a1IDJyR73+cTBaFIS7SC6LhpY/W3AMEXO9iYq5NJ58WAwnwL1p5vKg==}
+  bun-types@1.1.37:
+    resolution: {integrity: sha512-C65lv6eBr3LPJWFZ2gswyrGZ82ljnH8flVE03xeXxKhi2ZGtFiO4isRKTKnitbSqtRAcaqYSR6djt1whI66AbA==}
 
   bytes@3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -8831,9 +8834,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  uWebSockets.js@https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/1977b5039938ad863d42fc4958d48c17e5a1fa06:
-    resolution: {tarball: https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/1977b5039938ad863d42fc4958d48c17e5a1fa06}
-    version: 20.43.0
+  uWebSockets.js@https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/6609a88ffa9a16ac5158046761356ce03250a0df:
+    resolution: {tarball: https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/6609a88ffa9a16ac5158046761356ce03250a0df}
+    version: 20.51.0
 
   uid2@1.0.0:
     resolution: {integrity: sha512-+I6aJUv63YAcY9n4mQreLUt0d4lvwkkopDNmpomkAUz0fAkEMV9pRWxN0EjhW1YfRhcuyHg2v3mwddCDW1+LFQ==}
@@ -12965,6 +12968,10 @@ snapshots:
       '@types/connect': 3.4.38
       '@types/node': 22.10.2
 
+  '@types/bun@1.1.14':
+    dependencies:
+      bun-types: 1.1.37
+
   '@types/caseless@0.12.5': {}
 
   '@types/connect@3.4.36':
@@ -13109,7 +13116,6 @@ snapshots:
   '@types/node@20.12.14':
     dependencies:
       undici-types: 5.26.5
-    optional: true
 
   '@types/node@22.10.2':
     dependencies:
@@ -13206,7 +13212,6 @@ snapshots:
   '@types/ws@8.5.13':
     dependencies:
       '@types/node': 22.10.2
-    optional: true
 
   '@typescript-eslint/eslint-plugin@7.16.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)(typescript@5.6.2)':
     dependencies:
@@ -14153,11 +14158,10 @@ snapshots:
 
   builtin-modules@3.3.0: {}
 
-  bun-types@1.1.17:
+  bun-types@1.1.37:
     dependencies:
       '@types/node': 20.12.14
       '@types/ws': 8.5.13
-    optional: true
 
   bytes@3.1.2: {}
 
@@ -14639,12 +14643,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.32.1(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.2)(bun-types@1.1.17)(postgres@3.4.4)(react@18.3.1):
+  drizzle-orm@0.32.1(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.2)(bun-types@1.1.37)(postgres@3.4.4)(react@18.3.1):
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/pg': 8.6.1
       '@types/react': 18.3.2
-      bun-types: 1.1.17
+      bun-types: 1.1.37
       postgres: 3.4.4
       react: 18.3.1
 
@@ -18868,7 +18872,7 @@ snapshots:
 
   typescript@5.6.2: {}
 
-  uWebSockets.js@https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/1977b5039938ad863d42fc4958d48c17e5a1fa06: {}
+  uWebSockets.js@https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/6609a88ffa9a16ac5158046761356ce03250a0df: {}
 
   uid2@1.0.0: {}
 

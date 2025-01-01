@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM imbios/bun-node:1.1.42-20.18-slim AS base
 WORKDIR /workspace
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -37,7 +37,7 @@ COPY ./ssl ./ssl
 
 # Apps
 
-FROM base AS app-base
+FROM node:20.18-alpine AS app-base
 WORKDIR /app
 ENV NODE_ENV=production
 RUN apk update
@@ -84,7 +84,6 @@ RUN chmod -R 755 /app
 
 FROM base AS api-base
 ENV NODE_ENV=production
-RUN apk add --no-cache gcompat
 
 # APIs
 
@@ -186,7 +185,7 @@ CMD [ "node", "apps/games-db-migration/dist/main.js" ]
 # GCR Cleaner
 
 FROM base AS gcloud-sdk-base
-RUN apk add --update curl bash which python3
+# RUN apk add --update curl bash which python3
 RUN curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/root
 ENV PATH $PATH:/root/google-cloud-sdk/bin
 

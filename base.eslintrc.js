@@ -12,7 +12,7 @@ module.exports = configure({
   ],
 
   extend: {
-    ignorePatterns: ['!**/*', 'node_modules', 'dist', 'public', '.eslintrc.cjs'],
+    ignorePatterns: ['!**/*', 'node_modules', 'dist', 'public', 'bin', '.eslintrc.cjs'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'sonarjs/no-identical-functions': 'off',

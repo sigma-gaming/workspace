@@ -2,11 +2,12 @@
   "name": "@migrations/games-db-migration",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "copy-env": "copy-env",
-    "build:dev": "NODE_ENV=development webpack",
+    "build:dev": "NODE_ENV=development bun build.mjs",
     "dev": "pnpm build:dev && dotenv -e .env.development -- node dist/main.js",
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production bun build.mjs",
     "start": "node dist/main.js",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"

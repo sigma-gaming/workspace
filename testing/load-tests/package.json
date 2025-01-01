@@ -3,6 +3,7 @@
   "version": "0.0.0-internal",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "scripts": {
     "games": "artillery run tests/games.yaml --insecure",
     "typecheck": "tsc --noEmit",

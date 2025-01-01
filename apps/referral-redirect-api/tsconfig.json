@@ -9,7 +9,7 @@
     "**.cjs"
   ],
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "ESNext",
     "noEmit": false,
     "outDir": "dist"
   }

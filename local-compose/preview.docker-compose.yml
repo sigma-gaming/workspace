@@ -1,0 +1,21 @@
+name: sigma-preview
+services:
+  control-api:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      target: control-api
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ../.env.development
+  
+  control-app:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+      target: control-app
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ../.env.development
