@@ -33,7 +33,7 @@ jobs:
     runs-on: [ubuntu-22.04]
 
     outputs:
-      apps: ${{ steps.affected.outputs.apps }}
+      apps: ${{ steps.affected.outputs.affected_apps }}
 
     steps:
       - uses: actions/checkout@v4
@@ -75,9 +75,9 @@ jobs:
               apps+=("@migrations/games-db-migration")
             fi
 
-            echo "apps=$(printf '%s\n' "${apps[@]}" | jq -R . | jq -s -c .)" >> $GITHUB_OUTPUT
+            echo "affected_apps=$(printf '%s\n' "${apps[@]}" | jq -R . | jq -s -c .)" >> $GITHUB_OUTPUT
           else
-            echo "apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
+            echo "affected_apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
           fi
 
   build:
@@ -97,10 +97,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Define scopes for hash check
-        id: hash-check-scopes
-        run: echo "::set-output name=scopes::apps,apis"
-
       - name: Parse package name
         id: parse
         uses: release-kit/regex@v1
@@ -109,40 +105,44 @@ jobs:
           pattern: '^@?(?<scope>.*)\/(?<name>.*)$'
 
       - name: Check if hash check should be used
-        id: should-check-hash
-        if: "contains(${{ steps.hash-check-scopes.outputs.scopes }}, ${{ steps.parse.outputs.scope }})"
-        run: echo "::set-output name=should_check::true"
+        id: hash-check
+        run: |
+          if [[ "${{ steps.parse.outputs.scope }}" =~ ^(apps|apis)$ ]]; then
+            echo "should_check=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_check=false" >> $GITHUB_OUTPUT
+          fi
 
       - uses: pnpm/action-setup@v4
-        if: steps.should-check-hash.outputs.should_check == 'true'
+        if: steps.hash-check.outputs.should_check == 'true'
         id: pnpm
         with:
           version: 9.15.2
           run_install: false
 
       - name: Install Node.js
-        if: steps.should-check-hash.outputs.should_check == 'true'
+        if: steps.hash-check.outputs.should_check == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
 
       - uses: oven-sh/setup-bun@v2
-        if: steps.should-check-hash.outputs.should_check == 'true'
+        if: steps.hash-check.outputs.should_check == 'true'
         with:
           bun-version: 1.1.42
 
       - name: Install dependencies
-        if: steps.should-check-hash.outputs.should_check == 'true'
+        if: steps.hash-check.outputs.should_check == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Build package
-        if: steps.should-check-hash.outputs.should_check == 'true'
+        if: steps.hash-check.outputs.should_check == 'true'
         run: pnpm nx run ${{ matrix.packageName }}:build
 
       - name: Calculate hash for dist and additional files
         id: calculate-hash
-        if: steps.should-check-hash.outputs.should_check == 'true'
+        if: steps.hash-check.outputs.should_check == 'true'
         uses: seepine/hash-files@v1
         with:
           workdir: ${{ github.workspace }}
@@ -152,7 +152,7 @@ jobs:
             apps/${{ steps.parse.outputs.name }}/nginx.conf
 
       - name: Check cache for this build
-        if: steps.should-check-hash.outputs.should_check == 'true'
+        if: steps.hash-check.outputs.should_check == 'true'
         id: check-cache
         uses: actions/cache@v3
         with:
@@ -163,7 +163,11 @@ jobs:
       - name: Check if build should be skipped
         id: should-skip-build
         run: |
-          echo "::set-output name=should_skip::${{ steps.check-cache.outputs.cache-hit == 'true' }}"
+          if [[ "${{ steps.check-cache.outputs.cache-hit }}" == "true" ]]; then
+            echo "should_skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_skip=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Skip build if cache exists
         if: steps.should-skip-build.outputs.should_skip == 'true'
@@ -212,7 +216,7 @@ jobs:
             --async
 
       - name: Set cache for this build hash
-        if: steps.should-skip-build.outputs.should_skip != 'true' && steps.should-check-hash.outputs.should_check == 'true'
+        if: steps.hash-check.outputs.should_check == 'true' && steps.should-skip-build.outputs.should_skip != 'true'
         uses: actions/cache@v3
         with:
           path: /dev/null # No files are stored, we just set the cache
