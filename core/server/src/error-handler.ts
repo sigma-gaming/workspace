@@ -1,7 +1,7 @@
 import { InternalServerException, RouteException } from '@core/exceptions'
 import { Context, Env, ErrorHandler } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { StatusCode } from 'hono/utils/http-status'
+import { ContentfulStatusCode } from 'hono/utils/http-status'
 
 export function createErrorHandler<E extends Env>(options: {
   showOriginalError?: boolean
@@ -33,6 +33,10 @@ export function createErrorHandler<E extends Env>(options: {
     }
 
     const { name, message, payload, statusCode } = exception
-    return ctx.json({ name, message, payload }, statusCode as StatusCode)
+
+    return ctx.json(
+      { name, message, payload },
+      statusCode as ContentfulStatusCode,
+    )
   }
 }
