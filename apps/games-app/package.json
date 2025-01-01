@@ -11,7 +11,7 @@
     "start": "NODE_ENV=production node server.js",
     "preview": "NODE_ENV=development dotenv -e .env.development nodemon ./server.js",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,tsx}\"",
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
