@@ -24,8 +24,6 @@
     "dev:payment:bovapay": "cloudflared tunnel run bovapay",
     "db:games:generate": "nx run @dbs/games-db:migration:generate",
     "db:games:apply:dev": "nx run @dbs/games-db:migration:apply:dev",
-    "dev:control-app": "nx run @apps/control-app:dev",
-    "dev:control-api": "nx run @apis/control-api:dev",
     "dev": "nx run-many -t dev --parallel 10",
     "dev:games": "nx run-many -t dev --projects @apps/games-app,@apis/games-api,@apis/games-ws,@apis/games-tasks --parallel 10",
     "dev:auth": "nx run-many -t dev --projects @apis/access-api,@apis/letsauth --parallel 10",
