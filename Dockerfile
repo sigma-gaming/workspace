@@ -185,7 +185,8 @@ CMD [ "node", "apps/games-db-migration/dist/main.js" ]
 # GCR Cleaner
 
 FROM base AS gcloud-sdk-base
-# RUN apk add --update curl bash which python3
+RUN apt-get update
+RUN apt-get install -y curl python3
 RUN curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=/root
 ENV PATH $PATH:/root/google-cloud-sdk/bin
 
