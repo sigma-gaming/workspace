@@ -15,6 +15,7 @@
     "dev:compose": "docker compose -f ./local-compose/docker-compose.yml",
     "dev:docker": "pnpm dev:compose up -d",
     "dev:docker:reset": "pnpm dev:compose down -v && pnpm dev:docker",
+    "dev:docker:preview": "docker compose -f ./local-compose/preview.docker-compose.yml up",
     "dev:games-app": "nx run @apps/games-app:dev",
     "dev:games-api": "nx run @apis/games-api:dev",
     "dev:games-ws": "nx run @apis/games-ws:dev",
