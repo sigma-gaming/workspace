@@ -146,7 +146,6 @@ jobs:
         uses: release-kit/hash-files@v1
         with:
           workdir: ${{ github.workspace }}
-          gitignore: 'false'
           patterns: |
             apps/${{ steps.parse.outputs.name }}/dist/**
             apps/${{ steps.parse.outputs.name }}/scripts/**

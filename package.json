@@ -81,7 +81,7 @@
     "js-cookie": "^3.0.5",
     "patronum": "^2.2.0",
     "plural-ru": "^2.0.2",
-    "postgres": "^3.4.3",
+    "postgres": "^3.4.5",
     "prom-client": "^15.1.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
