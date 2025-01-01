@@ -97,16 +97,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Gcloud auth
-        uses: google-github-actions/auth@v2
+      - uses: pnpm/action-setup@v4
+        id: pnpm
         with:
-          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
+          version: 9.15.2
+          run_install: false
 
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
-          skip_install: true
+          node-version: 20
+          cache: pnpm
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.42
+
+      - name: Define scopes for hash check
+        id: hash-check-scopes
+        run: echo "::set-output name=scopes::apps,apis"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        run: pnpm nx run ${{ matrix.packageName }}:build
 
       - name: Parse package name
         id: parse
@@ -115,7 +130,54 @@ jobs:
           string: ${{ matrix.packageName }}
           pattern: '^@?(?<scope>.*)\/(?<name>.*)$'
 
+      - name: Hash check message
+        if: "contains(${{ steps.hash-check-scopes.outputs.scopes }}, ${{ steps.parse.outputs.scope }})"
+        run: echo "Checking build hash for ${{ matrix.packageName }}"
+
+      - name: Calculate hash for dist and additional files
+        id: calculate-hash
+        if: "contains(${{ steps.hash-check-scopes.outputs.scopes }}, ${{ steps.parse.outputs.scope }})"
+        uses: seepine/hash-files@v1
+        with:
+          workdir: ${{ github.workspace }}
+          patterns: |
+            apps/${{ steps.parse.outputs.name }}/dist/**
+            apps/${{ steps.parse.outputs.name }}/scripts/**
+            apps/${{ steps.parse.outputs.name }}/nginx.conf
+
+      - name: Check cache for this build
+        if: "contains(${{ steps.hash-check-scopes.outputs.scopes }}, ${{ steps.parse.outputs.scope }})"
+        id: check-cache
+        uses: actions/cache@v3
+        with:
+          path: /dev/null # No files are restored, we just check existence
+          key: build-cache-${{ steps.parse.outputs.name }}-${{ steps.calculate-hash.outputs.hash }}
+        continue-on-error: true
+
+      - name: Check if build should be skipped
+        id: should-skip
+        run: |
+          echo "::set-output name=should_skip::${{ steps.check-cache.outputs.cache-hit == 'true' }}"
+
+      - name: Skip build if cache exists
+        if: steps.should-skip.outputs.should_skip == 'true'
+        run: echo "Cache hit for ${{ matrix.packageName }}. Skipping build."
+
+      - name: Gcloud auth
+        if: steps.should-skip.outputs.should_skip != 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
+
+      - name: Setup gcloud
+        if: steps.should-skip.outputs.should_skip != 'true'
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          skip_install: true
+
       - name: Build on Google Cloud
+        if: steps.should-skip.outputs.should_skip != 'true'
         run: |
           image=${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}
 
@@ -142,3 +204,10 @@ jobs:
             --config cloudbuild.yaml \
             --region ${{ vars.GCLOUD_REGISTRY_REGION }} \
             --async
+
+      - name: Set cache for this build hash
+        if: steps.should-skip.outputs.should_skip != 'true'
+        uses: actions/cache@v3
+        with:
+          path: /dev/null # No files are stored, we just set the cache
+          key: build-cache-${{ steps.parse.outputs.name }}-${{ steps.calculate-hash.outputs.hash }}
