@@ -91,7 +91,7 @@ export class BadRequestException extends RouteException<BadRequestExceptionPaylo
 }
 
 type ValidationExceptionPayload = {
-  issues: ZodIssue[]
+  issues?: ZodIssue[]
   fieldErrors: Record<string, string[] | undefined>
 }
 
