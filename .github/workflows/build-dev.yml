@@ -144,7 +144,7 @@ jobs:
         id: calculate-hash
         if: steps.hash-check.outputs.should_check == 'true'
         run: |
-          echo "hash=${{ hashFiles('apps/${{ steps.parse.outputs.name }}/dist/**', 'apps/${{ steps.parse.outputs.name }}/scripts/**', 'apps/${{ steps.parse.outputs.name }}/nginx.conf') }}" >> $GITHUB_OUTPUT
+          echo "hash=${{ hashFiles(format('apps/{0}/dist/**', steps.parse.outputs.name), format('apps/{0}/scripts/**', steps.parse.outputs.name), format('apps/{0}/nginx.conf', steps.parse.outputs.name)) }}" >> $GITHUB_OUTPUT
 
       - name: Create temporary file for cache
         run: echo "" > .temp-cache-file
