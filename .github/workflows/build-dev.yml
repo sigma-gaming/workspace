@@ -146,17 +146,21 @@ jobs:
         uses: seepine/hash-files@v1
         with:
           workdir: ${{ github.workspace }}
+          gitignore: false
           patterns: |
             apps/${{ steps.parse.outputs.name }}/dist/**
             apps/${{ steps.parse.outputs.name }}/scripts/**
             apps/${{ steps.parse.outputs.name }}/nginx.conf
+
+      - name: Create temporary file for cache
+        run: echo "" > .temp-cache-file
 
       - name: Check cache for this build
         if: steps.hash-check.outputs.should_check == 'true'
         id: check-cache
         uses: actions/cache@v3
         with:
-          path: /dev/null # No files are restored, we just check existence
+          path: .temp-cache-file
           key: build-cache-${{ steps.parse.outputs.name }}-${{ steps.calculate-hash.outputs.hash }}
         continue-on-error: true
 
@@ -219,5 +223,5 @@ jobs:
         if: steps.hash-check.outputs.should_check == 'true' && steps.should-skip-build.outputs.should_skip != 'true'
         uses: actions/cache@v3
         with:
-          path: /dev/null # No files are stored, we just set the cache
+          path: .temp-cache-file
           key: build-cache-${{ steps.parse.outputs.name }}-${{ steps.calculate-hash.outputs.hash }}
