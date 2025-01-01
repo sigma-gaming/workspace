@@ -160,9 +160,6 @@ importers:
       uWebSockets.js:
         specifier: github:uNetworking/uWebSockets.js#v20.51.0
         version: https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/6609a88ffa9a16ac5158046761356ce03250a0df
-      uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
       vk-io:
         specifier: ^4.9.1
         version: 4.9.1
