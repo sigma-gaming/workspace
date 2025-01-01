@@ -143,7 +143,7 @@ jobs:
       - name: Calculate hash for dist and additional files
         id: calculate-hash
         if: steps.hash-check.outputs.should_check == 'true'
-        uses: seepine/hash-files@v1
+        uses: release-kit/hash-files@v1
         with:
           workdir: ${{ github.workspace }}
           gitignore: false

@@ -111,7 +111,6 @@ export function tbValidator<
     }
 
     const errors = getErrors(data)
-    console.log(errors)
 
     throw new ValidationException({
       fieldErrors: errors.reduce(
