@@ -117,7 +117,13 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 for (const entry of entries) {
   if (exceptions.has(entry)) continue
-  await $`gcloud artifacts docker images delete ${entry.url} --async --delete-tags --quiet`
+
+  try {
+    await $`gcloud artifacts docker images delete ${entry.url} --async --delete-tags --quiet`
+  } catch (error) {
+    console.info(`Failed to delete ${entry.url}`, error)
+  }
+
   await sleep(60 / REQUESTS_PER_MINUTE * 1000)
 }
 
