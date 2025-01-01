@@ -1,5 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
-import { zValidator } from '@core/server'
+import { tbValidator } from '@core/server'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { BalanceUpdate, GlobalTaskUpdate, UpdateMode } from '@games/model'
 import {
@@ -8,19 +8,18 @@ import {
   globalTaskService,
   sessionService,
 } from '@games/services'
-import { z } from 'zod'
+import { Type } from '@sinclair/typebox'
 import { createRouter } from '../../../app/router'
 import { limitByIp } from '../../../middlewares/rate-limit'
+
+const PayloadSchema = Type.Object({
+  taskKey: Type.Enum(GlobalTaskKey),
+})
 
 export const claimRewardRoute = createRouter().post(
   '/',
   limitByIp({ limit: 5, windowMs: 60 * 1000 }),
-  zValidator(
-    'json',
-    z.object({
-      taskKey: z.nativeEnum(GlobalTaskKey),
-    }),
-  ),
+  tbValidator('json', PayloadSchema),
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)
     const { taskKey } = ctx.req.valid('json')

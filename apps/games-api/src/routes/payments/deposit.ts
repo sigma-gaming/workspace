@@ -1,23 +1,38 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
-import { zValidator } from '@core/server'
+import { tbValidator, TypeboxError } from '@core/server'
 import { Currency, DepositMethod, PaymentProvider } from '@dbs/games-types'
 import { gemInt } from '@games/model'
 import { PaymentOutcome, paymentService, sessionService } from '@games/services'
-import { z } from 'zod'
+import { Type } from '@sinclair/typebox'
 import { createRouter } from '../../app/router'
 import { limitByIp } from '../../middlewares/rate-limit'
 
-const PayloadSchema = z.object({
-  gemAmount: z.number().min(gemInt(1)),
-  provider: z.nativeEnum(PaymentProvider),
-  method: z.nativeEnum(DepositMethod),
-  currency: z.nativeEnum(Currency),
+const PayloadSchema = Type.Object({
+  gemAmount: Type.Integer({
+    minimum: gemInt(1),
+  }),
+  provider: Type.Enum(PaymentProvider),
+  method: Type.Enum(DepositMethod),
+  currency: Type.Enum(Currency),
 })
 
 export const depositRoute = createRouter().post(
   '/',
   limitByIp({ limit: 5, windowMs: 60 * 1000 }),
-  zValidator('json', PayloadSchema),
+  tbValidator('json', PayloadSchema, {
+    gemAmount: {
+      [TypeboxError.IntegerMinimum]: 'Минимальная сумма пополнения - 1 гем',
+    },
+    provider: {
+      [TypeboxError.Union]: 'Неподдерживаемый провайдер',
+    },
+    method: {
+      [TypeboxError.Union]: 'Неподдерживаемый метод оплаты',
+    },
+    currency: {
+      [TypeboxError.Union]: 'Неподдерживаемая валюта',
+    },
+  }),
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)
     const { gemAmount, provider, method, currency } = ctx.req.valid('json')

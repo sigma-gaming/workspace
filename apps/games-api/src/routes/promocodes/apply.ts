@@ -1,5 +1,5 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
-import { zValidator } from '@core/server'
+import { tbValidator, TypeboxError } from '@core/server'
 import { PromocodeBonusType } from '@dbs/games-types'
 import { BalanceUpdate, UpdateMode } from '@games/model'
 import {
@@ -8,7 +8,7 @@ import {
   promocodeService,
   sessionService,
 } from '@games/services'
-import { z } from 'zod'
+import { Type } from '@sinclair/typebox'
 import { createRouter } from '../../app/router'
 import { limitByIp } from '../../middlewares/rate-limit'
 
@@ -32,15 +32,20 @@ const MessageMap: Record<FailureActivationResult, string> = {
     'Не удалось применить промокод. Попробуйте ещё раз или напишите в поддержку',
 }
 
+const PayloadSchema = Type.Object({
+  code: Type.String({
+    minLength: 1,
+  }),
+})
+
 export const applyRoute = createRouter().post(
   '/',
   limitByIp({ limit: 5, windowMs: 60 * 1000 }),
-  zValidator(
-    'json',
-    z.object({
-      code: z.string().min(1, 'Не может быть пустым'),
-    }),
-  ),
+  tbValidator('json', PayloadSchema, {
+    code: {
+      [TypeboxError.StringMinLength]: 'Не может быть пустым',
+    },
+  }),
   async (ctx) => {
     const payload = ctx.req.valid('json')
     const { userId } = await sessionService.getHonoSession(ctx)

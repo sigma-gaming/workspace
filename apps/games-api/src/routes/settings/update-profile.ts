@@ -1,8 +1,8 @@
 import { BadRequestException } from '@core/exceptions'
-import { zValidator } from '@core/server'
+import { tbValidator, TypeboxError } from '@core/server'
 import { AccountTable, ProfileTable, ProfileUpdate } from '@dbs/games-schema'
 import { AccountProvider, UserRole } from '@dbs/games-types'
-import { getUserFullName, ProfileValidation } from '@games/model'
+import { getUserFullName } from '@games/model'
 import {
   gamesCache,
   gamesDb,
@@ -11,8 +11,8 @@ import {
   sessionService,
   userService,
 } from '@games/services'
+import { Type } from '@sinclair/typebox'
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 import { createRouter } from '../../app/router'
 import { limitByIp } from '../../middlewares/rate-limit'
 
@@ -107,17 +107,43 @@ const reservedUsernames = [
   'authentication',
 ]
 
+const PayloadSchema = Type.Object({
+  username: Type.Optional(
+    Type.String({
+      minLength: 3,
+      maxLength: 20,
+      pattern: `^[a-zA-Z0-9_]+$`,
+    }),
+  ),
+  name: Type.Optional(
+    Type.String({
+      minLength: 3,
+      maxLength: 32,
+      pattern: `^[!#$€£%&'"'()*+-./:;,=<>?@\\^|А-Яа-яёЁA-Za-z0-9 ]+$`,
+    }),
+  ),
+  provider: Type.Enum(AccountProvider),
+})
+
 export const updateProfileRoute = createRouter().post(
   '/',
   limitByIp({ limit: 10, windowMs: 60 * 1000 }),
-  zValidator(
-    'json',
-    z.object({
-      username: ProfileValidation.UsernameSchema.optional(),
-      name: ProfileValidation.NameSchema.optional(),
-      provider: z.nativeEnum(AccountProvider),
-    }),
-  ),
+  tbValidator('json', PayloadSchema, {
+    username: {
+      [TypeboxError.StringMinLength]: 'Минимальная длина - 3 символа',
+      [TypeboxError.StringMaxLength]: 'Максимальная длина - 20 символов',
+      [TypeboxError.StringPattern]:
+        'Допустимы только латинские буквы, цифры и нижнее подчеркивание',
+    },
+    name: {
+      [TypeboxError.StringMinLength]: 'Минимальная длина - 3 символа',
+      [TypeboxError.StringMaxLength]: 'Максимальная длина - 32 символов',
+      [TypeboxError.StringPattern]: 'Содержатся недопустимые символы',
+    },
+    provider: {
+      [TypeboxError.Union]: 'Неподдерживаемый провайдер',
+    },
+  }),
   async (ctx) => {
     const payload = ctx.req.valid('json')
     const { userId } = await sessionService.getHonoSession(ctx)

@@ -1,5 +1,5 @@
 import { BadRequestException } from '@core/exceptions'
-import { zValidator } from '@core/server'
+import { tbValidator } from '@core/server'
 import { AccountTable } from '@dbs/games-schema'
 import { AccountProvider, GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { GlobalTaskUpdate, UpdateMode } from '@games/model'
@@ -14,8 +14,8 @@ import {
   telegramBotService,
   vkService,
 } from '@games/services'
+import { Type } from '@sinclair/typebox'
 import { and, eq } from 'drizzle-orm'
-import { z } from 'zod'
 import { createRouter } from '../../../app/router'
 import { limitByIp } from '../../../middlewares/rate-limit'
 
@@ -150,15 +150,14 @@ const checkers: Record<GlobalTaskKey, GlobalTaskChecker> = {
   },
 }
 
+const PayloadSchema = Type.Object({
+  taskKey: Type.Enum(GlobalTaskKey),
+})
+
 export const completeRoute = createRouter().post(
   '/',
   limitByIp({ limit: 5, windowMs: 60 * 1000 }),
-  zValidator(
-    'json',
-    z.object({
-      taskKey: z.nativeEnum(GlobalTaskKey),
-    }),
-  ),
+  tbValidator('json', PayloadSchema),
   async (ctx) => {
     const { userId } = await sessionService.getHonoSession(ctx)
     const { taskKey } = ctx.req.valid('json')

@@ -1,18 +1,10 @@
 import { GameRecordSelect } from '@dbs/games-schema'
 import { PincodeMode } from '@dbs/games-types'
-import { gemInt } from '@games/model'
-import { z } from 'zod'
 
-export const PincodePayloadSchema = z.strictObject({
-  bet: z
-    .number()
-    .int()
-    .min(gemInt(1), 'Минимальная ставка - 1 гем')
-    .max(gemInt(5000), 'Максимальная ставка - 5000 гемов'),
-  mode: z.nativeEnum(PincodeMode),
-})
-
-export type PincodePayload = z.infer<typeof PincodePayloadSchema>
+export type PincodePayload = {
+  bet: number
+  mode: PincodeMode
+}
 
 export type PlayPincodeInput = {
   userId: string
