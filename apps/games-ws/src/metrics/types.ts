@@ -1,7 +1,7 @@
 export enum UserType {
-  Authenticated = 'authenticated',
-  Guest = 'guest',
-  Unknown = 'unknown',
+  Authenticated = 'Authenticated',
+  Guest = 'Guest',
+  Unknown = 'Unknown',
 }
 
 export enum EmitScope {
