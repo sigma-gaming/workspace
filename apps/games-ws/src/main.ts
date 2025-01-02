@@ -1,6 +1,10 @@
 import './setup'
 import './shared/sentry/init'
 import { shutdownAll } from '@core/di'
+import {
+  SocketRejectionReason,
+  TooManyConnectionsException,
+} from '@core/exceptions'
 import { logger } from '@core/logger'
 import { UpdateMode } from '@games/model'
 import {
@@ -16,6 +20,7 @@ import { io } from './io'
 import { EmitScope, metrics, registry, UserType } from './metrics'
 import { startLastWinsBroadcast } from './processes/last-wins'
 import { ipRoom, userRoom } from './shared/rooms'
+import { getRoomConnections } from './shared/rooms/get-connections'
 import { sendToAllLocal, sendToUser, sendToUserOptimized } from './shared/send'
 
 const app = env.isDev
@@ -38,6 +43,40 @@ function getUserIp(socket: Socket) {
   return socket.handshake.address
 }
 
+function saveUserIp(socket: Socket) {
+  const userIp = getUserIp(socket)
+  socket.data.userIp = userIp
+}
+
+function getSavedUserIp(socket: Socket): string | null {
+  return socket.data.userIp ?? null
+}
+
+io.use((socket, next) => {
+  if (env.rateLimit.bypassToken) {
+    const bypassToken = socket.handshake.headers['x-bypass-rate-limit']
+
+    if (bypassToken === env.rateLimit.bypassToken) {
+      return next()
+    }
+  }
+
+  const userIp = getUserIp(socket)
+  const ipConnections = getRoomConnections(ipRoom(userIp))
+
+  if (ipConnections >= 5) {
+    metrics.rejectedTotalCounter.inc({
+      user_type: UserType.Unknown,
+      reason: SocketRejectionReason.TooManyConnections,
+    })
+
+    return next(new TooManyConnectionsException())
+  }
+
+  saveUserIp(socket)
+  next()
+})
+
 io.on('connection', async (socket) => {
   const cookie = parse(socket.handshake.headers.cookie ?? '')
   const { session } = await sessionService.getSessionSafe(cookie.session_id)
@@ -45,19 +84,28 @@ io.on('connection', async (socket) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const user_type = session ? UserType.Authenticated : UserType.Guest
 
-  /**
-   * For guests we use IP room to track unique guest count
-   */
-  const room = session ? userRoom(session.userId) : ipRoom(getUserIp(socket))
+  const userIp = getSavedUserIp(socket)
 
-  socket.join(room)
+  if (!userIp) {
+    logger.error('No saved user IP found')
+    return socket.disconnect()
+  }
+
+  /**
+   * Determine the main room for tracking the user online
+   */
+  const mainRoom = session ? userRoom(session.userId) : ipRoom(userIp)
+
+  /**
+   * Join both IP and user rooms for rate-limiting and tracking the user online
+   */
+  socket.join(ipRoom(userIp))
+  if (session) socket.join(userRoom(session.userId))
 
   metrics.connectedTotalCounter.inc({ user_type })
   metrics.connectionsGauge.inc({ user_type })
 
-  const members = io.sockets.adapter.rooms.get(room)?.size ?? 0
-
-  if (members === 1) {
+  if (getRoomConnections(mainRoom) === 1) {
     metrics.onlineUsersGauge.inc({ user_type })
   }
 
@@ -65,9 +113,7 @@ io.on('connection', async (socket) => {
     metrics.connectionsGauge.dec({ user_type })
     metrics.disconnectedTotalCounter.inc({ user_type })
 
-    const members = io.sockets.adapter.rooms.get(room)?.size ?? 0
-
-    if (members === 0) {
+    if (getRoomConnections(mainRoom) === 0) {
       metrics.onlineUsersGauge.dec({ user_type })
     }
   })

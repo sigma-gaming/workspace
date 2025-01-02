@@ -1,4 +1,8 @@
-import { NotAuthenticatedException } from '@core/exceptions'
+import { $$notifications } from '@core/client'
+import {
+  NotAuthenticatedException,
+  SocketRejectionReason,
+} from '@core/exceptions'
 import { createEffect, createEvent, sample } from 'effector'
 import { createBrowserHistory } from 'history'
 import Cookies from 'js-cookie'
@@ -11,6 +15,7 @@ import { $$user } from '../entities/user'
 import { $$maintenance } from '../features/maintenance'
 import { $$notificationEvents } from '../features/notification-events'
 import { router } from '../routing'
+import { $$gamesWs } from '../shared/api/games-ws'
 import { env } from '../shared/env'
 import { $$chatWidget } from '../widgets/chat'
 
@@ -60,6 +65,17 @@ sample({
       expires: 365,
     })
   }),
+})
+
+sample({
+  clock: $$gamesWs.rejected,
+  filter: (reason) => reason === SocketRejectionReason.TooManyConnections,
+  target: $$notifications.show.prepend(() => ({
+    color: 'red',
+    title: 'Слишком много подключений',
+    message:
+      'Некоторые функции могут не работать. Закройте лишние вкладки и попробуйте снова',
+  })),
 })
 
 export const $$app = {

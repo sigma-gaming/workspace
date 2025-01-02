@@ -22,6 +22,8 @@ const EnvSchema = z
     GAMES_DB_PASSWORD: z.string(),
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
+
+    BYPASS_RATE_LIMIT_TOKEN: z.string().optional(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
@@ -59,6 +61,10 @@ const EnvSchema = z
 
     jwt: {
       secret: raw.JWT_SECRET,
+    },
+
+    rateLimit: {
+      bypassToken: raw.BYPASS_RATE_LIMIT_TOKEN,
     },
   }))
 

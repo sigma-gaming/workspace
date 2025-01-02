@@ -19,6 +19,12 @@ export const connectedTotalCounter = new Counter({
   labelNames: ['user_type'],
 })
 
+export const rejectedTotalCounter = new Counter({
+  name: 'games_ws_rejected_total',
+  help: 'Number of times users were rejected from the server',
+  labelNames: ['user_type', 'reason'],
+})
+
 export const disconnectedTotalCounter = new Counter({
   name: 'games_ws_disconnected_total',
   help: 'Number of times users disconnected from the server',

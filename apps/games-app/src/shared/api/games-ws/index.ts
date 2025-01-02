@@ -1,4 +1,5 @@
 import { ClientToServerEvents, ServerToClientEvents } from '@apis/games-ws'
+import { SocketRejectionReason } from '@core/exceptions'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import { io, Socket } from 'socket.io-client'
 import { env } from '../../env'
@@ -25,6 +26,7 @@ const reconnect = createEvent()
 
 const connected = createEvent()
 const disconnected = createEvent()
+const rejected = createEvent<SocketRejectionReason>()
 
 sample({ source: connect, target: connectFx })
 sample({ source: disconnect, target: disconnectFx })
@@ -37,9 +39,24 @@ const $connected = createStore(false)
 gamesWs.on('connect', () => connected())
 gamesWs.on('disconnect', () => disconnected())
 
+gamesWs.on('connect_error', (error) => {
+  if (
+    'data' in error &&
+    typeof error.data === 'object' &&
+    error.data !== null &&
+    'reason' in error.data &&
+    error.data.reason
+  ) {
+    rejected(error.data.reason as SocketRejectionReason)
+  } else {
+    rejected(SocketRejectionReason.Unknown)
+  }
+})
+
 export const $$gamesWs = {
   connect,
   disconnect,
   reconnect,
+  rejected,
   $connected,
 }

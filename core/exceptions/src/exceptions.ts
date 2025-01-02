@@ -61,6 +61,18 @@ export class TooManyRequestsException extends RouteException {
   message = 'Too many requests'
 }
 
+export enum SocketRejectionReason {
+  TooManyConnections = 'TooManyConnections',
+  Unknown = 'Unknown',
+}
+
+export class TooManyConnectionsException extends RouteException {
+  name = 'TooManyConnectionsException'
+  statusCode = 429
+  message = 'Too many connections'
+  data = { reason: SocketRejectionReason.TooManyConnections }
+}
+
 export class UnauthorizedException extends RouteException {
   name = 'UnauthorizedException'
   statusCode = 403
