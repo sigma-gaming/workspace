@@ -23,7 +23,7 @@ export function sendToUserOptimized<K extends keyof ServerToClientEvents>(
   ...payload: Parameters<ServerToClientEvents[K]>
 ) {
   const connections = getRoomConnections(userRoom(userId))
-  if (connections === 1) return
+  if (connections < 2) return
   io.to(userRoom(userId)).emit(event, ...payload)
 
   metrics.eventsSentTotalCounter.inc({

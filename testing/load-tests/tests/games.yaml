@@ -11,7 +11,7 @@ config:
       name: Ramp up load
     - duration: 30
       arrivalRate: 15
-      rampTo: 50
+      rampTo: 30
       name: Spike phase
   plugins:
     apdex: {}
