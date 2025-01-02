@@ -141,8 +141,14 @@ sample({
 
 sample({
   clock: betHalved,
-  source: fields.bet.$value,
-  fn: (bet) => Math.max(1, bet / 2),
+  source: { bet: fields.bet.$value, balance: $$balance.$available },
+  fn: ({ bet, balance }) =>
+    clampBet({
+      bet: bet / 2,
+      min: MIN_BET,
+      max: MAX_BET,
+      balance,
+    }),
   target: fields.bet.update,
 })
 
