@@ -6,7 +6,7 @@ import { createMutation } from '@farfetched/core'
 import { ChatMessageDetailed, ChatValidation } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
-import { v4 as uuid } from 'uuid'
+import { v4 } from 'uuid'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { createApiEffect } from '../../shared/api/effects'
@@ -102,7 +102,7 @@ sample({
 
 const submitted = sample({
   source: form.submitted,
-  fn: (payload) => ({ ...payload, trackingId: uuid() }),
+  fn: (payload) => ({ ...payload, trackingId: v4() }),
 })
 
 sample({

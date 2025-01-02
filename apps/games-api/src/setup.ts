@@ -8,7 +8,12 @@ import {
   TelegramBotOptionsToken,
   VkOptionsToken,
 } from '@games/options'
+import { FormatRegistry } from '@sinclair/typebox'
 import { env } from './env'
+
+FormatRegistry.Set('uuid', (value) =>
+  /^(?:urn:uuid:)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(value),
+)
 
 registerOptions(GamesDbOptionsToken, {
   url: env.gamesDb.url,
