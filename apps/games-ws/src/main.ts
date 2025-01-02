@@ -13,7 +13,7 @@ import { Socket } from 'socket.io'
 import { App, SSLApp } from 'uWebSockets.js'
 import { env } from './env'
 import { io } from './io'
-import { metrics, registry, UserType } from './metrics'
+import { EmitScope, metrics, registry, UserType } from './metrics'
 import { startLastWinsBroadcast } from './processes/last-wins'
 import { ipRoom, userRoom } from './shared/rooms'
 import { sendToAllLocal, sendToUser, sendToUserOptimized } from './shared/send'
@@ -52,6 +52,7 @@ io.on('connection', async (socket) => {
 
   socket.join(room)
 
+  metrics.connectedTotalCounter.inc({ user_type })
   metrics.connectionsGauge.inc({ user_type })
 
   const members = io.sockets.adapter.rooms.get(room)?.size ?? 0
@@ -62,6 +63,7 @@ io.on('connection', async (socket) => {
 
   socket.on('disconnect', () => {
     metrics.connectionsGauge.dec({ user_type })
+    metrics.disconnectedTotalCounter.inc({ user_type })
 
     const members = io.sockets.adapter.rooms.get(room)?.size ?? 0
 
@@ -69,7 +71,42 @@ io.on('connection', async (socket) => {
       metrics.onlineUsersGauge.dec({ user_type })
     }
   })
+
+  socket.on('error', (error) => {
+    metrics.errorsTotalCounter.inc({ user_type })
+    logger.error(error, 'Error in socket')
+  })
+
+  const originalEmit = socket.emit
+
+  socket.emit = (event, ...args) => {
+    metrics.eventsSentTotalCounter.inc({
+      user_type,
+      emit_scope: EmitScope.Socket,
+    })
+
+    logger.info(`Emit ${event} (socket)`)
+
+    return originalEmit(event, ...args)
+  }
+
+  socket.onAny(() => {
+    metrics.eventsReceivedTotalCounter.inc({ user_type })
+  })
 })
+
+const ioOriginalEmit = io.emit
+
+io.emit = (event, ...args) => {
+  metrics.eventsSentTotalCounter.inc({
+    user_type: UserType.Unknown,
+    emit_scope: EmitScope.Global,
+  })
+
+  logger.info(`Emit ${event} (global)`)
+
+  return ioOriginalEmit(event, ...args)
+}
 
 /**
  * Business logic

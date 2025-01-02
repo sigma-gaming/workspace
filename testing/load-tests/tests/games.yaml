@@ -61,4 +61,4 @@ scenarios:
                 bet: 1000
                 sides:
                   - 1
-        count: 30
+        count: 50
