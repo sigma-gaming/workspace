@@ -417,36 +417,6 @@ importers:
         specifier: workspace:*
         version: link:../../tooling/env
 
-  apps/domain-api:
-    dependencies:
-      '@core/di':
-        specifier: workspace:*
-        version: link:../../core/di
-      '@core/logger':
-        specifier: workspace:*
-        version: link:../../core/logger
-      '@core/server':
-        specifier: workspace:*
-        version: link:../../core/server
-      '@dbs/games-db':
-        specifier: workspace:*
-        version: link:../../dbs/games-db
-      '@dbs/games-schema':
-        specifier: workspace:*
-        version: link:../../dbs/games-schema
-      '@games/options':
-        specifier: workspace:*
-        version: link:../../games-libs/options
-      '@games/redis':
-        specifier: workspace:*
-        version: link:../../games-libs/redis
-      '@games/services':
-        specifier: workspace:*
-        version: link:../../games-libs/services
-      '@tooling/env':
-        specifier: workspace:*
-        version: link:../../tooling/env
-
   apps/games-api:
     dependencies:
       '@core/cron-jobs':
