@@ -70,7 +70,7 @@ function main() {
       return new Response(
         `<div>
           <style>h1 { font-family: Helvetica, sans-serif; font-size: 24px; }</style>
-          <h1>Сайт недоступен, и не удалось получить адрес для перенаправления. Найдите актуальный домен в нашем Telegram-канале: <a href="https://t.me/SigmaGamesFeed">@SigmaGamesFeed</a>.</h1>
+          <h1>Сайт недоступен, и не удалось получить адрес для перенаправления. Получите актуальный домен в нашем Telegram-боте: <a href="https://t.me/SigmaGamesBot">@SigmaGamesBot</a>.</h1>
         </div>`,
         {
           status: 200,
