@@ -124,6 +124,9 @@ RUN pnpm nx run @apis/payment-api:build
 FROM prebuild AS letsauth-build
 RUN pnpm nx run @apis/letsauth:build
 
+FROM prebuild AS domain-api-build
+RUN pnpm nx run @apis/domain-api:build
+
 FROM api-base AS games-api
 COPY --from=games-api-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
@@ -153,6 +156,10 @@ COPY --from=letsauth-build /build ./
 ENV HOST=0.0.0.0
 # PORT is set from outside
 CMD [ "node", "--max_semi_space_size=64", "apps/letsauth/dist/server/entry.mjs" ]
+
+FROM api-base AS domain-api
+COPY --from=domain-api-build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/domain-api/dist/main.js" ]
 
 # WS APIs
 

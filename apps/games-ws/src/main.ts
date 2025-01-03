@@ -52,6 +52,15 @@ function getSavedUserIp(socket: Socket): string | null {
   return socket.data.userIp ?? null
 }
 
+let currentConnections = 0
+
+function calculateMaxConnectionsPerIp() {
+  if (currentConnections > 5000) return 1
+  if (currentConnections > 1000) return 3
+  if (currentConnections > 250) return 10
+  return 30
+}
+
 io.use((socket, next) => {
   if (env.rateLimit.bypassToken) {
     const bypassToken = socket.handshake.headers['x-bypass-rate-limit']
@@ -64,7 +73,7 @@ io.use((socket, next) => {
   const userIp = getUserIp(socket)
   const ipConnections = getRoomConnections(ipRoom(userIp))
 
-  if (ipConnections >= 5) {
+  if (ipConnections >= calculateMaxConnectionsPerIp()) {
     metrics.rejectedTotalCounter.inc({
       user_type: UserType.Unknown,
       reason: SocketRejectionReason.TooManyConnections,
@@ -102,6 +111,7 @@ io.on('connection', async (socket) => {
   socket.join(ipRoom(userIp))
   if (session) socket.join(userRoom(session.userId))
 
+  currentConnections += 1
   metrics.connectedTotalCounter.inc({ user_type })
   metrics.connectionsGauge.inc({ user_type })
 
@@ -110,6 +120,7 @@ io.on('connection', async (socket) => {
   }
 
   socket.on('disconnect', () => {
+    currentConnections -= 1
     metrics.connectionsGauge.dec({ user_type })
     metrics.disconnectedTotalCounter.inc({ user_type })
 

@@ -13,9 +13,6 @@
       "{workspaceRoot}/pnpm-lock.yaml",
       "{workspaceRoot}/.npmrc"
     ],
-    "ci": [
-      "{workspaceRoot}/.github/workflows/deploy-dev-stacks.yml"
-    ],
     "env": [
       "{workspaceRoot}/.env.development"
     ],
@@ -34,19 +31,12 @@
     ],
     "test": [
       "{projectRoot}/**/*.test.ts",
-      "{projectRoot}/**/*.test.tsx",
-      "{projectRoot}/jest.config.ts",
-      "{projectRoot}/jest.config.js"
+      "{projectRoot}/**/*.test.tsx"
     ],
     "config": [
       "{projectRoot}/package.json",
       "{projectRoot}/tsconfig.json",
-      "{projectRoot}/tsconfig.app.json",
-      "{projectRoot}/tsconfig.spec.json",
       "{projectRoot}/vite.config.*",
-      "{projectRoot}/next.config.*",
-      "{projectRoot}/rollup.config.*",
-      "{projectRoot}/webpack.config.*",
       "{projectRoot}/drizzle.config.*",
       "{projectRoot}/nginx.conf"
     ],
@@ -90,8 +80,7 @@
         "config",
         "test",
         "src",
-        "^src",
-        "{workspaceRoot}/jest.preset.js"
+        "^src"
       ]
     },
     "typecheck": {
@@ -133,7 +122,6 @@
     },
     "start": {
       "dependsOn": [
-        "ci",
         "build",
         "^build"
       ]
