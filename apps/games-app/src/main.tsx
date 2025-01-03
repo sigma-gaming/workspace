@@ -10,3 +10,9 @@ const root = ReactDOM.createRoot(document.querySelector('#root')!)
 root.render(<AppView />)
 
 $$app.started()
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register(
+    import.meta.env.MODE === 'production' ? '/sw.js' : '/dev-sw.js?dev-sw',
+  )
+}

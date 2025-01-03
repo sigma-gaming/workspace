@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig } from 'vite'
 import lqip from 'vite-plugin-lqip'
+import { VitePWA } from 'vite-plugin-pwa'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 const monorepo = (end: string) => path.resolve(__dirname, '../..', end)
@@ -19,6 +20,9 @@ export default defineConfig({
       key: fs.readFileSync(monorepo('ssl/local.key')),
     },
     open: true,
+    headers: {
+      'X-Sigma-Games': '1',
+    },
   },
   plugins: [
     react({
@@ -37,6 +41,20 @@ export default defineConfig({
       },
     }),
     lqip(),
+    VitePWA({
+      manifest: false,
+      injectRegister: false,
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectManifest: {
+        injectionPoint: undefined,
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
+    }),
   ],
   build: {
     sourcemap: true,
