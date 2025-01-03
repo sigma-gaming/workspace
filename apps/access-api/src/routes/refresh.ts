@@ -1,8 +1,8 @@
 import { BadRequestException } from '@core/exceptions'
-import { limitByIp } from '@core/server'
 import { SessionState } from '@games/model'
 import { sessionService } from '@games/services'
 import { createRouter } from '../app/router'
+import { limitByIp } from '../middlewares/limit-by-ip'
 
 export const refreshRoute = createRouter().post(
   '/',

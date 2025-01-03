@@ -1,7 +1,8 @@
-import { limitByIp, zValidator } from '@core/server'
+import { zValidator } from '@core/server'
 import { sessionService } from '@games/services'
 import { z } from 'zod'
 import { createRouter } from '../app/router'
+import { limitByIp } from '../middlewares/limit-by-ip'
 
 export const logoutRoute = createRouter().get(
   '/',
