@@ -44,7 +44,7 @@ export const request = async <T>({
 
   const response = await fetch(url, { method, body, headers })
 
-  const json = await response.json()
+  const json = (await response.json()) as any
 
   if (!response.ok) {
     logger.error(`Request failed: ${JSON.stringify(json)}`)
