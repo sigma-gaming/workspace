@@ -4,13 +4,13 @@ import { z } from 'zod'
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
-    REFERRAL_REDIRECT_API_PORT: z.coerce.number(),
-    REFERRAL_REDIRECT_API_INTERNAL_PORT: z.coerce.number(),
+    REDIRECT_API_PORT: z.coerce.number(),
+    REDIRECT_API_INTERNAL_PORT: z.coerce.number(),
 
     PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-    PUBLIC_REFERRAL_REDIRECT_API_URL: z.string(),
-    PUBLIC_REFERRAL_REDIRECT_API_VERSION: z.string().default('unknown'),
+    PUBLIC_REDIRECT_API_URL: z.string(),
+    PUBLIC_REDIRECT_API_VERSION: z.string().default('unknown'),
 
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
@@ -25,8 +25,8 @@ const EnvSchema = z
     isProd: raw.NODE_ENV === 'production',
 
     ports: {
-      public: raw.REFERRAL_REDIRECT_API_PORT,
-      internal: raw.REFERRAL_REDIRECT_API_INTERNAL_PORT,
+      public: raw.REDIRECT_API_PORT,
+      internal: raw.REDIRECT_API_INTERNAL_PORT,
     },
 
     gamesDb: {
@@ -47,9 +47,9 @@ const EnvSchema = z
       version: raw.PUBLIC_GAMES_API_VERSION,
     },
 
-    referralRedirectApi: {
-      url: raw.PUBLIC_REFERRAL_REDIRECT_API_URL,
-      version: raw.PUBLIC_REFERRAL_REDIRECT_API_VERSION,
+    redirectApi: {
+      url: raw.PUBLIC_REDIRECT_API_URL,
+      version: raw.PUBLIC_REDIRECT_API_VERSION,
     },
   }))
 

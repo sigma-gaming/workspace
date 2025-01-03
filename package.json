@@ -19,7 +19,7 @@
     "dev:games-app": "nx run @apps/games-app:dev",
     "dev:games-api": "nx run @apis/games-api:dev",
     "dev:games-ws": "nx run @apis/games-ws:dev",
-    "dev:referral": "nx run @apis/referral-redirect-api:dev",
+    "dev:redirect": "nx run @apis/redirect-api:dev",
     "dev:payment": "nx run @apis/payment-api:dev",
     "dev:payment:bovapay": "cloudflared tunnel run bovapay",
     "db:games:generate": "nx run @dbs/games-db:migration:generate",

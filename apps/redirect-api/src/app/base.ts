@@ -8,7 +8,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 
 export const baseApp = new Hono<HonoUwsEnv>()
-  .use(cors({ origin: '*' }))
+  .use(cors())
   .use(requestIdMiddleware)
   .use(loggerMiddleware)
 

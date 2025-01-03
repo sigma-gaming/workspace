@@ -112,8 +112,8 @@ RUN pnpm nx run @apis/games-tasks:build && \
 FROM prebuild AS control-api-build
 RUN pnpm nx run @apis/control-api:build
 
-FROM prebuild AS referral-redirect-api-build
-RUN pnpm nx run @apis/referral-redirect-api:build
+FROM prebuild AS redirect-api-build
+RUN pnpm nx run @apis/redirect-api:build
 
 FROM prebuild AS access-api-build
 RUN pnpm nx run @apis/access-api:build
@@ -123,9 +123,6 @@ RUN pnpm nx run @apis/payment-api:build
 
 FROM prebuild AS letsauth-build
 RUN pnpm nx run @apis/letsauth:build
-
-FROM prebuild AS domain-api-build
-RUN pnpm nx run @apis/domain-api:build
 
 FROM api-base AS games-api
 COPY --from=games-api-build /build ./
@@ -139,9 +136,9 @@ FROM api-base AS control-api
 COPY --from=control-api-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]
 
-FROM api-base AS referral-redirect-api
-COPY --from=referral-redirect-api-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/referral-redirect-api/dist/main.js" ]
+FROM api-base AS redirect-api
+COPY --from=redirect-api-build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/redirect-api/dist/main.js" ]
 
 FROM api-base AS access-api
 COPY --from=access-api-build /build ./
@@ -156,10 +153,6 @@ COPY --from=letsauth-build /build ./
 ENV HOST=0.0.0.0
 # PORT is set from outside
 CMD [ "node", "--max_semi_space_size=64", "apps/letsauth/dist/server/entry.mjs" ]
-
-FROM api-base AS domain-api
-COPY --from=domain-api-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/domain-api/dist/main.js" ]
 
 # WS APIs
 

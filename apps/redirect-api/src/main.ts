@@ -10,6 +10,12 @@ import { env } from './env'
 const server = createServer({
   app,
   trustProxy: true,
+  uwsOptions: env.isDev
+    ? {
+        key_file_name: '../../ssl/local.key',
+        cert_file_name: '../../ssl/local.crt',
+      }
+    : {},
 })
 
 const internalServer = createServer({
@@ -30,7 +36,7 @@ server.listen(env.ports.public, (token) => {
     process.exit(1)
   }
 
-  logger.info(`🚀 API ready at ${env.referralRedirectApi.url}`)
+  logger.info(`🚀 API ready at ${env.redirectApi.url}`)
 })
 
 internalServer.listen(env.ports.internal, (token) => {

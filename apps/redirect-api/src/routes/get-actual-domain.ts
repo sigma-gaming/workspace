@@ -2,7 +2,7 @@ import { DomainApp } from '@dbs/games-types-private'
 import { domainService } from '@games/services'
 import { createRouter } from '../app/router'
 
-export const getActualDomainRoute = createRouter().get('/', async (ctx) => {
+export const domainRoute = createRouter().get('/', async (ctx) => {
   const domain = domainService.getLatestDomain(DomainApp.GamesApp)
 
   if (!domain) {

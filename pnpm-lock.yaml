@@ -707,7 +707,7 @@ importers:
         specifier: workspace:*
         version: link:../../tooling/env
 
-  apps/referral-redirect-api:
+  apps/redirect-api:
     dependencies:
       '@core/di':
         specifier: workspace:*
