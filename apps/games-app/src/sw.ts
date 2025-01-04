@@ -58,6 +58,21 @@ const fallbackHtml = `
   </section>
 </body>`
 
+const STATIC_EXTENSIONS = [
+  'js',
+  'css',
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'svg',
+  'ico',
+  'woff',
+  'woff2',
+  'ttf',
+  'eot',
+]
+
 function main() {
   const { clients, addEventListener, skipWaiting } =
     self as unknown as ServiceWorkerGlobalScope
@@ -84,7 +99,14 @@ function main() {
 
   addEventListener('fetch', (event) => {
     if (event.request.mode === 'navigate') {
-      event.respondWith(handleNavigation(event))
+      const url = new URL(event.request.url)
+      const fileExtension = url.pathname.split('.').pop()?.toLowerCase()
+      const isStatic =
+        fileExtension && STATIC_EXTENSIONS.includes(fileExtension)
+
+      if (!isStatic) {
+        event.respondWith(handleNavigation(event))
+      }
     }
   })
 
