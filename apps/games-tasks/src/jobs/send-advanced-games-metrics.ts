@@ -1,5 +1,5 @@
 import { TransactionTable } from '@dbs/games-schema'
-import { TransactionType } from '@dbs/games-types'
+import { Game, TransactionType } from '@dbs/games-types'
 import { budgetService, gamesCache, gamesDb } from '@games/services'
 import { and, count, gt, inArray, isNotNull, max, min, sum } from 'drizzle-orm'
 import { Gauge, Pushgateway, Registry } from 'prom-client'
@@ -99,6 +99,14 @@ export const sendAdvancedGamesMetricsJob = createJob({
 
     logger.info(`Budget: ${budget}`)
     budgetGauge.set(budget)
+
+    for (const type of Object.values(TransactionType)) {
+      for (const game of Object.values(Game)) {
+        maxAmountGauge.set({ type, game }, 0)
+        totalAmountGauge.set({ type, game }, 0)
+        gamesCountGauge.set({ type, game }, 0)
+      }
+    }
 
     for (const {
       game,
