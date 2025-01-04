@@ -25,6 +25,9 @@ importers:
       '@grammyjs/auto-retry':
         specifier: ^2.0.2
         version: 2.0.2(grammy@1.23.0(encoding@0.1.13))
+      '@grammyjs/emoji':
+        specifier: ^1.2.0
+        version: 1.2.0(grammy@1.23.0(encoding@0.1.13))
       '@grammyjs/parse-mode':
         specifier: ^1.10.0
         version: 1.10.0(grammy@1.23.0(encoding@0.1.13))
@@ -3111,6 +3114,11 @@ packages:
     engines: {node: '>=12.20.0 || >=14.13.1'}
     peerDependencies:
       grammy: ^1.10.0
+
+  '@grammyjs/emoji@1.2.0':
+    resolution: {integrity: sha512-gpqvcuCxtk/quVyqx0VLB3KRGycvC9nB6LirD3eCjJjR0tUaPCvCqXrG2wntLWude9R8Ywbu3CmHx1JphhwJNg==}
+    peerDependencies:
+      grammy: ^1.7.1
 
   '@grammyjs/parse-mode@1.10.0':
     resolution: {integrity: sha512-ZjbY2Ax0b4Nf8lPz3NV0cWDxUC10kOkzgxws+iTdgG+hAiPQVUnP/oJnAKrW1ZQOWULZYQ4GOR/+aCZHyUuLQA==}
@@ -12657,6 +12665,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@grammyjs/emoji@1.2.0(grammy@1.23.0(encoding@0.1.13))':
+    dependencies:
+      grammy: 1.23.0(encoding@0.1.13)
+
   '@grammyjs/parse-mode@1.10.0(grammy@1.23.0(encoding@0.1.13))':
     dependencies:
       grammy: 1.23.0(encoding@0.1.13)
@@ -14645,7 +14657,7 @@ snapshots:
       '@astrojs/telemetry': 3.1.0
       '@babel/core': 7.25.8
       '@babel/plugin-transform-react-jsx': 7.25.7(@babel/core@7.25.8)
-      '@babel/types': 7.26.3
+      '@babel/types': 7.25.8
       '@oslojs/encoding': 1.1.0
       '@rollup/pluginutils': 5.1.2(rollup@2.79.2)
       '@types/babel__core': 7.20.5
@@ -14702,7 +14714,7 @@ snapshots:
       zod-to-json-schema: 3.23.3(zod@3.23.8)
       zod-to-ts: 1.2.0(typescript@5.5.3)(zod@3.23.8)
     optionalDependencies:
-      sharp: 0.33.5
+      sharp: 0.33.4
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -17983,7 +17995,8 @@ snapshots:
 
   nanoid@3.3.7: {}
 
-  nanoid@3.3.8: {}
+  nanoid@3.3.8:
+    optional: true
 
   natural-compare@1.4.0: {}
 
@@ -18464,6 +18477,7 @@ snapshots:
       nanoid: 3.3.8
       picocolors: 1.1.1
       source-map-js: 1.2.1
+    optional: true
 
   postgres-array@2.0.0: {}
 
@@ -20123,7 +20137,7 @@ snapshots:
   vite@5.4.9(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.4.38))(terser@5.31.0):
     dependencies:
       esbuild: 0.21.5
-      postcss: 8.4.49
+      postcss: 8.4.47
       rollup: 4.24.0
     optionalDependencies:
       '@types/node': 22.10.2

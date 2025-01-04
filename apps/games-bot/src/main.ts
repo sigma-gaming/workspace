@@ -5,6 +5,7 @@ import { createServer } from '@core/server'
 import { DomainApp } from '@dbs/games-types-private'
 import { affiliateService, domainService } from '@games/services'
 import { autoRetry } from '@grammyjs/auto-retry'
+import { emoji, EmojiFlavor } from '@grammyjs/emoji'
 import {
   fmt,
   hydrateReply,
@@ -19,7 +20,7 @@ import { app } from './app'
 import { internalApp } from './app/internal'
 import { env } from './env'
 
-type BotContext = ParseModeFlavor<Context>
+type BotContext = ParseModeFlavor<EmojiFlavor<Context>>
 
 const bot = new Bot<BotContext>(env.telegram.botFullToken)
 
@@ -48,15 +49,16 @@ bot.command('start', async (ctx) => {
     throw new Error('Actual domain not found')
   }
 
-  const url = `https://${latestDomain.host}?r=${code}`
+  const url = new URL(`https://${latestDomain.host}`)
+  if (code) url.searchParams.set('r', code)
 
-  const keyboard = new InlineKeyboard().url('Перейти на сайт', url)
+  const keyboard = new InlineKeyboard().url('Перейти на сайт', url.toString())
 
   await ctx.replyFmt(
     fmt([
-      fmt`Привет, ${ctx.from?.first_name ?? 'друг'}! 🎮 Добро пожаловать в мир Sigma Games!\n\n`,
-      fmt`Наш актуальный домен: ${link(latestDomain.host, url)}. Я добавил кнопку ниже, чтобы ты мог легко перейти на наш сайт и начать своё игровое приключение.\n\n`,
-      fmt`У нас ты точно найдешь игру, которая тебе понравится. Присоединяйся к нашему сообществу и начни играть прямо сейчас! 😎\n\n`,
+      fmt`Привет, ${ctx.from?.first_name ?? 'друг'}! ${emoji('video_game')} Добро пожаловать в мир Sigma Games!\n\n`,
+      fmt`Наш актуальный домен: ${link(latestDomain.host, url.toString())}. Я добавил кнопку ниже, чтобы ты мог легко перейти на наш сайт и начать своё игровое приключение.\n\n`,
+      fmt`У нас ты точно найдешь игру, которая тебе понравится. Присоединяйся к нашему сообществу и начни играть прямо сейчас! ${emoji('smiling_face_with_sunglasses')}\n\n`,
       fmt`Если у тебя возникнут вопросы, я всегда готов помочь. Удачи и приятной игры!`,
     ]),
     { reply_markup: keyboard },
