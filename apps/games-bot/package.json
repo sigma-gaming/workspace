@@ -1,11 +1,8 @@
 {
-  "name": "@apis/games-ws",
+  "name": "@bots/games-bot",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "./src/client.ts",
-  "module": "./src/client.ts",
-  "types": "./src/client.ts",
   "scripts": {
     "copy-env": "copy-env",
     "dev": "NODE_ENV=development tsx watch src/main.ts --clear-screen=false",
@@ -19,15 +16,11 @@
   "dependencies": {
     "@dbs/games-db": "workspace:*",
     "@dbs/games-schema": "workspace:*",
-    "@games/model": "workspace:*",
+    "@core/server": "workspace:*",
     "@games/services": "workspace:*",
     "@games/options": "workspace:*",
-    "@games/engine": "workspace:*",
     "@core/di": "workspace:*",
-    "@core/exceptions": "workspace:*",
     "@core/logger": "workspace:*",
-    "@tooling/env": "workspace:*",
-    "@core/io-client": "workspace:*",
-    "@core/utils": "workspace:*"
+    "@tooling/env": "workspace:*"
   }
 }

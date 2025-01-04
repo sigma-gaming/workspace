@@ -25,7 +25,6 @@
     "@dbs/games-db": "workspace:*",
     "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*",
-    "@games/redis": "workspace:*",
     "@games/services": "workspace:*",
     "@games/options": "workspace:*",
     "@core/server": "workspace:*",

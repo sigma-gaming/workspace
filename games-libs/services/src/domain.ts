@@ -8,7 +8,7 @@ import { desc } from 'drizzle-orm'
 export class DomainService {
   private logger = loggerService.logger.child('Domain')
   private cached: DomainSelect[] = []
-  private initializationPromise?: Promise<void>
+  private initializationPromise: Promise<void>
 
   constructor() {
     this.initializationPromise = this.initialize()

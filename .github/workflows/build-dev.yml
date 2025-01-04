@@ -107,7 +107,7 @@ jobs:
       - name: Check if hash check should be used
         id: hash-check
         run: |
-          if [[ "${{ steps.parse.outputs.scope }}" =~ ^(apps|apis)$ ]]; then
+          if [[ "${{ steps.parse.outputs.scope }}" =~ ^(apps|apis|bots)$ ]]; then
             echo "should_check=true" >> $GITHUB_OUTPUT
           else
             echo "should_check=false" >> $GITHUB_OUTPUT

@@ -172,6 +172,15 @@ WORKDIR /workspace
 COPY --from=games-ws-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
 
+# Bots
+
+FROM prebuild AS games-bot-build
+RUN pnpm nx run @bots/games-bot:build
+
+FROM api-base AS games-bot
+COPY --from=games-bot-build /build ./
+CMD [ "node", "--max_semi_space_size=64", "apps/games-bot/dist/main.js" ]
+
 # Migrations
 
 FROM prebuild AS games-db-migration-build

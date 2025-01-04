@@ -16,7 +16,6 @@
   "dependencies": {
     "@dbs/games-db": "workspace:*",
     "@dbs/games-schema": "workspace:*",
-    "@games/redis": "workspace:*",
     "@core/server": "workspace:*",
     "@games/services": "workspace:*",
     "@games/options": "workspace:*",
