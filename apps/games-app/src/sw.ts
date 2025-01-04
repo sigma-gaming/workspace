@@ -142,15 +142,16 @@ function main() {
         if (domainResponse.ok) {
           console.info('Domain response is ok, parsing data')
 
-          const data = await domainResponse.json()
-          const currentHost = new URL(event.request.url).host
-          console.info('Current host:', currentHost)
-          console.info('Actual host:', data.host)
+          const domain = await domainResponse.json()
+          const { host, pathname, search } = new URL(event.request.url)
 
-          if (data?.host && data.host !== currentHost) {
+          console.info('Current host:', host)
+          console.info('Actual host:', domain.host)
+
+          if (domain?.host && domain.host !== host) {
             console.info('Redirecting to new domain')
 
-            const redirectUrl = `https://${data.host}`
+            const redirectUrl = `https://${domain.host}${pathname}${search}`
             return Response.redirect(redirectUrl, 302)
           }
 
