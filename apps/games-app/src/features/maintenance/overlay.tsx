@@ -16,10 +16,8 @@ export const MaintenanceOverlay = () => {
         <Loader size="xl" />
         <Text className="text-center" size="lg" lh="xs">
           Начинаются технические работы, следите за&nbsp;обновлениями
-          в&nbsp;нашем{' '}
-          <Anchor href="https://t.me/SigmaGamesFeed">
-            Telegram&nbsp;канале
-          </Anchor>
+          в&nbsp;нашем Telegram&nbsp;канале:{' '}
+          <Anchor href="https://t.me/SigmaGamesFeed">@SigmaGamesFeed</Anchor>
         </Text>
       </div>
     </CenteredLayout>

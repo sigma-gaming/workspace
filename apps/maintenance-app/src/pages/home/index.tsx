@@ -25,10 +25,8 @@ export const HomePageView = () => {
           </h1>
         </div>
         <Text className="text-center" size="md" lh="md">
-          Следите за&nbsp;обновлениями в&nbsp;нашем{' '}
-          <Anchor href="https://t.me/SigmaGamesFeed">
-            Telegram&nbsp;канале
-          </Anchor>
+          Следите за&nbsp;обновлениями в&nbsp;нашем Telegram&nbsp;канале:{' '}
+          <Anchor href="https://t.me/SigmaGamesFeed">@SigmaGamesFeed</Anchor>
         </Text>
       </div>
     </CenteredLayout>
