@@ -152,7 +152,7 @@ jobs:
       - name: Check cache for this build
         if: steps.hash-check.outputs.should_check == 'true'
         id: check-cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v4
         with:
           path: .temp-cache-file
           key: build-cache-${{ steps.parse.outputs.name }}-${{ steps.calculate-hash.outputs.hash }}
@@ -215,7 +215,7 @@ jobs:
 
       - name: Set cache for this build hash
         if: steps.hash-check.outputs.should_check == 'true' && steps.should-skip-build.outputs.should_skip != 'true'
-        uses: actions/cache@v3
+        uses: actions/cache/save@v4
         with:
           path: .temp-cache-file
           key: build-cache-${{ steps.parse.outputs.name }}-${{ steps.calculate-hash.outputs.hash }}
