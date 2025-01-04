@@ -9,6 +9,8 @@ import { internalApp } from './app/internal'
 import { env } from './env'
 import { sentry } from './shared/sentry'
 
+await domainService.waitForInitialization()
+
 app.onError(
   createErrorHandler({
     showOriginalError: env.isDev,
@@ -35,9 +37,6 @@ const internalServer = createServer({
   app: internalApp,
   trustProxy: true,
 })
-
-// Initialize lazy services
-domainService.waitForInitialization()
 
 server.listen(env.ports.public, (token) => {
   if (!token) {

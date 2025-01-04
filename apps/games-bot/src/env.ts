@@ -21,6 +21,8 @@ const EnvSchema = z
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
+
+    BYPASS_WAF_TOKEN: z.string().optional(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
@@ -53,6 +55,10 @@ const EnvSchema = z
       botId: raw.PUBLIC_TELEGRAM_BOT_ID,
       botToken: raw.TELEGRAM_BOT_TOKEN,
       botFullToken: `${raw.PUBLIC_TELEGRAM_BOT_ID}:${raw.TELEGRAM_BOT_TOKEN}`,
+    },
+
+    waf: {
+      bypassToken: raw.BYPASS_WAF_TOKEN,
     },
   }))
 

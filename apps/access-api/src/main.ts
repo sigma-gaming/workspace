@@ -7,6 +7,8 @@ import { app } from './app'
 import { internalApp } from './app/internal'
 import { env } from './env'
 
+await domainService.waitForInitialization()
+
 app.onError(
   createErrorHandler({
     showOriginalError: env.isDev,
@@ -32,9 +34,6 @@ const internalServer = createServer({
   app: internalApp,
   trustProxy: true,
 })
-
-// Initialize lazy services
-domainService.waitForInitialization()
 
 server.listen(env.ports.public, (token) => {
   if (!token) {

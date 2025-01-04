@@ -20,6 +20,8 @@ import { app } from './app'
 import { internalApp } from './app/internal'
 import { env } from './env'
 
+await domainService.waitForInitialization()
+
 type BotContext = ParseModeFlavor<EmojiFlavor<Context>>
 
 const bot = new Bot<BotContext>(env.telegram.botFullToken)
@@ -94,12 +96,10 @@ if (env.isDev) {
       process.exit(1)
     }
 
-    bot.api.setWebhook(url)
+    bot.api.setWebhook(url, { secret_token: env.waf.bypassToken })
     logger.info(`🚀 Bot ready at ${url}`)
   })
 }
-
-await domainService.waitForInitialization()
 
 const internalServer = createServer({
   app: internalApp,

@@ -7,6 +7,8 @@ import { app } from './app'
 import { internalApp } from './app/internal'
 import { env } from './env'
 
+await domainService.waitForInitialization()
+
 app.onError(
   createErrorHandler({
     showOriginalError: env.isDev,
@@ -50,9 +52,6 @@ internalServer.listen(env.ports.internal, (token) => {
 
   logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
 })
-
-// Initialize lazy services
-domainService.waitForInitialization()
 
 process.on('uncaughtException', (error) => {
   logger.info('Uncaught exception')
