@@ -13,6 +13,8 @@ $$app.started()
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(
-    import.meta.env.MODE === 'production' ? '/sw.js' : '/dev-sw.js?dev-sw',
+    import.meta.env.MODE === 'production'
+      ? `/sw.js?random=${Math.random().toString().slice(2)}`
+      : '/dev-sw.js?dev-sw',
   )
 }
