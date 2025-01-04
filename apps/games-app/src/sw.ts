@@ -1,16 +1,27 @@
 /// <reference lib="webworker" />
 
-const fallbackHtml = `<div>
+const fallbackHtml = `
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="theme-color" content="#1E0130">
+  <title>Сайт недоступен</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300..900&amp;display=swap" rel="stylesheet">
+</head>
+<body>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body { 
       background-color: #181623; 
       color: #C0C1D9; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      font-family: Rubik, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      min-height: 100%;
       padding: 20px;
     }
     .container {
@@ -28,6 +39,9 @@ const fallbackHtml = `<div>
       margin: 0;
       line-height: 1.5;
     }
+    p + p {
+      margin-top: 16px;
+    }
     a {
       color: #ad6ddf;
       text-decoration: none;
@@ -39,9 +53,10 @@ const fallbackHtml = `<div>
   <div class="container">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 96px; height: 96px;"><path d="M4 7m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z"></path><path d="M7 16v4"></path><path d="M7.5 16l9 -9"></path><path d="M13.5 16l6.5 -6.5"></path><path d="M4 13.5l6.5 -6.5"></path><path d="M17 16v4"></path><path d="M5 20h4"></path><path d="M15 20h4"></path><path d="M17 7v-2"></path><path d="M7 7v-2"></path></svg>
     <h1>Сайт недоступен</h1>
+    <p>У вас отсутствует подключение к&nbsp;интернету, или сайт заблокирован в&nbsp;вашем&nbsp;регионе</p>
     <p>Получите актуальный домен в&nbsp;нашем Telegram&nbsp;боте: <a href="https://t.me/SigmaGamesBot">@SigmaGamesBot</a></p>
   </div>
-</div>`
+</body>`
 
 function main() {
   const { clients, addEventListener, skipWaiting } =
