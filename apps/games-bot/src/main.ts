@@ -35,15 +35,15 @@ bot.use(limit({ limit: 3, timeFrame: 2000 }))
 
 bot.catch(logger.error)
 
-async function processStartQuery(match: string) {
+async function getStartReferralCampaign(match: string) {
   if (!match) return null
   const campaign = await affiliateService.getCampaign(match)
   if (!campaign) return null
-  return campaign.code
+  return campaign
 }
 
 bot.command('start', async (ctx) => {
-  const code = await processStartQuery(ctx.match)
+  const campaign = await getStartReferralCampaign(ctx.match)
 
   const latestDomain = domainService.getLatestDomain(DomainApp.GamesApp)
 
@@ -52,7 +52,12 @@ bot.command('start', async (ctx) => {
   }
 
   const url = new URL(`https://${latestDomain.host}`)
-  if (code) url.searchParams.set('r', code)
+
+  if (campaign) {
+    url.searchParams.set('r', campaign.code)
+
+    affiliateService.incrementCampaignVisits({ campaignId: campaign.id })
+  }
 
   const keyboard = new InlineKeyboard().url('Перейти на сайт', url.toString())
 
