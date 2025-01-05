@@ -88,7 +88,7 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  app.use(webhookCallback(bot, 'hono'))
+  app.post('/', webhookCallback(bot, 'hono'))
 
   server = createServer({
     app,
