@@ -211,7 +211,7 @@ jobs:
           gcloud builds submit . \
             --config cloudbuild.yaml \
             --region ${{ vars.GCLOUD_REGISTRY_REGION }} \
-            --polling-interval=30
+            --polling-interval=20
 
       - name: Set cache for this build hash
         if: steps.hash-check.outputs.should_check == 'true' && steps.should-skip-build.outputs.should_skip != 'true'
