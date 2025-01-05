@@ -100,7 +100,7 @@ export const sendAdvancedGamesMetricsJob = createJob({
     logger.info(`Budget: ${budget}`)
     budgetGauge.set(budget)
 
-    for (const type of Object.values(TransactionType)) {
+    for (const type of [TransactionType.Win, TransactionType.Loss]) {
       for (const game of Object.values(Game)) {
         maxAmountGauge.set({ type, game }, 0)
         totalAmountGauge.set({ type, game }, 0)
