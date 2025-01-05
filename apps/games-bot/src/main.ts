@@ -14,9 +14,10 @@ import {
 } from '@grammyjs/parse-mode'
 import { limit } from '@grammyjs/ratelimiter'
 import { apiThrottler } from '@grammyjs/transformer-throttler'
+import { serve } from '@hono/node-server'
 import { Bot, Context, InlineKeyboard, webhookCallback } from 'grammy'
+import { Hono } from 'hono'
 import { TemplatedApp } from 'uWebSockets.js'
-import { app } from './app'
 import { internalApp } from './app/internal'
 import { env } from './env'
 
@@ -88,22 +89,18 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  app.post('/', webhookCallback(bot, 'hono'))
+  const app = new Hono().post('/', webhookCallback(bot, 'hono'))
 
-  server = createServer({
-    app,
-    trustProxy: true,
+  serve({
+    fetch: app.fetch,
+    port: env.ports.public,
   })
 
-  server.listen(env.ports.public, (token) => {
-    if (!token) {
-      logger.error('Failed to start API')
-      process.exit(1)
-    }
-
-    bot.api.setWebhook(url, { secret_token: env.telegram.webhookSecretToken })
-    logger.info(`🚀 Bot ready at ${url}`)
+  await bot.api.setWebhook(url, {
+    secret_token: env.telegram.webhookSecretToken,
   })
+
+  logger.info(`🚀 Bot ready at ${url}`)
 }
 
 const internalServer = createServer({
