@@ -37,8 +37,13 @@ type BotContext = ParseModeFlavor<EmojiFlavor<Context>>
 
 const bot = new Bot<BotContext>(env.telegram.botFullToken)
 
-logger.info('Env')
-logger.info(env)
+bot.api.config.use(async (prev, method, payload, signal) => {
+  logger.info(`Method: ${method}`)
+  logger.info(`Payload: ${JSON.stringify(payload)}`)
+  const response = await prev(method, payload, signal)
+  logger.info(`Response: ${JSON.stringify(response)}`)
+  return response
+})
 
 bot.api.config.use(
   autoRetry({
