@@ -40,9 +40,15 @@ const bot = new Bot<BotContext>(env.telegram.botFullToken)
 bot.api.config.use(async (prev, method, payload, signal) => {
   logger.info(`Method: ${method}`)
   logger.info(`Payload: ${JSON.stringify(payload)}`)
-  const response = await prev(method, payload, signal)
-  logger.info(`Response: ${JSON.stringify(response)}`)
-  return response
+
+  try {
+    const response = await prev(method, payload, signal)
+    logger.info(`Response: ${JSON.stringify(response)}`)
+    return response
+  } catch (error) {
+    logger.error(error)
+    throw error
+  }
 })
 
 bot.api.config.use(
