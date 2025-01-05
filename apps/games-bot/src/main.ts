@@ -1,13 +1,7 @@
 import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import {
-  createErrorHandler,
-  createServer,
-  HonoUwsEnv,
-  loggerMiddleware,
-  requestIdMiddleware,
-} from '@core/server'
+import { createServer } from '@core/server'
 import { DomainApp } from '@dbs/games-types-private'
 import { affiliateService, domainService } from '@games/services'
 import { autoRetry } from '@grammyjs/auto-retry'
@@ -20,9 +14,8 @@ import {
 } from '@grammyjs/parse-mode'
 import { limit } from '@grammyjs/ratelimiter'
 import { apiThrottler } from '@grammyjs/transformer-throttler'
+import express, { Express } from 'express'
 import { Bot, Context, InlineKeyboard, webhookCallback } from 'grammy'
-import { Hono } from 'hono'
-import { TemplatedApp } from 'uWebSockets.js'
 import { internalApp } from './app/internal'
 import { env } from './env'
 
@@ -77,7 +70,7 @@ bot.command('start', async (ctx) => {
   )
 })
 
-let server: TemplatedApp | undefined
+let server: Express | undefined
 
 if (env.isDev) {
   bot.catch(logger.error)
@@ -95,40 +88,58 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  const app = new Hono<HonoUwsEnv>()
-    .use(requestIdMiddleware)
-    .use(loggerMiddleware)
-    .post(
-      '/',
-      webhookCallback(bot, 'hono', {
-        secretToken: env.telegram.webhookSecretToken,
-      }),
-    )
-    .onError(
-      createErrorHandler({
-        showOriginalError: false,
-        onInternalError: (error) => {
-          logger.error(error)
-        },
-      }),
-    )
+  server = express()
 
-  server = createServer({
-    app,
-    trustProxy: true,
+  server.use(express.json())
+
+  server.post(
+    '/',
+    webhookCallback(bot, 'express', {
+      secretToken: env.telegram.webhookSecretToken,
+    }),
+  )
+
+  server.on('error', (error) => {
+    logger.error(error)
   })
 
-  server.listen(env.ports.public, async (token) => {
-    if (!token) {
-      logger.error('Failed to start API')
-      process.exit(1)
-    }
+  // const app = new Hono<HonoUwsEnv>()
+  //   .use(requestIdMiddleware)
+  //   .use(loggerMiddleware)
+  //   .post(
+  //     '/',
+  //     webhookCallback(bot, 'hono', {
+  //       secretToken: env.telegram.webhookSecretToken,
+  //     }),
+  //   )
+  //   .onError(
+  //     createErrorHandler({
+  //       showOriginalError: false,
+  //       onInternalError: (error) => {
+  //         logger.error(error)
+  //       },
+  //     }),
+  //   )
 
-    await bot.api.setWebhook(url, {
-      secret_token: env.telegram.webhookSecretToken,
-    })
+  // server = createServer({
+  //   app,
+  //   trustProxy: true,
+  // })
 
+  server.listen(env.ports.public, () => {
     logger.info(`🚀 Bot ready at ${url}`)
+
+    bot.api
+      .setWebhook(url, {
+        secret_token: env.telegram.webhookSecretToken,
+      })
+      .then((is) => {
+        logger.info(`Webhook ${is ? 'set' : 'failed to set'}`)
+      })
+      .catch((error) => {
+        logger.info('Failed to set webhook')
+        logger.error(error)
+      })
   })
 }
 
@@ -178,7 +189,6 @@ async function handleExit() {
   }, 5000)
 
   logger.info('Closing servers..')
-  server?.close()
   internalServer.close()
   logger.info('Servers closed')
 

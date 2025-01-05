@@ -8,7 +8,7 @@
     "dev": "NODE_ENV=development tsx watch src/main.ts --clear-screen=false",
     "build": "NODE_ENV=production bun build.mjs",
     "start": "NODE_ENV=production node dist/main.js",
-    "preview": "dotenv -e .env.development -- node dist/main.js",
+    "preview": "NODE_ENV=development dotenv -e .env.development -- node dist/main.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"
@@ -21,6 +21,7 @@
     "@games/options": "workspace:*",
     "@core/di": "workspace:*",
     "@core/logger": "workspace:*",
-    "@tooling/env": "workspace:*"
+    "@tooling/env": "workspace:*",
+    "express": "4.21.2"
   }
 }
