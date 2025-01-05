@@ -71,6 +71,7 @@ async function getStartReferralCampaign(match: string) {
 }
 
 bot.command('start', async (ctx) => {
+  logger.info('Start command received')
   const campaign = await getStartReferralCampaign(ctx.match)
 
   const latestDomain = domainService.getLatestDomain(DomainApp.GamesApp)

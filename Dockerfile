@@ -172,14 +172,19 @@ WORKDIR /workspace
 COPY --from=games-ws-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
 
+# Bot base
+
+FROM node:18.20.5-slim AS bot-base
+ENV NODE_ENV=production
+
 # Bots
 
 FROM prebuild AS games-bot-build
 RUN pnpm nx run @bots/games-bot:build
 
-FROM api-base AS games-bot
+FROM bot-base AS games-bot
 COPY --from=games-bot-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "--dns-result-order=ipv4first", "apps/games-bot/dist/main.js" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/games-bot/dist/main.js" ]
 
 # Migrations
 
