@@ -40,7 +40,14 @@ const bot = new Bot<BotContext>(env.telegram.botFullToken)
 logger.info('Env')
 logger.info(env)
 
-bot.api.config.use(autoRetry({ maxDelaySeconds: 5 }))
+bot.api.config.use(
+  autoRetry({
+    maxDelaySeconds: 5,
+    rethrowHttpErrors: true,
+    rethrowInternalServerErrors: true,
+    maxRetryAttempts: 30,
+  }),
+)
 
 bot.use(hydrateReply)
 bot.use(limit({ limit: 3, timeFrame: 2000 }))
