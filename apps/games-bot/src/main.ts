@@ -13,7 +13,6 @@ import {
   type ParseModeFlavor,
 } from '@grammyjs/parse-mode'
 import { limit } from '@grammyjs/ratelimiter'
-import { apiThrottler } from '@grammyjs/transformer-throttler'
 import express, { Express } from 'express'
 import { Bot, Context, InlineKeyboard, webhookCallback } from 'grammy'
 import { internalApp } from './app/internal'
@@ -25,8 +24,6 @@ type BotContext = ParseModeFlavor<EmojiFlavor<Context>>
 
 const bot = new Bot<BotContext>(env.telegram.botFullToken)
 
-const throttler = apiThrottler()
-bot.api.config.use(throttler)
 bot.api.config.use(autoRetry({ maxDelaySeconds: 5 }))
 
 bot.use(emojiParser)
