@@ -17,6 +17,9 @@ export const logoutRoute = createRouter().get(
     const { hostname } = new URL(returnUrl)
     const domain = sessionService.getBaseDomain(ctx)
 
+    const logger = ctx.get('logger')
+    logger.info(JSON.stringify({ hostname, domain }))
+
     if (hostname !== domain && !hostname.endsWith('.' + domain)) {
       ctx.status(400)
       return ctx.text('Invalid return URL')
