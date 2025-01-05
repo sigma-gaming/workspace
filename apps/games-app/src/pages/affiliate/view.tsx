@@ -139,41 +139,43 @@ const LinkCardView = ({
   code?: string
   loading?: boolean
 }) => {
-  const link = `${env.redirectApi.url}/r/${code}`
+  const redirectLink = `${env.redirectApi.url}/r/${code}`
+  const botLink = `https://t.me/${env.telegram.botUsername}?start=${code}`
 
   return (
     <Skeleton visible={loading}>
       <Card className="gap-4 min-h-[112px]">
-        <h2 className="text-lg font-medium leading-tight">
-          Ваша реферальная ссылка
-        </h2>
-        <CopyButton value={link} timeout={2000}>
-          {({ copied, copy }) => (
-            <Tooltip
-              label={copied ? 'Скопировано!' : 'Скопировать ссылку'}
-              className="text-sm px-2 py-1"
-              position="right"
-            >
-              <button
-                className="mt-auto flex items-center justify-between gap-2 pl-3 pr-[9px] h-9 bg-[var(--mantine-color-input-bg)] rounded-lg select-none"
-                onClick={copy}
-              >
-                <span className="text-sm truncate">{link}</span>
-                {copied ? (
-                  <IconCheck
-                    className="text-green-600"
-                    width={18}
-                    height={18}
-                  />
-                ) : (
-                  <IconCopy className="text-dimmed" width={18} height={18} />
-                )}
-              </button>
-            </Tooltip>
-          )}
-        </CopyButton>
+        <h2 className="text-lg font-medium leading-tight">Ваши ссылки</h2>
+        <LinkField link={redirectLink} />
+        <LinkField link={botLink} />
       </Card>
     </Skeleton>
+  )
+}
+
+const LinkField = ({ link }: { link: string }) => {
+  return (
+    <CopyButton value={link} timeout={2000}>
+      {({ copied, copy }) => (
+        <Tooltip
+          label={copied ? 'Скопировано!' : 'Скопировать ссылку'}
+          className="text-sm px-2 py-1"
+          position="right"
+        >
+          <button
+            className="mt-auto flex items-center justify-between gap-2 pl-3 pr-[9px] h-9 bg-[var(--mantine-color-input-bg)] rounded-lg select-none"
+            onClick={copy}
+          >
+            <span className="text-sm truncate">{link}</span>
+            {copied ? (
+              <IconCheck className="text-green-600" width={18} height={18} />
+            ) : (
+              <IconCopy className="text-dimmed" width={18} height={18} />
+            )}
+          </button>
+        </Tooltip>
+      )}
+    </CopyButton>
   )
 }
 

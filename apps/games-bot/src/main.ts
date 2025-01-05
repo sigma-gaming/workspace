@@ -1,11 +1,17 @@
 import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { createServer } from '@core/server'
+import {
+  createErrorHandler,
+  createServer,
+  HonoUwsEnv,
+  loggerMiddleware,
+  requestIdMiddleware,
+} from '@core/server'
 import { DomainApp } from '@dbs/games-types-private'
 import { affiliateService, domainService } from '@games/services'
 import { autoRetry } from '@grammyjs/auto-retry'
-import { emoji, EmojiFlavor, emojiParser } from '@grammyjs/emoji'
+import { emoji, EmojiFlavor } from '@grammyjs/emoji'
 import {
   fmt,
   hydrateReply,
@@ -13,8 +19,9 @@ import {
   type ParseModeFlavor,
 } from '@grammyjs/parse-mode'
 import { limit } from '@grammyjs/ratelimiter'
-import express, { Express } from 'express'
 import { Bot, Context, InlineKeyboard, webhookCallback } from 'grammy'
+import { Hono } from 'hono'
+import { TemplatedApp } from 'uWebSockets.js'
 import { internalApp } from './app/internal'
 import { env } from './env'
 
@@ -26,7 +33,6 @@ const bot = new Bot<BotContext>(env.telegram.botFullToken)
 
 bot.api.config.use(autoRetry({ maxDelaySeconds: 5 }))
 
-bot.use(emojiParser)
 bot.use(hydrateReply)
 bot.use(limit({ limit: 3, timeFrame: 2000 }))
 
@@ -38,6 +44,7 @@ async function getStartReferralCampaign(match: string) {
 }
 
 bot.command('start', async (ctx) => {
+  console.log(123)
   const campaign = await getStartReferralCampaign(ctx.match)
 
   const latestDomain = domainService.getLatestDomain(DomainApp.GamesApp)
@@ -67,7 +74,7 @@ bot.command('start', async (ctx) => {
   )
 })
 
-let server: Express | undefined
+let server: TemplatedApp | undefined
 
 if (env.isDev) {
   bot.catch(logger.error)
@@ -85,45 +92,36 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  server = express()
+  const app = new Hono<HonoUwsEnv>()
+    .use(requestIdMiddleware)
+    .use(loggerMiddleware)
+    .post(
+      '/',
+      webhookCallback(bot, 'hono', {
+        secretToken: env.telegram.webhookSecretToken,
+      }),
+    )
+    .onError(
+      createErrorHandler({
+        showOriginalError: false,
+        onInternalError: (error) => {
+          logger.error(error)
+        },
+      }),
+    )
 
-  server.use(express.json())
-
-  server.post(
-    '/',
-    webhookCallback(bot, 'express', {
-      secretToken: env.telegram.webhookSecretToken,
-    }),
-  )
-
-  server.on('error', (error) => {
-    logger.error(error)
+  server = createServer({
+    app,
+    trustProxy: true,
   })
 
-  // const app = new Hono<HonoUwsEnv>()
-  //   .use(requestIdMiddleware)
-  //   .use(loggerMiddleware)
-  //   .post(
-  //     '/',
-  //     webhookCallback(bot, 'hono', {
-  //       secretToken: env.telegram.webhookSecretToken,
-  //     }),
-  //   )
-  //   .onError(
-  //     createErrorHandler({
-  //       showOriginalError: false,
-  //       onInternalError: (error) => {
-  //         logger.error(error)
-  //       },
-  //     }),
-  //   )
+  server.listen(env.ports.public, (token) => {
+    if (!token) {
+      logger.error('Failed to start Games Bot')
+      process.exit(1)
+    }
 
-  // server = createServer({
-  //   app,
-  //   trustProxy: true,
-  // })
-
-  server.listen(env.ports.public, () => {
+    logger.info(`🚀 Webhook server started at port ${env.ports.public}`)
     logger.info(`🚀 Bot ready at ${url}`)
 
     bot.api

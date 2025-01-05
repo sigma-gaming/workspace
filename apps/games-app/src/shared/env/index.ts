@@ -13,6 +13,7 @@ const PublicEnvSchema = z
     PUBLIC_ACCESS_API_URL: z.string(),
     PUBLIC_REDIRECT_API_URL: z.string(),
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
+    PUBLIC_TELEGRAM_BOT_USERNAME: z.string(),
     PUBLIC_VK_APP_ID: z.string(),
   })
   .transform((raw) => ({
@@ -39,6 +40,7 @@ const PublicEnvSchema = z
     },
     telegram: {
       botId: raw.PUBLIC_TELEGRAM_BOT_ID,
+      botUsername: raw.PUBLIC_TELEGRAM_BOT_USERNAME,
     },
     vk: {
       appId: raw.PUBLIC_VK_APP_ID,
