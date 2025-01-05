@@ -101,7 +101,7 @@ if (env.isDev) {
       process.exit(1)
     }
 
-    bot.api.setWebhook(url, { secret_token: env.waf.bypassToken })
+    bot.api.setWebhook(url, { secret_token: env.telegram.webhookSecretToken })
     logger.info(`🚀 Bot ready at ${url}`)
   })
 }
