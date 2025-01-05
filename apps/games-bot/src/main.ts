@@ -1,7 +1,7 @@
 import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { createServer } from '@core/server'
+import { createErrorHandler, createServer } from '@core/server'
 import { DomainApp } from '@dbs/games-types-private'
 import { affiliateService, domainService } from '@games/services'
 import { autoRetry } from '@grammyjs/auto-retry'
@@ -89,12 +89,21 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  const app = new Hono().post(
-    '/',
-    webhookCallback(bot, 'hono', {
-      secretToken: env.telegram.webhookSecretToken,
-    }),
-  )
+  const app = new Hono()
+    .post(
+      '/',
+      webhookCallback(bot, 'hono', {
+        secretToken: env.telegram.webhookSecretToken,
+      }),
+    )
+    .onError(
+      createErrorHandler({
+        showOriginalError: false,
+        onInternalError: (error) => {
+          logger.error(error)
+        },
+      }),
+    )
 
   serve({
     fetch: app.fetch,
