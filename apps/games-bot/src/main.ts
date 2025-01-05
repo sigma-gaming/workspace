@@ -1,11 +1,17 @@
 import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import { createErrorHandler, createServer } from '@core/server'
+import {
+  createErrorHandler,
+  createServer,
+  HonoUwsEnv,
+  loggerMiddleware,
+  requestIdMiddleware,
+} from '@core/server'
 import { DomainApp } from '@dbs/games-types-private'
 import { affiliateService, domainService } from '@games/services'
 import { autoRetry } from '@grammyjs/auto-retry'
-import { emoji, EmojiFlavor } from '@grammyjs/emoji'
+import { emoji, EmojiFlavor, emojiParser } from '@grammyjs/emoji'
 import {
   fmt,
   hydrateReply,
@@ -14,7 +20,6 @@ import {
 } from '@grammyjs/parse-mode'
 import { limit } from '@grammyjs/ratelimiter'
 import { apiThrottler } from '@grammyjs/transformer-throttler'
-import { serve } from '@hono/node-server'
 import { Bot, Context, InlineKeyboard, webhookCallback } from 'grammy'
 import { Hono } from 'hono'
 import { TemplatedApp } from 'uWebSockets.js'
@@ -31,10 +36,9 @@ const throttler = apiThrottler()
 bot.api.config.use(throttler)
 bot.api.config.use(autoRetry({ maxDelaySeconds: 5 }))
 
+bot.use(emojiParser)
 bot.use(hydrateReply)
 bot.use(limit({ limit: 3, timeFrame: 2000 }))
-
-bot.catch(logger.error)
 
 async function getStartReferralCampaign(match: string) {
   if (!match) return null
@@ -76,7 +80,9 @@ bot.command('start', async (ctx) => {
 let server: TemplatedApp | undefined
 
 if (env.isDev) {
+  bot.catch(logger.error)
   bot.start()
+
   logger.info('🚀 Bot long polling started')
 } else {
   const url = env.gamesBot.url
@@ -89,7 +95,9 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  const app = new Hono()
+  const app = new Hono<HonoUwsEnv>()
+    .use(requestIdMiddleware)
+    .use(loggerMiddleware)
     .post(
       '/',
       webhookCallback(bot, 'hono', {
@@ -105,16 +113,23 @@ if (env.isDev) {
       }),
     )
 
-  serve({
-    fetch: app.fetch,
-    port: env.ports.public,
+  server = createServer({
+    app,
+    trustProxy: true,
   })
 
-  await bot.api.setWebhook(url, {
-    secret_token: env.telegram.webhookSecretToken,
-  })
+  server.listen(env.ports.public, async (token) => {
+    if (!token) {
+      logger.error('Failed to start API')
+      process.exit(1)
+    }
 
-  logger.info(`🚀 Bot ready at ${url}`)
+    await bot.api.setWebhook(url, {
+      secret_token: env.telegram.webhookSecretToken,
+    })
+
+    logger.info(`🚀 Bot ready at ${url}`)
+  })
 }
 
 const internalServer = createServer({
