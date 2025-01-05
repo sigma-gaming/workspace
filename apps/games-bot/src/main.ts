@@ -19,7 +19,13 @@ import {
   type ParseModeFlavor,
 } from '@grammyjs/parse-mode'
 import { limit } from '@grammyjs/ratelimiter'
-import { Bot, Context, InlineKeyboard, webhookCallback } from 'grammy'
+import {
+  API_CONSTANTS,
+  Bot,
+  Context,
+  InlineKeyboard,
+  webhookCallback,
+} from 'grammy'
 import { Hono } from 'hono'
 import { TemplatedApp } from 'uWebSockets.js'
 import { internalApp } from './app/internal'
@@ -30,6 +36,9 @@ await domainService.waitForInitialization()
 type BotContext = ParseModeFlavor<EmojiFlavor<Context>>
 
 const bot = new Bot<BotContext>(env.telegram.botFullToken)
+
+logger.info('Env')
+logger.info(env)
 
 bot.api.config.use(autoRetry({ maxDelaySeconds: 5 }))
 
@@ -44,7 +53,6 @@ async function getStartReferralCampaign(match: string) {
 }
 
 bot.command('start', async (ctx) => {
-  console.log(123)
   const campaign = await getStartReferralCampaign(ctx.match)
 
   const latestDomain = domainService.getLatestDomain(DomainApp.GamesApp)
@@ -127,6 +135,7 @@ if (env.isDev) {
     bot.api
       .setWebhook(url, {
         secret_token: env.telegram.webhookSecretToken,
+        allowed_updates: API_CONSTANTS.ALL_UPDATE_TYPES,
       })
       .then((is) => {
         logger.info(`Webhook ${is ? 'set' : 'failed to set'}`)
