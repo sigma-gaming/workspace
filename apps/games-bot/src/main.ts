@@ -89,7 +89,12 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  const app = new Hono().post('/', webhookCallback(bot, 'hono'))
+  const app = new Hono().post(
+    '/',
+    webhookCallback(bot, 'hono', {
+      secretToken: env.telegram.webhookSecretToken,
+    }),
+  )
 
   serve({
     fetch: app.fetch,
