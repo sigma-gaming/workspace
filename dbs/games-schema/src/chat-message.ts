@@ -1,7 +1,6 @@
 import { ChatMessageAttachment } from '@dbs/games-types'
 import { sql } from 'drizzle-orm'
 import {
-  bigint,
   boolean,
   index,
   integer,
@@ -12,16 +11,15 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { chatMessageTypeEnum, userRoleEnum } from './enums'
+import { uuidv7 } from './lib/sql'
 import { ProfileTable } from './user/profile'
 import { UserTable } from './user/user'
 
 export const ChatMessageTable = pgTable(
   'ChatMessage',
   {
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedAlwaysAsIdentity(),
-    trackingId: uuid('trackingId').notNull().defaultRandom(),
+    id: uuid('id').primaryKey().default(uuidv7),
+    trackingId: uuid('trackingId').notNull().default(uuidv7),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),

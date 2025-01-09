@@ -2,11 +2,12 @@ name: sigma
 
 services:
   postgres:
-    image: postgres:16.1-alpine
+    image: ghcr.io/fboulnois/pg_uuidv7:1.6.0
     ports:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./postgres.init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     environment:
       POSTGRES_PASSWORD: SECRET_REMOVED
 

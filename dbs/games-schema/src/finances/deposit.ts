@@ -2,7 +2,6 @@ import { DepositPayload } from '@dbs/games-types'
 import { sql } from 'drizzle-orm'
 import {
   bigint,
-  integer,
   jsonb,
   numeric,
   pgTable,
@@ -17,11 +16,12 @@ import {
   paymentProviderEnum,
   paymentStatusEnum,
 } from '../enums'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 import { TransactionTable } from './transaction'
 
 export const DepositTable = pgTable('Deposit', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid('id').primaryKey().default(uuidv7),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .defaultNow()
     .notNull(),
@@ -47,10 +47,9 @@ export const DepositTable = pgTable('Deposit', {
   userId: uuid('userId')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
-  transactionId: bigint('transactionId', { mode: 'number' }).references(
-    () => TransactionTable.id,
-    { onDelete: 'cascade' },
-  ),
+  transactionId: uuid('transactionId').references(() => TransactionTable.id, {
+    onDelete: 'cascade',
+  }),
 })
 
 export type DepositSelect = typeof DepositTable.$inferSelect

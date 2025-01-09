@@ -1,13 +1,12 @@
 import { bigint, index, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { gameEnum, transactionTypeEnum } from '../enums'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 
 export const TransactionTable = pgTable(
   'Transaction',
   {
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedAlwaysAsIdentity(),
+    id: uuid('id').primaryKey().default(uuidv7),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),
@@ -19,7 +18,7 @@ export const TransactionTable = pgTable(
     userId: uuid('userId').references(() => UserTable.id, {
       onDelete: 'set null',
     }),
-    gameRecordId: bigint('gameRecordId', { mode: 'number' }),
+    gameRecordId: uuid('gameRecordId'),
   },
   (table) => ({
     userIdIdx: index().on(table.userId),

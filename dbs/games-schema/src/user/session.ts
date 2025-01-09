@@ -1,10 +1,11 @@
-import { integer, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { ReferralCampaignTable } from '../affiliate/referral-campaign'
 import { accountProviderEnum } from '../enums'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from './user'
 
 export const SessionTable = pgTable('Session', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: uuid('id').primaryKey().default(uuidv7),
   expiresAt: timestamp('expiresAt', {
     withTimezone: true,
     mode: 'string',
@@ -16,7 +17,7 @@ export const SessionTable = pgTable('Session', {
   referrerId: uuid('referrerId').references(() => UserTable.id, {
     onDelete: 'set null',
   }),
-  referralCampaignId: integer('referralCampaignId').references(
+  referralCampaignId: uuid('referralCampaignId').references(
     () => ReferralCampaignTable.id,
     { onDelete: 'set null' },
   ),

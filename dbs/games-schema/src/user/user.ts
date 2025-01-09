@@ -8,11 +8,12 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { userRoleEnum } from '../enums'
+import { uuidv7 } from '../lib/sql'
 
 export const UserTable = pgTable(
   'User',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
+    id: uuid('id').primaryKey().default(uuidv7),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),
@@ -28,7 +29,7 @@ export const UserTable = pgTable(
     virtual: boolean('virtual').notNull().default(false),
 
     referrerId: uuid('referrerId'),
-    referralCampaignId: integer('referralCampaignId'),
+    referralCampaignId: uuid('referralCampaignId'),
     profileId: integer('profileId'),
     securityId: uuid('securityId'),
   },

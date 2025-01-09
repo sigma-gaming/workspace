@@ -1,10 +1,24 @@
 import { TransactionTable } from '@dbs/games-schema'
 import { Game, TransactionType } from '@dbs/games-types'
 import { budgetService, gamesCache, gamesDb } from '@games/services'
-import { and, count, gt, inArray, isNotNull, max, min, sum } from 'drizzle-orm'
+import {
+  and,
+  count,
+  gt,
+  inArray,
+  isNotNull,
+  lt,
+  max,
+  min,
+  sql,
+  sum,
+} from 'drizzle-orm'
 import { Gauge, Pushgateway, Registry } from 'prom-client'
+import { v7 } from 'uuid'
 import { env } from '../env'
 import { createJob } from '../shared/jobs'
+
+const MIN_ID = v7({ msecs: 0 })
 
 export const sendAdvancedGamesMetricsJob = createJob({
   name: 'SendAdvancedGamesMetrics',
@@ -12,8 +26,8 @@ export const sendAdvancedGamesMetricsJob = createJob({
   handler: async ({ logger }) => {
     const lock = await gamesCache.lastMetricsTransactionId.lock(10_000)
 
-    async function updateLastId(id: number) {
-      if (id === 0) {
+    async function updateLastId(id: string) {
+      if (id === MIN_ID) {
         logger.info('skipping lastMetricsTransactionId update (maxId === 0)')
         return
       }
@@ -27,9 +41,12 @@ export const sendAdvancedGamesMetricsJob = createJob({
 
     const budget = await budgetService.getAvailable()
 
+    // Add some gap to avoid race condition
+    const tenSecondsAgo = new Date(Date.now() - 10_000)
+
     const stats = await gamesDb
       .select({
-        maxId: max(TransactionTable.id).mapWith(Number),
+        maxId: max(sql<string>`${TransactionTable.id}::text`).mapWith(String),
         game: TransactionTable.game,
         type: TransactionTable.type,
         maxAmount: max(TransactionTable.amount).mapWith(Number),
@@ -48,15 +65,16 @@ export const sendAdvancedGamesMetricsJob = createJob({
             TransactionType.Win,
             TransactionType.Loss,
           ]),
+          lt(TransactionTable.createdAt, tenSecondsAgo.toISOString()),
         ),
       )
       .groupBy(TransactionTable.game, TransactionTable.type)
 
-    logger.debug(stats)
+    logger.debug(JSON.stringify(stats))
 
     const maxId = stats.reduce((acc, stat) => {
-      return Math.max(acc, stat.maxId)
-    }, 0)
+      return stat.maxId > acc ? stat.maxId : acc
+    }, MIN_ID)
 
     if (!env.metrics.pushgatewayUrl) {
       await updateLastId(maxId)

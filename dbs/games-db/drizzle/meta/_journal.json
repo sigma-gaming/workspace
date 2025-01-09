@@ -729,6 +729,62 @@
       "when": 1735315660836,
       "tag": "0103_exotic_stature",
       "breakpoints": true
+    },
+    {
+      "idx": 104,
+      "version": "7",
+      "when": 1736429208391,
+      "tag": "0104_optimal_karnak",
+      "breakpoints": true
+    },
+    {
+      "idx": 105,
+      "version": "7",
+      "when": 1736432003888,
+      "tag": "0105_careless_mastermind",
+      "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1736434982026,
+      "tag": "0106_high_silvermane",
+      "breakpoints": true
+    },
+    {
+      "idx": 107,
+      "version": "7",
+      "when": 1736435247275,
+      "tag": "0107_lumpy_shatterstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 108,
+      "version": "7",
+      "when": 1736437201172,
+      "tag": "0108_green_cammi",
+      "breakpoints": true
+    },
+    {
+      "idx": 109,
+      "version": "7",
+      "when": 1736437901847,
+      "tag": "0109_overrated_vargas",
+      "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "7",
+      "when": 1736438039020,
+      "tag": "0110_noisy_stellaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 111,
+      "version": "7",
+      "when": 1736439577656,
+      "tag": "0111_complete_madame_hydra",
+      "breakpoints": true
     }
   ]
 }

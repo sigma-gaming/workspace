@@ -1,12 +1,13 @@
 import { sql } from 'drizzle-orm'
 import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { accountProviderEnum } from '../enums'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from './user'
 
 export const AccountTable = pgTable(
   'Account',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
+    id: uuid('id').primaryKey().default(uuidv7),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),

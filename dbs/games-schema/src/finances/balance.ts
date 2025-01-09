@@ -18,15 +18,15 @@ export const BalanceTable = pgTable('Balance', {
   totalBetCount: integer('totalBetCount').notNull().default(0),
 
   maxWin: bigint('maxWin', { mode: 'number' }).notNull().default(0),
-  maxWinGameId: bigint('maxWinGameId', { mode: 'number' }).references(
+  maxWinGameId: uuid('maxWinGameId').references(() => GameRecordTable.id, {
+    onDelete: 'cascade',
+  }),
+
+  maxMultiplier: integer('maxMultiplier').notNull().default(0),
+  maxMultiplierGameId: uuid('maxMultiplierGameId').references(
     () => GameRecordTable.id,
     { onDelete: 'cascade' },
   ),
-
-  maxMultiplier: integer('maxMultiplier').notNull().default(0),
-  maxMultiplierGameId: bigint('maxMultiplierGameId', {
-    mode: 'number',
-  }).references(() => GameRecordTable.id, { onDelete: 'cascade' }),
 })
 
 export type BalanceSelect = typeof BalanceTable.$inferSelect

@@ -308,7 +308,7 @@ export class PaymentService {
       .then(takeFirstOrNull)
   }
 
-  async handleDepositStatusUpdate(depositId: number, newStatus: PaymentStatus) {
+  async handleDepositStatusUpdate(depositId: string, newStatus: PaymentStatus) {
     await gamesDb.transaction(async (tx) => {
       const deposit = await gamesDb
         .select()
@@ -365,7 +365,7 @@ export class PaymentService {
   }
 
   async handleWithdrawalStatusUpdate(
-    withdrawalId: number,
+    withdrawalId: string,
     newStatus: PaymentStatus,
   ) {
     await gamesDb.transaction(async (tx) => {

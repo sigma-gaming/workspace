@@ -13,7 +13,7 @@ const PayloadSchema = Type.Object({
   attachments: Type.Array(
     Type.Object({
       type: Type.Enum(ChatMessageAttachmentType),
-      gameRecordId: Type.Number(),
+      gameRecordId: Type.String({ format: 'uuid' }),
     }),
     { maxItems: 1 },
   ),

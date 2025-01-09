@@ -155,7 +155,7 @@ export class AuthService {
      */
 
     let referrerId: string | null | undefined
-    let referralCampaignId: number | undefined
+    let referralCampaignId: string | undefined
 
     if (referralCampaignCode) {
       const referralCampaign =

@@ -11,14 +11,13 @@ import {
 } from 'drizzle-orm/pg-core'
 import { gameEnum, gameOutcomeEnum } from '../enums'
 import { TransactionTable } from '../finances/transaction'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 
 export const GameRecordTable = pgTable(
   'GameRecord',
   {
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedAlwaysAsIdentity(),
+    id: uuid('id').primaryKey().default(uuidv7),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),
@@ -35,7 +34,7 @@ export const GameRecordTable = pgTable(
     userId: uuid('userId')
       .references(() => UserTable.id, { onDelete: 'cascade' })
       .notNull(),
-    transactionId: bigint('transactionId', { mode: 'number' })
+    transactionId: uuid('transactionId')
       .references(() => TransactionTable.id, { onDelete: 'cascade' })
       .notNull(),
   },

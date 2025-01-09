@@ -72,7 +72,7 @@ export class AffiliateService {
     campaignId,
   }: {
     tx?: typeof gamesDb
-    campaignId: number
+    campaignId: string
   }) {
     const db = tx ?? gamesDb
 
@@ -87,7 +87,7 @@ export class AffiliateService {
     campaignId,
   }: {
     tx?: typeof gamesDb
-    campaignId: number
+    campaignId: string
   }) {
     const db = tx ?? gamesDb
 
@@ -232,7 +232,7 @@ export class AffiliateService {
     tx?: typeof gamesDb
     referralId: string
     referrerId: string | null
-    referralCampaignId: number | null
+    referralCampaignId: string | null
     referralAction: ReferralAction
     amount: number
   }) {

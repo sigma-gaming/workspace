@@ -24,6 +24,7 @@ import {
   GlobalEntityListService,
   GlobalJsonEntityService,
   GlobalNumberEntityService,
+  GlobalStringEntityService,
   KeyEntityListService,
   KeyJsonEntityService,
   KeyStringEntityService,
@@ -58,7 +59,7 @@ export class GamesCacheRegistry {
   globalTasks: GlobalJsonEntityService<GlobalTaskSelect[]>
   globalTaskStatus: KeyJsonEntityService<[TaskStatus, boolean]>
   currencyRates: GlobalJsonEntityService<CurrencyExchangeRates>
-  lastMetricsTransactionId: GlobalNumberEntityService
+  lastMetricsTransactionId: GlobalStringEntityService
 
   constructor() {
     const { version } = resolveOptions(GamesCacheOptionsToken)
@@ -221,7 +222,7 @@ export class GamesCacheRegistry {
       ttl: 60 * 15, // 15 minutes
     })
 
-    this.lastMetricsTransactionId = new GlobalNumberEntityService({
+    this.lastMetricsTransactionId = new GlobalStringEntityService({
       redis,
       redlock,
       key: `global:lastMetricsTransactionId`,

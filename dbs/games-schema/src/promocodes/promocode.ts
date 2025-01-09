@@ -10,12 +10,13 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { promocodeBonusTypeEnum } from '../enums'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 
 export const PromocodeTable = pgTable(
   'Promocode',
   {
-    id: uuid('id').defaultRandom().primaryKey(),
+    id: uuid('id').primaryKey().default(uuidv7),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),

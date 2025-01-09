@@ -1,9 +1,12 @@
 import { logger } from '@core/logger'
 import { gamesCache } from '@games/services'
+import { v7 } from 'uuid'
 import { sendToAllLocal } from '../../shared/send'
 
-let lastWinSent = -1
-let lastBigWinSent = -1
+const MIN_ID = v7({ msecs: 0 })
+
+let lastWinSent = MIN_ID
+let lastBigWinSent = MIN_ID
 
 async function sendLastWins() {
   // Add 100ms compensation for network delays

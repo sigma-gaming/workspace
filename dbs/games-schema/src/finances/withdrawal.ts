@@ -1,7 +1,6 @@
 import { sql } from 'drizzle-orm'
 import {
   bigint,
-  integer,
   numeric,
   pgTable,
   text,
@@ -14,11 +13,12 @@ import {
   paymentStatusEnum,
   withdrawalMethodEnum,
 } from '../enums'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 import { TransactionTable } from './transaction'
 
 export const WithdrawalTable = pgTable('Withdrawal', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid('id').primaryKey().default(uuidv7),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .defaultNow()
     .notNull(),
@@ -42,10 +42,9 @@ export const WithdrawalTable = pgTable('Withdrawal', {
   userId: uuid('userId')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
-  transactionId: bigint('transactionId', { mode: 'number' }).references(
-    () => TransactionTable.id,
-    { onDelete: 'cascade' },
-  ),
+  transactionId: uuid('transactionId').references(() => TransactionTable.id, {
+    onDelete: 'cascade',
+  }),
 })
 
 export type WithdrawalSelect = typeof WithdrawalTable.$inferSelect

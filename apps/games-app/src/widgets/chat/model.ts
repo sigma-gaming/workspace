@@ -6,7 +6,7 @@ import { createMutation } from '@farfetched/core'
 import { ChatMessageDetailed, ChatValidation } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
-import { v4 } from 'uuid'
+import { v4, v7 } from 'uuid'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
 import { createApiEffect } from '../../shared/api/effects'
@@ -72,7 +72,9 @@ sample({
       (message) => !ids.includes(message.id),
     )
 
-    return messages.concat(newMessages).sort((a, b) => a.id - b.id)
+    return messages.concat(newMessages).sort((a, b) => {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    })
   },
   target: $messages,
 })
@@ -119,8 +121,6 @@ sample({
     messages: $messages,
   },
   fn: ({ user, senderName, profile, messages }, payload) => {
-    const lastId = messages[messages.length - 1]?.id ?? -1
-
     return messages.concat({
       /*
        * Should not be possible real id to prevent any conflicts
@@ -130,7 +130,7 @@ sample({
        * Another user's message real ID: 2 (causes the conflict, as there are two messages with the same ID)
        * Your new message real ID: 3
        */
-      id: -(lastId + 1),
+      id: v7(),
       createdAt: new Date().toISOString(),
       type: ChatMessageType.UserMessage,
       attachments: payload.attachments,

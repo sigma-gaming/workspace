@@ -7,17 +7,10 @@ export enum SessionState {
   Authenticated,
 }
 
-export type AccessTokenPayload = {
-  userId: string
-  referrerId: string | null
-  referralCampaignId: number | null
-  provider: AccountProvider
-}
-
 export type SessionTokenPayload = {
   userId: string
   referrerId: string | null
-  referralCampaignId: number | null
+  referralCampaignId: string | null
   provider: AccountProvider
 }
 

@@ -27,6 +27,7 @@ import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { not } from 'patronum'
 import { ReactNode, useState } from 'react'
+import { v7 } from 'uuid'
 import { $$affiliate } from '../../entities/affiliate'
 import { $$session } from '../../entities/session'
 import { env } from '../../shared/env'
@@ -468,14 +469,14 @@ const NotConnectedContent = () => {
           <LastTransactionsView
             transactions={[
               {
-                id: 1,
+                id: v7(),
                 referralAction: ReferralAction.Deposit,
                 amount: gemInt(33333),
                 referralAvatar: null,
                 referralName: 'Lydik',
               },
               {
-                id: 1,
+                id: v7(),
                 referralAction: ReferralAction.Deposit,
                 amount: gemInt(33333),
                 referralAvatar: null,

@@ -1,9 +1,5 @@
 import { takeFirstOrThrow } from '@core/utils'
-import {
-  BalanceSelect,
-  GameRecordTable,
-  TransactionTable,
-} from '@dbs/games-schema'
+import { BalanceSelect, GameRecordTable } from '@dbs/games-schema'
 import {
   Game,
   GameOutcome,
@@ -14,6 +10,7 @@ import {
 } from '@dbs/games-types'
 import { gamesDb } from '@games/services'
 import { eq } from 'drizzle-orm'
+import { v7 } from 'uuid'
 import { balanceService } from './balance'
 import { budgetService } from './budget'
 import { gamesCache } from './cache'
@@ -44,7 +41,7 @@ const outcomeToTypeMap: Record<GameOutcome, TransactionType> = {
 }
 
 export class GameService {
-  getGameRecord = async (gameRecordId: number) => {
+  getGameRecord = async (gameRecordId: string) => {
     const record = await gamesDb.query.GameRecordTable.findFirst({
       where: eq(GameRecordTable.id, gameRecordId),
     })
@@ -112,13 +109,18 @@ export class GameService {
     const profile = await profileService.getDetailedProfile(userId)
 
     const saveGame = async (tx: typeof gamesDb) => {
+      const transactionId = v7()
+      const gameRecordId = v7()
+
       const transaction = await balanceService.createTransaction({
         tx,
         payload: {
+          id: transactionId,
           userId,
           type: outcomeToTypeMap[outcome],
           game,
           amount: payout,
+          gameRecordId,
         },
       })
 
@@ -127,6 +129,7 @@ export class GameService {
       const gameRecord = await tx
         .insert(GameRecordTable)
         .values({
+          id: gameRecordId,
           game,
           outcome,
           snapshot,
@@ -135,7 +138,7 @@ export class GameService {
           payout,
           userId,
           previewUserName: profile.username ?? profile.name,
-          transactionId: transaction.id,
+          transactionId,
         })
         .returning()
         .then(takeFirstOrThrow)
@@ -149,11 +152,6 @@ export class GameService {
         gameRecord,
         wageringChange,
       })
-
-      await tx
-        .update(TransactionTable)
-        .set({ gameRecordId: gameRecord.id })
-        .where(eq(TransactionTable.id, transaction.id))
 
       return { gameRecord, updatedBalance }
     }

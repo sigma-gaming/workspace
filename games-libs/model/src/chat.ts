@@ -19,7 +19,7 @@ export const ChatValidation = {
       .array(
         z.object({
           type: z.nativeEnum(ChatMessageAttachmentType),
-          gameRecordId: z.number(),
+          gameRecordId: z.string().uuid(),
         }),
       )
       .max(1, 'Доступно только одно вложение'),

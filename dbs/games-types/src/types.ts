@@ -29,7 +29,7 @@ export type SnapshotByGame<T extends Game> = {
 
 export type ChatMessageAttachmentGame = {
   type: ChatMessageAttachmentType.Game
-  gameRecordId: number
+  gameRecordId: string
 }
 
 export type ChatMessageAttachment = ChatMessageAttachmentGame

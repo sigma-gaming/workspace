@@ -2,21 +2,19 @@ import {
   bigint,
   boolean,
   index,
-  integer,
   pgTable,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
 import { referralActionEnum } from '../enums'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 import { ReferralCampaignTable } from './referral-campaign'
 
 export const ReferrerTransactionTable = pgTable(
   'ReferrerTransaction',
   {
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedAlwaysAsIdentity(),
+    id: uuid('id').primaryKey().default(uuidv7),
     createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),
@@ -30,7 +28,7 @@ export const ReferrerTransactionTable = pgTable(
     referralId: uuid('referralId').references(() => UserTable.id, {
       onDelete: 'set null',
     }),
-    referralCampaignId: integer('referralCampaignId').references(
+    referralCampaignId: uuid('referralCampaignId').references(
       () => ReferralCampaignTable.id,
       { onDelete: 'set null' },
     ),

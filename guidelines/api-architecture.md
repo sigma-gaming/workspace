@@ -185,7 +185,7 @@ We use a typed database schema with Drizzle ORM:
 ```typescript
 // schema/table.ts
 export const MyTable = pgTable('MyTable', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid('id').primaryKey().default(uuidv7),
   trackingId: uuid('trackingId').notNull(),
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   data: jsonb('data').$type<MyDataType>(),

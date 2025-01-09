@@ -1,8 +1,9 @@
 import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 
 export const ReferralCampaignTable = pgTable('ReferralCampaign', {
-  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  id: uuid('id').primaryKey().default(uuidv7),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),

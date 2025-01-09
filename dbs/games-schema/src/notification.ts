@@ -7,10 +7,11 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { notificationKindEnum } from './enums'
+import { uuidv7 } from './lib/sql'
 import { UserTable } from './user/user'
 
 export const NotificationTable = pgTable('Notification', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().default(uuidv7),
   createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),
