@@ -32,9 +32,9 @@ ALTER TABLE "Transaction" ALTER COLUMN "id" SET DATA TYPE uuid USING (uuid_gener
 ALTER TABLE "Transaction" ALTER COLUMN "id" SET DEFAULT uuid_generate_v7();
 
 -- Convert reference columns to UUID with explicit casting
-ALTER TABLE "Deposit" ALTER COLUMN "transactionId" SET DATA TYPE uuid USING (uuid_generate_v7());
-ALTER TABLE "Withdrawal" ALTER COLUMN "transactionId" SET DATA TYPE uuid USING (uuid_generate_v7());
-ALTER TABLE "GameRecord" ALTER COLUMN "transactionId" SET DATA TYPE uuid USING (uuid_generate_v7());
+ALTER TABLE "Deposit" ALTER COLUMN "transactionId" SET DATA TYPE uuid USING (NULL);
+ALTER TABLE "Withdrawal" ALTER COLUMN "transactionId" SET DATA TYPE uuid USING (NULL);
+ALTER TABLE "GameRecord" ALTER COLUMN "transactionId" SET DATA TYPE uuid USING (NULL);
 
 -- Update references with new UUIDs
 UPDATE "Deposit" d

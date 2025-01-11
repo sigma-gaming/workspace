@@ -28,8 +28,8 @@ ALTER TABLE "GameRecord" ALTER COLUMN "id" SET DATA TYPE uuid USING (uuid_genera
 ALTER TABLE "GameRecord" ALTER COLUMN "id" SET DEFAULT uuid_generate_v7();
 
 -- Convert Balance reference columns to UUID with explicit casting
-ALTER TABLE "Balance" ALTER COLUMN "maxWinGameId" SET DATA TYPE uuid USING (uuid_generate_v7());
-ALTER TABLE "Balance" ALTER COLUMN "maxMultiplierGameId" SET DATA TYPE uuid USING (uuid_generate_v7());
+ALTER TABLE "Balance" ALTER COLUMN "maxWinGameId" SET DATA TYPE uuid USING (NULL);
+ALTER TABLE "Balance" ALTER COLUMN "maxMultiplierGameId" SET DATA TYPE uuid USING (NULL);
 ALTER TABLE "Transaction" ALTER COLUMN "gameRecordId" SET DATA TYPE uuid USING (uuid_generate_v7());
 
 -- Update Balance references with new UUIDs
