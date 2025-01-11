@@ -22,7 +22,6 @@ const EnvSchema = z
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
     TELEGRAM_BOT_TOKEN: z.string(),
     TELEGRAM_WEBHOOK_SECRET_TOKEN: z.string().optional(),
-    TELEGRAM_WEBHOOK_CERT: z.string().optional(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
@@ -56,7 +55,6 @@ const EnvSchema = z
       botToken: raw.TELEGRAM_BOT_TOKEN,
       botFullToken: `${raw.PUBLIC_TELEGRAM_BOT_ID}:${raw.TELEGRAM_BOT_TOKEN}`,
       webhookSecretToken: raw.TELEGRAM_WEBHOOK_SECRET_TOKEN,
-      webhookCert: raw.TELEGRAM_WEBHOOK_CERT,
     },
   }))
 
