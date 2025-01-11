@@ -146,53 +146,44 @@ jobs:
         run: |
           echo "hash=${{ hashFiles(format('apps/{0}/dist/**', steps.parse.outputs.name), format('apps/{0}/scripts/**', steps.parse.outputs.name), format('apps/{0}/nginx.conf', steps.parse.outputs.name)) }}" >> $GITHUB_OUTPUT
 
-      - name: Create temporary file for cache
-        run: echo "" > .temp-cache-file
-
-      - name: Check cache for this build
-        if: steps.hash-check.outputs.should_check == 'true'
-        id: check-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: .temp-cache-file
-          key: build-cache-${{ steps.parse.outputs.name }}-${{ steps.calculate-hash.outputs.hash }}
-        continue-on-error: true
-
-      - name: Check if build should be skipped
-        id: should-skip-build
-        run: |
-          if [[ "${{ steps.check-cache.outputs.cache-hit }}" == "true" ]]; then
-            echo "should_skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "should_skip=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Skip build if cache exists
-        if: steps.should-skip-build.outputs.should_skip == 'true'
-        run: echo "Cache hit for ${{ matrix.packageName }}. Skipping build."
-
       - name: Gcloud auth
-        if: steps.should-skip-build.outputs.should_skip != 'true'
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
 
       - name: Setup gcloud
-        if: steps.should-skip-build.outputs.should_skip != 'true'
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           skip_install: true
 
       - name: Build on Google Cloud
-        if: steps.should-skip-build.outputs.should_skip != 'true'
         run: |
           image=${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}
 
           cat <<EOF > cloudbuild.yaml
           steps:
+            - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+              id: 'check-cache'
+              entrypoint: 'sh'
+              args:
+                - '-c'
+                - |
+                  if [ "${{ steps.hash-check.outputs.should_check }}" = "true" ]; then
+                    echo "Checking cache for hash: ${{ steps.calculate-hash.outputs.hash }}"
+                    if gsutil -q stat gs://sigma-games_cloudbuild_cache/build-hash/${{ steps.calculate-hash.outputs.hash }}; then
+                      echo "Cache hit for ${{ steps.calculate-hash.outputs.hash }}. Exiting build."
+                      exit 0
+                    else
+                      echo "Cache miss for ${{ steps.calculate-hash.outputs.hash }}. Proceeding with build."
+                    fi
+                  else
+                    echo "Hash check disabled for this image. Proceeding with build."
+                  fi
+
             - name: "gcr.io/cloud-builders/docker"
-              id: "Build ${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}"
+              id: "build"
+              waitFor: ['check-cache']
               env:
                 - "DOCKER_BUILDKIT=1"
               args:
@@ -203,6 +194,21 @@ jobs:
                 - --build-arg=sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
                 - --build-arg=sentry_release=dev-${{ needs.timestamp.outputs.timestamp }}
                 - .
+
+            - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+              id: 'save-cache'
+              waitFor: ['build']
+              entrypoint: 'sh'
+              args:
+                - '-c'
+                - |
+                  if [ "${{ steps.hash-check.outputs.should_check }}" = "true" ]; then
+                    echo "Saving hash ${{ steps.calculate-hash.outputs.hash }} to GCS"
+                    echo "Build completed successfully" | gsutil cp - gs://sigma-games_cloudbuild_cache/build-hash/${{ steps.calculate-hash.outputs.hash }}
+                  else
+                    echo "Hash saving skipped as hash check is disabled."
+                  fi
+
           images:
             - $image:latest
             - $image:dev-${{ needs.timestamp.outputs.timestamp }}
@@ -211,11 +217,4 @@ jobs:
           gcloud builds submit . \
             --config cloudbuild.yaml \
             --region europe-west1 \
-            --polling-interval=20
-
-      - name: Set cache for this build hash
-        if: steps.hash-check.outputs.should_check == 'true' && steps.should-skip-build.outputs.should_skip != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: .temp-cache-file
-          key: build-cache-${{ steps.parse.outputs.name }}-${{ steps.calculate-hash.outputs.hash }}
+            --async
