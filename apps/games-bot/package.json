@@ -21,7 +21,6 @@
     "@games/options": "workspace:*",
     "@core/di": "workspace:*",
     "@core/logger": "workspace:*",
-    "@tooling/env": "workspace:*",
-    "express": "4.21.2"
+    "@tooling/env": "workspace:*"
   }
 }
