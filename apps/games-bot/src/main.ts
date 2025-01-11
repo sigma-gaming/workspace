@@ -24,6 +24,7 @@ import {
   Bot,
   Context,
   InlineKeyboard,
+  InputFile,
   webhookCallback,
 } from 'grammy'
 import { Hono } from 'hono'
@@ -151,10 +152,17 @@ if (env.isDev) {
     logger.info(`🚀 Webhook server started at port ${env.ports.public}`)
     logger.info(`🚀 Bot ready at ${url}`)
 
+    let certificate: InputFile | undefined
+
+    if (env.telegram.webhookCert) {
+      certificate = new InputFile(Buffer.from(env.telegram.webhookCert))
+    }
+
     bot.api
       .setWebhook(url, {
         secret_token: env.telegram.webhookSecretToken,
         allowed_updates: API_CONSTANTS.ALL_UPDATE_TYPES,
+        certificate,
       })
       .then((is) => {
         logger.info(`Webhook ${is ? 'set' : 'failed to set'}`)
