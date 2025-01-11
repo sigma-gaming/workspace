@@ -210,7 +210,7 @@ jobs:
 
           gcloud builds submit . \
             --config cloudbuild.yaml \
-            --region europe-west4 \
+            --region europe-west1 \
             --polling-interval=20
 
       - name: Set cache for this build hash
