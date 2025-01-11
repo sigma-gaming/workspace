@@ -4,5 +4,5 @@ await Bun.build({
   outdir: 'dist',
   target: 'node',
   sourcemap: 'external',
-  external: ['uWebSockets.js'],
+  external: ['uWebSockets.js', 'grammy'],
 })
