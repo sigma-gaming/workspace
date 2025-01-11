@@ -10,7 +10,7 @@ on:
         default: false
 
 env:
-  DOCKER_REGISTRY: ${{ vars.GCLOUD_REGISTRY_REGION }}-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
+  DOCKER_REGISTRY: europe-west4-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
 
 concurrency:
   group: ${{ github.workflow }}
@@ -210,7 +210,7 @@ jobs:
 
           gcloud builds submit . \
             --config cloudbuild.yaml \
-            --region ${{ vars.GCLOUD_REGISTRY_REGION }} \
+            --region europe-west4 \
             --polling-interval=20
 
       - name: Set cache for this build hash
