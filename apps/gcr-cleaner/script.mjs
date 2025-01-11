@@ -1,6 +1,8 @@
+/* eslint-disable no-undef */
+
+import 'zx/globals'
 import { ArtifactRegistryClient } from '@google-cloud/artifact-registry'
 import semver from 'semver'
-import 'zx/globals'
 
 const REQUESTS_PER_MINUTE = 30
 const GCLOUD_PROJECT_ID = process.env.GCLOUD_PROJECT_ID
@@ -9,11 +11,11 @@ const GCLOUD_SERVICE_ACCOUNT_KEY = process.env.GCLOUD_SERVICE_ACCOUNT_KEY
 const AUTH_KEYS = JSON.parse(GCLOUD_SERVICE_ACCOUNT_KEY)
 
 const client = new ArtifactRegistryClient({
-  credentials: AUTH_KEYS
+  credentials: AUTH_KEYS,
 })
 
 const images = await client.listDockerImages({
-  parent: `projects/${GCLOUD_PROJECT_ID}/locations/${GCLOUD_REGISTRY_REGION}/repositories/docker`
+  parent: `projects/${GCLOUD_PROJECT_ID}/locations/${GCLOUD_REGISTRY_REGION}/repositories/docker`,
 })
 
 const entries = []
@@ -29,8 +31,8 @@ for (const image of images) {
     const uploadedAt = new Date(Number(tag.uploadTime.seconds) * 1000)
 
     const isLatest = tag.tags.includes('latest')
-    const hasVersion = tag.tags.some(tag => Boolean(semver.valid(tag)))
-    const isDev = tag.tags.some(tag => tag.startsWith('dev-'))
+    const hasVersion = tag.tags.some((tag) => Boolean(semver.valid(tag)))
+    const isDev = tag.tags.some((tag) => tag.startsWith('dev-'))
 
     entries.push({
       path,
@@ -113,18 +115,29 @@ for (const entry of entries) {
 fs.writeFileSync('./key.json', GCLOUD_SERVICE_ACCOUNT_KEY)
 await $`gcloud auth activate-service-account ${AUTH_KEYS.client_email} --key-file=./key.json`
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+let triesCount = 0
+let successCount = 0
 
 for (const entry of entries) {
   if (exceptions.has(entry)) continue
 
+  triesCount += 1
+
   try {
     await $`gcloud artifacts docker images delete ${entry.url} --async --delete-tags --quiet`
+    successCount += 1
   } catch (error) {
     console.info(`Failed to delete ${entry.url}`, error)
   }
 
-  await sleep(60 / REQUESTS_PER_MINUTE * 1000)
+  await sleep((60 / REQUESTS_PER_MINUTE) * 1000)
+}
+
+if (triesCount > 0 && successCount === 0) {
+  console.error('No images deleted successfully')
+  process.exit(1)
 }
 
 // Exit with success
