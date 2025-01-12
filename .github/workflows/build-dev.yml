@@ -195,7 +195,7 @@ jobs:
                 - --build-arg=sentry_release=dev-${{ needs.timestamp.outputs.timestamp }}
                 - .
 
-            - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+            - name: 'gcr.io/cloud-builders/gsutil'
               id: 'save-cache'
               waitFor: ['build']
               entrypoint: 'sh'
