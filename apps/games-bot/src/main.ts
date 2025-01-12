@@ -101,6 +101,34 @@ bot.command('start', async (ctx) => {
   )
 })
 
+bot.command('domains', async (ctx) => {
+  const domains = domainService.getDomainsByApp(DomainApp.GamesApp)
+
+  const keyboard = new InlineKeyboard(
+    domains.map((domain) => [
+      InlineKeyboard.url(
+        `${domain.host} ${emoji('globe_showing_americas')}`,
+        `https://${domain.host}`,
+      ),
+    ]),
+  )
+
+  await ctx.replyFmt(fmt`${emoji('green_circle')} Доступные домены:`, {
+    reply_markup: keyboard,
+  })
+})
+
+bot.command('help', async (ctx) => {
+  await ctx.replyFmt(
+    fmt([
+      fmt`Доступные команды:\n\n`,
+      fmt`${emoji('robot')} /start - Запустить бота\n`,
+      fmt`${emoji('globe_showing_americas')} /domains - Показать доступные домены\n`,
+      fmt`${emoji('books')} /help - Показать доступные команды\n`,
+    ]),
+  )
+})
+
 let server: TemplatedApp | undefined
 
 if (env.isDev) {
@@ -165,6 +193,12 @@ if (env.isDev) {
       })
   })
 }
+
+bot.api.setMyCommands([
+  { command: 'start', description: 'Запустить бота' },
+  { command: 'domains', description: 'Показать доступные домены' },
+  { command: 'help', description: 'Показать доступные команды' },
+])
 
 const internalServer = createServer({
   app: internalApp,
