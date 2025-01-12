@@ -110,10 +110,10 @@ function main() {
     }
   })
 
-  const domainUrl =
+  const domainsUrl =
     process.env.NODE_ENV === 'production'
-      ? 'https://sigm.to/domain'
-      : 'https://redirect.sigma.local:5080/domain'
+      ? 'https://sigm.to/domains'
+      : 'https://redirect.sigma.local:5080/domains'
 
   async function handleNavigation(event: FetchEvent) {
     try {
@@ -136,26 +136,58 @@ function main() {
       console.error('Failed to fetch navigation response:', error)
 
       try {
-        console.info('Fetching actual domain')
-        const domainResponse = await fetch(`${domainUrl}/getActualDomain`)
+        console.info('Fetching actual domains')
+        const domainsResponse = await fetch(domainsUrl)
 
-        if (domainResponse.ok) {
+        if (domainsResponse.ok) {
           console.info('Domain response is ok, parsing data')
 
-          const domain = await domainResponse.json()
+          const domains = await domainsResponse.json()
+
+          if (!Array.isArray(domains)) {
+            console.info(domains)
+
+            throw new TypeError(
+              `Invalid domains response. Expected array, got: ${typeof domains}`,
+            )
+          }
+
           const { host, pathname, search } = new URL(event.request.url)
 
           console.info('Current host:', host)
-          console.info('Actual host:', domain.host)
+          console.info('Actual domains:', domains)
 
-          if (domain?.host && domain.host !== host) {
-            console.info('Redirecting to new domain')
+          for (const domain of domains) {
+            console.info('Checking domain:', domain)
 
-            const redirectUrl = `https://${domain.host}${pathname}${search}`
-            return Response.redirect(redirectUrl, 302)
+            if (!domain?.host) {
+              console.info('Domain does not contain host')
+              continue
+            }
+
+            if (domain.host === host) {
+              console.info('Host matches, skipping')
+              continue
+            }
+
+            const response = await fetchWithTimeout(
+              new Request(`https://${domain.host}`),
+              2500,
+            )
+
+            if (response.ok) {
+              console.info('Domain is available, redirecting..')
+
+              const url = new URL(`https://${domain.host}${pathname}${search}`)
+              url.searchParams.set('new', 'true')
+
+              console.info('Redirect url:', url.toString())
+
+              return Response.redirect(url, 302)
+            }
           }
 
-          console.info('Response does not contain host or host is the same')
+          console.info('No available domains found')
         }
       } catch (error) {
         console.error('Failed to fetch the actual domain:', error)

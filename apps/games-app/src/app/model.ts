@@ -14,7 +14,7 @@ import { $$session } from '../entities/session'
 import { $$user } from '../entities/user'
 import { $$maintenance } from '../features/maintenance'
 import { $$notificationEvents } from '../features/notification-events'
-import { router } from '../routing'
+import { removeQueryParam, router } from '../routing'
 import { $$gamesWs } from '../shared/api/games-ws'
 import { env } from '../shared/env'
 import { $$chatWidget } from '../widgets/chat'
@@ -65,6 +65,30 @@ sample({
       expires: 365,
     })
   }),
+})
+
+sample({
+  clock: router.$query,
+  filter: (query) => Boolean(query.new),
+  target: $$notifications.show.prepend(() => ({
+    color: 'green',
+    title: 'Новый домен',
+    message:
+      'Вы были автоматически перенаправлены на новый домен. Используйте его для доступа к сайту.',
+    autoClose: 10000,
+  })),
+})
+
+sample({
+  clock: router.$query,
+  filter: (query) => Boolean(query.r),
+  target: removeQueryParam.prepend(() => 'r'),
+})
+
+sample({
+  clock: router.$query,
+  filter: (query) => Boolean(query.new),
+  target: removeQueryParam.prepend(() => 'new'),
 })
 
 sample({

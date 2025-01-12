@@ -54,6 +54,10 @@ export class DomainService {
     return this.cached.find((domain) => domain.app === app) ?? null
   }
 
+  getDomainsByApp(app: DomainApp) {
+    return this.cached.filter((domain) => domain.app === app)
+  }
+
   originMatches(origin?: string, apps?: DomainApp[]) {
     if (!origin) return false
 
