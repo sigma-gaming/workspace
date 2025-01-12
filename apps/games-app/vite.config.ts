@@ -21,7 +21,7 @@ export default defineConfig({
     },
     open: true,
     headers: {
-      'X-Sigma-Games': '1',
+      Server: 'vite',
     },
   },
   plugins: [

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  CloudflareChallengeException,
   NotAuthenticatedException,
   RouteException,
   TooManyRequestsException,
@@ -24,6 +25,7 @@ export function createExceptionEvents(
     badRequest,
     notAuthenticated,
     tooManyRequests,
+    cloudflareChallenge,
     __: other,
   } = split(receivedApiError, {
     validation: (error): error is ValidationException =>
@@ -34,6 +36,8 @@ export function createExceptionEvents(
       error instanceof TooManyRequestsException,
     notAuthenticated: (error): error is NotAuthenticatedException =>
       error instanceof NotAuthenticatedException,
+    cloudflareChallenge: (error): error is CloudflareChallengeException =>
+      error instanceof CloudflareChallengeException,
   })
 
   sample({
@@ -69,6 +73,7 @@ export function createExceptionEvents(
     tooManyRequests,
     notAuthenticated,
     formErrors: receivedFormErrors,
+    cloudflareChallenge,
     other,
   }
 }

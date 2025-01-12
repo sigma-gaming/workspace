@@ -124,10 +124,16 @@ function main() {
         throw new Error('Invalid response')
       }
 
-      const xHeader = response.headers.get('x-sigma-games')
+      const serverHeader = response.headers.get('server')
+      console.info('Extracted server header:', serverHeader)
 
-      if (xHeader !== '1') {
-        throw new Error('Missing or incorrect x-sigma-games header')
+      const hasValidServerHeader =
+        process.env.NODE_ENV === 'production'
+          ? serverHeader === 'cloudflare'
+          : serverHeader === 'vite'
+
+      if (!hasValidServerHeader) {
+        throw new Error('Missing or incorrect server header')
       }
 
       console.info('Navigation response is ok, returning original response')

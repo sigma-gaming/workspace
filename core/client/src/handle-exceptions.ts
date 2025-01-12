@@ -12,10 +12,11 @@ export function handleExceptions(
     form?: Form<any, any, any>
     message?: (message: string) => NotificationData
     notAuthenticatedMessage?: () => NotificationData
-    otherMessage?: (exception: RouteException<unknown>) => NotificationData
     tooManyRequestsMessage?: (
       exception: TooManyRequestsException,
     ) => NotificationData
+    cloudflareChallengeMessage?: () => NotificationData
+    otherMessage?: (exception: RouteException<unknown>) => NotificationData
   } = {},
 ) {
   const {
@@ -34,6 +35,11 @@ export function handleExceptions(
       color: 'red',
       title: 'Слишком много запросов',
       message: 'Попробуйте через несколько минут',
+    }),
+    cloudflareChallengeMessage = () => ({
+      color: 'red',
+      title: 'Cloudflare',
+      message: 'Пожалуйста, перезагрузите страницу для решения капчи',
     }),
     otherMessage = () => ({
       color: 'red',
@@ -66,6 +72,12 @@ export function handleExceptions(
   sample({
     source: receivedException.tooManyRequests,
     fn: tooManyRequestsMessage,
+    target: $$notifications.show,
+  })
+
+  sample({
+    source: receivedException.cloudflareChallenge,
+    fn: cloudflareChallengeMessage,
     target: $$notifications.show,
   })
 

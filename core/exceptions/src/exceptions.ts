@@ -25,6 +25,12 @@ export class InternalServerException extends RouteException<{
   message = 'Internal server error'
 }
 
+export class CloudflareChallengeException extends RouteException {
+  name = 'CloudflareChallengeException'
+  statusCode = 403
+  message = 'Cloudflare challenge'
+}
+
 export class ResourceLockedException extends RouteException {
   name = 'ResourceLockedException'
   statusCode = 423
