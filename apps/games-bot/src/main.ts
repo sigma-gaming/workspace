@@ -107,15 +107,16 @@ bot.command('domains', async (ctx) => {
   const keyboard = new InlineKeyboard(
     domains.map((domain) => [
       InlineKeyboard.url(
-        `${domain.host} ${emoji('globe_showing_americas')}`,
+        `${domain.host} ${emoji('flag_russia')} ${emoji('flag_european_union')}`,
         `https://${domain.host}`,
       ),
     ]),
   )
 
-  await ctx.replyFmt(fmt`${emoji('green_circle')} Доступные домены:`, {
-    reply_markup: keyboard,
-  })
+  await ctx.replyFmt(
+    fmt`${emoji('globe_showing_americas')} Доступные домены:`,
+    { reply_markup: keyboard },
+  )
 })
 
 bot.command('help', async (ctx) => {
