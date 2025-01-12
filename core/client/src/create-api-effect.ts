@@ -39,7 +39,7 @@ export const createApiEffectFactory = ({
 
       const contentType = response.headers.get('content-type')
 
-      if (response.status === 403 && contentType?.includes('text/plain')) {
+      if (response.status === 403 && contentType?.includes('text/html')) {
         console.info('Headers', Object.fromEntries(response.headers.entries()))
         onCloudflareChallenge?.()
         throw new CloudflareChallengeException()
