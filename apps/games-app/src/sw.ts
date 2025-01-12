@@ -120,6 +120,14 @@ function main() {
       console.info('Fetching navigation response')
       const response = await fetchWithTimeout(event.request, 5000)
 
+      if (
+        response.status === 403 &&
+        response.headers.get('cf-mitigated') === 'challenge'
+      ) {
+        console.info('Cloudflare challenge response, returning response as is')
+        return response
+      }
+
       if (!response?.ok) {
         throw new Error('Invalid response')
       }
