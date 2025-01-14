@@ -1,4 +1,3 @@
-import { esbuildDecorators } from '@anatine/esbuild-decorators'
 import node from '@astrojs/node'
 import tailwind from '@astrojs/tailwind'
 import earlyHints from '@itsmatteomanf/astro-early-hints'
@@ -12,12 +11,5 @@ export default defineConfig({
   server: {
     host: 'auth.local',
     port: Number(process.env.AUTH_API_PORT) || 8080,
-  },
-  vite: {
-    optimizeDeps: {
-      esbuildOptions: {
-        plugins: [esbuildDecorators({ tsconfig: './tsconfig.json' })],
-      },
-    },
   },
 })
