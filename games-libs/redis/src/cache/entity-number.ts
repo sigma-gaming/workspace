@@ -1,4 +1,4 @@
-import { GlobalEntityBaseService, KeyEntityBaseService } from './entity-base'
+import { GlobalEntityBaseService, KeyEntityBaseService } from './entity-base.js'
 
 export class GlobalNumberEntityService extends GlobalEntityBaseService<number> {
   parse = Number

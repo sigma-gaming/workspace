@@ -91,14 +91,12 @@ export const withdrawRoute = createRouter().post(
 
     const balance: BalanceUpdate = {
       time,
+      userId,
       mode: UpdateMode.Optimized,
-      available: updatedBalance.available,
+      data: { available: updatedBalance.available },
     }
 
-    gamesPubsubs.balanceUpdated.publish({
-      userId,
-      update: balance,
-    })
+    gamesPubsubs.balanceUpdated.publish(balance)
 
     return ctx.json({
       balance,

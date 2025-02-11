@@ -1,5 +1,6 @@
 import { Icons, LazyWrapper, useLazyAnimate } from '@core/ui'
 import { trimText } from '@core/utils'
+import { PincodeMode } from '@dbs/games-types'
 import { getPincodeHighlight } from '@games/model'
 import { useUnit } from 'effector-react'
 import { lazy, memo, useMemo, useRef } from 'react'
@@ -119,8 +120,8 @@ export const AnimatedPincode = () => {
         </div>
 
         <p className="absolute top-4 right-4 opacity-50 font-medium leading-none">
-          {mode === 'hardcore' && 'HARDCORE'}
-          {mode === 'easy' && 'EASY'}
+          {mode === PincodeMode.Hardcore && 'HARDCORE'}
+          {mode === PincodeMode.Easy && 'EASY'}
         </p>
 
         <LazyWrapper>

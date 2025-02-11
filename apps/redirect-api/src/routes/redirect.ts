@@ -15,7 +15,7 @@ export const redirectRoute = createRouter().get('/', async (ctx) => {
     await affiliateService.incrementCampaignVisits({ campaignId: campaign.id })
   }
 
-  const domain = domainService.getLatestDomain(DomainApp.GamesApp)
+  const domain = domainService.getLatestDomain(DomainApp.CoreApp)
 
   if (!domain) {
     return ctx.text('Try again later', 503)

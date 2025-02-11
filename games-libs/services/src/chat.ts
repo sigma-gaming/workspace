@@ -13,7 +13,7 @@ import {
   ChatMessageType,
   UserRole,
 } from '@dbs/games-types'
-import { ChatMessageDetailed, ProfileDetailed } from '@games/model'
+import { ChatMessageDetailed, UserDetails } from '@games/model'
 import { gamesDb } from '@games/services'
 import { desc } from 'drizzle-orm'
 import { gamesCache } from './cache'
@@ -134,24 +134,29 @@ export class ChatService {
     }
 
     let chatMessageInsert: ChatMessageInsert
-    let detailedProfile: ProfileDetailed | null = null
+    let userDetails: UserDetails | null = null
 
     if (userId) {
-      detailedProfile = await profileService.getDetailedProfile(userId)
+      userDetails = await profileService.getUserDetails(userId)
 
       chatMessageInsert = {
         type: ChatMessageType.UserMessage,
         text,
         attachments,
         userId,
-        profileId: detailedProfile.id,
+        profileId: userDetails.profile.id,
         trackingId: payload.trackingId,
+        senderName: userDetails.profile.name,
+        senderUsername: userDetails.profile.username,
+        senderImage: userDetails.profile.image,
+        senderRoles: userDetails.user.roles,
       }
     } else {
       chatMessageInsert = {
         type: ChatMessageType.SystemMessage,
         text,
         attachments,
+        senderRoles: [UserRole.Admin],
       }
     }
 
@@ -161,20 +166,8 @@ export class ChatService {
       .returning()
       .then(takeFirstOrThrow)
 
-    const detailedMessage: ChatMessageDetailed = message
-
-    if (detailedProfile) {
-      detailedMessage.senderName = detailedProfile.name
-      detailedMessage.senderUsername = detailedProfile.username
-      detailedMessage.senderImage = detailedProfile.image
-      detailedMessage.senderRoles = detailedProfile.roles
-    } else {
-      // System message
-      detailedMessage.senderRoles = [UserRole.Admin]
-    }
-
-    await gamesCache.lastChatMessages.push(detailedMessage)
-    await gamesPubsubs.chatMessages.publish(detailedMessage)
+    await gamesCache.lastChatMessages.push(message)
+    await gamesPubsubs.chatMessages.publish(message)
 
     return message
   }

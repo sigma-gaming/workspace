@@ -28,6 +28,13 @@ import {
 
 const encoder = new TextEncoder()
 
+const mapCurrency = (currency: Currency): BovapayCurrency => {
+  if (currency === Currency.RUB) return 'rub'
+  if (currency === Currency.KGS) return 'kgs'
+  if (currency === Currency.UZS) return 'uzs'
+  throw new Error('Unsupported currency')
+}
+
 export class BovapayService implements PaymentProviderService {
   readonly provider = PaymentProvider.Bovapay
   private readonly options: BovapayOptions
@@ -106,7 +113,7 @@ export class BovapayService implements PaymentProviderService {
       amount: Math.ceil(request.currencyAmount),
       callback_url: this.options.callbackUrl,
       redirect_url: request.redirectUrl,
-      customer_name: request.userProfile.name,
+      customer_name: request.userProfile.profile.name,
       currency,
       payment_method: paymentMethod,
     }
@@ -129,6 +136,7 @@ export class BovapayService implements PaymentProviderService {
       createdAt: response.data.created_at,
       updatedAt: response.data.updated_at,
       payload: {
+        $type: DepositType.Redirect,
         type: DepositType.Redirect,
         redirectUrl: response.data.form_url,
       },
@@ -149,7 +157,7 @@ export class BovapayService implements PaymentProviderService {
     const payoutRequest: BovapayCreatePayoutRequest = {
       user_id: request.userId,
       amount: request.currencyAmount,
-      currency: request.currency.toLowerCase() as any,
+      currency: mapCurrency(request.currency),
       method: request.method as any,
     }
 

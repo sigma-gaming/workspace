@@ -186,16 +186,6 @@ FROM bot-base AS games-bot
 COPY --from=games-bot-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-bot/dist/main.js" ]
 
-# Migrations
-
-FROM prebuild AS games-db-migration-build
-RUN pnpm nx run @migrations/games-db-migration:build
-
-FROM base AS games-db-migration
-WORKDIR /workspace
-COPY --from=games-db-migration-build /build ./
-CMD [ "node", "apps/games-db-migration/dist/main.js" ]
-
 # GCR Cleaner
 
 FROM base AS gcloud-sdk-base

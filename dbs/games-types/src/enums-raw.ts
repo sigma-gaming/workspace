@@ -1,147 +1,147 @@
 export enum AccountProvider {
-  VK = 'VK',
-  Telegram = 'Telegram',
+  VK,
+  Telegram,
 }
 
 export enum UserRole {
-  User = 'User',
-  Admin = 'Admin',
-  Moderator = 'Moderator',
-  Support = 'Support',
+  User,
+  Admin,
+  Moderator,
+  Support,
 }
 
 export enum TransactionType {
-  Deposit = 'Deposit',
-  Withdrawal = 'Withdrawal',
-  Transfer = 'Transfer',
-  Bonus = 'Bonus',
-  Bet = 'Bet',
-  Win = 'Win',
-  Loss = 'Loss',
-  Refund = 'Refund',
+  Deposit,
+  Withdrawal,
+  Transfer,
+  Bonus,
+  Bet,
+  Win,
+  Loss,
+  Refund,
 }
 
 export enum ReferralAction {
-  Deposit = 'Deposit',
-  Withdrawal = 'Withdrawal',
+  Deposit,
+  Withdrawal,
 }
 
 export enum Game {
-  Dice = 'Dice',
-  Pincode = 'Pincode',
+  Dice,
+  Pincode,
 }
 
 export enum GameOutcome {
-  Win = 'Win',
-  Loss = 'Loss',
+  Win,
+  Loss,
 }
 
 export enum PincodeMode {
-  Easy = 'easy',
-  Hardcore = 'hardcore',
+  Easy,
+  Hardcore,
 }
 
 export enum NotificationKind {
-  Success = 'Success',
-  Info = 'Info',
-  Warning = 'Warning',
-  Failure = 'Failure',
+  Success,
+  Info,
+  Warning,
+  Failure,
 }
 
 export enum ChatMessageType {
-  UserMessage = 'UserMessage',
-  SystemMessage = 'SystemMessage',
+  UserMessage,
+  SystemMessage,
 }
 
 export enum ChatMessageAttachmentType {
-  Game = 'Game',
+  Game,
 }
 
 export enum FraudRisk {
-  Clear = 'Clear',
-  Low = 'Low',
-  Medium = 'Medium',
-  High = 'High',
-  Unknown = 'Unknown',
+  Clear,
+  Low,
+  Medium,
+  High,
+  Unknown,
 }
 
 export enum PromocodeBonusType {
-  DepositMultiplier = 'DepositMultiplier',
-  DepositFixed = 'DepositFixed',
-  Payout = 'Payout',
+  DepositMultiplier,
+  DepositFixed,
+  Payout,
 }
 
 export enum PromocodeUsageStatus {
-  Applied = 'Applied',
-  Pending = 'Pending',
+  Applied,
+  Pending,
 }
 
 export enum GlobalTaskKey {
-  VkGroupSubscribe = 'VkGroupSubscribe',
-  VkPinnedRepost = 'VkPinnedRepost',
-  TelegramGroupSubscribe = 'TelegramGroupSubscribe',
+  VkGroupSubscribe,
+  VkPinnedRepost,
+  TelegramGroupSubscribe,
 }
 
 export enum TaskType {
-  Global = 'Global',
-  Personal = 'Personal',
+  Global,
+  Personal,
 }
 
 export enum TaskStatus {
-  Pending = 'Pending',
-  Completed = 'Completed',
-  Claimed = 'Claimed',
+  Pending,
+  Completed,
+  Claimed,
 }
 
 export enum PaymentStatus {
-  Pending = 'Pending',
-  Processing = 'Processing',
-  Completed = 'Completed',
-  Failed = 'Failed',
-  Rejected = 'Rejected',
-  Cancelled = 'Cancelled',
-  Expired = 'Expired',
+  Pending,
+  Processing,
+  Completed,
+  Failed,
+  Rejected,
+  Cancelled,
+  Expired,
 }
 
 export enum Currency {
-  RUB = 'RUB',
-  KZT = 'KZT',
-  KGS = 'KGS',
-  UZS = 'UZS',
-  UAH = 'UAH',
-  USD = 'USD',
-  EUR = 'EUR',
-  TRX = 'TRX',
-  USDT_TRC20 = 'USDT_TRC20',
-  USDT_ERC20 = 'USDT_ERC20',
-  BTC = 'BTC',
-  LTC = 'LTC',
-  TON = 'TON',
-  NOT = 'NOT',
-  ETH = 'ETH',
-  BNB = 'BNB',
-  DOGE = 'DOGE',
+  RUB,
+  KZT,
+  KGS,
+  UZS,
+  UAH,
+  USD,
+  EUR,
+  TRX,
+  USDT_TRC20,
+  USDT_ERC20,
+  BTC,
+  LTC,
+  TON,
+  NOT,
+  ETH,
+  BNB,
+  DOGE,
 }
 
 export enum DepositType {
-  Redirect = 'Redirect',
-  WhiteLabel = 'WhiteLabel',
+  Redirect,
+  WhiteLabel,
 }
 
 export enum DepositMethod {
-  SBP = 'SBP',
-  CreditCard = 'CreditCard',
-  Piastrix = 'Piastrix',
-  Toncoin = 'Toncoin',
+  SBP,
+  CreditCard,
+  Piastrix,
+  Toncoin,
 }
 
 export enum WithdrawalMethod {
-  SBP = 'SBP',
-  CreditCard = 'CreditCard',
-  Piastrix = 'Piastrix',
+  SBP,
+  CreditCard,
+  Piastrix,
 }
 
 export enum PaymentProvider {
-  Bovapay = 'Bovapay',
-  Test = 'Test',
+  Bovapay,
+  Test,
 }

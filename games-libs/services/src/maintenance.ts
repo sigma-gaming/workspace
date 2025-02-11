@@ -9,28 +9,28 @@ export class MaintenanceService {
   private readonly logger: Logger
 
   constructor() {
-    this.logger = loggerService.logger.child('MaintenanceCache')
+    this.logger = loggerService.logger.child('MaintenanceService')
   }
 
-  private async queryMaintenance() {
+  private async queryMaintenanceEnabled() {
     const config = await gamesDb.query.ConfigTable.findFirst()
     if (!config) throw new Error('Config not found')
     return config.maintenanceEnabled
   }
 
-  private async getMaintenance() {
-    if (!gamesCache.ready) return this.queryMaintenance()
+  private async checkMaintenanceEnabled() {
+    if (!gamesCache.ready) return this.queryMaintenanceEnabled()
     const cached = await gamesCache.maintenance.get()
     if (cached !== null) return cached
-    const maintenance = await this.queryMaintenance()
+    const maintenance = await this.queryMaintenanceEnabled()
     await gamesCache.maintenance.set(maintenance)
     return maintenance
   }
 
-  async isMaintenanceMode() {
+  async isMaintenanceEnabled() {
     for (let i = 0; i < 3; i++) {
       try {
-        return await this.getMaintenance()
+        return await this.checkMaintenanceEnabled()
       } catch (error) {
         this.logger.info('Failed to get maintenance mode:')
         this.logger.error(error)
@@ -42,7 +42,7 @@ export class MaintenanceService {
     return true
   }
 
-  async setMaintenanceMode(state: boolean) {
+  async setMaintenanceEnabled(state: boolean) {
     await gamesDb.update(ConfigTable).set({ maintenanceEnabled: state })
     if (!gamesCache.ready) return state
     await gamesCache.maintenance.set(state)

@@ -39,10 +39,6 @@
       "{projectRoot}/vite.config.*",
       "{projectRoot}/drizzle.config.*",
       "{projectRoot}/nginx.conf"
-    ],
-    "migrations": [
-      "{projectRoot}/migrate.*",
-      "{projectRoot}/drizzle/**/*"
     ]
   },
   "targetDefaults": {
@@ -108,16 +104,10 @@
         "build"
       ]
     },
-    "migration:dev": {
-      "dependsOn": [
-        "copy-env"
-      ]
-    },
     "dev": {
       "dependsOn": [
         "copy-env",
-        "^build",
-        "^migration:dev"
+        "^build"
       ]
     },
     "start": {

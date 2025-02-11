@@ -117,10 +117,10 @@ sample({
   source: {
     user: $$user.$user,
     senderName: $$profile.$name,
-    profile: $$profile.$profile,
+    userDetails: $$profile.$userDetails,
     messages: $messages,
   },
-  fn: ({ user, senderName, profile, messages }, payload) => {
+  fn: ({ user, senderName, userDetails, messages }, payload) => {
     return messages.concat({
       /*
        * Should not be possible real id to prevent any conflicts
@@ -135,15 +135,15 @@ sample({
       type: ChatMessageType.UserMessage,
       attachments: payload.attachments,
       senderName,
-      senderUsername: profile!.username,
-      senderImage: profile!.image,
+      senderUsername: userDetails!.profile.username,
+      senderImage: userDetails!.profile.image,
       senderRoles: user!.roles,
       userId: user!.id,
       text: payload.text,
       temporary: true,
       isPinned: false,
       trackingId: payload.trackingId,
-      profileId: profile!.id,
+      profileId: userDetails!.profile.id,
     })
   },
   target: $messages,

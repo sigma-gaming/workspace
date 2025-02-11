@@ -11,8 +11,8 @@ export const getStatusesRoute = createRouter().get('/', async (ctx) => {
   for (const taskKey of Object.values(GlobalTaskKey)) {
     promises.push(
       globalTaskService
-        .getStatus({ taskKey, userId })
-        .then(([status]) => ({ taskKey, status })),
+        .getStatus({ taskKey: Number(taskKey), userId })
+        .then(([status]) => ({ taskKey: Number(taskKey), status })),
     )
   }
 

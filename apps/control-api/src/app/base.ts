@@ -16,7 +16,7 @@ export const baseApp = new Hono<HonoUwsEnv>()
     cors({
       origin: (origin) => {
         const matches = domainService.originMatches(origin, [
-          DomainApp.GamesApp,
+          DomainApp.CoreApp,
           DomainApp.ControlApp,
         ])
 

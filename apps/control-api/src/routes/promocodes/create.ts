@@ -94,6 +94,8 @@ export const createRoute = createRouter().post(
         type: PromocodeBonusType.Payout,
         payout: payload.payout,
       }
+
+      bonus.$type = bonus.type
     }
 
     await gamesDb.transaction(async (tx) => {

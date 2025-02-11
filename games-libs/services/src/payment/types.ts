@@ -12,7 +12,7 @@ import {
   PaymentStatus,
   WithdrawalMethod,
 } from '@dbs/games-types'
-import { ProfileDetailed } from '@games/model'
+import { UserDetails } from '@games/model'
 
 export enum PaymentOutcome {
   Success = 'Success',
@@ -127,7 +127,7 @@ export type PaymentRequest = {
   currencyAmount: number
   provider: PaymentProvider
   currency: Currency
-  userProfile: ProfileDetailed
+  userProfile: UserDetails
   userStats: UserStatsSelect
 }
 

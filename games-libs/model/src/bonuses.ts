@@ -1,7 +1,7 @@
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
-import { Update } from './updates'
+import { UserUpdate } from './updates'
 
-export type GlobalTaskUpdate = Update & {
+export type GlobalTaskStatusUpdate = UserUpdate<{
   key: GlobalTaskKey
   status: TaskStatus
-}
+}>

@@ -23,9 +23,7 @@ export const baseApp = new Hono<BaseEnv>()
     '*',
     cors({
       origin: (origin) => {
-        const matches = domainService.originMatches(origin, [
-          DomainApp.GamesApp,
-        ])
+        const matches = domainService.originMatches(origin, [DomainApp.CoreApp])
 
         if (!matches) return null
         return origin

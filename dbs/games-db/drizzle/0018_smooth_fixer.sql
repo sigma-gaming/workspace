@@ -1,1 +1,0 @@
-ALTER TABLE "PromocodeUsage" DROP COLUMN IF EXISTS "id";

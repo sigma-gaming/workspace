@@ -1,1 +1,0 @@
-ALTER TABLE "User" ADD COLUMN "virtual" boolean DEFAULT false NOT NULL;

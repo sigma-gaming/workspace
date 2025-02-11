@@ -9,7 +9,6 @@ const removeQueryParamFx = attach({
     promise = promise.finally(() => {
       const url = new URL(location.href)
       url.searchParams.delete(param)
-      console.log(url)
       history.replace(url)
     })
   },

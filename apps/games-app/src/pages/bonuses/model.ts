@@ -8,7 +8,7 @@ import { subscriptionFactory } from '@core/io-client'
 import { noop } from '@core/utils'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { createMutation, createQuery } from '@farfetched/core'
-import { formatGem, gemFloat, GlobalTaskUpdate } from '@games/model'
+import { formatGem, gemFloat, GlobalTaskStatusUpdate } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, EffectResult, sample } from 'effector'
 import { status } from 'patronum'
@@ -58,12 +58,12 @@ const claimGlobalTaskRewardMutation = createMutation({
   effect: createApiEffect('json', gamesApi.tasks.global.claimReward.$post),
 })
 
-const globalTaskUpdateReceived = createEvent<GlobalTaskUpdate>()
+const globalTaskStatusUpdateReceived = createEvent<GlobalTaskStatusUpdate>()
 
-const { receivedData: globalTaskUpdated } = invoke(() =>
+const { receivedData: globalTaskStatusUpdated } = invoke(() =>
   subscriptionFactory({
     ws: gamesWs,
-    event: 'global-tasks/updated',
+    event: 'global-tasks/status-updated',
   }),
 )
 
@@ -178,18 +178,18 @@ sample({
     claimGlobalTaskRewardMutation.finished.success,
   ],
   fn: ({ result }) => result.task,
-  target: globalTaskUpdateReceived,
+  target: globalTaskStatusUpdateReceived,
 })
 
 sample({
-  source: globalTaskUpdated,
-  target: globalTaskUpdateReceived,
+  source: globalTaskStatusUpdated,
+  target: globalTaskStatusUpdateReceived,
 })
 
 sample({
-  clock: onlyLatestUpdate(globalTaskUpdateReceived),
+  clock: onlyLatestUpdate(globalTaskStatusUpdateReceived),
   source: $globalTaskStatuses,
-  fn: (statuses, { key, status }) => ({ ...statuses, [key]: status }),
+  fn: (statuses, { data }) => ({ ...statuses, [data.key]: data.status }),
   target: $globalTaskStatuses,
 })
 

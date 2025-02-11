@@ -35,11 +35,11 @@ export const NotificationsPageView = () => {
   const errors = useUnit(form.$errors)
   const submitting = useUnit($$notificationsPage.$submitting)
 
-  const colorOptions: Array<{ label: string; value: NotificationKind }> = [
-    { label: 'Информация', value: NotificationKind.Info },
-    { label: 'Успех', value: NotificationKind.Success },
-    { label: 'Предупреждение', value: NotificationKind.Warning },
-    { label: 'Ошибка', value: NotificationKind.Failure },
+  const kindOptions: Array<{ label: string; value: string }> = [
+    { label: 'Информация', value: String(NotificationKind.Info) },
+    { label: 'Успех', value: String(NotificationKind.Success) },
+    { label: 'Предупреждение', value: String(NotificationKind.Warning) },
+    { label: 'Ошибка', value: String(NotificationKind.Failure) },
   ]
 
   return (
@@ -81,9 +81,9 @@ export const NotificationsPageView = () => {
             />
           </Text>
         }
-        data={colorOptions}
-        value={kind}
-        onChange={(color) => updateKind(color as NotificationKind)}
+        data={kindOptions}
+        value={kind ? String(kind) : null}
+        onChange={(value) => updateKind(Number(value) as NotificationKind)}
         allowDeselect={false}
         error={errors.kind[0]}
       />

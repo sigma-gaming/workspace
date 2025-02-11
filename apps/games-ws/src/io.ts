@@ -8,7 +8,7 @@ export const io = new Server<ClientToServerEvents, ServerToClientEvents>({
   adapter: createAdapter(gamesPubsubs.pub, gamesPubsubs.sub),
   allowRequest(req, callback) {
     const matches = domainService.originMatches(req.headers.origin, [
-      DomainApp.GamesApp,
+      DomainApp.CoreApp,
       DomainApp.ControlApp,
     ])
 

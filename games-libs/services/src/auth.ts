@@ -128,7 +128,7 @@ export class AuthService {
         ...accountSharedInput,
       })
 
-      await gamesCache.detailedProfile.del(userId)
+      await gamesCache.userDetails.del(userId)
 
       return { outcome: AuthOutcome.Connected }
     }
@@ -169,7 +169,11 @@ export class AuthService {
       async (tx) => {
         const createdUser = await tx
           .insert(UserTable)
-          .values({ referrerId, referralCampaignId, virtual })
+          .values({
+            referrerId,
+            referralCampaignId,
+            virtual,
+          })
           .returning()
           .then(takeFirstOrThrow)
 

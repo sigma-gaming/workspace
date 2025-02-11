@@ -21,17 +21,17 @@ export const MiniProfile = () => {
   const isMobile = useMedia({ to: 'md' })
   const userLoggedIn = useUnit($$session.$loggedIn)
   const userLoaded = useUnit($$user.$loaded)
-  const profile = useUnit($$profile.$profile)
-  const profileLoaded = useUnit($$profile.$loaded)
+  const userDetails = useUnit($$profile.$userDetails)
+  const userDetailsLoaded = useUnit($$profile.$loaded)
   const roles = useUnit($$user.$roles)
   const avatarSize = useAvatarSize()
-  const loading = !userLoaded || !profileLoaded
+  const loading = !userLoaded || !userDetailsLoaded
 
   if (!userLoggedIn) {
     return <ExpiredProfile />
   }
 
-  const initials = getUserInitials(profile?.name)
+  const initials = getUserInitials(userDetails?.profile.name)
 
   return (
     <Menu
@@ -47,7 +47,7 @@ export const MiniProfile = () => {
           className="flex gap-3 md:gap-4 items-center justify-end cursor-pointer rounded-xl !outline-offset-4"
         >
           <Avatar
-            src={profile?.image}
+            src={userDetails?.profile.image}
             alt="Аватар пользователя"
             renderRoot={({ children, className, ...props }) => (
               <button
@@ -67,18 +67,18 @@ export const MiniProfile = () => {
       </Menu.Target>
 
       <Menu.Dropdown p="xs">
-        {profile && (
+        {userDetails && (
           <div className="px-3 py-2">
             <Text className="text-ellipsis overflow-hidden" fw={500}>
-              {profile.name}
+              {userDetails.profile.name}
             </Text>
-            {profile.username && (
+            {userDetails.profile.username && (
               <Text
                 className="text-ellipsis overflow-hidden"
                 size="sm"
                 c="dark.2"
               >
-                @{profile.username}
+                @{userDetails.profile.username}
               </Text>
             )}
             <p className="mt-2 text-sm">Роли: {roles.join(', ')}</p>

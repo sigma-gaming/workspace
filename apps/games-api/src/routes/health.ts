@@ -7,7 +7,7 @@ export const healthyRoute = new Hono().get('/', async (ctx) => {
 })
 
 export const readyRoute = new Hono().get('/', async (ctx) => {
-  if (await maintenanceService.isMaintenanceMode()) {
+  if (await maintenanceService.isMaintenanceEnabled()) {
     throw new HTTPException(503)
   }
 

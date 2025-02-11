@@ -9,12 +9,14 @@ import {
 } from './enums-raw'
 
 export type GameSnapshotDice = {
+  $type?: Game.Dice
   game: Game.Dice
   inputSides: number[]
   outputSide: number
 }
 
 export type GameSnapshotPincode = {
+  $type?: Game.Pincode
   game: Game.Pincode
   mode: PincodeMode
   outputNumber: number
@@ -28,6 +30,7 @@ export type SnapshotByGame<T extends Game> = {
 }[T]
 
 export type ChatMessageAttachmentGame = {
+  $type?: ChatMessageAttachmentType.Game
   type: ChatMessageAttachmentType.Game
   gameRecordId: string
 }
@@ -36,6 +39,7 @@ export type ChatMessageAttachment = ChatMessageAttachmentGame
 
 export type PromocodeBonus =
   | {
+      $type?: PromocodeBonusType.DepositMultiplier
       type: PromocodeBonusType.DepositMultiplier
       multiplier: number
       minDeposit?: number
@@ -43,28 +47,33 @@ export type PromocodeBonus =
       activeHours: number
     }
   | {
+      $type?: PromocodeBonusType.DepositFixed
       type: PromocodeBonusType.DepositFixed
       payout: number
       minDeposit: number
       activeHours: number
     }
   | {
+      $type?: PromocodeBonusType.Payout
       type: PromocodeBonusType.Payout
       payout: number
     }
 
 export type GlobalTaskRequirements =
   | {
+      $type?: GlobalTaskKey.TelegramGroupSubscribe
       type: GlobalTaskKey.TelegramGroupSubscribe
       groupHandle: string
       groupId: number
     }
   | {
+      $type?: GlobalTaskKey.VkGroupSubscribe
       type: GlobalTaskKey.VkGroupSubscribe
       groupHandle: string
       groupId: number
     }
   | {
+      $type?: GlobalTaskKey.VkPinnedRepost
       type: GlobalTaskKey.VkPinnedRepost
       groupHandle: string
       groupId: number
@@ -81,10 +90,12 @@ export type DepositInstructions = {
 
 export type DepositPayload =
   | {
+      $type?: DepositType.Redirect
       type: DepositType.Redirect
       redirectUrl: string
     }
   | {
+      $type?: DepositType.WhiteLabel
       type: DepositType.WhiteLabel
       instructions: DepositInstructions
     }

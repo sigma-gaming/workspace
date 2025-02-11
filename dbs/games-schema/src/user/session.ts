@@ -1,23 +1,23 @@
-import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { AccountProvider } from '@dbs/games-types'
+import { pgTable, smallint, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { ReferralCampaignTable } from '../affiliate/referral-campaign'
-import { accountProviderEnum } from '../enums'
 import { uuidv7 } from '../lib/sql'
 import { UserTable } from './user'
 
-export const SessionTable = pgTable('Session', {
+export const SessionTable = pgTable('session', {
   id: uuid('id').primaryKey().default(uuidv7),
-  expiresAt: timestamp('expiresAt', {
+  expiresAt: timestamp('expires_at', {
     withTimezone: true,
     mode: 'string',
   }).notNull(),
-  provider: accountProviderEnum('provider').notNull(),
-  userId: uuid('userId')
+  provider: smallint('provider').$type<AccountProvider>().notNull(),
+  userId: uuid('user_id')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
-  referrerId: uuid('referrerId').references(() => UserTable.id, {
+  referrerId: uuid('referrer_id').references(() => UserTable.id, {
     onDelete: 'set null',
   }),
-  referralCampaignId: uuid('referralCampaignId').references(
+  referralCampaignId: uuid('referral_campaign_id').references(
     () => ReferralCampaignTable.id,
     { onDelete: 'set null' },
   ),

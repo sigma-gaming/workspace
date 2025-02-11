@@ -54,14 +54,12 @@ export const playDice = createRouter().post(
 
     const balance: BalanceUpdate = {
       time: Date.now(),
+      userId,
       mode: UpdateMode.Optimized,
-      available: updatedBalance,
+      data: { available: updatedBalance },
     }
 
-    gamesPubsubs.balanceUpdated.publish({
-      userId,
-      update: balance,
-    })
+    gamesPubsubs.balanceUpdated.publish(balance)
 
     return ctx.json({
       record,

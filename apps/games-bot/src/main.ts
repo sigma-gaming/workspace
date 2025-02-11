@@ -74,7 +74,7 @@ bot.command('start', async (ctx) => {
   logger.info('Start command received')
   const campaign = await getStartReferralCampaign(ctx.match)
 
-  const latestDomain = domainService.getLatestDomain(DomainApp.GamesApp)
+  const latestDomain = domainService.getLatestDomain(DomainApp.CoreApp)
 
   if (!latestDomain) {
     throw new Error('Actual domain not found')
@@ -102,7 +102,7 @@ bot.command('start', async (ctx) => {
 })
 
 bot.command('domains', async (ctx) => {
-  const domains = domainService.getDomainsByApp(DomainApp.GamesApp)
+  const domains = domainService.getDomainsByApp(DomainApp.CoreApp)
 
   const keyboard = new InlineKeyboard(
     domains.map((domain) => [

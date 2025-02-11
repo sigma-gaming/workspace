@@ -1,8 +1,8 @@
 import { bigint, pgTable, uuid } from 'drizzle-orm/pg-core'
 import { UserTable } from '../user/user'
 
-export const ReferrerBalanceTable = pgTable('ReferrerBalance', {
-  referrerId: uuid('referrerId')
+export const ReferrerBalanceTable = pgTable('referrer_balance', {
+  referrerId: uuid('referrer_id')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .primaryKey(),
   available: bigint('available', { mode: 'number' }).notNull().default(0),

@@ -20,12 +20,14 @@ export const ProviderSelect = memo(
         label="Платёжный сервис"
         placeholder="Выберите платёжный сервис"
         description={`Если не получается ${operation === 'deposit' ? 'пополнить баланс' : 'сделать вывод'}, попробуйте другой вариант`}
-        value={selectedProvider}
-        onChange={(value) => fields.provider.update(value as PaymentProvider)}
+        value={selectedProvider ? String(selectedProvider) : null}
+        onChange={(value) =>
+          fields.provider.update(Number(value) as PaymentProvider)
+        }
         allowDeselect={false}
         data={providers.map(({ provider }, idx) => ({
           label: `Вариант #${idx + 1}`,
-          value: provider,
+          value: String(provider),
         }))}
       />
     )

@@ -7,5 +7,5 @@
     "**.js",
     "**.mjs",
     "**.cjs"
-, "../services/src/pubsubs.ts"  ]
+  ]
 }

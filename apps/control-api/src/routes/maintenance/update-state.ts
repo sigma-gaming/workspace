@@ -24,12 +24,12 @@ export const updateStateRoute = createRouter().post(
     roleService.assert(user, UserRole.Admin)
 
     const currentMaintenanceEnabled =
-      await maintenanceService.isMaintenanceMode()
+      await maintenanceService.isMaintenanceEnabled()
 
     const payload = ctx.req.valid('json')
 
     if (payload.maintenanceEnabled !== currentMaintenanceEnabled) {
-      await maintenanceService.setMaintenanceMode(payload.maintenanceEnabled)
+      await maintenanceService.setMaintenanceEnabled(payload.maintenanceEnabled)
 
       if (gamesPubsubs.ready && payload.maintenanceEnabled) {
         await gamesPubsubs.maintenanceStarted.publish()

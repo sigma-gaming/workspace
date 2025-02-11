@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import { Logger, loggerService } from '@core/logger'
 import { takeFirstOrThrow } from '@core/utils'
 import {
+  ProfileSelect,
   ReferralCampaignInsert,
   ReferralCampaignTable,
   ReferrerBalanceSelect,
@@ -227,6 +228,7 @@ export class AffiliateService {
     referrerId,
     referralCampaignId,
     referralAction,
+    referralProfile,
     amount,
   }: {
     tx?: typeof gamesDb
@@ -234,6 +236,7 @@ export class AffiliateService {
     referrerId: string | null
     referralCampaignId: string | null
     referralAction: ReferralAction
+    referralProfile: ProfileSelect
     amount: number
   }) {
     const db = tx ?? gamesDb
@@ -255,6 +258,9 @@ export class AffiliateService {
       referralAction,
       referralCampaignId,
       referralId,
+      referralName: referralProfile.name,
+      referralImage: referralProfile.image,
+      referralUsername: referralProfile.username,
       amount: finalAmount,
     })
   }

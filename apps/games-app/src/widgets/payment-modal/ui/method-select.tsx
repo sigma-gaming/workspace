@@ -102,8 +102,8 @@ export const MethodSelect = memo(() => {
   return (
     <Radio.Group
       label={'Способ ' + (operation === 'deposit' ? 'пополнения' : 'вывода')}
-      value={selectedMethod}
-      onChange={(value) => fields.method.update(value as DepositMethod)}
+      value={selectedMethod ? String(selectedMethod) : null}
+      onChange={(value) => fields.method.update(Number(value) as DepositMethod)}
     >
       <div ref={methodListOuterRef} className={styles.methodListOuter}>
         <div
@@ -120,7 +120,7 @@ export const MethodSelect = memo(() => {
                 <Radio.Card
                   key={method}
                   className={styles.methodCard}
-                  value={method}
+                  value={String(method)}
                   data-value={method}
                 >
                   <div className={styles.methodCardInner}>

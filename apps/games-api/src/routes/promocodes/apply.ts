@@ -58,14 +58,12 @@ export const applyRoute = createRouter().post(
     if (result.outcome === PromocodeActivationOutcome.AppliedPayout) {
       const balance: BalanceUpdate = {
         time: Date.now(),
+        userId,
         mode: UpdateMode.Optimized,
-        available: result.updatedBalance.available,
+        data: { available: result.updatedBalance.available },
       }
 
-      gamesPubsubs.balanceUpdated.publish({
-        userId,
-        update: balance,
-      })
+      gamesPubsubs.balanceUpdated.publish(balance)
 
       return ctx.json({
         bonusType: PromocodeBonusType.Payout,

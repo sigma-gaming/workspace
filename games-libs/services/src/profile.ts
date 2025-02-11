@@ -6,13 +6,13 @@ import {
   ProfileTable,
   UserTable,
 } from '@dbs/games-schema'
-import { ProfileDetailed } from '@games/model'
+import { UserDetails } from '@games/model'
 import { gamesDb } from '@games/services'
 import { eq } from 'drizzle-orm'
 import { gamesCache } from './cache'
 
 export class ProfileService {
-  private async queryDetailedProfile(userId: string) {
+  private async queryUserDetails(userId: string) {
     const joins = await gamesDb
       .select({
         user: UserTable,
@@ -46,26 +46,26 @@ export class ProfileService {
       throw new InternalServerException()
     }
 
-    const detailedProfile: ProfileDetailed = {
-      ...profile,
-      roles: user.roles,
+    const userDetails: UserDetails = {
+      profile,
+      user,
       accounts,
     }
 
-    return detailedProfile
+    return userDetails
   }
 
-  async getDetailedProfile(userId: string): Promise<ProfileDetailed> {
+  async getUserDetails(userId: string): Promise<UserDetails> {
     if (!gamesCache.ready) {
-      return this.queryDetailedProfile(userId)
+      return this.queryUserDetails(userId)
     }
 
-    const cached = await gamesCache.detailedProfile.get(userId)
+    const cached = await gamesCache.userDetails.get(userId)
     if (cached) return cached
 
-    const detailedProfile = await this.queryDetailedProfile(userId)
-    await gamesCache.detailedProfile.set(userId, detailedProfile)
-    return detailedProfile
+    const userDetails = await this.queryUserDetails(userId)
+    await gamesCache.userDetails.set(userId, userDetails)
+    return userDetails
   }
 }
 

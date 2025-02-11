@@ -1,25 +1,25 @@
-import { GlobalTaskRequirements } from '@dbs/games-types'
+import { GlobalTaskKey, GlobalTaskRequirements } from '@dbs/games-types'
 import {
   bigint,
   boolean,
   integer,
   jsonb,
   pgTable,
+  smallint,
   timestamp,
 } from 'drizzle-orm/pg-core'
-import { globalTaskKeyEnum } from '../enums'
 
-export const GlobalTaskTable = pgTable('GlobalTask', {
-  key: globalTaskKeyEnum('key').primaryKey(),
+export const GlobalTaskTable = pgTable('global_task', {
+  key: smallint('key').$type<GlobalTaskKey>().primaryKey(),
 
-  createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),
 
-  isActive: boolean('isActive').default(true).notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
   requirements: jsonb('requirements').$type<GlobalTaskRequirements>().notNull(),
   payout: bigint('payout', { mode: 'number' }).notNull(),
-  wageringMultiplier: integer('wageringMultiplier').notNull(),
+  wageringMultiplier: integer('wagering_multiplier').notNull(),
 })
 
 export type GlobalTaskSelect = typeof GlobalTaskTable.$inferSelect

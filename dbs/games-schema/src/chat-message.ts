@@ -1,4 +1,8 @@
-import { ChatMessageAttachment } from '@dbs/games-types'
+import {
+  ChatMessageAttachment,
+  ChatMessageType,
+  UserRole,
+} from '@dbs/games-types'
 import { sql } from 'drizzle-orm'
 import {
   boolean,
@@ -6,46 +10,46 @@ import {
   integer,
   jsonb,
   pgTable,
+  smallint,
   text,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
-import { chatMessageTypeEnum, userRoleEnum } from './enums'
 import { uuidv7 } from './lib/sql'
 import { ProfileTable } from './user/profile'
 import { UserTable } from './user/user'
 
 export const ChatMessageTable = pgTable(
-  'ChatMessage',
+  'chat_message',
   {
     id: uuid('id').primaryKey().default(uuidv7),
-    trackingId: uuid('trackingId').notNull().default(uuidv7),
-    createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
+    trackingId: uuid('tracking_id').notNull().default(uuidv7),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),
 
-    type: chatMessageTypeEnum('type').notNull(),
+    type: smallint('type').$type<ChatMessageType>().notNull(),
     text: text('text'),
     attachments: jsonb('attachments')
       .$type<ChatMessageAttachment[]>()
       .default([]),
 
-    senderName: text('senderName'),
-    senderUsername: text('senderUsername'),
-    senderImage: text('senderImage'),
-    senderRoles: userRoleEnum('senderRoles').array(),
+    senderName: text('sender_name'),
+    senderUsername: text('sender_username'),
+    senderImage: text('sender_image'),
+    senderRoles: smallint('sender_roles').$type<UserRole>().array(),
 
-    isPinned: boolean('isPinned').default(false).notNull(),
+    isPinned: boolean('is_pinned').default(false).notNull(),
 
-    userId: uuid('userId').references(() => UserTable.id, {
+    userId: uuid('user_id').references(() => UserTable.id, {
       onDelete: 'cascade',
     }),
-    profileId: integer('profileId').references(() => ProfileTable.id, {
+    profileId: integer('profile_id').references(() => ProfileTable.id, {
       onDelete: 'cascade',
     }),
   },
   (table) => ({
-    pinned: index()
+    pinned: index('IX_chat_message_is_pinned')
       .on(table.isPinned)
       .where(sql`${table.isPinned} = true`),
   }),

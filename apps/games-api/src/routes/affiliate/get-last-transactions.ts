@@ -1,17 +1,15 @@
 import { BadRequestException, InternalServerException } from '@core/exceptions'
 import {
-  ProfileTable,
   ReferrerPayoutTable,
   ReferrerTransactionTable,
 } from '@dbs/games-schema'
-import { ReferrerTransactionDetailed } from '@games/model'
 import {
   affiliateService,
   gamesCache,
   gamesDb,
   sessionService,
 } from '@games/services'
-import { and, desc, eq, getTableColumns } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 import { createRouter } from '../../app/router'
 
 export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
@@ -39,18 +37,9 @@ export const getLastTransactionsRoute = createRouter().get('/', async (ctx) => {
     throw new InternalServerException({ cause })
   }
 
-  const transactions: ReferrerTransactionDetailed[] = await gamesDb
-    .select({
-      ...getTableColumns(ReferrerTransactionTable),
-      referralName: ProfileTable.name,
-      referralAvatar: ProfileTable.image,
-      referralUsername: ProfileTable.username,
-    })
+  const transactions = await gamesDb
+    .select()
     .from(ReferrerTransactionTable)
-    .leftJoin(
-      ProfileTable,
-      eq(ReferrerTransactionTable.referralId, ProfileTable.userId),
-    )
     .where(
       and(
         eq(ReferrerTransactionTable.referrerId, userId),

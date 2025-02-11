@@ -2,19 +2,19 @@ import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 
-export const ReferralCampaignTable = pgTable('ReferralCampaign', {
+export const ReferralCampaignTable = pgTable('referral_campaign', {
   id: uuid('id').primaryKey().default(uuidv7),
-  createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),
   name: text('name').notNull(),
 
   code: text('code').unique().notNull(),
 
-  totalVisits: integer('totalVisits').notNull().default(0),
-  totalSignups: integer('totalSignups').notNull().default(0),
+  totalVisits: integer('total_visits').notNull().default(0),
+  totalSignups: integer('total_signups').notNull().default(0),
 
-  referrerId: uuid('referrerId').references(() => UserTable.id, {
+  referrerId: uuid('referrer_id').references(() => UserTable.id, {
     onDelete: 'cascade',
   }),
 })

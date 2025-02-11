@@ -1,12 +1,12 @@
 import { pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { UserTable } from '../user/user'
 
-export const ReferrerPayoutTable = pgTable('ReferrerPayout', {
-  referrerId: uuid('referrerId')
+export const ReferrerPayoutTable = pgTable('referrer_payout', {
+  referrerId: uuid('referrer_id')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .primaryKey(),
-  nextPayoutAt: timestamp('nextPayoutAt').notNull(),
-  lastPayoutAt: timestamp('lastPayoutAt'),
+  nextPayoutAt: timestamp('next_payout_at').notNull(),
+  lastPayoutAt: timestamp('last_payout_at'),
 })
 
 export type ReferrerPayoutSelect = typeof ReferrerPayoutTable.$inferSelect

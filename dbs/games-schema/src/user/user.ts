@@ -1,37 +1,39 @@
+import { UserRole } from '@dbs/games-types'
 import { sql } from 'drizzle-orm'
 import {
   boolean,
   foreignKey,
   integer,
   pgTable,
+  smallint,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
-import { userRoleEnum } from '../enums'
 import { uuidv7 } from '../lib/sql'
 
 export const UserTable = pgTable(
-  'User',
+  'user',
   {
     id: uuid('id').primaryKey().default(uuidv7),
-    createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),
-    updatedAt: timestamp('updatedAt', { withTimezone: true, mode: 'string' })
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow()
       .$onUpdate(() => sql`now()`),
-    roles: userRoleEnum('roles')
+    roles: smallint('roles')
       .array()
       .notNull()
-      .default(sql`'{"User"}'`),
+      .$type<UserRole[]>()
+      .default(sql`'{0}'`),
 
     virtual: boolean('virtual').notNull().default(false),
 
-    referrerId: uuid('referrerId'),
-    referralCampaignId: uuid('referralCampaignId'),
-    profileId: integer('profileId'),
-    securityId: uuid('securityId'),
+    referrerId: uuid('referrer_id'),
+    referralCampaignId: uuid('referral_campaign_id'),
+    profileId: integer('profile_id'),
+    securityId: uuid('security_id'),
   },
   (table) => ({
     referrerIdKey: foreignKey({

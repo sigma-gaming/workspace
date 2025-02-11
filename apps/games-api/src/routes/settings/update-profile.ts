@@ -207,12 +207,12 @@ export const updateProfileRoute = createRouter().post(
       .where(eq(ProfileTable.userId, userId))
 
     if (gamesCache.ready) {
-      await gamesCache.detailedProfile.del(userId)
+      await gamesCache.userDetails.del(userId)
     }
 
     return ctx.json({
       status: 'success',
-      detailedProfile: await profileService.getDetailedProfile(userId),
+      userDetails: await profileService.getUserDetails(userId),
     })
   },
 )

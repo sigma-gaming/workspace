@@ -1,48 +1,49 @@
+import {
+  Currency,
+  PaymentProvider,
+  PaymentStatus,
+  WithdrawalMethod,
+} from '@dbs/games-types'
 import { sql } from 'drizzle-orm'
 import {
   bigint,
   numeric,
   pgTable,
+  smallint,
   text,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
-import {
-  currencyEnum,
-  paymentProviderEnum,
-  paymentStatusEnum,
-  withdrawalMethodEnum,
-} from '../enums'
 import { uuidv7 } from '../lib/sql'
 import { UserTable } from '../user/user'
 import { TransactionTable } from './transaction'
 
-export const WithdrawalTable = pgTable('Withdrawal', {
+export const WithdrawalTable = pgTable('withdrawal', {
   id: uuid('id').primaryKey().default(uuidv7),
-  createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
     .notNull(),
-  updatedAt: timestamp('updatedAt', { withTimezone: true, mode: 'string' })
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
     .defaultNow()
     .notNull()
     .$onUpdate(() => sql`now()`),
 
-  gemAmount: bigint('gemAmount', { mode: 'number' }).notNull(),
-  currencyAmount: numeric('currencyAmount', {
+  gemAmount: bigint('gem_amount', { mode: 'number' }).notNull(),
+  currencyAmount: numeric('currency_amount', {
     precision: 20,
     scale: 18,
   }).notNull(),
-  providerAmount: text('providerAmount').notNull(),
-  status: paymentStatusEnum('status').notNull(),
-  currency: currencyEnum('currency').notNull(),
-  method: withdrawalMethodEnum('method').notNull(),
-  provider: paymentProviderEnum('provider').notNull(),
-  providerTransactionId: text('providerTransactionId').notNull(),
+  providerAmount: text('provider_amount').notNull(),
+  status: smallint('status').$type<PaymentStatus>().notNull(),
+  currency: smallint('currency').$type<Currency>().notNull(),
+  method: smallint('method').$type<WithdrawalMethod>().notNull(),
+  provider: smallint('provider').$type<PaymentProvider>().notNull(),
+  providerTransactionId: text('provider_transaction_id').notNull(),
 
-  userId: uuid('userId')
+  userId: uuid('user_id')
     .references(() => UserTable.id, { onDelete: 'cascade' })
     .notNull(),
-  transactionId: uuid('transactionId').references(() => TransactionTable.id, {
+  transactionId: uuid('transaction_id').references(() => TransactionTable.id, {
     onDelete: 'cascade',
   }),
 })

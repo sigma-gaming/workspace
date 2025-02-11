@@ -1,31 +1,32 @@
+import { NotificationKind } from '@dbs/games-types'
 import {
   boolean,
   integer,
   pgTable,
+  smallint,
   text,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
-import { notificationKindEnum } from './enums'
 import { uuidv7 } from './lib/sql'
 import { UserTable } from './user/user'
 
-export const NotificationTable = pgTable('Notification', {
+export const NotificationTable = pgTable('notification', {
   id: uuid('id').primaryKey().default(uuidv7),
-  createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),
-  expiresAt: timestamp('expiresAt', {
+  expiresAt: timestamp('expires_at', {
     withTimezone: true,
     mode: 'string',
   }).notNull(),
-  kind: notificationKindEnum('kind').notNull(),
+  kind: smallint('kind').$type<NotificationKind>().notNull(),
   title: text('title').notNull(),
   message: text('message').notNull(),
-  autoClose: boolean('autoClose').notNull(),
-  autoCloseMs: integer('autoCloseMs').notNull(),
-  withCloseButton: boolean('withCloseButton').notNull(),
-  userId: uuid('userId').references(() => UserTable.id, {
+  autoClose: boolean('auto_close').notNull(),
+  autoCloseMs: integer('auto_close_ms').notNull(),
+  withCloseButton: boolean('with_close_button').notNull(),
+  userId: uuid('user_id').references(() => UserTable.id, {
     onDelete: 'cascade',
   }),
 })

@@ -22,8 +22,6 @@
     "dev:redirect": "nx run @apis/redirect-api:dev",
     "dev:payment": "nx run @apis/payment-api:dev",
     "dev:payment:bovapay": "cloudflared tunnel run bovapay",
-    "db:games:generate": "nx run @dbs/games-db:migration:generate",
-    "db:games:apply:dev": "nx run @dbs/games-db:migration:apply:dev",
     "dev": "nx run-many -t dev --parallel 10",
     "dev:games": "nx run-many -t dev --projects @apps/games-app,@apis/games-api,@apis/games-ws,@apis/games-tasks --parallel 10",
     "dev:games:bot": "nx run @bots/games-bot:dev",
@@ -69,13 +67,14 @@
     "atomic-router": "^0.9.5",
     "atomic-router-react": "^0.9.1",
     "axios": "^1.7.9",
+    "change-case": "^5.4.4",
     "clsx": "^2.1.1",
     "cookie": "^0.6.0",
     "cron": "^3.5.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "dotenv-expand": "^12.0.1",
-    "drizzle-orm": "^0.32.2",
+    "drizzle-orm": "0.39.1",
     "effector": "^23.2.3",
     "effector-react": "^23.3.0",
     "effector-storage": "^7.1.0",
@@ -147,7 +146,8 @@
   "packageManager": "pnpm@9.15.2",
   "pnpm": {
     "patchedDependencies": {
-      "nx@17.0.2": "patches/nx@17.0.2.patch"
+      "nx@17.0.2": "patches/nx@17.0.2.patch",
+      "drizzle-orm": "patches/drizzle-orm@0.39.1.patch"
     }
   }
 }

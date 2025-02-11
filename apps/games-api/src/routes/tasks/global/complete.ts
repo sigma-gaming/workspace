@@ -2,7 +2,7 @@ import { BadRequestException } from '@core/exceptions'
 import { tbValidator } from '@core/server'
 import { AccountTable } from '@dbs/games-schema'
 import { AccountProvider, GlobalTaskKey, TaskStatus } from '@dbs/games-types'
-import { GlobalTaskUpdate, UpdateMode } from '@games/model'
+import { GlobalTaskStatusUpdate, UpdateMode } from '@games/model'
 import {
   gamesDb,
   gamesPubsubs,
@@ -169,17 +169,14 @@ export const completeRoute = createRouter().post(
     })
 
     if (completion.outcome === GlobalTaskCompleteOutcome.Completed) {
-      const task: GlobalTaskUpdate = {
+      const task: GlobalTaskStatusUpdate = {
         time: Date.now(),
+        userId,
         mode: UpdateMode.Optimized,
-        key: taskKey,
-        status: TaskStatus.Completed,
+        data: { key: taskKey, status: TaskStatus.Completed },
       }
 
-      gamesPubsubs.globalTaskUpdated.publish({
-        userId,
-        update: task,
-      })
+      gamesPubsubs.globalTaskStatusUpdated.publish(task)
 
       return ctx.json({
         task,

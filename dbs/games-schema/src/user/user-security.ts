@@ -9,41 +9,41 @@ import {
 import { UserTable } from './user'
 
 export const UserSecurityTable = pgTable(
-  'UserSecurity',
+  'user_security',
   {
-    userId: uuid('userId')
+    userId: uuid('user_id')
       .references(() => UserTable.id, { onDelete: 'cascade' })
       .primaryKey(),
 
     whitelisted: boolean('whitelisted').notNull().default(false),
 
-    lastIP: text('lastIP'),
-    addressTon: text('addressTon'),
-    addressUsdt: text('addressUsdt'),
-    addressUsdc: text('addressUsdc'),
-    addressTrx: text('addressTrx'),
-    addressEth: text('addressEth'),
-    addressBtc: text('addressBtc'),
-    addressLtc: text('addressLtc'),
-    addressDoge: text('addressDoge'),
-    addressBnb: text('addressBnb'),
-    addressXmr: text('addressXmr'),
-    addressSol: text('addressSol'),
-    ipScore: integer('ipScore').notNull().default(0),
-    addressTonScore: integer('addressTonScore').notNull().default(0),
-    addressUsdtScore: integer('addressUsdtScore').notNull().default(0),
-    addressUsdcScore: integer('addressUsdcScore').notNull().default(0),
-    addressTrxScore: integer('addressTrxScore').notNull().default(0),
-    addressEthScore: integer('addressEthScore').notNull().default(0),
-    addressBtcScore: integer('addressBtcScore').notNull().default(0),
-    addressLtcScore: integer('addressLtcScore').notNull().default(0),
-    addressDogeScore: integer('addressDogeScore').notNull().default(0),
-    addressBnbScore: integer('addressBnbScore').notNull().default(0),
-    addressXmrScore: integer('addressXmrScore').notNull().default(0),
-    addressSolScore: integer('addressSolScore').notNull().default(0),
+    lastIP: text('last_ip'),
+    addressTon: text('address_ton'),
+    addressUsdt: text('address_usdt'),
+    addressUsdc: text('address_usdc'),
+    addressTrx: text('address_trx'),
+    addressEth: text('address_eth'),
+    addressBtc: text('address_btc'),
+    addressLtc: text('address_ltc'),
+    addressDoge: text('address_doge'),
+    addressBnb: text('address_bnb'),
+    addressXmr: text('address_xmr'),
+    addressSol: text('address_sol'),
+    ipScore: integer('ip_score').notNull().default(0),
+    addressTonScore: integer('address_ton_score').notNull().default(0),
+    addressUsdtScore: integer('address_usdt_score').notNull().default(0),
+    addressUsdcScore: integer('address_usdc_score').notNull().default(0),
+    addressTrxScore: integer('address_trx_score').notNull().default(0),
+    addressEthScore: integer('address_eth_score').notNull().default(0),
+    addressBtcScore: integer('address_btc_score').notNull().default(0),
+    addressLtcScore: integer('address_ltc_score').notNull().default(0),
+    addressDogeScore: integer('address_doge_score').notNull().default(0),
+    addressBnbScore: integer('address_bnb_score').notNull().default(0),
+    addressXmrScore: integer('address_xmr_score').notNull().default(0),
+    addressSolScore: integer('address_sol_score').notNull().default(0),
   },
   (table) => ({
-    lastIpIdx: index().on(table.lastIP),
+    lastIpIdx: index('IX_user_security_last_ip').on(table.lastIP),
   }),
 )
 

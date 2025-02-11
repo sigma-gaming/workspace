@@ -90,9 +90,9 @@ const Profile = () => {
           description="Из какой социальной сети брать информацию для профиля"
           data={accounts.map((account) => ({
             label: ProviderInfoMap[account.provider].label,
-            value: account.provider,
+            value: String(account.provider),
           }))}
-          value={provider}
+          value={provider ? String(provider) : null}
           onChange={(value) => updateProvider(value as AccountProvider | null)}
           allowDeselect={false}
           error={errors.provider[0]}

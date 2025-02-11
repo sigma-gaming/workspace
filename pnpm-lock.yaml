@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  drizzle-orm:
+    hash: fikvuelgaw3qdzc6clazym7qt4
+    path: patches/drizzle-orm@0.39.1.patch
   nx@17.0.2:
     hash: bcbannpz5bgghmtfrif35w7hia
     path: patches/nx@17.0.2.patch
@@ -94,6 +97,9 @@ importers:
       axios:
         specifier: ^1.7.9
         version: 1.7.9
+      change-case:
+        specifier: ^5.4.4
+        version: 5.4.4
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -113,8 +119,8 @@ importers:
         specifier: ^12.0.1
         version: 12.0.1
       drizzle-orm:
-        specifier: ^0.32.2
-        version: 0.32.2(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.18)(bun-types@1.1.43)(postgres@3.4.5)(react@18.3.1)
+        specifier: 0.39.1
+        version: 0.39.1(patch_hash=fikvuelgaw3qdzc6clazym7qt4)(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.18)(bun-types@1.1.43)(postgres@3.4.5)(react@18.3.1)
       effector:
         specifier: ^23.2.3
         version: 23.2.3
@@ -495,15 +501,6 @@ importers:
       '@games/services':
         specifier: workspace:*
         version: link:../../games-libs/services
-      '@tooling/env':
-        specifier: workspace:*
-        version: link:../../tooling/env
-
-  apps/games-db-migration:
-    dependencies:
-      '@dbs/games-db':
-        specifier: workspace:*
-        version: link:../../dbs/games-db
       '@tooling/env':
         specifier: workspace:*
         version: link:../../tooling/env
@@ -897,6 +894,9 @@ importers:
       '@core/server':
         specifier: workspace:*
         version: link:../../core/server
+      '@types/k6':
+        specifier: 0.54.2
+        version: 0.54.2
 
   testing/seed:
     dependencies:
@@ -4470,6 +4470,9 @@ packages:
   '@types/jsonfile@6.1.4':
     resolution: {integrity: sha512-D5qGUYwjvnNNextdU59/+fI+spnwtTFmyQP0h+PfIOSkNfpU6AOICUOkm4i0OnSk+NyjdPJrxCDro0sJsWlRpQ==}
 
+  '@types/k6@0.54.2':
+    resolution: {integrity: sha512-B5LPxeQm97JnUTpoKNE1UX9jFp+JiJCAXgZOa2P7aChxVoPQXKfWMzK+739xHq3lPkKj1aV+HeOxkP56g/oWBg==}
+
   '@types/keygrip@1.0.6':
     resolution: {integrity: sha512-lZuNAY9xeJt7Bx4t4dx0rYCDqGPW8RXhQZK1td7d4H6E9zYbLoOtjBvfwdTKpsyxQI/2jv+armjX/RW+ZNpXOQ==}
 
@@ -5202,6 +5205,9 @@ packages:
     resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
+  change-case@5.4.4:
+    resolution: {integrity: sha512-HRQyTk2/YPEkt9TnUPbOpr64Uw3KOicFWPVBb+xiHvd6eBx/qPr9xqfBFDT8P2vWsvvz4jbEkfDe71W3VyNu2w==}
+
   character-entities-html4@2.1.0:
     resolution: {integrity: sha512-1v7fgQRj6hnSwFpq1Eu0ynr/CDEw0rXo2B61qXrLNdHZmPKgb7fqS1a2JwF0rISo9q77jDI8VMEHoApn8qDoZA==}
 
@@ -5627,14 +5633,15 @@ packages:
     resolution: {integrity: sha512-NWkQ7GD2OTbQ7HzcjsaCOf3n0tlFPSEAF38fvDpwDj8jRbGWGFtN2cD8I8wp4lU+5Os/oyP2xycTKGLHdPipUw==}
     hasBin: true
 
-  drizzle-orm@0.32.2:
-    resolution: {integrity: sha512-3fXKzPzrgZIcnWCSLiERKN5Opf9Iagrag75snfFlKeKSYB1nlgPBshzW3Zn6dQymkyiib+xc4nIz0t8U+Xdpuw==}
+  drizzle-orm@0.39.1:
+    resolution: {integrity: sha512-2bDHlzTY31IDmrYn8i+ZZrxK8IyBD4mPZ7JmZdVDQj2tpBZXs/gxB/1kK5pSvkjxPUMNOVsTnoGkSltgjuJwcA==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
-      '@cloudflare/workers-types': '>=3'
-      '@electric-sql/pglite': '>=0.1.1'
-      '@libsql/client': '*'
-      '@neondatabase/serverless': '>=0.1'
+      '@cloudflare/workers-types': '>=4'
+      '@electric-sql/pglite': '>=0.2.0'
+      '@libsql/client': '>=0.10.0'
+      '@libsql/client-wasm': '>=0.10.0'
+      '@neondatabase/serverless': '>=0.10.0'
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
       '@planetscale/database': '>=1'
@@ -5648,7 +5655,7 @@ packages:
       '@xata.io/client': '*'
       better-sqlite3: '>=7'
       bun-types: '*'
-      expo-sqlite: '>=13.2.0'
+      expo-sqlite: '>=14.0.0'
       knex: '*'
       kysely: '*'
       mysql2: '>=2'
@@ -5666,6 +5673,8 @@ packages:
       '@electric-sql/pglite':
         optional: true
       '@libsql/client':
+        optional: true
+      '@libsql/client-wasm':
         optional: true
       '@neondatabase/serverless':
         optional: true
@@ -13447,6 +13456,8 @@ snapshots:
     dependencies:
       '@types/node': 22.10.2
 
+  '@types/k6@0.54.2': {}
+
   '@types/keygrip@1.0.6':
     optional: true
 
@@ -14068,9 +14079,9 @@ snapshots:
       '@astrojs/internal-helpers': 0.4.1
       '@astrojs/markdown-remark': 5.3.0
       '@astrojs/telemetry': 3.1.0
-      '@babel/core': 7.26.0
-      '@babel/plugin-transform-react-jsx': 7.25.9(@babel/core@7.26.0)
-      '@babel/types': 7.26.5
+      '@babel/core': 7.25.8
+      '@babel/plugin-transform-react-jsx': 7.25.7(@babel/core@7.25.8)
+      '@babel/types': 7.25.8
       '@oslojs/encoding': 1.1.0
       '@rollup/pluginutils': 5.1.2(rollup@2.79.2)
       '@types/babel__core': 7.20.5
@@ -14118,16 +14129,16 @@ snapshots:
       tsconfck: 3.1.4(typescript@5.7.3)
       unist-util-visit: 5.0.0
       vfile: 6.0.3
-      vite: 5.4.11(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.31.0)
-      vitefu: 1.0.3(vite@5.4.11(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.31.0))
+      vite: 5.4.9(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.31.0)
+      vitefu: 1.0.3(vite@5.4.9(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.31.0))
       which-pm: 3.0.0
       xxhash-wasm: 1.0.2
       yargs-parser: 21.1.1
-      zod: 3.24.1
-      zod-to-json-schema: 3.23.3(zod@3.24.1)
-      zod-to-ts: 1.2.0(typescript@5.7.3)(zod@3.24.1)
+      zod: 3.23.8
+      zod-to-json-schema: 3.23.3(zod@3.23.8)
+      zod-to-ts: 1.2.0(typescript@5.7.3)(zod@3.23.8)
     optionalDependencies:
-      sharp: 0.33.5
+      sharp: 0.33.4
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -14514,6 +14525,8 @@ snapshots:
 
   chalk@5.3.0: {}
 
+  change-case@5.4.4: {}
+
   character-entities-html4@2.1.0: {}
 
   character-entities-legacy@3.0.0: {}
@@ -14893,7 +14906,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.32.2(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.18)(bun-types@1.1.43)(postgres@3.4.5)(react@18.3.1):
+  drizzle-orm@0.39.1(patch_hash=fikvuelgaw3qdzc6clazym7qt4)(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.18)(bun-types@1.1.43)(postgres@3.4.5)(react@18.3.1):
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/pg': 8.6.1
@@ -19565,10 +19578,6 @@ snapshots:
       sugarss: 4.0.1(postcss@8.5.1)
       terser: 5.31.0
 
-  vitefu@1.0.3(vite@5.4.11(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.31.0)):
-    optionalDependencies:
-      vite: 5.4.11(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.31.0)
-
   vitefu@1.0.3(vite@5.4.9(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.31.0)):
     optionalDependencies:
       vite: 5.4.9(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.31.0)
@@ -19972,19 +19981,10 @@ snapshots:
     dependencies:
       zod: 3.23.8
 
-  zod-to-json-schema@3.23.3(zod@3.24.1):
-    dependencies:
-      zod: 3.24.1
-
   zod-to-ts@1.2.0(typescript@5.7.3)(zod@3.23.8):
     dependencies:
       typescript: 5.7.3
       zod: 3.23.8
-
-  zod-to-ts@1.2.0(typescript@5.7.3)(zod@3.24.1):
-    dependencies:
-      typescript: 5.7.3
-      zod: 3.24.1
 
   zod@3.23.8: {}
 

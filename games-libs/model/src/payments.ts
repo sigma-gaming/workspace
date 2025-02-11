@@ -7,7 +7,7 @@ import {
 
 export type CurrencyExchangeRates = Partial<Record<Currency, number>>
 
-export type ConfigList<Method extends string, Entry> = Array<{
+export type ConfigList<Method extends number, Entry> = Array<{
   method: Method
   isP2p?: boolean
   currencies: Array<{
@@ -28,7 +28,7 @@ export type CurrencyConfigTree<Entry> = {
   [currency in Currency]?: ProviderConfigTree<Entry>
 }
 
-export type ConfigTree<Method extends string, Entry> = {
+export type ConfigTree<Method extends number, Entry> = {
   [method in Method]?: CurrencyConfigTree<Entry>
 }
 
@@ -68,7 +68,7 @@ export type PaymentConfigTrees = {
   withdrawal: WithdrawalConfigTree
 }
 
-export function toConfigTree<Method extends string, Entry>(
+export function toConfigTree<Method extends number, Entry>(
   list: ConfigList<Method, Entry>,
 ): ConfigTree<Method, Entry> {
   return list.reduce(

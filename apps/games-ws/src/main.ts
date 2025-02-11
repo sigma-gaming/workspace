@@ -187,22 +187,22 @@ gamesPubsubs.maintenanceStarted.subscribe(() => {
   sendToAllLocal('maintenance/started')
 })
 
-gamesPubsubs.balanceUpdated.subscribe(({ userId, update }) => {
+gamesPubsubs.balanceUpdated.subscribe((update) => {
   if (update.mode === UpdateMode.Optimized) {
-    sendToUserOptimized(userId, 'balance/updated', update)
+    sendToUserOptimized(update.userId, 'balance/updated', update)
     return
   }
 
-  sendToUser(userId, 'balance/updated', update)
+  sendToUser(update.userId, 'balance/updated', update)
 })
 
-gamesPubsubs.globalTaskUpdated.subscribe(({ userId, update }) => {
+gamesPubsubs.globalTaskStatusUpdated.subscribe((update) => {
   if (update.mode === UpdateMode.Optimized) {
-    sendToUserOptimized(userId, 'global-tasks/updated', update)
+    sendToUserOptimized(update.userId, 'global-tasks/status-updated', update)
     return
   }
 
-  sendToUser(userId, 'global-tasks/updated', update)
+  sendToUser(update.userId, 'global-tasks/status-updated', update)
 })
 
 /**
@@ -236,7 +236,7 @@ internalApp.get('/ready', async (res) => {
     })
   }
 
-  const maintenanceMode = await maintenanceService.isMaintenanceMode()
+  const maintenanceMode = await maintenanceService.isMaintenanceEnabled()
 
   if (maintenanceMode) {
     wrapReply(() => {

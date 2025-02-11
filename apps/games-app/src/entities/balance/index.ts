@@ -9,9 +9,9 @@ import { createApiEffect } from '../../shared/api/effects'
 import { gamesApi } from '../../shared/api/games'
 import { gamesWs } from '../../shared/api/games-ws'
 
-const getDetailedBalanceFx = createApiEffect(
+const getBalanceFx = createApiEffect(
   'query',
-  gamesApi.me.getDetailedBalance.$get,
+  gamesApi.me.getBalance.$get,
 )
 
 const { receivedData: balanceUpdated } = invoke(() =>
@@ -27,7 +27,7 @@ const loaded = createEvent()
 const updateReceived = createEvent<BalanceUpdate>()
 
 const $balance = createStore<BalanceDetailed | null>(null).reset(reset)
-const $status = status(getDetailedBalanceFx).reset(reset)
+const $status = status(getBalanceFx).reset(reset)
 
 function receiveUpdates<T>(
   mutation: Mutation<any, T, any>,
@@ -44,9 +44,9 @@ sample({
   clock: onlyLatestUpdate(updateReceived),
   source: $balance,
   filter: Boolean,
-  fn: (balance, { available }) => ({
+  fn: (balance, { data }) => ({
     ...balance,
-    available,
+    available: data.available,
   }),
   target: $balance,
 })
@@ -59,16 +59,16 @@ const $previousAvailable = previous($available)
 
 sample({
   clock: request,
-  target: getDetailedBalanceFx,
+  target: getBalanceFx,
 })
 
 sample({
-  clock: getDetailedBalanceFx.done,
+  clock: getBalanceFx.done,
   target: loaded,
 })
 
 sample({
-  source: getDetailedBalanceFx.doneData,
+  source: getBalanceFx.doneData,
   target: $balance,
 })
 

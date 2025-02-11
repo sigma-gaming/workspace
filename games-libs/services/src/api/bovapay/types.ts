@@ -1,5 +1,3 @@
-import { Currency } from '@dbs/games-types'
-
 export type BovapayPaymentMethod =
   | 'card'
   | 'sberpay'
@@ -25,7 +23,7 @@ export type BovapayBankColors = Record<string, string>
 export type BovapayCreatePayoutRequest = {
   user_id: string
   amount: number
-  currency: Lowercase<Currency>
+  currency: BovapayCurrency
   method: BovapayPayoutMethod
   description?: string
 }

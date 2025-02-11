@@ -1,5 +1,4 @@
 import { createLazyInstance } from '@core/di'
-import { sleep } from '@core/utils'
 import { Currency } from '@dbs/games-types'
 import { CurrencyExchangeRates } from '@games/model'
 import { binanceApi, BinanceSymbol } from './api/binance'
@@ -19,8 +18,6 @@ const symbolCurrencyMap: Record<BinanceSymbol, Currency> = {
 
 export class CurrencyRatesService {
   private async getLatestRates(): Promise<CurrencyExchangeRates> {
-    await sleep(1000)
-
     const [fiatRatesResponse, cryptoRatesResponse] = await Promise.allSettled([
       coincapApi.getRates(),
       binanceApi.getTickerPrice({
@@ -60,24 +57,27 @@ export class CurrencyRatesService {
       const usdt = fiatRawRatesMap[CoincapSymbol.USDT]
 
       if (rub && usd) {
-        rates.RUB = 100
-        rates.USD = rates.RUB / rub
-        if (eur) rates.EUR = eur * rates.USD
-        if (kzt) rates.KZT = kzt * rates.USD
-        if (kgs) rates.KGS = kgs * rates.USD
-        if (uzs) rates.UZS = uzs * rates.USD
-        if (uah) rates.UAH = uah * rates.USD
-        if (usdt) rates.USDT_ERC20 = usdt * rates.USD
-        if (usdt) rates.USDT_TRC20 = usdt * rates.USD
+        rates[Currency.RUB] = 100
+        rates[Currency.USD] = rates[Currency.RUB] / rub
+        if (eur) rates[Currency.EUR] = eur * rates[Currency.USD]
+        if (kzt) rates[Currency.KZT] = kzt * rates[Currency.USD]
+        if (kgs) rates[Currency.KGS] = kgs * rates[Currency.USD]
+        if (uzs) rates[Currency.UZS] = uzs * rates[Currency.USD]
+        if (uah) rates[Currency.UAH] = uah * rates[Currency.USD]
+        if (usdt) rates[Currency.USDT_ERC20] = usdt * rates[Currency.USD]
+        if (usdt) rates[Currency.USDT_TRC20] = usdt * rates[Currency.USD]
       }
     }
 
-    if (cryptoRatesResponse.status === 'fulfilled' && rates.USDT_TRC20) {
+    if (
+      cryptoRatesResponse.status === 'fulfilled' &&
+      rates[Currency.USDT_TRC20]
+    ) {
       const tickerPrices = cryptoRatesResponse.value
 
       for (const ticker of tickerPrices) {
         const currency = symbolCurrencyMap[ticker.symbol]
-        rates[currency] = Number(ticker.price) * rates.USDT_TRC20
+        rates[currency] = Number(ticker.price) * rates[Currency.USDT_TRC20]
       }
     }
 

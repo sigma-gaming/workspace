@@ -53,9 +53,9 @@ sample({
 handleExceptions(updateProfileMutation, { form })
 
 sample({
-  source: $$profile.$profile,
+  source: $$profile.$userDetails,
   filter: Boolean,
-  fn: (profile) => ({
+  fn: ({ profile }) => ({
     name: profile.name ?? '',
     username: profile.username ?? '',
     provider: profile.usedProvider as AccountProvider,
@@ -78,10 +78,7 @@ sample({
   target: profileFields.name.update,
 })
 
-$$profile.receiveUpdates(
-  updateProfileMutation,
-  (output) => output.detailedProfile,
-)
+$$profile.receiveUpdates(updateProfileMutation, (output) => output.userDetails)
 
 sample({
   clock: updateProfileMutation.finished.success,

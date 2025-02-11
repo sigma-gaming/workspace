@@ -106,7 +106,7 @@ export class GameService {
     outcome,
     balance,
   }: SaveGamePayload) => {
-    const profile = await profileService.getDetailedProfile(userId)
+    const userDetails = await profileService.getUserDetails(userId)
 
     const saveGame = async (tx: typeof gamesDb) => {
       const transactionId = v7()
@@ -125,6 +125,7 @@ export class GameService {
       })
 
       const multiplier = Math.floor(Math.max(0, payout / bet) * 100)
+      snapshot.$type = snapshot.game
 
       const gameRecord = await tx
         .insert(GameRecordTable)
@@ -137,7 +138,8 @@ export class GameService {
           bet,
           payout,
           userId,
-          previewUserName: profile.username ?? profile.name,
+          previewUserName:
+            userDetails.profile.username ?? userDetails.profile.name,
           transactionId,
         })
         .returning()

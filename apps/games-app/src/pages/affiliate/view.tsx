@@ -1,13 +1,9 @@
 import { Avatar, Icons, Table, TableCellTextColor } from '@core/ui'
 import { trimText } from '@core/utils'
+import { ReferrerTransactionSelect } from '@dbs/games-schema'
 import { ReferralAction } from '@dbs/games-types'
 import { reflect } from '@effector/reflect'
-import {
-  formatGem,
-  gemFloat,
-  gemInt,
-  ReferrerTransactionDetailed,
-} from '@games/model'
+import { formatGem, gemFloat, gemInt } from '@games/model'
 import {
   Button,
   Card,
@@ -35,8 +31,8 @@ import { $$affiliatePage } from './model'
 import styles from './styles.module.css'
 
 type ReferrerTransactionDisplay = Pick<
-  ReferrerTransactionDetailed,
-  'id' | 'referralName' | 'referralAvatar' | 'referralAction' | 'amount'
+  ReferrerTransactionSelect,
+  'id' | 'referralName' | 'referralImage' | 'referralAction' | 'amount'
 >
 
 const BalanceCardView = ({
@@ -250,9 +246,9 @@ const TransactionsTable = ({
             <Table.Row key={transaction.id}>
               <Table.Cell>
                 <div className="flex items-center gap-2">
-                  {transaction.referralAvatar && (
+                  {transaction.referralImage && (
                     <Avatar
-                      src={transaction.referralAvatar}
+                      src={transaction.referralImage}
                       size={20}
                       alt="Реферал"
                     />
@@ -472,14 +468,14 @@ const NotConnectedContent = () => {
                 id: v7(),
                 referralAction: ReferralAction.Deposit,
                 amount: gemInt(33333),
-                referralAvatar: null,
+                referralImage: null,
                 referralName: 'Lydik',
               },
               {
                 id: v7(),
                 referralAction: ReferralAction.Deposit,
                 amount: gemInt(33333),
-                referralAvatar: null,
+                referralImage: null,
                 referralName: 'Admin',
               },
             ]}

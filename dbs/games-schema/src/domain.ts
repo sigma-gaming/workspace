@@ -1,10 +1,10 @@
-import { pgTable, text, timestamp } from 'drizzle-orm/pg-core'
-import { domainAppEnum } from './enums'
+import type { DomainApp } from '@dbs/games-types-private'
+import { pgTable, smallint, text, timestamp } from 'drizzle-orm/pg-core'
 
-export const DomainTable = pgTable('Domain', {
+export const DomainTable = pgTable('domain', {
   host: text('host').primaryKey(),
-  app: domainAppEnum('app').notNull(),
-  createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
+  app: smallint('app').$type<DomainApp>().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
     .notNull()
     .defaultNow(),
 })

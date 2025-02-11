@@ -50,8 +50,9 @@ export const PromocodesPageView = () => {
   const errors = useUnit(form.$errors)
   const submitting = useUnit($$promocodesPage.$submitting)
 
-  const bonusTypeOptions: Array<{ label: string; value: PromocodeBonusType }> =
-    [{ label: 'Мгновенная выплата', value: PromocodeBonusType.Payout }]
+  const bonusTypeOptions: Array<{ label: string; value: string }> = [
+    { label: 'Мгновенная выплата', value: String(PromocodeBonusType.Payout) },
+  ]
 
   useEffect(() => {
     if (createdCodes.length === 0) return
@@ -133,8 +134,10 @@ export const PromocodesPageView = () => {
         <Select
           label="Тип бонуса"
           data={bonusTypeOptions}
-          value={bonusType}
-          onChange={(color) => updateBonusType(color as PromocodeBonusType)}
+          value={String(bonusType)}
+          onChange={(color) =>
+            updateBonusType(Number(color) as PromocodeBonusType)
+          }
           allowDeselect={false}
           error={errors.bonusType[0]}
         />

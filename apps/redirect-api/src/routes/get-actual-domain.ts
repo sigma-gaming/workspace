@@ -3,7 +3,7 @@ import { domainService } from '@games/services'
 import { createRouter } from '../app/router'
 
 export const domainRoute = createRouter().get('/', async (ctx) => {
-  const domain = domainService.getLatestDomain(DomainApp.GamesApp)
+  const domain = domainService.getLatestDomain(DomainApp.CoreApp)
 
   if (!domain) {
     return ctx.text('Try again later', 503)

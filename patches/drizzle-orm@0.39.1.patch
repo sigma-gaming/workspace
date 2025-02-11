@@ -1,0 +1,30 @@
+diff --git a/pg-core/columns/timestamp.cjs b/pg-core/columns/timestamp.cjs
+index f558f6c4c50e101e288ebd6fac1694e73a0f0510..9c810be40c42969bcf906636ffe1ade0f4e0d8ad 100644
+--- a/pg-core/columns/timestamp.cjs
++++ b/pg-core/columns/timestamp.cjs
+@@ -89,6 +89,10 @@ class PgTimestampString extends import_common.PgColumn {
+     const precision = this.precision === void 0 ? "" : `(${this.precision})`;
+     return `timestamp${precision}${this.withTimezone ? " with time zone" : ""}`;
+   }
++  mapFromDriverValue(value) {
++    const date = new Date(this.withTimezone ? value : value + '+0000');
++    return date.toISOString();
++  }
+ }
+ function timestamp(a, b = {}) {
+   const { name, config } = (0, import_utils.getColumnNameAndConfig)(a, b);
+diff --git a/pg-core/columns/timestamp.js b/pg-core/columns/timestamp.js
+index 5f793f05c82dbbe024bffbeb237fd04b2e8229ef..6c27991554ed6f5b1cf35e0f79d77a323d9fe1a6 100644
+--- a/pg-core/columns/timestamp.js
++++ b/pg-core/columns/timestamp.js
+@@ -62,6 +62,10 @@ class PgTimestampString extends PgColumn {
+     const precision = this.precision === void 0 ? "" : `(${this.precision})`;
+     return `timestamp${precision}${this.withTimezone ? " with time zone" : ""}`;
+   }
++  mapFromDriverValue(value) {
++    const date = new Date(this.withTimezone ? value : value + '+0000');
++    return date.toISOString();
++  }
+ }
+ function timestamp(a, b = {}) {
+   const { name, config } = getColumnNameAndConfig(a, b);

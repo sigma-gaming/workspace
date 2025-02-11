@@ -11,6 +11,7 @@ export class GlobalEntityBaseService<TValue> {
   protected readonly logger: Logger
   protected readonly redis: Redis
   protected readonly redlock: Redlock
+
   protected readonly parse: Parser<TValue> = JSON.parse
   protected readonly stringify: Stringifier<TValue> = JSON.stringify
 

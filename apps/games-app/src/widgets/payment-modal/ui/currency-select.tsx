@@ -5,23 +5,23 @@ import { forwardRef, memo } from 'react'
 import { $currencies, $currencyConfig, $operation, fields } from '../model/form'
 
 const currencyLabelMap: Record<Currency, string> = {
-  RUB: 'Рубль',
-  KZT: 'Тенге',
-  KGS: 'Кыргызский сом',
-  UZS: 'Узбекский сом',
-  UAH: 'Украинская гривна',
-  USD: 'Доллар',
-  EUR: 'Евро',
-  TRX: 'TRX',
-  USDT_TRC20: 'USDT (TRC20)',
-  USDT_ERC20: 'USDT (ERC20)',
-  BTC: 'BTC',
-  LTC: 'LTC',
-  TON: 'TON',
-  NOT: 'NOT',
-  ETH: 'ETH',
-  BNB: 'BNB',
-  DOGE: 'DOGE',
+  [Currency.RUB]: 'Рубль',
+  [Currency.KZT]: 'Тенге',
+  [Currency.KGS]: 'Кыргызский сом',
+  [Currency.UZS]: 'Узбекский сом',
+  [Currency.UAH]: 'Украинская гривна',
+  [Currency.USD]: 'Доллар',
+  [Currency.EUR]: 'Евро',
+  [Currency.TRX]: 'TRX',
+  [Currency.USDT_TRC20]: 'USDT (TRC20)',
+  [Currency.USDT_ERC20]: 'USDT (ERC20)',
+  [Currency.BTC]: 'BTC',
+  [Currency.LTC]: 'LTC',
+  [Currency.TON]: 'TON',
+  [Currency.NOT]: 'NOT',
+  [Currency.ETH]: 'ETH',
+  [Currency.BNB]: 'BNB',
+  [Currency.DOGE]: 'DOGE',
 }
 
 export const CurrencySelect = memo(
@@ -42,13 +42,13 @@ export const CurrencySelect = memo(
         label="Валюта"
         placeholder="Выберите валюту"
         description={`В этой валюте будет ${operation === 'deposit' ? 'происходить оплата' : 'сделана выплата'}`}
-        value={selectedCurrency}
-        onChange={(value) => fields.currency.update(value as Currency)}
+        value={selectedCurrency ? String(selectedCurrency) : null}
+        onChange={(value) => fields.currency.update(Number(value) as Currency)}
         allowDeselect={false}
         disabled={!selectedProvider || currencies.length < 2}
         data={currencies.map(({ currency }) => ({
           label: currencyLabelMap[currency],
-          value: currency,
+          value: String(currency),
         }))}
       />
     )

@@ -1,14 +1,12 @@
-import { ProfileSelect } from '@dbs/games-schema'
-import { UserRole } from '@dbs/games-types'
+import { ProfileSelect, UserSelect } from '@dbs/games-schema'
 import { z } from 'zod'
 import { AccountPublic } from './account'
 
-export type ProfileDetailed = {
-  name: string
-  image: string | null
-  roles: UserRole[]
+export type UserDetails = {
+  user: UserSelect
+  profile: ProfileSelect
   accounts: AccountPublic[]
-} & ProfileSelect
+}
 
 export function getUserFullName(
   firstName?: string | null,

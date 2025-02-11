@@ -1,7 +1,7 @@
 import { BadRequestException } from '@core/exceptions'
 import { tbValidator } from '@core/server'
 import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
-import { BalanceUpdate, GlobalTaskUpdate, UpdateMode } from '@games/model'
+import { BalanceUpdate, GlobalTaskStatusUpdate, UpdateMode } from '@games/model'
 import {
   gamesPubsubs,
   GlobalTaskClaimRewardOutcome,
@@ -35,28 +35,22 @@ export const claimRewardRoute = createRouter().post(
 
       const time = Date.now()
 
-      const task: GlobalTaskUpdate = {
+      const task: GlobalTaskStatusUpdate = {
         time,
+        userId,
         mode: UpdateMode.Optimized,
-        key: taskKey,
-        status: TaskStatus.Claimed,
+        data: { key: taskKey, status: TaskStatus.Claimed },
       }
 
       const balance: BalanceUpdate = {
         time,
+        userId,
         mode: UpdateMode.Optimized,
-        available,
+        data: { available },
       }
 
-      gamesPubsubs.balanceUpdated.publish({
-        userId,
-        update: balance,
-      })
-
-      gamesPubsubs.globalTaskUpdated.publish({
-        userId,
-        update: task,
-      })
+      gamesPubsubs.balanceUpdated.publish(balance)
+      gamesPubsubs.globalTaskStatusUpdated.publish(task)
 
       return ctx.json({
         payout,

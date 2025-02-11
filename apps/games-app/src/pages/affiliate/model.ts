@@ -111,7 +111,7 @@ sample({
   filter: Boolean,
   fn: (balance, { result }) => ({
     ...balance,
-    available: result.balance.available,
+    available: result.balance.data.available,
   }),
   target: $balanceDetailed,
 })

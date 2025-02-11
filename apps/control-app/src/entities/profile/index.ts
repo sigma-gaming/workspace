@@ -7,35 +7,35 @@ import { createApiEffect } from '../../shared/api/effects'
 const request = createEvent()
 const refresh = createEvent()
 
-const profileQuery = createQuery({
+const userDetailsQuery = createQuery({
   name: 'profile/get',
-  effect: createApiEffect('query', controlApi.me.getDetailedProfile.$get),
+  effect: createApiEffect('query', controlApi.me.getUserDetails.$get),
 })
 
-const loaded = profileQuery.finished.success
+const loaded = userDetailsQuery.finished.success
 
-const $profile = profileQuery.$data
-const $loading = profileQuery.$pending
-const $loaded = and($profile)
+const $userDetails = userDetailsQuery.$data
+const $loading = userDetailsQuery.$pending
+const $loaded = and($userDetails)
 
-const $accounts = $profile.map((profile) => profile?.accounts ?? [])
+const $accounts = $userDetails.map((details) => details?.accounts ?? [])
 
-const $name = $profile.map((profile) => profile?.name ?? '')
+const $name = $userDetails.map((details) => details?.profile.name ?? '')
 
-const $usedProvider = $profile.map((profile) => {
-  if (!profile) return null
-  return profile.usedProvider
+const $usedProvider = $userDetails.map((details) => {
+  if (!details) return null
+  return details.profile.usedProvider
 })
 
 sample({
   clock: request,
-  target: profileQuery.start,
+  target: userDetailsQuery.start,
 })
 
 sample({
   clock: refresh,
   fn: () => true,
-  target: [profileQuery.$stale, profileQuery.refresh],
+  target: [userDetailsQuery.$stale, userDetailsQuery.refresh],
 })
 
 export const $$profile = {
@@ -45,7 +45,7 @@ export const $$profile = {
   $loading,
   $loaded,
   $accounts,
-  $profile,
+  $userDetails,
   $name,
   $usedProvider,
 }

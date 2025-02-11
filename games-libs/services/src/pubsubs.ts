@@ -4,7 +4,7 @@ import { NotificationSelect } from '@dbs/games-schema'
 import {
   BalanceUpdate,
   ChatMessageDetailed,
-  GlobalTaskUpdate,
+  GlobalTaskStatusUpdate,
 } from '@games/model'
 import { GamesRedisOptionsToken } from '@games/options'
 import { PubSub, PubSubService, RedisService } from '@games/redis'
@@ -19,8 +19,8 @@ export class GamesPubSubRegistry extends Shutdownable {
   notifications: PubSub<NotificationSelect>
   chatMessages: PubSub<ChatMessageDetailed>
   maintenanceStarted: PubSub<void>
-  balanceUpdated: PubSub<{ userId: string; update: BalanceUpdate }>
-  globalTaskUpdated: PubSub<{ userId: string; update: GlobalTaskUpdate }>
+  balanceUpdated: PubSub<BalanceUpdate>
+  globalTaskStatusUpdated: PubSub<GlobalTaskStatusUpdate>
 
   constructor() {
     super()
@@ -51,18 +51,12 @@ export class GamesPubSubRegistry extends Shutdownable {
       channelName: 'maintenance-started',
     })
 
-    this.balanceUpdated = this.service.create<{
-      userId: string
-      update: BalanceUpdate
-    }>({
+    this.balanceUpdated = this.service.create<BalanceUpdate>({
       channelName: 'balance-updated',
     })
 
-    this.globalTaskUpdated = this.service.create<{
-      userId: string
-      update: GlobalTaskUpdate
-    }>({
-      channelName: 'global-tasks-updated',
+    this.globalTaskStatusUpdated = this.service.create<GlobalTaskStatusUpdate>({
+      channelName: 'global-task-status-updated',
     })
   }
 

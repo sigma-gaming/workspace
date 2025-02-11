@@ -151,7 +151,7 @@ export class PaymentService {
           currency,
           provider,
           redirectUrl,
-          userProfile: await profileService.getDetailedProfile(userId),
+          userProfile: await profileService.getUserDetails(userId),
           userStats: await userStatsService.getStats(userId),
         })
 
@@ -238,7 +238,7 @@ export class PaymentService {
               method,
               currency,
               provider,
-              userProfile: await profileService.getDetailedProfile(userId),
+              userProfile: await profileService.getUserDetails(userId),
               userStats: await userStatsService.getStats(userId),
             })
 
@@ -435,8 +435,8 @@ export class PaymentService {
   }
 
   async processStaleDeposits() {
-    let provider: PaymentProvider
-    for (provider in DEPOSIT_STALE_TIMEOUTS) {
+    for (const key of Object.keys(DEPOSIT_STALE_TIMEOUTS)) {
+      const provider = Number(key) as PaymentProvider
       const providerService = this.getProviderService(provider)
       const timeout = DEPOSIT_STALE_TIMEOUTS[provider]
 
@@ -468,8 +468,8 @@ export class PaymentService {
   }
 
   async processStaleWithdrawals() {
-    let provider: PaymentProvider
-    for (provider in WITHDRAWAL_STALE_TIMEOUTS) {
+    for (const key of Object.keys(WITHDRAWAL_STALE_TIMEOUTS)) {
+      const provider = Number(key) as PaymentProvider
       const providerService = this.getProviderService(provider)
       const timeout = WITHDRAWAL_STALE_TIMEOUTS[provider]
 

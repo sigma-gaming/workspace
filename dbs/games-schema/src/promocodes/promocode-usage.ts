@@ -1,22 +1,28 @@
-import { pgTable, primaryKey, timestamp, uuid } from 'drizzle-orm/pg-core'
-import { promocodeUsageStatusEnum } from '../enums'
+import { PromocodeUsageStatus } from '@dbs/games-types'
+import {
+  pgTable,
+  primaryKey,
+  smallint,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { UserTable } from '../user/user'
 import { PromocodeTable } from './promocode'
 
 export const PromocodeUsageTable = pgTable(
-  'PromocodeUsage',
+  'promocode_usage',
   {
-    createdAt: timestamp('createdAt', { withTimezone: true, mode: 'string' })
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .notNull()
       .defaultNow(),
 
-    status: promocodeUsageStatusEnum('status').notNull(),
-    expiresAt: timestamp('expiresAt', { withTimezone: true, mode: 'string' }),
+    status: smallint('status').$type<PromocodeUsageStatus>().notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }),
 
-    promocodeId: uuid('promocodeId')
+    promocodeId: uuid('promocode_id')
       .references(() => PromocodeTable.id, { onDelete: 'cascade' })
       .notNull(),
-    userId: uuid('userId')
+    userId: uuid('user_id')
       .references(() => UserTable.id, { onDelete: 'cascade' })
       .notNull(),
   },

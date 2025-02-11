@@ -12,7 +12,7 @@ type PincodeConfig = {
 }
 
 const config: PincodeConfig = {
-  easy: {
+  [PincodeMode.Easy]: {
     combinationMap: {
       0: '0000',
       1111: '1111',
@@ -67,7 +67,7 @@ const config: PincodeConfig = {
       7777: 15,
     },
   },
-  hardcore: {
+  [PincodeMode.Hardcore]: {
     combinationMap: {
       0: '0000',
       1111: '1111',
@@ -173,26 +173,30 @@ for (let code = 0; code < 10000; code++) {
 
   if (countMap.get('0') === 2) {
     setCombination(PincodeMode.Easy, code, `2x0`)
-    config.easy.highlightMap[code] = markNumbers(0, codeString, 0)
+    config[PincodeMode.Easy].highlightMap[code] = markNumbers(0, codeString, 0)
   }
 
   if (countMap.get('9') === 2) {
     setCombination(PincodeMode.Easy, code, `2x9`)
-    config.easy.highlightMap[code] = markNumbers(0, codeString, 9)
+    config[PincodeMode.Easy].highlightMap[code] = markNumbers(0, codeString, 9)
   }
 
   if (countMap.get('7') === 2) {
     setCombination(PincodeMode.Hardcore, code, '2x7')
     setCombination(PincodeMode.Easy, code, '2x7')
-    config.hardcore.highlightMap[code] = markNumbers(0, codeString, 7)
-    config.easy.highlightMap[code] = markNumbers(0, codeString, 7)
+    config[PincodeMode.Easy].highlightMap[code] = markNumbers(0, codeString, 7)
+    config[PincodeMode.Hardcore].highlightMap[code] = markNumbers(
+      0,
+      codeString,
+      7,
+    )
   }
 
   for (const [number, count] of countMap) {
     if (count === 3) {
       setCombination(PincodeMode.Easy, code, `3xN`)
 
-      config.easy.highlightMap[code] = markNumbers(
+      config[PincodeMode.Easy].highlightMap[code] = markNumbers(
         0,
         codeString,
         Number(number),
@@ -203,8 +207,12 @@ for (let code = 0; code < 10000; code++) {
   if (countMap.get('7') === 3) {
     setCombination(PincodeMode.Easy, code, '3x7')
     setCombination(PincodeMode.Hardcore, code, `3x7`)
-    config.hardcore.highlightMap[code] = markNumbers(0, codeString, 7)
-    config.easy.highlightMap[code] = markNumbers(0, codeString, 7)
+    config[PincodeMode.Easy].highlightMap[code] = markNumbers(0, codeString, 7)
+    config[PincodeMode.Hardcore].highlightMap[code] = markNumbers(
+      0,
+      codeString,
+      7,
+    )
   }
 }
 

@@ -8,6 +8,7 @@ import {
   PromocodeSelect,
   ReferrerBalanceSelect,
   ReferrerSettingsSelect,
+  ReferrerTransactionSelect,
   SessionSelect,
   UserSelect,
 } from '@dbs/games-schema'
@@ -15,8 +16,7 @@ import { TaskStatus } from '@dbs/games-types'
 import {
   ChatMessageDetailed,
   CurrencyExchangeRates,
-  ProfileDetailed,
-  ReferrerTransactionDetailed,
+  UserDetails,
 } from '@games/model'
 import { GamesCacheOptionsToken } from '@games/options'
 import {
@@ -32,7 +32,7 @@ import {
 import { gamesRedis } from './redis'
 
 type LastReferrerTransactions = {
-  transactions: ReferrerTransactionDetailed[]
+  transactions: ReferrerTransactionSelect[]
   totalAmount: number
 }
 
@@ -41,7 +41,7 @@ export class GamesCacheRegistry {
   backgroundJobsEnabled: GlobalBooleanEntityService
   budget: GlobalJsonEntityService<BudgetSelect>
   budgetAvailable: GlobalNumberEntityService
-  detailedProfile: KeyJsonEntityService<ProfileDetailed>
+  userDetails: KeyJsonEntityService<UserDetails>
   user: KeyJsonEntityService<UserSelect>
   session: KeyJsonEntityService<SessionSelect>
   sessionCodeToSessionId: KeyStringEntityService
@@ -68,7 +68,7 @@ export class GamesCacheRegistry {
     this.maintenance = new GlobalBooleanEntityService({
       redis,
       redlock,
-      key: `global:maintenance`,
+      key: `global:maintenanceEnabled`,
     })
 
     this.backgroundJobsEnabled = new GlobalBooleanEntityService({
@@ -91,10 +91,10 @@ export class GamesCacheRegistry {
       ttl: 60 * 60 * 24, // 1 day
     })
 
-    this.detailedProfile = new KeyJsonEntityService<ProfileDetailed>({
+    this.userDetails = new KeyJsonEntityService<UserDetails>({
       redis,
       redlock,
-      keygen: (token: string) => `${version}:detailedProfile:${token}`,
+      keygen: (userId: string) => `${version}:userDetails:${userId}`,
     })
 
     this.user = new KeyJsonEntityService<UserSelect>({

@@ -1,5 +1,6 @@
 import { Logger, loggerService } from '@core/logger'
 import { Callback, Redis } from 'ioredis'
+import { serializator } from '../serialization'
 
 type RedisMessageHandler = (channel: string, message: string) => void
 
@@ -65,7 +66,7 @@ export class PubSubService {
 
     return {
       publish: async (payload) => {
-        return this.redis.publish(channelName, JSON.stringify(payload))
+        return this.redis.publish(channelName, serializator.stringify(payload))
       },
       subscribe: (handler) => {
         if (!subscribed) {
@@ -78,7 +79,8 @@ export class PubSubService {
             return
           }
 
-          const payload = message.length > 0 ? JSON.parse(message) : null
+          const payload =
+            message.length > 0 ? serializator.parse<TPayload>(message) : null
           handler(payload as TPayload)
         }
 

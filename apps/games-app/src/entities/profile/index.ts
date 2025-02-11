@@ -1,5 +1,5 @@
 import { createQuery, Mutation, update } from '@farfetched/core'
-import { ProfileDetailed } from '@games/model'
+import { UserDetails } from '@games/model'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
 import { createApiEffect } from '../../shared/api/effects'
@@ -9,60 +9,60 @@ const request = createEvent()
 const refresh = createEvent()
 const reset = createEvent()
 
-const profileQuery = createQuery({
+const userDetailsQuery = createQuery({
   name: 'profile/get',
-  effect: createApiEffect('query', gamesApi.me.getDetailedProfile.$get),
+  effect: createApiEffect('query', gamesApi.me.getUserDetails.$get),
 })
 
 function receiveUpdates<T>(
   mutation: Mutation<any, T, any>,
-  selector: (data: T) => ProfileDetailed,
+  selector: (data: T) => UserDetails,
 ) {
-  update(profileQuery, {
+  update(userDetailsQuery, {
     on: mutation,
     by: {
       success: ({ query, mutation }) => {
         if (query && 'error' in query) return { error: query.error }
 
-        const detailedProfile = selector(mutation.result)
-        return { result: detailedProfile, error: null }
+        const userDetails = selector(mutation.result)
+        return { result: userDetails, error: null }
       },
     },
   })
 }
 
-const loaded = profileQuery.finished.success
+const loaded = userDetailsQuery.finished.success
 
-const $profile = profileQuery.$data
-const $loading = profileQuery.$pending
-const $loaded = and($profile)
+const $userDetails = userDetailsQuery.$data
+const $loading = userDetailsQuery.$pending
+const $loaded = and($userDetails)
 
-const $accounts = $profile.map((profile) => profile?.accounts ?? [])
+const $accounts = $userDetails.map((details) => details?.accounts ?? [])
 
-const $name = $profile.map((profile) => profile?.name ?? '')
-const $hasCustomName = $profile.map(
-  (profile) => profile?.hasCustomName ?? false,
+const $name = $userDetails.map((details) => details?.profile.name ?? '')
+const $hasCustomName = $userDetails.map(
+  (details) => details?.profile.hasCustomName ?? false,
 )
 
-const $usedProvider = $profile.map((profile) => {
-  if (!profile) return null
-  return profile.usedProvider
+const $usedProvider = $userDetails.map((details) => {
+  if (!details) return null
+  return details.profile.usedProvider
 })
 
 sample({
   clock: request,
-  target: profileQuery.start,
+  target: userDetailsQuery.start,
 })
 
 sample({
   clock: refresh,
   fn: () => true,
-  target: [profileQuery.$stale, profileQuery.refresh],
+  target: [userDetailsQuery.$stale, userDetailsQuery.refresh],
 })
 
 sample({
   clock: reset,
-  target: profileQuery.reset,
+  target: userDetailsQuery.reset,
 })
 
 export const $$profile = {
@@ -74,7 +74,7 @@ export const $$profile = {
   $loading,
   $loaded,
   $accounts,
-  $profile,
+  $userDetails,
   $name,
   $hasCustomName,
   $usedProvider,

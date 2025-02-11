@@ -1,5 +1,5 @@
 config:
-  target: https://api.sigma1.games
+  target: http://127.0.0.1:5052
   phases:
     - duration: 60
       arrivalRate: 1
@@ -17,48 +17,14 @@ config:
     apdex: {}
   apdex:
     threshold: 400
-  processor: "./games.ts"
   http:
     defaults:
       headers:
-        x-bypass-waf: "SECRET_REMOVED"
-        x-bypass-rate-limit: "SECRET_REMOVED"
+        Authorization: "Bearer 01947e52-be29-7b2c-a16c-d9e1e1573bf4"
 
 scenarios:
   - flow:
-      - function: setSessionId
-      - parallel:
-          - get:
-              url: "/me/getUser"
-              cookie:
-                session_id: "{{ sessionId }}"
-          - get:
-              url: "/me/getDetailedBalance"
-              cookie:
-                session_id: "{{ sessionId }}"
-          - get:
-              url: "/me/getDetailedProfile"
-              cookie:
-                session_id: "{{ sessionId }}"
-          - get:
-              url: "/chat/getLastMessages"
-              cookie:
-                session_id: "{{ sessionId }}"
-          - get:
-              url: "/affiliate/isConnected"
-              cookie:
-                session_id: "{{ sessionId }}"
-          - get:
-              url: "/notifications/getActual"
-              cookie:
-                session_id: "{{ sessionId }}"
       - loop:
-          - post:
-              url: "/games/playDice"
-              cookie:
-                session_id: "{{ sessionId }}"
-              json:
-                bet: 1000
-                sides:
-                  - 1
+          - get:
+              url: "/games/play-dice"
         count: 50

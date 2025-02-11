@@ -1,9 +1,7 @@
 import { Logger, loggerService } from '@core/logger'
 import { Redlock } from '@sesamecare-oss/redlock'
 import { Redis } from 'ioredis'
-
-type Parser<TValue> = (value: string) => TValue
-type Stringifier<TValue> = (value: TValue) => string
+import { serializator } from '../serialization'
 
 export class GlobalEntityListService<TValue> {
   protected readonly key: string
@@ -12,8 +10,9 @@ export class GlobalEntityListService<TValue> {
   protected readonly logger: Logger
   protected readonly redis: Redis
   protected readonly redlock: Redlock
-  protected readonly parse: Parser<TValue> = JSON.parse
-  protected readonly stringify: Stringifier<TValue> = JSON.stringify
+
+  protected readonly parse = serializator.parse
+  protected readonly stringify = serializator.stringify
 
   constructor(options: {
     redis: Redis
@@ -42,7 +41,7 @@ export class GlobalEntityListService<TValue> {
 
   async get(count = this.max) {
     const list = await this.redis.lrange(this.key, 0, count - 1)
-    return list.map((value) => this.parse(value))
+    return list.map((value) => this.parse<TValue>(value))
   }
 
   async push(value: TValue) {
@@ -133,8 +132,9 @@ export class KeyEntityListService<TValue> {
   protected readonly parentLogger: Logger
   protected readonly redis: Redis
   protected readonly redlock: Redlock
-  protected readonly parse: Parser<TValue> = JSON.parse
-  protected readonly stringify: Stringifier<TValue> = JSON.stringify
+
+  protected readonly parse = serializator.parse
+  protected readonly stringify = serializator.stringify
 
   constructor(options: {
     redis: Redis
@@ -158,7 +158,7 @@ export class KeyEntityListService<TValue> {
 
   async get(key: string, count = this.max) {
     const list = await this.redis.lrange(this.keygen(key), 0, count - 1)
-    return list.map((value) => this.parse(value))
+    return list.map((value) => this.parse<TValue>(value))
   }
 
   async push(key: string, value: TValue) {

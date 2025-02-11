@@ -58,6 +58,7 @@ export class SessionService {
     }
 
     const cached = await gamesCache.session.get(sessionId)
+    console.log({ cached })
     if (cached) return cached
 
     const session = await this.querySession(sessionId)
