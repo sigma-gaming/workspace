@@ -1,8 +1,9 @@
 name: Build development images with Google Cloud Build
 
 on:
-  push:
-    branches: ['main']
+  # push:
+  #   branches: ['main']
+  workflow_dispatch:
 
 env:
   DOCKER_REGISTRY: europe-west4-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
