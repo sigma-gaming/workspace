@@ -1,3 +1,4 @@
+import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { createMutation } from '@farfetched/core'
 import { clampBet, gemFloat, gemInt } from '@games/model'
@@ -18,7 +19,6 @@ import {
 } from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
 import { getPincodeCombination } from './lib/config'
-import { handleExceptions } from '@core/client'
 
 type WinInfo = {
   amount: number

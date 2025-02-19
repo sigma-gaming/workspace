@@ -1,3 +1,4 @@
+import { handleExceptions } from '@core/client'
 import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
 import { status } from 'patronum'
@@ -6,7 +7,6 @@ import {
   postAffiliateConnect,
 } from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
-import { handleExceptions } from '@core/client'
 
 const request = createEvent()
 const connect = createEvent()

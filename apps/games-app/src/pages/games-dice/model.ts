@@ -1,3 +1,4 @@
+import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { createMutation } from '@farfetched/core'
 import {
@@ -21,7 +22,6 @@ import {
   postGamesPlayDice,
 } from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
-import { handleExceptions } from '@core/client'
 
 const playGameMutation = createMutation({
   name: 'games/dice/play',
