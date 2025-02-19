@@ -1,0 +1,2083 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://api.sigma.local:5050"
+    },
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/affiliate/connect": {
+      "post": {
+        "tags": [
+          "Affiliate"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/affiliate/balance": {
+      "get": {
+        "tags": [
+          "Affiliate"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferrerBalance"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/affiliate/campaigns": {
+      "get": {
+        "tags": [
+          "Affiliate"
+        ],
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCampaignsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/affiliate/last-transactions": {
+      "get": {
+        "tags": [
+          "Affiliate"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLastTransactionsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/affiliate/settings": {
+      "get": {
+        "tags": [
+          "Affiliate"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferrerSettings"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/affiliate/is-connected": {
+      "get": {
+        "tags": [
+          "Affiliate"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/affiliate/withdraw": {
+      "post": {
+        "tags": [
+          "Affiliate"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WithdrawResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/last-messages": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChatMessage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/send-message": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ChatMessagePayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ChatMessagePayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ChatMessagePayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games/ping": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games/play-dice": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlayDicePayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlayDicePayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlayDicePayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games/play-pincode": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlayPincodePayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlayPincodePayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/PlayPincodePayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games-history/last-wins": {
+      "get": {
+        "tags": [
+          "GamesHistory"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameRecord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games-history/big-wins": {
+      "get": {
+        "tags": [
+          "GamesHistory"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameRecord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games-history/my-games": {
+      "get": {
+        "tags": [
+          "GamesHistory"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GameRecord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/actual": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Notification"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payments/currency-rates": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyExchangeRates"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/promocodes/apply": {
+      "post": {
+        "tags": [
+          "Promocodes"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyPromocodePayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyPromocodePayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApplyPromocodePayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplyPromocodeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/profile": {
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateProfilePayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateProfilePayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateProfilePayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/global/my-statuses": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "VkGroupSubscribe": {
+                      "$ref": "#/components/schemas/TaskStatus"
+                    },
+                    "VkPinnedRepost": {
+                      "$ref": "#/components/schemas/TaskStatus"
+                    },
+                    "TelegramGroupSubscribe": {
+                      "$ref": "#/components/schemas/TaskStatus"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/global/list": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GlobalTask"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/global/complete": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteTaskPayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteTaskPayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteTaskPayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompleteTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/global/claim-reward": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteTaskPayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteTaskPayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CompleteTaskPayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimRewardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/details": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/balance": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalancePublic"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Account": {
+        "required": [
+          "createdAt",
+          "id",
+          "provider",
+          "providerUserFirstName",
+          "providerUserId",
+          "updatedAt",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "providerUserId": {
+            "type": "string"
+          },
+          "providerUsername": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerUserFirstName": {
+            "type": "string"
+          },
+          "providerUserLastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerUserImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AccountProvider"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AccountProvider": {
+        "enum": [
+          "Vk",
+          "Telegram"
+        ],
+        "type": "string"
+      },
+      "ApplyPromocodePayload": {
+        "required": [
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ApplyPromocodeResponse": {
+        "required": [
+          "balance",
+          "bonusType",
+          "payout"
+        ],
+        "type": "object",
+        "properties": {
+          "bonusType": {
+            "$ref": "#/components/schemas/PromocodeBonusType"
+          },
+          "payout": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "balance": {
+            "$ref": "#/components/schemas/BalancePublicUserUpdate"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BalancePublic": {
+        "required": [
+          "available",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BalancePublicUserUpdate": {
+        "required": [
+          "data",
+          "mode",
+          "time",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/UpdateMode"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BalancePublic"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BasePlayPayload": {
+        "required": [
+          "bet"
+        ],
+        "type": "object",
+        "properties": {
+          "bet": {
+            "maximum": 500000,
+            "minimum": 100,
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessage": {
+        "required": [
+          "createdAt",
+          "id",
+          "isPinned",
+          "senderRoles",
+          "trackingId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "trackingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ChatMessageAttachmentGame"
+                }
+              ]
+            }
+          },
+          "senderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "senderUsername": {
+            "type": "string",
+            "nullable": true
+          },
+          "senderImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isPinned": {
+            "type": "boolean"
+          },
+          "profileId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ChatMessageType"
+          },
+          "senderRoles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessageAttachment": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ChatMessageAttachmentGame"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "Game": "#/components/schemas/ChatMessageAttachmentGame"
+          }
+        }
+      },
+      "ChatMessageAttachmentGame": {
+        "required": [
+          "gameRecordId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "Game"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "gameRecordId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessageAttachmentType": {
+        "enum": [
+          "Game"
+        ],
+        "type": "string"
+      },
+      "ChatMessagePayload": {
+        "required": [
+          "trackingId"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string",
+            "nullable": true
+          },
+          "attachments": {
+            "maxItems": 1,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ChatMessageAttachmentGame"
+                }
+              ]
+            },
+            "nullable": true
+          },
+          "trackingId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessageType": {
+        "enum": [
+          "UserMessage",
+          "SystemMessage"
+        ],
+        "type": "string"
+      },
+      "ClaimRewardResponse": {
+        "required": [
+          "balance",
+          "payout",
+          "task"
+        ],
+        "type": "object",
+        "properties": {
+          "payout": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "task": {
+            "$ref": "#/components/schemas/GlobalTaskStatusUserUpdate"
+          },
+          "balance": {
+            "$ref": "#/components/schemas/BalancePublicUserUpdate"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompleteTaskPayload": {
+        "required": [
+          "taskKey"
+        ],
+        "type": "object",
+        "properties": {
+          "taskKey": {
+            "$ref": "#/components/schemas/GlobalTaskKey"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompleteTaskResponse": {
+        "required": [
+          "task"
+        ],
+        "type": "object",
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/GlobalTaskStatusUserUpdate"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConnectResponse": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Currency": {
+        "enum": [
+          "Rub",
+          "Kzt",
+          "Kgs",
+          "Uzs",
+          "Uah",
+          "Usd",
+          "Eur",
+          "Trx",
+          "UsdtTrc20",
+          "UsdtErc20",
+          "Btc",
+          "Ltc",
+          "Ton",
+          "Not",
+          "Eth",
+          "Bnb",
+          "Doge"
+        ],
+        "type": "string"
+      },
+      "CurrencyExchangeRates": {
+        "required": [
+          "map"
+        ],
+        "type": "object",
+        "properties": {
+          "map": {
+            "type": "object",
+            "properties": {
+              "Rub": {
+                "type": "number",
+                "format": "double"
+              },
+              "Kzt": {
+                "type": "number",
+                "format": "double"
+              },
+              "Kgs": {
+                "type": "number",
+                "format": "double"
+              },
+              "Uzs": {
+                "type": "number",
+                "format": "double"
+              },
+              "Uah": {
+                "type": "number",
+                "format": "double"
+              },
+              "Usd": {
+                "type": "number",
+                "format": "double"
+              },
+              "Eur": {
+                "type": "number",
+                "format": "double"
+              },
+              "Trx": {
+                "type": "number",
+                "format": "double"
+              },
+              "UsdtTrc20": {
+                "type": "number",
+                "format": "double"
+              },
+              "UsdtErc20": {
+                "type": "number",
+                "format": "double"
+              },
+              "Btc": {
+                "type": "number",
+                "format": "double"
+              },
+              "Ltc": {
+                "type": "number",
+                "format": "double"
+              },
+              "Ton": {
+                "type": "number",
+                "format": "double"
+              },
+              "Not": {
+                "type": "number",
+                "format": "double"
+              },
+              "Eth": {
+                "type": "number",
+                "format": "double"
+              },
+              "Bnb": {
+                "type": "number",
+                "format": "double"
+              },
+              "Doge": {
+                "type": "number",
+                "format": "double"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "Game": {
+        "enum": [
+          "Dice",
+          "Pincode"
+        ],
+        "type": "string"
+      },
+      "GameOutcome": {
+        "enum": [
+          "Win",
+          "Loss"
+        ],
+        "type": "string"
+      },
+      "GameRecord": {
+        "required": [
+          "bet",
+          "createdAt",
+          "game",
+          "id",
+          "multiplier",
+          "outcome",
+          "payout",
+          "previewUserName",
+          "snapshot",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "game": {
+            "$ref": "#/components/schemas/Game"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/GameOutcome"
+          },
+          "snapshot": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GameSnapshotDice"
+              },
+              {
+                "$ref": "#/components/schemas/GameSnapshotPincode"
+              }
+            ]
+          },
+          "bet": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "multiplier": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "payout": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "previewUserName": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "transactionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameSnapshot": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/GameSnapshotPincode"
+          },
+          {
+            "$ref": "#/components/schemas/GameSnapshotDice"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "game",
+          "mapping": {
+            "Pincode": "#/components/schemas/GameSnapshotPincode",
+            "Dice": "#/components/schemas/GameSnapshotDice"
+          }
+        }
+      },
+      "GameSnapshotDice": {
+        "required": [
+          "game",
+          "inputSides",
+          "outputSide"
+        ],
+        "type": "object",
+        "properties": {
+          "game": {
+            "enum": [
+              "Dice"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "inputSides": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "outputSide": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameSnapshotPincode": {
+        "required": [
+          "game",
+          "mode",
+          "outputNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "game": {
+            "enum": [
+              "Pincode"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "mode": {
+            "$ref": "#/components/schemas/PincodeMode"
+          },
+          "outputNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetCampaignsResponse": {
+        "required": [
+          "campaigns",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "campaigns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferralCampaign"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetLastTransactionsResponse": {
+        "required": [
+          "totalAmount",
+          "transactions"
+        ],
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferrerTransaction"
+            }
+          },
+          "totalAmount": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalTask": {
+        "required": [
+          "createdAt",
+          "isActive",
+          "key",
+          "payout",
+          "requirements",
+          "wageringMultiplier"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "#/components/schemas/GlobalTaskKey"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "requirements": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GlobalTaskRequirementsVkGroupSubscribe"
+              },
+              {
+                "$ref": "#/components/schemas/GlobalTaskRequirementsVkPinnedRepost"
+              },
+              {
+                "$ref": "#/components/schemas/GlobalTaskRequirementsTelegramGroupSubscribe"
+              }
+            ]
+          },
+          "payout": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringMultiplier": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalTaskKey": {
+        "enum": [
+          "VkGroupSubscribe",
+          "VkPinnedRepost",
+          "TelegramGroupSubscribe"
+        ],
+        "type": "string"
+      },
+      "GlobalTaskRequirements": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/GlobalTaskRequirementsVkPinnedRepost"
+          },
+          {
+            "$ref": "#/components/schemas/GlobalTaskRequirementsTelegramGroupSubscribe"
+          },
+          {
+            "$ref": "#/components/schemas/GlobalTaskRequirementsVkGroupSubscribe"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "VkPinnedRepost": "#/components/schemas/GlobalTaskRequirementsVkPinnedRepost",
+            "TelegramGroupSubscribe": "#/components/schemas/GlobalTaskRequirementsTelegramGroupSubscribe",
+            "VkGroupSubscribe": "#/components/schemas/GlobalTaskRequirementsVkGroupSubscribe"
+          }
+        }
+      },
+      "GlobalTaskRequirementsTelegramGroupSubscribe": {
+        "required": [
+          "groupHandle",
+          "groupId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "TelegramGroupSubscribe"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "groupHandle": {
+            "type": "string"
+          },
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalTaskRequirementsVkGroupSubscribe": {
+        "required": [
+          "groupHandle",
+          "groupId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "VkGroupSubscribe"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "groupHandle": {
+            "type": "string"
+          },
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalTaskRequirementsVkPinnedRepost": {
+        "required": [
+          "groupHandle",
+          "groupId",
+          "postId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "VkPinnedRepost"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "groupHandle": {
+            "type": "string"
+          },
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "postId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalTaskStatus": {
+        "required": [
+          "status",
+          "taskKey",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "taskKey": {
+            "$ref": "#/components/schemas/GlobalTaskKey"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalTaskStatusUserUpdate": {
+        "required": [
+          "data",
+          "mode",
+          "time",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/UpdateMode"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GlobalTaskStatus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Notification": {
+        "required": [
+          "autoClose",
+          "autoCloseMs",
+          "createdAt",
+          "expiresAt",
+          "id",
+          "kind",
+          "message",
+          "title",
+          "withCloseButton"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/NotificationKind"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "autoClose": {
+            "type": "boolean"
+          },
+          "autoCloseMs": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withCloseButton": {
+            "type": "boolean"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NotificationKind": {
+        "enum": [
+          "Success",
+          "Info",
+          "Warning",
+          "Failure"
+        ],
+        "type": "string"
+      },
+      "PincodeMode": {
+        "enum": [
+          "Easy",
+          "Hardcore"
+        ],
+        "type": "string"
+      },
+      "PlayDicePayload": {
+        "required": [
+          "sides"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePlayPayload"
+          }
+        ],
+        "properties": {
+          "sides": {
+            "maxItems": 5,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlayPincodePayload": {
+        "required": [
+          "mode"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePlayPayload"
+          }
+        ],
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/PincodeMode"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlayResponse": {
+        "required": [
+          "balanceUpdate",
+          "record"
+        ],
+        "type": "object",
+        "properties": {
+          "record": {
+            "$ref": "#/components/schemas/GameRecord"
+          },
+          "balanceUpdate": {
+            "$ref": "#/components/schemas/BalancePublicUserUpdate"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Profile": {
+        "required": [
+          "createdAt",
+          "hasCustomName",
+          "id",
+          "name",
+          "updatedAt",
+          "usedProvider",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "hasCustomName": {
+            "type": "boolean"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "usedProvider": {
+            "$ref": "#/components/schemas/AccountProvider"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PromocodeBonusType": {
+        "enum": [
+          "DepositMultiplier",
+          "DepositFixed",
+          "Payout"
+        ],
+        "type": "string"
+      },
+      "ReferralAction": {
+        "enum": [
+          "Deposit",
+          "Withdrawal"
+        ],
+        "type": "string"
+      },
+      "ReferralCampaign": {
+        "required": [
+          "code",
+          "createdAt",
+          "id",
+          "name",
+          "totalSignups",
+          "totalVisits"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "totalVisits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalSignups": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "referrerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReferrerBalance": {
+        "required": [
+          "available",
+          "referrerId"
+        ],
+        "type": "object",
+        "properties": {
+          "referrerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReferrerBalanceUserUpdate": {
+        "required": [
+          "data",
+          "mode",
+          "time",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/UpdateMode"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReferrerBalance"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReferrerSettings": {
+        "required": [
+          "referrerId",
+          "revShare"
+        ],
+        "type": "object",
+        "properties": {
+          "referrerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revShare": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReferrerTransaction": {
+        "required": [
+          "amount",
+          "createdAt",
+          "id",
+          "isProcessed",
+          "referralAction",
+          "referralName",
+          "referrerId"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "amount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "referrerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isProcessed": {
+            "type": "boolean"
+          },
+          "referralId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "referralCampaignId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "referralAction": {
+            "$ref": "#/components/schemas/ReferralAction"
+          },
+          "referralName": {
+            "type": "string"
+          },
+          "referralImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "referralUsername": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TaskStatus": {
+        "enum": [
+          "Pending",
+          "Completed",
+          "Claimed"
+        ],
+        "type": "string"
+      },
+      "UpdateMode": {
+        "enum": [
+          "Always",
+          "Optimized"
+        ],
+        "type": "string"
+      },
+      "UpdateProfilePayload": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 20,
+            "minLength": 3,
+            "pattern": "^[a-zA-Z0-9_]+$",
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "maxLength": 32,
+            "minLength": 3,
+            "pattern": "^[!#$€£%&'\"'()*+-./:;,=<>?@\\\\^|А-Яа-яёЁA-Za-z0-9 ]+$",
+            "type": "string",
+            "nullable": true
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AccountProvider"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDetails": {
+        "required": [
+          "accounts",
+          "profile",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserPublic"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Account"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserPublic": {
+        "required": [
+          "id",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profileId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserRole": {
+        "enum": [
+          "User",
+          "Admin",
+          "Moderator",
+          "Support"
+        ],
+        "type": "string"
+      },
+      "WithdrawResponse": {
+        "required": [
+          "balance",
+          "referrerBalance"
+        ],
+        "type": "object",
+        "properties": {
+          "balance": {
+            "$ref": "#/components/schemas/BalancePublicUserUpdate"
+          },
+          "referrerBalance": {
+            "$ref": "#/components/schemas/ReferrerBalanceUserUpdate"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "Authorization header using the Bearer scheme (session)",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  }
+}

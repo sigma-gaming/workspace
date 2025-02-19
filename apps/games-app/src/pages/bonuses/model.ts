@@ -4,11 +4,9 @@ import {
   onlyLatestUpdate,
 } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { subscriptionFactory } from '@core/io-client'
 import { noop } from '@core/utils'
-import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { createMutation, createQuery } from '@farfetched/core'
-import { formatGem, gemFloat, GlobalTaskStatusUpdate } from '@games/model'
+import { formatGem, gemFloat } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, EffectResult, sample } from 'effector'
 import { status } from 'patronum'
@@ -17,9 +15,18 @@ import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { $$session } from '../../entities/session'
 import { routes } from '../../routing'
+import {
+  getTasksGlobalList,
+  getTasksGlobalMyStatuses,
+  GlobalTaskKey,
+  GlobalTaskStatusUserUpdate,
+  postPromocodesApply,
+  postTasksGlobalClaimReward,
+  postTasksGlobalComplete,
+  TaskStatus,
+} from '../../shared/api/core'
+import { $$coreWs, EventName } from '../../shared/api/core-ws'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
-import { gamesWs } from '../../shared/api/games-ws'
 
 const completeGlobalTask = createEvent<GlobalTaskKey>()
 const claimGlobalTaskReward = createEvent<GlobalTaskKey>()
@@ -27,18 +34,15 @@ const reset = createEvent()
 
 const applyPromocodeMutation = createMutation({
   name: 'bonuses/applyPromocode',
-  effect: createApiEffect('json', gamesApi.promocodes.apply.$post),
+  effect: createApiEffect(postPromocodesApply),
 })
 
 const getGlobalTasksQuery = createQuery({
   name: 'bonuses/getGlobalTasks',
-  effect: createApiEffect('query', gamesApi.tasks.global.getTasks.$get),
+  effect: createApiEffect(getTasksGlobalList),
 })
 
-const getGlobalTaskStatusesFx = createApiEffect(
-  'query',
-  gamesApi.tasks.global.getStatuses.$get,
-)
+const getGlobalTaskStatusesFx = createApiEffect(getTasksGlobalMyStatuses)
 
 export type GlobalTaskStatuses = EffectResult<typeof getGlobalTaskStatusesFx>
 
@@ -50,21 +54,18 @@ const INITIAL_GLOBAL_TASK_STATUSES: GlobalTaskStatuses = {
 
 const completeGlobalTaskMutation = createMutation({
   name: 'bonuses/completeGlobalTask',
-  effect: createApiEffect('json', gamesApi.tasks.global.complete.$post),
+  effect: createApiEffect(postTasksGlobalComplete),
 })
 
 const claimGlobalTaskRewardMutation = createMutation({
   name: 'bonuses/claimGlobalTaskReward',
-  effect: createApiEffect('json', gamesApi.tasks.global.claimReward.$post),
+  effect: createApiEffect(postTasksGlobalClaimReward),
 })
 
-const globalTaskStatusUpdateReceived = createEvent<GlobalTaskStatusUpdate>()
+const globalTaskStatusUpdateReceived = createEvent<GlobalTaskStatusUserUpdate>()
 
 const { receivedData: globalTaskStatusUpdated } = invoke(() =>
-  subscriptionFactory({
-    ws: gamesWs,
-    event: 'global-tasks/status-updated',
-  }),
+  $$coreWs.subscriptionFactory(EventName.GlobalTaskStatusUpdated),
 )
 
 const promocodeFields = {
@@ -189,7 +190,7 @@ sample({
 sample({
   clock: onlyLatestUpdate(globalTaskStatusUpdateReceived),
   source: $globalTaskStatuses,
-  fn: (statuses, { data }) => ({ ...statuses, [data.key]: data.status }),
+  fn: (statuses, { data }) => ({ ...statuses, [data.taskKey]: data.status }),
   target: $globalTaskStatuses,
 })
 

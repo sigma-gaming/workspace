@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@core/logger": "workspace:*",
-    "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*"
   },
   "devDependencies": {

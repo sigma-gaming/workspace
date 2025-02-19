@@ -1,4 +1,4 @@
-import { RouteException, TooManyRequestsException } from '@core/exceptions'
+import { HttpException, TooManyRequestsException } from '@core/exceptions'
 import { Form } from '@core/forms'
 import { Mutation } from '@farfetched/core'
 import { NotificationData } from '@mantine/notifications'
@@ -7,7 +7,7 @@ import { createExceptionEvents } from './create-exception-events'
 import { $$notifications } from './notifications'
 
 export function handleExceptions(
-  mutation: Mutation<any, any, RouteException<unknown>>,
+  mutation: Mutation<any, any, HttpException>,
   targets: {
     form?: Form<any, any, any>
     message?: (message: string) => NotificationData
@@ -16,7 +16,7 @@ export function handleExceptions(
       exception: TooManyRequestsException,
     ) => NotificationData
     cloudflareChallengeMessage?: () => NotificationData
-    otherMessage?: (exception: RouteException<unknown>) => NotificationData
+    otherMessage?: (exception: HttpException) => NotificationData
   } = {},
 ) {
   const {

@@ -2,7 +2,7 @@ const { configure } = require('eslint-kit')
 
 module.exports = configure({
   root: __dirname,
-  extends: '../../base.eslintrc.js',
+  extends: '../../.eslintrc.cjs',
   extend: {
     rules: {
       'import-x/no-default-export': 'off',

@@ -1,11 +1,11 @@
 import { Avatar, Icons, useMedia } from '@core/ui'
-import { ChatMessageType } from '@dbs/games-types'
 import { getUserInitials } from '@games/model'
 import { ActionIcon, Button, Skeleton } from '@mantine/core'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { memo, UIEventHandler, useCallback, useEffect, useRef } from 'react'
 import { $$session } from '../../entities/session'
+import { ChatMessageType } from '../../shared/api/core'
 import { useTimeAgo } from '../../shared/time'
 import { $$chatWidget, ExtendedMessage } from './model'
 

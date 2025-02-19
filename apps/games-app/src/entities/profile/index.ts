@@ -1,40 +1,32 @@
-import { createQuery, Mutation, update } from '@farfetched/core'
-import { UserDetails } from '@games/model'
+import { Mutation, update } from '@farfetched/core'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
-import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
+import { UserDetails } from '../../shared/api/core'
+import { $$user } from '../user'
 
-const request = createEvent()
 const refresh = createEvent()
-const reset = createEvent()
-
-const userDetailsQuery = createQuery({
-  name: 'profile/get',
-  effect: createApiEffect('query', gamesApi.me.getUserDetails.$get),
-})
 
 function receiveUpdates<T>(
   mutation: Mutation<any, T, any>,
   selector: (data: T) => UserDetails,
 ) {
-  update(userDetailsQuery, {
+  update($$user.query, {
     on: mutation,
     by: {
       success: ({ query, mutation }) => {
         if (query && 'error' in query) return { error: query.error }
 
         const userDetails = selector(mutation.result)
-        return { result: userDetails, error: null }
+        return { result: userDetails }
       },
     },
   })
 }
 
-const loaded = userDetailsQuery.finished.success
+const loaded = $$user.query.finished.success
 
-const $userDetails = userDetailsQuery.$data
-const $loading = userDetailsQuery.$pending
+const $userDetails = $$user.query.$data
+const $loading = $$user.query.$pending
 const $loaded = and($userDetails)
 
 const $accounts = $userDetails.map((details) => details?.accounts ?? [])
@@ -50,26 +42,14 @@ const $usedProvider = $userDetails.map((details) => {
 })
 
 sample({
-  clock: request,
-  target: userDetailsQuery.start,
-})
-
-sample({
   clock: refresh,
   fn: () => true,
-  target: [userDetailsQuery.$stale, userDetailsQuery.refresh],
-})
-
-sample({
-  clock: reset,
-  target: userDetailsQuery.reset,
+  target: $$user.refresh,
 })
 
 export const $$profile = {
   receiveUpdates,
-  request,
   refresh,
-  reset,
   loaded,
   $loading,
   $loaded,

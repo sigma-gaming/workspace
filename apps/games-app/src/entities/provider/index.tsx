@@ -1,6 +1,6 @@
 import { Icons, LinkButton, LinkButtonProps } from '@core/ui'
-import { AccountProvider } from '@dbs/games-types'
 import Cookies from 'js-cookie'
+import { AccountProvider } from '../../shared/api/core'
 import { env } from '../../shared/env'
 
 type ProviderInfo = {
@@ -9,7 +9,7 @@ type ProviderInfo = {
 }
 
 export const ProviderInfoMap: Record<AccountProvider, ProviderInfo> = {
-  [AccountProvider.VK]: {
+  [AccountProvider.Vk]: {
     label: 'ВКонтакте',
     profileUrl: 'https://vk.com/{{id}}',
   },

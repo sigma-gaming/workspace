@@ -33,7 +33,6 @@ export const UserTable = pgTable(
     referrerId: uuid('referrer_id'),
     referralCampaignId: uuid('referral_campaign_id'),
     profileId: integer('profile_id'),
-    securityId: uuid('security_id'),
   },
   (table) => ({
     referrerIdKey: foreignKey({

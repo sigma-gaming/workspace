@@ -1,24 +1,23 @@
 import { $$notifications } from '@core/client'
-import { subscriptionFactory } from '@core/io-client'
-import { NotificationSelect } from '@dbs/games-schema'
 import { createQuery } from '@farfetched/core'
-import { mapColor } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEffect, createEvent, sample } from 'effector'
+import { getNotificationsActual, Notification } from '../../shared/api/core'
+import { EventName } from '../../shared/api/core-ws'
+import { $$coreWs } from '../../shared/api/core-ws/model'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
-import { gamesWs } from '../../shared/api/games-ws'
+import { mapColor } from './lib/map-color'
 
 const initialize = createEvent()
 const reset = createEvent()
 
 const getActualQuery = createQuery({
   name: 'notifications/getActual',
-  effect: createApiEffect('query', gamesApi.notifications.getActual.$get),
+  effect: createApiEffect(getNotificationsActual),
 })
 
 const { receivedData: notificationReceived } = invoke(() => {
-  return subscriptionFactory({ ws: gamesWs, event: 'notification' })
+  return $$coreWs.subscriptionFactory(EventName.NotificationCreated)
 })
 
 sample({
@@ -50,7 +49,7 @@ sample({
 sample({
   clock: getActualQuery.finished.success,
   fn: ({ result }) => result,
-  target: createEffect((notifications: NotificationSelect[]) => {
+  target: createEffect((notifications: Notification[]) => {
     const shown = localStorage.getItem('notifications/shown')?.split(',') ?? []
 
     notifications

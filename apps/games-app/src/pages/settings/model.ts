@@ -1,6 +1,5 @@
 import { $$notifications, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { AccountProvider } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import { getUserFullName, ProfileValidation } from '@games/model'
 import { createEvent, sample } from 'effector'
@@ -8,14 +7,14 @@ import { not } from 'patronum'
 import { z } from 'zod'
 import { $$profile } from '../../entities/profile'
 import { routes } from '../../routing'
+import { AccountProvider, putSettingsProfile } from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
 
 const reset = createEvent()
 
 const updateProfileMutation = createMutation({
   name: 'settings/setUsedProvider',
-  effect: createApiEffect('json', gamesApi.settings.updateProfile.$post),
+  effect: createApiEffect(putSettingsProfile),
 })
 
 const $updatingProfile = updateProfileMutation.$pending
@@ -78,7 +77,7 @@ sample({
   target: profileFields.name.update,
 })
 
-$$profile.receiveUpdates(updateProfileMutation, (output) => output.userDetails)
+$$profile.receiveUpdates(updateProfileMutation, (details) => details)
 
 sample({
   clock: updateProfileMutation.finished.success,

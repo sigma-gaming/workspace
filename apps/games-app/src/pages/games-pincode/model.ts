@@ -1,9 +1,6 @@
-import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { GameRecordSelect } from '@dbs/games-schema'
-import { Game, GameOutcome, PincodeMode } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { clampBet, gemFloat, gemInt, getPincodeCombination } from '@games/model'
+import { clampBet, gemFloat, gemInt } from '@games/model'
 import { createEvent, createStore, sample } from 'effector'
 import { and, condition, delay, not } from 'patronum'
 import { z } from 'zod'
@@ -12,8 +9,16 @@ import { $$balance } from '../../entities/balance'
 import { $$gameHistory } from '../../features/game-history'
 import { $$ping } from '../../features/ping'
 import { routes } from '../../routing'
+import {
+  Game,
+  GameOutcome,
+  GameRecord,
+  PincodeMode,
+  postGamesPlayPincode,
+} from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
+import { getPincodeCombination } from './lib/config'
+import { handleExceptions } from '@core/client'
 
 type WinInfo = {
   amount: number
@@ -22,10 +27,10 @@ type WinInfo = {
 
 const playGameMutation = createMutation({
   name: 'games/pincode/play',
-  effect: createApiEffect('json', gamesApi.games.playPincode.$post),
+  effect: createApiEffect(postGamesPlayPincode),
 })
 
-$$balance.receiveUpdates(playGameMutation, ({ balance }) => balance)
+$$balance.receiveUpdates(playGameMutation, (data) => data.balanceUpdate)
 
 const betDoubled = createEvent()
 const betHalved = createEvent()
@@ -64,7 +69,7 @@ const $winInfo = createStore<WinInfo | null>(null)
   .on(showWinInfo, (_, winInfo) => winInfo)
   .reset(reset)
 
-const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
+const $lastGame = createStore<GameRecord | null>(null).reset(reset)
 
 export const MIN_BET = gemInt(1)
 export const MAX_BET = gemInt(5000)

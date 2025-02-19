@@ -1,6 +1,5 @@
 import { $$notifications, handleExceptions } from '@core/client'
 import { noop } from '@core/utils'
-import { ReferrerBalanceSelect } from '@dbs/games-schema'
 import { createMutation, createQuery } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
 import { and, status } from 'patronum'
@@ -8,35 +7,39 @@ import { $$affiliate } from '../../entities/affiliate'
 import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { routes } from '../../routing'
+import {
+  getAffiliateBalance,
+  getAffiliateCampaigns,
+  getAffiliateLastTransactions,
+  getAffiliateSettings,
+  postAffiliateWithdraw,
+  ReferrerBalance,
+} from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
 
 const withdraw = createEvent()
 const reset = createEvent()
 
-const getBalanceFx = createApiEffect(
-  'query',
-  gamesApi.affiliate.getBalance.$get,
-)
+const getBalanceFx = createApiEffect(getAffiliateBalance)
 
 const getSettingsQuery = createQuery({
-  name: 'affiliate/getSettings',
-  effect: createApiEffect('query', gamesApi.affiliate.getSettings.$get),
+  name: 'affiliate/settings',
+  effect: createApiEffect(getAffiliateSettings),
 })
 
 const getCampaignsQuery = createQuery({
-  name: 'affiliate/getCampaigns',
-  effect: createApiEffect('query', gamesApi.affiliate.getCampaigns.$get),
+  name: 'affiliate/campaigns',
+  effect: createApiEffect(getAffiliateCampaigns),
 })
 
 const getLastTransactionsQuery = createQuery({
-  name: 'affiliate/getLastTransactions',
-  effect: createApiEffect('query', gamesApi.affiliate.getLastTransactions.$get),
+  name: 'affiliate/last-transactions',
+  effect: createApiEffect(getAffiliateLastTransactions),
 })
 
 const withdrawMutation = createMutation({
   name: 'affiliate/withdraw',
-  effect: createApiEffect('json', gamesApi.affiliate.withdraw.$post),
+  effect: createApiEffect(postAffiliateWithdraw),
 })
 
 $$balance.receiveUpdates(withdrawMutation, ({ balance }) => balance)
@@ -45,7 +48,7 @@ const $settings = getSettingsQuery.$data
 const $settingsLoaded = getSettingsQuery.$succeeded
 const $revShare = $settings.map((settings) => settings?.revShare ?? 0)
 
-const $balanceDetailed = createStore<ReferrerBalanceSelect | null>(null)
+const $balanceDetailed = createStore<ReferrerBalance | null>(null)
   .on(getBalanceFx.doneData, (_, balance) => balance)
   .reset(reset)
 

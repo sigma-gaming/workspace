@@ -1,10 +1,10 @@
 import { Icons, LazyWrapper, useLazyAnimate } from '@core/ui'
 import { trimText } from '@core/utils'
-import { PincodeMode } from '@dbs/games-types'
-import { getPincodeHighlight } from '@games/model'
 import { useUnit } from 'effector-react'
 import { lazy, memo, useMemo, useRef } from 'react'
 import { $$profile } from '../../../entities/profile'
+import { PincodeMode } from '../../../shared/api/core'
+import { getPincodeHighlight } from '../lib/config'
 import { $$pincodePage } from '../model'
 import styles from './styles.module.css'
 

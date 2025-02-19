@@ -1,8 +1,9 @@
 import {
   BadRequestException,
   CloudflareChallengeException,
+  HttpException,
+  isException,
   NotAuthenticatedException,
-  RouteException,
   TooManyRequestsException,
   ValidationException,
 } from '@core/exceptions'
@@ -11,7 +12,7 @@ import { Mutation } from '@farfetched/core'
 import { createEvent, sample, split } from 'effector'
 
 export function createExceptionEvents(
-  mutation: Mutation<any, any, RouteException<unknown>>,
+  mutation: Mutation<any, any, HttpException>,
 ) {
   const receivedApiError = sample({
     source: mutation.finished.failure,
@@ -29,22 +30,21 @@ export function createExceptionEvents(
     __: other,
   } = split(receivedApiError, {
     validation: (error): error is ValidationException =>
-      error instanceof ValidationException,
+      isException(error, ValidationException),
     badRequest: (error): error is BadRequestException =>
-      error instanceof BadRequestException,
+      isException(error, BadRequestException),
     tooManyRequests: (error): error is TooManyRequestsException =>
-      error instanceof TooManyRequestsException,
+      isException(error, TooManyRequestsException),
     notAuthenticated: (error): error is NotAuthenticatedException =>
-      error instanceof NotAuthenticatedException,
+      isException(error, NotAuthenticatedException),
     cloudflareChallenge: (error): error is CloudflareChallengeException =>
-      error instanceof CloudflareChallengeException,
+      isException(error, CloudflareChallengeException),
   })
 
   sample({
     source: validation,
     fn: ({ payload }) => {
-      const { fieldErrors } = payload
-      return normalizeFieldErrors(fieldErrors)
+      return normalizeFieldErrors(payload.errors)
     },
     target: receivedFormErrors,
   })

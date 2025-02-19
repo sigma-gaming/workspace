@@ -1,5 +1,4 @@
 import { Avatar, WithError } from '@core/ui'
-import { AccountProvider } from '@dbs/games-types'
 import { getUserFullName, getUserInitials } from '@games/model'
 import {
   Anchor,
@@ -25,6 +24,7 @@ import {
   VkButton,
 } from '../../entities/provider'
 import { $$user } from '../../entities/user'
+import { AccountProvider } from '../../shared/api/core'
 import { $$settingsPage } from './model.ts'
 
 export const SettingsPageView = () => {
@@ -131,7 +131,7 @@ const SocialNetworks = () => {
   const accounts = useUnit($$profile.$accounts)
 
   const vkAccount = accounts.find(
-    (account) => account.provider === AccountProvider.VK,
+    (account) => account.provider === AccountProvider.Vk,
   )
 
   const telegramAccount = accounts.find(

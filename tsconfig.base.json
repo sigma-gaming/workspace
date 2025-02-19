@@ -32,21 +32,6 @@
       "@tooling/env/client": [
         "tooling/env/src/client.ts"
       ],
-      "@apis/access-api": [
-        "apps/access-api/src/client.ts"
-      ],
-      "@apis/games-api": [
-        "apps/games-api/src/client.ts"
-      ],
-      "@apis/games-ws": [
-        "apps/games-ws/src/client.ts"
-      ],
-      "@apis/control-api": [
-        "apps/control-api/src/client.ts"
-      ],
-      "@apis/letsauth": [
-        "apps/letsauth/src/client.ts"
-      ],
       "@core/server": [
         "core/server/src/index.ts"
       ],
@@ -68,18 +53,6 @@
       "@games/model": [
         "games-libs/model/src/index.ts"
       ],
-      "@games/options": [
-        "games-libs/options/src/index.ts"
-      ],
-      "@games/services": [
-        "games-libs/services/src/index.ts"
-      ],
-      "@games/redis": [
-        "games-libs/redis/src/index.ts"
-      ],
-      "@games/engine": [
-        "games-libs/engine/src/index.ts"
-      ],
       "@core/logger": [
         "core/logger/src/index.ts"
       ],
@@ -100,9 +73,6 @@
       ],
       "@core/client": [
         "core/client/src/index.ts"
-      ],
-      "@core/io-client": [
-        "core/io-client/src/index.ts"
       ],
       "@core/flow": [
         "core/flow/src/index.ts"

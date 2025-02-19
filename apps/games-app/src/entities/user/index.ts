@@ -1,43 +1,43 @@
-import { RouteException } from '@core/exceptions'
 import { createQuery } from '@farfetched/core'
 import { createEvent, sample } from 'effector'
 import { and } from 'patronum'
+import { getUserDetails } from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
 
 const request = createEvent()
 const refresh = createEvent()
-const failed = createEvent<RouteException<unknown>>()
+const failed = createEvent<Error>()
 
-const userQuery = createQuery({
+const query = createQuery({
   name: 'user/get',
-  effect: createApiEffect('query', gamesApi.me.getUser.$get),
+  effect: createApiEffect(getUserDetails),
 })
 
-const loaded = userQuery.finished.success
+const loaded = query.finished.success
 
-const $user = userQuery.$data
-const $loading = userQuery.$pending
+const $user = query.$data.map((details) => details?.user ?? null)
+const $loading = query.$pending
 const $loaded = and($user)
 
 sample({
   clock: request,
-  target: userQuery.start,
+  target: query.start,
 })
 
 sample({
   clock: refresh,
   fn: () => true,
-  target: [userQuery.$stale, userQuery.refresh],
+  target: [query.$stale, query.refresh],
 })
 
 sample({
-  source: userQuery.finished.failure,
+  source: query.finished.failure,
   fn: ({ error }) => error,
   target: failed,
 })
 
 export const $$user = {
+  query,
   request,
   refresh,
   loaded,

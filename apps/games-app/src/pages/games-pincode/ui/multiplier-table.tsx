@@ -1,7 +1,7 @@
 import { Badge, BadgeColor } from '@core/ui'
-import { getPincodeMultiplierMap } from '@games/model'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
+import { getPincodeMultiplierMap } from '../lib/config'
 import { $$pincodePage } from '../model'
 import styles from './styles.module.css'
 

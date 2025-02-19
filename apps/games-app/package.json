@@ -20,8 +20,7 @@
     "@core/exceptions": "workspace:*",
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",
-    "@tooling/env": "workspace:*",
-    "@core/io-client": "workspace:*"
+    "@tooling/env": "workspace:*"
   },
   "devDependencies": {
     "@dbs/games-schema": "workspace:*"

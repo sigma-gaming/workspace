@@ -1,1 +1,0 @@
-export { PubSubService } from './service'

@@ -18,7 +18,7 @@ export const ChatValidation = {
     attachments: z
       .array(
         z.object({
-          type: z.nativeEnum(ChatMessageAttachmentType),
+          type: z.literal(ChatMessageAttachmentType.Game),
           gameRecordId: z.string().uuid(),
         }),
       )

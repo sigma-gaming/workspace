@@ -1,7 +1,5 @@
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
-import { accessApi } from '../../shared/api/access'
-import { createApiEffect } from '../../shared/api/effects'
 import { env } from '../../shared/env'
 import { createLogoutUrl } from '../provider'
 
@@ -21,7 +19,13 @@ function isExpiringSoon(expiresAt: string | null) {
   return new Date(expiresAt) < new Date(Date.now() + threshold)
 }
 
-const refreshSessionFx = createApiEffect('json', accessApi.refresh.$post)
+// TODO: add session refresh
+// const refreshSessionFx = createApiEffect('json', accessApi.refresh.$post)
+const refreshSessionFx = createEffect(() => {
+  const date = new Date()
+  date.setMonth(date.getMonth() + 1)
+  return { expiresAt: date.toISOString() }
+})
 
 const redirectToLogoutFx = createEffect(() => {
   window.location.replace(createLogoutUrl())

@@ -1,0 +1,694 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://ws.sigma.local:5070"
+    },
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {},
+  "components": {
+    "schemas": {
+      "BalancePublic": {
+        "required": [
+          "available",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BalancePublicUserUpdate": {
+        "required": [
+          "data",
+          "mode",
+          "time",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/UpdateMode"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BalancePublic"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessage": {
+        "required": [
+          "createdAt",
+          "id",
+          "isPinned",
+          "senderRoles",
+          "trackingId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "trackingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "text": {
+            "type": "string",
+            "nullable": true
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ChatMessageAttachmentGame"
+                }
+              ]
+            }
+          },
+          "senderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "senderUsername": {
+            "type": "string",
+            "nullable": true
+          },
+          "senderImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isPinned": {
+            "type": "boolean"
+          },
+          "profileId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ChatMessageType"
+          },
+          "senderRoles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessageAttachment": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ChatMessageAttachmentGame"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "Game": "#/components/schemas/ChatMessageAttachmentGame"
+          }
+        }
+      },
+      "ChatMessageAttachmentGame": {
+        "required": [
+          "gameRecordId",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "Game"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "gameRecordId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatMessageAttachmentType": {
+        "enum": [
+          "Game"
+        ],
+        "type": "string"
+      },
+      "ChatMessageType": {
+        "enum": [
+          "UserMessage",
+          "SystemMessage"
+        ],
+        "type": "string"
+      },
+      "EmptyPayload": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Event": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/EventBalanceUpdated"
+          },
+          {
+            "$ref": "#/components/schemas/EventGlobalTaskStatusUpdated"
+          },
+          {
+            "$ref": "#/components/schemas/EventMaintenanceStarted"
+          },
+          {
+            "$ref": "#/components/schemas/EventLastWinsUpdated"
+          },
+          {
+            "$ref": "#/components/schemas/EventBigWinsUpdated"
+          },
+          {
+            "$ref": "#/components/schemas/EventChatMessageCreated"
+          },
+          {
+            "$ref": "#/components/schemas/EventNotificationCreated"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "name",
+          "mapping": {
+            "BalanceUpdated": "#/components/schemas/EventBalanceUpdated",
+            "GlobalTaskStatusUpdated": "#/components/schemas/EventGlobalTaskStatusUpdated",
+            "MaintenanceStarted": "#/components/schemas/EventMaintenanceStarted",
+            "LastWinsUpdated": "#/components/schemas/EventLastWinsUpdated",
+            "BigWinsUpdated": "#/components/schemas/EventBigWinsUpdated",
+            "ChatMessageCreated": "#/components/schemas/EventChatMessageCreated",
+            "NotificationCreated": "#/components/schemas/EventNotificationCreated"
+          }
+        }
+      },
+      "EventBalanceUpdated": {
+        "required": [
+          "name",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "enum": [
+              "BalanceUpdated"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "payload": {
+            "$ref": "#/components/schemas/BalancePublicUserUpdate"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EventBigWinsUpdated": {
+        "required": [
+          "name",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "enum": [
+              "BigWinsUpdated"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "payload": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameRecord"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "EventChatMessageCreated": {
+        "required": [
+          "name",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "enum": [
+              "ChatMessageCreated"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ChatMessage"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EventGlobalTaskStatusUpdated": {
+        "required": [
+          "name",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "enum": [
+              "GlobalTaskStatusUpdated"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "payload": {
+            "$ref": "#/components/schemas/GlobalTaskStatusUserUpdate"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EventLastWinsUpdated": {
+        "required": [
+          "name",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "enum": [
+              "LastWinsUpdated"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "payload": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameRecord"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "EventMaintenanceStarted": {
+        "required": [
+          "name",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "enum": [
+              "MaintenanceStarted"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "payload": {
+            "$ref": "#/components/schemas/EmptyPayload"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EventName": {
+        "enum": [
+          "MaintenanceStarted",
+          "BalanceUpdated",
+          "GlobalTaskStatusUpdated",
+          "NotificationCreated",
+          "LastWinsUpdated",
+          "BigWinsUpdated",
+          "ChatMessageCreated"
+        ],
+        "type": "string"
+      },
+      "EventNotificationCreated": {
+        "required": [
+          "name",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "enum": [
+              "NotificationCreated"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "payload": {
+            "$ref": "#/components/schemas/Notification"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Game": {
+        "enum": [
+          "Dice",
+          "Pincode"
+        ],
+        "type": "string"
+      },
+      "GameOutcome": {
+        "enum": [
+          "Win",
+          "Loss"
+        ],
+        "type": "string"
+      },
+      "GameRecord": {
+        "required": [
+          "bet",
+          "createdAt",
+          "game",
+          "id",
+          "multiplier",
+          "outcome",
+          "payout",
+          "previewUserName",
+          "snapshot",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "game": {
+            "$ref": "#/components/schemas/Game"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/GameOutcome"
+          },
+          "snapshot": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GameSnapshotDice"
+              },
+              {
+                "$ref": "#/components/schemas/GameSnapshotPincode"
+              }
+            ]
+          },
+          "bet": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "multiplier": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "payout": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "previewUserName": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "transactionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameSnapshot": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/GameSnapshotPincode"
+          },
+          {
+            "$ref": "#/components/schemas/GameSnapshotDice"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "game",
+          "mapping": {
+            "Pincode": "#/components/schemas/GameSnapshotPincode",
+            "Dice": "#/components/schemas/GameSnapshotDice"
+          }
+        }
+      },
+      "GameSnapshotDice": {
+        "required": [
+          "game",
+          "inputSides",
+          "outputSide"
+        ],
+        "type": "object",
+        "properties": {
+          "game": {
+            "enum": [
+              "Dice"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "inputSides": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "outputSide": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GameSnapshotPincode": {
+        "required": [
+          "game",
+          "mode",
+          "outputNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "game": {
+            "enum": [
+              "Pincode"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "mode": {
+            "$ref": "#/components/schemas/PincodeMode"
+          },
+          "outputNumber": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalTaskKey": {
+        "enum": [
+          "VkGroupSubscribe",
+          "VkPinnedRepost",
+          "TelegramGroupSubscribe"
+        ],
+        "type": "string"
+      },
+      "GlobalTaskStatus": {
+        "required": [
+          "status",
+          "taskKey",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "taskKey": {
+            "$ref": "#/components/schemas/GlobalTaskKey"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GlobalTaskStatusUserUpdate": {
+        "required": [
+          "data",
+          "mode",
+          "time",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "time": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/UpdateMode"
+          },
+          "data": {
+            "$ref": "#/components/schemas/GlobalTaskStatus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Notification": {
+        "required": [
+          "autoClose",
+          "autoCloseMs",
+          "createdAt",
+          "expiresAt",
+          "id",
+          "kind",
+          "message",
+          "title",
+          "withCloseButton"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/NotificationKind"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "autoClose": {
+            "type": "boolean"
+          },
+          "autoCloseMs": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withCloseButton": {
+            "type": "boolean"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NotificationKind": {
+        "enum": [
+          "Success",
+          "Info",
+          "Warning",
+          "Failure"
+        ],
+        "type": "string"
+      },
+      "PincodeMode": {
+        "enum": [
+          "Easy",
+          "Hardcore"
+        ],
+        "type": "string"
+      },
+      "TaskStatus": {
+        "enum": [
+          "Pending",
+          "Completed",
+          "Claimed"
+        ],
+        "type": "string"
+      },
+      "UpdateMode": {
+        "enum": [
+          "Always",
+          "Optimized"
+        ],
+        "type": "string"
+      },
+      "UserRole": {
+        "enum": [
+          "User",
+          "Admin",
+          "Moderator",
+          "Support"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "Authorization header using the Bearer scheme (session)",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
-import { PincodeMode } from '@dbs/games-types'
 import { Input, SegmentedControl, SegmentedControlItem } from '@mantine/core'
 import { IconBabyCarriage, IconFlame } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
+import { PincodeMode } from '../../../shared/api/core'
 import { $$pincodePage } from '../model'
 
 type Option = SegmentedControlItem & { value: string }
@@ -48,7 +48,7 @@ export const ModeField = () => {
         withItemsBorders={false}
         value={String(value)}
         onChange={(value) =>
-          $$pincodePage.fields.mode.update(Number(value) as PincodeMode)
+          $$pincodePage.fields.mode.update(value as PincodeMode)
         }
         color={colorMap[value]}
         data={options}

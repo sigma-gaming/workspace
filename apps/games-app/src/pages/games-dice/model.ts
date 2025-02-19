@@ -1,7 +1,4 @@
-import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { GameRecordSelect } from '@dbs/games-schema'
-import { Game, GameOutcome } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
 import {
   calculateDiceFullWinAmount,
@@ -17,15 +14,21 @@ import { $$audio, Sound } from '../../entities/audio'
 import { $$balance } from '../../entities/balance'
 import { $$gameHistory } from '../../features/game-history'
 import { routes } from '../../routing'
+import {
+  Game,
+  GameOutcome,
+  GameRecord,
+  postGamesPlayDice,
+} from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
+import { handleExceptions } from '@core/client'
 
 const playGameMutation = createMutation({
   name: 'games/dice/play',
-  effect: createApiEffect('json', gamesApi.games.playDice.$post),
+  effect: createApiEffect(postGamesPlayDice),
 })
 
-$$balance.receiveUpdates(playGameMutation, ({ balance }) => balance)
+$$balance.receiveUpdates(playGameMutation, (data) => data.balanceUpdate)
 
 const betDoubled = createEvent()
 const betHalved = createEvent()
@@ -54,7 +57,7 @@ const $started = createStore(false)
   .on(playGameMutation.finished.success, () => true)
   .reset(reset)
 
-const $lastGame = createStore<GameRecordSelect | null>(null).reset(reset)
+const $lastGame = createStore<GameRecord | null>(null).reset(reset)
 
 const animationsLoaded = combineEvents({
   events: [startLoaded, animationLoaded],

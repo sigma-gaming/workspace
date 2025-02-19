@@ -1,6 +1,6 @@
 export enum UpdateMode {
-  Always,
-  Optimized,
+  Always = 'Always',
+  Optimized = 'Optimized',
 }
 
 export type Update<T> = {

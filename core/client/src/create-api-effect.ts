@@ -1,53 +1,28 @@
 import {
   CloudflareChallengeException,
-  InternalServerException,
-  recreateException,
-  RouteException,
+  HttpException,
+  mapException,
 } from '@core/exceptions'
 import { createEffect, Effect } from 'effector'
-import { ClientResponse } from 'hono/client'
-import { StatusCode } from 'hono/utils/http-status'
-
-type Options = {
-  headers?: Record<string, string>
-}
-
-type HonoRpcRouteJson<P, R> = (
-  args: { json: P },
-  options?: Options,
-) => Promise<ClientResponse<R, StatusCode, 'json'>>
-
-type HonoRpcRouteQuery<P, R> = (
-  args: { query: P },
-  options?: Options,
-) => Promise<ClientResponse<R, StatusCode, 'json'>>
 
 type FactoryOptions = {
   checkCloudflareChallenge?: boolean
   onCloudflareChallenge?: () => void
 }
 
+type NormalizePayload<P> = undefined extends P
+  ? Exclude<P, undefined> | void
+  : P
+
 export const createApiEffectFactory = ({
   onCloudflareChallenge,
   checkCloudflareChallenge = Boolean(onCloudflareChallenge),
 }: FactoryOptions = {}) => {
-  return function createApiEffect<F extends 'query' | 'json', P, R>(
-    format: F,
-    fn: F extends 'query' ? HonoRpcRouteQuery<P, R> : HonoRpcRouteJson<P, R>,
-  ) {
+  return function createApiEffect<P, R>(fn: (payload: P) => Promise<R>) {
     const effect = createEffect(async (payload: P) => {
       try {
-        const response = await fn({ [format]: payload } as any)
-        if (response.ok) return await response.json()
-
-        const contentType = response.headers.get('content-type')
-
-        if (contentType?.includes('application/json')) {
-          const exception = recreateException(await response.json())
-          if (exception) throw exception
-        }
-
-        throw new InternalServerException()
+        const response = await fn(payload)
+        return response
       } catch (error) {
         /**
          * Cloudflare challenge response doesn't have CORS headers,
@@ -68,10 +43,15 @@ export const createApiEffectFactory = ({
           }
         }
 
+        if (error instanceof HttpException) {
+          throw mapException(error)
+        }
+
+        console.error(error)
         throw error
       }
     })
 
-    return effect as Effect<P, R, RouteException<unknown>>
+    return effect as Effect<NormalizePayload<P>, R, HttpException>
   }
 }

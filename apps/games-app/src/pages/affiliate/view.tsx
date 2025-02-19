@@ -1,7 +1,5 @@
 import { Avatar, Icons, Table, TableCellTextColor } from '@core/ui'
 import { trimText } from '@core/utils'
-import { ReferrerTransactionSelect } from '@dbs/games-schema'
-import { ReferralAction } from '@dbs/games-types'
 import { reflect } from '@effector/reflect'
 import { formatGem, gemFloat, gemInt } from '@games/model'
 import {
@@ -26,12 +24,13 @@ import { ReactNode, useState } from 'react'
 import { v7 } from 'uuid'
 import { $$affiliate } from '../../entities/affiliate'
 import { $$session } from '../../entities/session'
+import { ReferralAction, ReferrerTransaction } from '../../shared/api/core'
 import { env } from '../../shared/env'
 import { $$affiliatePage } from './model'
 import styles from './styles.module.css'
 
 type ReferrerTransactionDisplay = Pick<
-  ReferrerTransactionSelect,
+  ReferrerTransaction,
   'id' | 'referralName' | 'referralImage' | 'referralAction' | 'amount'
 >
 
