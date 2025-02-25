@@ -34,7 +34,7 @@ export function handleExceptions(
     tooManyRequestsMessage = () => ({
       color: 'red',
       title: 'Слишком много запросов',
-      message: 'Попробуйте через несколько минут',
+      message: 'Попробуйте чуть позже',
     }),
     cloudflareChallengeMessage = () => ({
       color: 'red',

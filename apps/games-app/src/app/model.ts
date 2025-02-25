@@ -61,7 +61,7 @@ sample({
   fn: (query) => query.r,
   filter: (query) => Boolean(query.r),
   target: createEffect((code: string) => {
-    Cookies.set('referralCampaign', code, {
+    Cookies.set('referral_campaign', code, {
       domain: env.domain,
       expires: 365,
     })

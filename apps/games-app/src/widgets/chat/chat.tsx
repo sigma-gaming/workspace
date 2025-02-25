@@ -21,6 +21,7 @@ export const Chat = () => {
   const disabled = !loggedIn
 
   const handleSubmit = () => {
+    if (sendingMessage) return
     submit()
     if (isMobile) textareaRef.current?.blur()
   }

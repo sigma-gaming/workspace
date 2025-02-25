@@ -23,43 +23,29 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 </SocialCallbackLayout>
 
 <script>
-  import { BadRequestException, recreateException } from '@core/exceptions'
-  import { AuthenticateOutcome } from '../../../api/types'
-  import { authApi } from '../../../shared/api/auth'
+  import {
+    AuthenticateOutcome,
+    AuthenticationAction,
+    AuthenticationIntegration,
+    postAuthenticate,
+  } from '../../../shared/api/auth'
 
   class TelegramIntegration extends HTMLElement {
     async connectedCallback() {
       const payload = window.location.hash.split('tgAuthResult=')[1]
-      const integration = 'telegram'
-      const action = this.dataset.action as 'sign-in' | 'connect' | undefined
+      const integration = AuthenticationIntegration.Telegram
+      const action = this.dataset.action as AuthenticationAction
       const returnUrl = this.dataset.returnUrl
       const accessUrl = this.dataset.accessUrl
 
       if (!action || !payload || !returnUrl || !accessUrl) return
 
-      const response = await authApi.authenticate.$post({
-        json: { app: 'sigma', action, integration, payload },
+      const authentication = await postAuthenticate({
+        app: 'sigma',
+        action,
+        integration,
+        payload,
       })
-
-      if (!response.ok) {
-        const json = await response.json()
-        const exception = recreateException(json)
-
-        if (exception instanceof BadRequestException) {
-          const params = new URLSearchParams()
-          params.set('returnUrl', returnUrl)
-          params.set('message', exception.payload.message)
-          const url = `/sigma/errors/system?${params.toString()}`
-          window.location.replace(url)
-          return
-        }
-
-        const url = `/sigma/errors/unknown?returnUrl=${returnUrl}`
-        window.location.replace(url)
-        return
-      }
-
-      const authentication = await response.json()
 
       if (authentication.outcome === AuthenticateOutcome.Connected) {
         window.location.replace(returnUrl)
@@ -68,6 +54,12 @@ const accessUrl = Astro.cookies.get('sigma_accessUrl')?.value
 
       if (authentication.outcome === AuthenticateOutcome.NotAuthenticated) {
         const url = `/sigma/errors/not-authenticated?returnUrl=${returnUrl}`
+        window.location.replace(url)
+        return
+      }
+
+      if (!authentication.code) {
+        const url = `/sigma/errors/unknown?returnUrl=${returnUrl}`
         window.location.replace(url)
         return
       }

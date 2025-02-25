@@ -18,4 +18,16 @@ export const sources = {
     watch: true,
     targets: ['./apps/games-app/src/shared/api/core-ws/generated'],
   },
+  accessApi: {
+    file: './openapi/access-api.json',
+    url: 'https://access.sigma.local:5120/openapi/v1.json',
+    watch: true,
+    targets: ['./apps/games-app/src/shared/api/access/generated'],
+  },
+  letsauthApi: {
+    file: './openapi/letsauth-api.json',
+    url: 'https://api.auth.local:5140/openapi/v1.json',
+    watch: true,
+    targets: ['./apps/letsauth/src/shared/api/auth/generated'],
+  },
 } satisfies Record<string, Source>
