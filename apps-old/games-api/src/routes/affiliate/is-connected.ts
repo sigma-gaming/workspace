@@ -1,9 +1,0 @@
-import { affiliateService, sessionService } from '@games/services'
-import { createRouter } from '../../app/router'
-
-export const isConnectedRoute = createRouter().get('/', async (ctx) => {
-  const { userId } = await sessionService.getHonoSession(ctx)
-  const settings = await affiliateService.getReferrerSettings(userId)
-
-  return ctx.json({ isConnected: Boolean(settings) })
-})
