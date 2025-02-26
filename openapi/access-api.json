@@ -20,7 +20,7 @@
         ],
         "parameters": [
           {
-            "name": "Code",
+            "name": "code",
             "in": "query",
             "required": true,
             "schema": {
@@ -28,7 +28,7 @@
             }
           },
           {
-            "name": "RedirectUrl",
+            "name": "redirectUrl",
             "in": "query",
             "required": true,
             "schema": {
@@ -70,7 +70,7 @@
         ],
         "parameters": [
           {
-            "name": "ReturnUrl",
+            "name": "returnUrl",
             "in": "query",
             "required": true,
             "schema": {
