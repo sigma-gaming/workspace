@@ -1,15 +1,7 @@
 import './setup'
 import { shutdownAll } from '@core/di'
 import { logger } from '@core/logger'
-import {
-  createErrorHandler,
-  createServer,
-  HonoUwsEnv,
-  loggerMiddleware,
-  requestIdMiddleware,
-} from '@core/server'
-import { DomainApp } from '@dbs/games-types-private'
-import { affiliateService, domainService } from '@games/services'
+import { createServer, HonoUwsEnv } from '@core/server'
 import { autoRetry } from '@grammyjs/auto-retry'
 import { emoji, EmojiFlavor } from '@grammyjs/emoji'
 import {
@@ -30,8 +22,11 @@ import { Hono } from 'hono'
 import { TemplatedApp } from 'uWebSockets.js'
 import { internalApp } from './app/internal'
 import { env } from './env'
-
-await domainService.waitForInitialization()
+import {
+  getCampaignsByCodeCode,
+  postCampaignsIdIncrementVisits,
+} from './shared/api/affiliate'
+import { DomainApp, getDomains, getDomainsLatest } from './shared/api/domain'
 
 type BotContext = ParseModeFlavor<EmojiFlavor<Context>>
 
@@ -65,7 +60,7 @@ bot.use(limit({ limit: 3, timeFrame: 2000 }))
 
 async function getStartReferralCampaign(match: string) {
   if (!match) return null
-  const campaign = await affiliateService.getCampaign(match)
+  const campaign = await getCampaignsByCodeCode(match)
   if (!campaign) return null
   return campaign
 }
@@ -74,7 +69,7 @@ bot.command('start', async (ctx) => {
   logger.info('Start command received')
   const campaign = await getStartReferralCampaign(ctx.match)
 
-  const latestDomain = domainService.getLatestDomain(DomainApp.CoreApp)
+  const latestDomain = await getDomainsLatest({ app: DomainApp.CoreApp })
 
   if (!latestDomain) {
     throw new Error('Actual domain not found')
@@ -84,8 +79,7 @@ bot.command('start', async (ctx) => {
 
   if (campaign) {
     url.searchParams.set('r', campaign.code)
-
-    affiliateService.incrementCampaignVisits({ campaignId: campaign.id })
+    postCampaignsIdIncrementVisits(campaign.id)
   }
 
   const keyboard = new InlineKeyboard().url('Перейти на сайт', url.toString())
@@ -102,7 +96,7 @@ bot.command('start', async (ctx) => {
 })
 
 bot.command('domains', async (ctx) => {
-  const domains = domainService.getDomainsByApp(DomainApp.CoreApp)
+  const domains = await getDomains({ app: DomainApp.CoreApp })
 
   const keyboard = new InlineKeyboard(
     domains.map((domain) => [
@@ -148,23 +142,12 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  const app = new Hono<HonoUwsEnv>()
-    .use(requestIdMiddleware)
-    .use(loggerMiddleware)
-    .post(
-      '/',
-      webhookCallback(bot, 'hono', {
-        secretToken: env.telegram.webhookSecretToken,
-      }),
-    )
-    .onError(
-      createErrorHandler({
-        showOriginalError: false,
-        onInternalError: (error) => {
-          logger.error(error)
-        },
-      }),
-    )
+  const app = new Hono<HonoUwsEnv>().post(
+    '/',
+    webhookCallback(bot, 'hono', {
+      secretToken: env.telegram.webhookSecretToken,
+    }),
+  )
 
   server = createServer({
     app,

@@ -30,4 +30,16 @@ export const sources = {
     watch: true,
     targets: ['./apps/letsauth/src/shared/api/auth/generated'],
   },
+  domainApi: {
+    file: './openapi/domain-api.json',
+    url: 'https://domain.sigma.local:5150/openapi/v1.json',
+    watch: true,
+    targets: ['./apps/games-bot/src/shared/api/domain/generated'],
+  },
+  affiliateApi: {
+    file: './openapi/affiliate-api.json',
+    url: 'https://affiliate.sigma.local:5160/openapi/v1.json',
+    watch: true,
+    targets: ['./apps/games-bot/src/shared/api/affiliate/generated'],
+  },
 } satisfies Record<string, Source>

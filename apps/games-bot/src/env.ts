@@ -4,13 +4,10 @@ import { z } from 'zod'
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
-    PAYMENT_API_PORT: z.coerce.number(),
-    PAYMENT_API_INTERNAL_PORT: z.coerce.number(),
+    GAMES_BOT_PORT: z.coerce.number().optional(),
+    GAMES_BOT_INTERNAL_PORT: z.coerce.number(),
 
-    PUBLIC_GAMES_APP_URL: z.string(),
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-    PAYMENT_API_URL: z.string(),
-    PAYMENT_API_VERSION: z.string().default('unknown'),
 
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
@@ -20,17 +17,20 @@ const EnvSchema = z
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
 
-    BOVAPAY_API_URL: z.string(),
-    BOVAPAY_API_KEY: z.string(),
-    BOVAPAY_CALLBACK_URL: z.string(),
+    DOMAIN_API_URL: z.string(),
+    GAMES_BOT_URL: z.string().optional(),
+
+    PUBLIC_TELEGRAM_BOT_ID: z.string(),
+    TELEGRAM_BOT_TOKEN: z.string(),
+    TELEGRAM_WEBHOOK_SECRET_TOKEN: z.string().optional(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
     isProd: raw.NODE_ENV === 'production',
 
     ports: {
-      public: raw.PAYMENT_API_PORT,
-      internal: raw.PAYMENT_API_INTERNAL_PORT,
+      public: raw.GAMES_BOT_PORT,
+      internal: raw.GAMES_BOT_INTERNAL_PORT,
     },
 
     gamesDb: {
@@ -43,23 +43,23 @@ const EnvSchema = z
       password: raw.GAMES_CACHE_PASSWORD,
     },
 
-    gamesApp: {
-      url: raw.PUBLIC_GAMES_APP_URL,
-    },
-
     gamesApi: {
       version: raw.PUBLIC_GAMES_API_VERSION,
     },
 
-    paymentApi: {
-      url: raw.PAYMENT_API_URL,
-      version: raw.PAYMENT_API_VERSION,
+    domainApi: {
+      url: raw.DOMAIN_API_URL,
     },
 
-    bovapay: {
-      apiUrl: raw.BOVAPAY_API_URL,
-      apiKey: raw.BOVAPAY_API_KEY,
-      callbackUrl: raw.BOVAPAY_CALLBACK_URL,
+    gamesBot: {
+      url: raw.GAMES_BOT_URL,
+    },
+
+    telegram: {
+      botId: raw.PUBLIC_TELEGRAM_BOT_ID,
+      botToken: raw.TELEGRAM_BOT_TOKEN,
+      botFullToken: `${raw.PUBLIC_TELEGRAM_BOT_ID}:${raw.TELEGRAM_BOT_TOKEN}`,
+      webhookSecretToken: raw.TELEGRAM_WEBHOOK_SECRET_TOKEN,
     },
   }))
 
