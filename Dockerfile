@@ -2,6 +2,7 @@ FROM imbios/bun-node:1.1.42-20.18-slim AS base
 WORKDIR /workspace
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+ENV COREPACK_INTEGRITY_KEYS=0
 RUN corepack enable
 RUN apt-get update
 RUN apt-get install -y ca-certificates
