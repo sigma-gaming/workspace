@@ -1,6 +1,6 @@
 {
   "name": "@sigma/workspace",
-  "version": "0.0.0-workspace",
+  "version": "0.0.1-workspace",
   "license": "UNLICENSED",
   "private": true,
   "homepage": "https://github.com/sigma-gaming/workspace",
