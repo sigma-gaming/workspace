@@ -13,7 +13,6 @@ const EnvSchema = z
     PUBLIC_CONTROL_APP_URL: z.string(),
     PUBLIC_CONTROL_API_URL: z.string(),
     PUBLIC_CONTROL_API_VERSION: z.string().default('unknown'),
-    JWT_SECRET: z.string(),
 
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
@@ -56,10 +55,6 @@ const EnvSchema = z
     controlApi: {
       url: raw.PUBLIC_CONTROL_API_URL,
       version: raw.PUBLIC_CONTROL_API_VERSION,
-    },
-
-    jwt: {
-      secret: raw.JWT_SECRET,
     },
   }))
 

@@ -7,8 +7,6 @@ const EnvSchema = z
 
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
 
-    JWT_SECRET: z.string(),
-
     GAMES_DB_HOST: z.string(),
     GAMES_DB_PORT: z.string().default('5432'),
     GAMES_DB_DATABASE: z.string().default('postgres'),
@@ -35,10 +33,6 @@ const EnvSchema = z
       host: raw.GAMES_CACHE_HOST,
       password: raw.GAMES_CACHE_PASSWORD,
       port: Number(raw.GAMES_CACHE_PORT),
-    },
-
-    jwt: {
-      secret: raw.JWT_SECRET,
     },
   }))
 

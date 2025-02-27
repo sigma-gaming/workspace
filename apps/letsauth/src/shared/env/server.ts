@@ -11,8 +11,6 @@ const ServerEnvSchema = z
     PUBLIC_AUTH_API_URL: z.string(),
     PUBLIC_AUTH_API_VERSION: z.string().default('unknown'),
 
-    JWT_SECRET: z.string(),
-
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
     GAMES_DB_DATABASE: z.string().default('postgres'),
@@ -50,10 +48,6 @@ const ServerEnvSchema = z
       domain: raw.PUBLIC_AUTH_API_DOMAIN,
       url: raw.PUBLIC_AUTH_API_URL,
       version: raw.PUBLIC_AUTH_API_VERSION,
-    },
-
-    jwt: {
-      secret: raw.JWT_SECRET,
     },
 
     telegram: {

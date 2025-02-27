@@ -24,7 +24,6 @@ type HonoEnvWithSession = {
 
 export type SessionOptions = {
   domain: string
-  jwt: { secret: string }
   cookie?: {
     idKey?: string
     expiresKey?: string

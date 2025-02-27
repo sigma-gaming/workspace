@@ -24,7 +24,6 @@ registerOptions(GamesCacheOptionsToken, {
 })
 
 registerOptions(SessionOptionsToken, {
-  jwt: { secret: serverEnv.jwt.secret },
   cookie: {
     idKey: 'sigma_sessionId',
     expiresKey: 'sigma_sessionExpiresAt',

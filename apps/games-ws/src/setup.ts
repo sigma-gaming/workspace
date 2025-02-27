@@ -23,6 +23,4 @@ registerOptions(GamesCacheOptionsToken, {
   version: env.gamesApi.version,
 })
 
-registerOptions(SessionOptionsToken, {
-  jwt: { secret: env.jwt.secret },
-})
+registerOptions(SessionOptionsToken, {})

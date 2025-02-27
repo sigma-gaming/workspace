@@ -25,7 +25,6 @@ registerOptions(GamesCacheOptionsToken, {
 })
 
 registerOptions(SessionOptionsToken, {
-  jwt: { secret: env.jwt.secret },
   cookie: {
     idKey: 'sessionId',
     expiresKey: 'sessionExpiresAt',

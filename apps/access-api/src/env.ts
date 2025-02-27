@@ -9,8 +9,6 @@ const EnvSchema = z
 
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
 
-    JWT_SECRET: z.string(),
-
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
     GAMES_DB_DATABASE: z.string().default('postgres'),
@@ -41,10 +39,6 @@ const EnvSchema = z
 
     gamesApi: {
       version: raw.PUBLIC_GAMES_API_VERSION,
-    },
-
-    jwt: {
-      secret: raw.JWT_SECRET,
     },
   }))
 

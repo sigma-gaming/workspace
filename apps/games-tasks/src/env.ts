@@ -11,7 +11,6 @@ const EnvSchema = z
     GAMES_TASKS_MODE: z.enum(['server', 'task']).default('server'),
     GAMES_TASKS_JOB: z.string().optional(),
     GAMES_TASKS_VERSION: z.string().default('unknown'),
-    JWT_SECRET: z.string(),
 
     GAMES_DB_HOST: z.string(),
     GAMES_DB_DATABASE: z.string().default('postgres'),
@@ -53,10 +52,6 @@ const EnvSchema = z
       mode: raw.GAMES_TASKS_MODE,
       job: raw.GAMES_TASKS_JOB,
       version: raw.GAMES_TASKS_VERSION,
-    },
-
-    jwt: {
-      secret: raw.JWT_SECRET,
     },
 
     bovapay: {

@@ -13,7 +13,6 @@ const EnvSchema = z
     PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
     PUBLIC_GAMES_WS_URL: z.string(),
     PUBLIC_GAMES_WS_VERSION: z.string().default('unknown'),
-    JWT_SECRET: z.string(),
 
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
@@ -57,10 +56,6 @@ const EnvSchema = z
     gamesWs: {
       url: raw.PUBLIC_GAMES_WS_URL,
       version: raw.PUBLIC_GAMES_WS_VERSION,
-    },
-
-    jwt: {
-      secret: raw.JWT_SECRET,
     },
 
     rateLimit: {

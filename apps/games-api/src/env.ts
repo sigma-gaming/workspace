@@ -23,7 +23,6 @@ const EnvSchema = z
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
 
-    JWT_SECRET: z.string(),
     BYPASS_RATE_LIMIT_TOKEN: z.string().optional(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
@@ -65,10 +64,6 @@ const EnvSchema = z
     gamesApi: {
       url: raw.PUBLIC_GAMES_API_URL,
       version: raw.PUBLIC_GAMES_API_VERSION,
-    },
-
-    jwt: {
-      secret: raw.JWT_SECRET,
     },
 
     rateLimit: {
