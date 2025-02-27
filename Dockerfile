@@ -1,8 +1,7 @@
-FROM imbios/bun-node:1.1.42-20.18-slim AS base
+FROM imbios/bun-node:1.2.3-22.14-slim AS base
 WORKDIR /workspace
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-ENV COREPACK_INTEGRITY_KEYS=0
 RUN corepack enable
 RUN apt-get update
 RUN apt-get install -y ca-certificates
@@ -38,7 +37,7 @@ COPY ./ssl ./ssl
 
 # Apps
 
-FROM node:20.18-alpine AS app-base
+FROM node:22.14-alpine AS app-base
 WORKDIR /app
 ENV NODE_ENV=production
 RUN apk update

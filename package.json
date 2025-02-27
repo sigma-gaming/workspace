@@ -9,7 +9,7 @@
     "url": "https://github.com/sigma-gaming/workspace"
   },
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "scripts": {
     "dev:compose": "docker compose -f ./local-compose/docker-compose.yml",
@@ -144,7 +144,7 @@
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^2.1.8"
   },
-  "packageManager": "pnpm@9.15.2",
+  "packageManager": "pnpm@10.5.2",
   "pnpm": {
     "patchedDependencies": {
       "nx@17.0.2": "patches/nx@17.0.2.patch"
