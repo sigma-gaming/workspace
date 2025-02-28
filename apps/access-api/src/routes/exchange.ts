@@ -39,10 +39,11 @@ export const exchangeRoute = createRouter().get(
 
     const { hostname } = new URL(returnUrl)
     const domain = sessionService.getBaseDomain(ctx)
+    console.log({ hostname, domain })
 
     if (hostname !== domain && !hostname.endsWith('.' + domain)) {
       ctx.status(400)
-      return ctx.text('Некорретный URL возврата')
+      return ctx.text('Некорректный URL возврата')
     }
 
     await gamesCache.sessionCodeToSessionId.del(code)
