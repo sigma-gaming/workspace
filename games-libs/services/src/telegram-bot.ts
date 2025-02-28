@@ -38,9 +38,9 @@ export class TelegramBotService {
   async checkSubscription(userId: number, groupId: number) {
     try {
       const chatMember = await this.bot.api.getChatMember(groupId, userId)
-      this.logger.info({ chatMember }, 'Chat member')
       return this.isSubscribedStatus(chatMember.status)
     } catch (error) {
+      console.log('Error', error)
       if (error instanceof GrammyError && error.error_code === 404) {
         return false
       }

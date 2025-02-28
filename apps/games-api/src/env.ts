@@ -72,6 +72,7 @@ const EnvSchema = z
 
     telegram: {
       botToken: raw.TELEGRAM_BOT_TOKEN,
+      botFullToken: `${raw.PUBLIC_TELEGRAM_BOT_ID}:${raw.TELEGRAM_BOT_TOKEN}`,
     },
 
     vk: {

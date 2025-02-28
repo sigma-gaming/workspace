@@ -4,7 +4,6 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
-    "copy-env": "copy-env",
     "create-env": "node ./scripts/create-env.js",
     "dev": "dotenv -e .env.development pnpm create-env && vite",
     "build": "vite build",

@@ -24,5 +24,5 @@ registerOptions(GamesCacheOptionsToken, {
 })
 
 registerOptions(TelegramBotOptionsToken, {
-  token: env.telegram.botToken,
+  token: env.telegram.botFullToken,
 })

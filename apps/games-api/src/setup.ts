@@ -41,7 +41,7 @@ registerOptions(BovapayOptionsToken, {
 })
 
 registerOptions(TelegramBotOptionsToken, {
-  token: env.telegram.botToken,
+  token: env.telegram.botFullToken,
 })
 
 registerOptions(VkOptionsToken, {

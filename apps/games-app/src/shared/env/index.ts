@@ -47,11 +47,6 @@ const PublicEnvSchema = z
     },
   }))
 
-if (process.env.NODE_ENV === 'development') {
-  // eslint-disable-next-line import-x/no-unresolved
-  await import('/env.js?url')
-}
-
 export const env = parseEnv({
   source: window.PUBLIC_ENV,
   schema: PublicEnvSchema,
