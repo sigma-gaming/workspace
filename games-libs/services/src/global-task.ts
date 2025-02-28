@@ -180,12 +180,14 @@ export class GlobalTaskService {
             .for('update')
 
           const status = statusEntity?.status ?? TaskStatus.Pending
+          this.logger.info({ status }, 'Status')
 
           if (status !== TaskStatus.Pending) {
             return { outcome: GlobalTaskCompleteOutcome.AlreadyCompleted }
           }
 
           const task = await this.getTask(taskKey)
+          this.logger.info({ task }, 'Task')
 
           if (!task) {
             return { outcome: GlobalTaskCompleteOutcome.Failed }
@@ -196,6 +198,7 @@ export class GlobalTaskService {
           }
 
           const check = await checker(userId, task)
+          this.logger.info({ check }, 'Check')
 
           if (!check.completed)
             return {
