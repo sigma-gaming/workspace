@@ -1,4 +1,4 @@
-import { createStatus, handleExceptions } from '@core/client'
+import { $$notifications, createStatus, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import {
   Currency,
@@ -11,8 +11,11 @@ import { CurrencyExchangeRates, gemInt, PaymentConfigLists } from '@games/model'
 import { combine, createEvent, createStore, sample } from 'effector'
 import { and, condition, interval } from 'patronum'
 import { z } from 'zod'
+import { $$audio, Sound } from '../../../entities/audio'
+import { $$balance } from '../../../entities/balance'
 import { createApiEffect } from '../../../shared/api/effects'
 import { gamesApi } from '../../../shared/api/games'
+import { close } from './modal'
 import { destroy, initialize } from './shared'
 
 export type Operation = 'deposit' | 'withdrawal'
@@ -37,6 +40,9 @@ export const withdrawMutation = createMutation({
   name: 'payments/withdraw',
   effect: createApiEffect('json', gamesApi.payments.withdraw.$post),
 })
+
+$$balance.receiveUpdates(depositMutation, (data) => data.balance)
+$$balance.receiveUpdates(withdrawMutation, (data) => data.balance)
 
 handleExceptions(depositMutation)
 handleExceptions(withdrawMutation)
@@ -187,11 +193,9 @@ export const $totalAmount = combine(
 
     const currencyAmount = correctedAmount / exchangeRate
 
-    return Math.round(
-      operation === 'deposit'
-        ? currencyAmount * (1 + commissionRate)
-        : currencyAmount * (1 - commissionRate),
-    )
+    return operation === 'deposit'
+      ? currencyAmount * (1 + commissionRate)
+      : currencyAmount * (1 - commissionRate)
   },
 )
 
@@ -283,6 +287,32 @@ condition({
   if: $operation.map((operation) => operation === 'deposit'),
   then: depositMutation.start,
   else: withdrawMutation.start,
+})
+
+sample({
+  clock: depositMutation.finished.success,
+  target: [
+    $$notifications.show.prepend(() => ({
+      color: 'green',
+      title: 'Баланс обновлен',
+      message: `Деньги зачислены на ваш счёт`,
+    })),
+    $$audio.play.prepend(() => Sound.TopUp),
+    close,
+  ],
+})
+
+sample({
+  clock: withdrawMutation.finished.success,
+  target: [
+    $$notifications.show.prepend(() => ({
+      color: 'green',
+      title: 'Баланс обновлен',
+      message: `Деньги успешно выведены`,
+    })),
+    $$audio.play.prepend(() => Sound.Withdraw),
+    close,
+  ],
 })
 
 sample({

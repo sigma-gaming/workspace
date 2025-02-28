@@ -1,9 +1,24 @@
-import { BadRequestException, InternalServerException } from '@core/exceptions'
 import { tbValidator, TypeboxError } from '@core/server'
-import { Currency, DepositMethod, PaymentProvider } from '@dbs/games-types'
-import { gemInt } from '@games/model'
-import { PaymentOutcome, paymentService, sessionService } from '@games/services'
+import { takeFirstOrThrow } from '@core/utils'
+import { BalanceTable } from '@dbs/games-schema'
+import {
+  Currency,
+  DepositMethod,
+  PaymentProvider,
+  ReferralAction,
+  TransactionType,
+} from '@dbs/games-types'
+import { BalanceUpdate, gemInt, UpdateMode } from '@games/model'
+import {
+  affiliateService,
+  balanceService,
+  gamesCache,
+  gamesDb,
+  gamesPubsubs,
+  sessionService,
+} from '@games/services'
 import { Type } from '@sinclair/typebox'
+import { eq } from 'drizzle-orm'
 import { createRouter } from '../../app/router'
 import { limitByIp } from '../../middlewares/rate-limit'
 
@@ -34,65 +49,62 @@ export const depositRoute = createRouter().post(
     },
   }),
   async (ctx) => {
-    const { userId } = await sessionService.getHonoSession(ctx)
-    const { gemAmount, provider, method, currency } = ctx.req.valid('json')
-    const host = ctx.req.header('x-forwarded-host') ?? ctx.req.header('host')
+    const { userId, referrerId, referralCampaignId } =
+      await sessionService.getHonoSession(ctx)
+    const { gemAmount } = ctx.req.valid('json')
 
-    if (!host) {
-      throw new InternalServerException()
-    }
+    const updatedBalance = await gamesDb.transaction(async (tx) => {
+      const balance = await tx
+        .select()
+        .from(BalanceTable)
+        .where(eq(BalanceTable.userId, userId))
+        .for('update')
+        .then(takeFirstOrThrow)
 
-    const redirectUrl = `https://${host}`
+      const transaction = await balanceService.createTransaction({
+        tx,
+        payload: {
+          userId,
+          type: TransactionType.Deposit,
+          amount: gemAmount,
+        },
+      })
 
-    const result = await paymentService.createDeposit({
-      userId,
-      gemAmount,
-      provider,
-      method,
-      currency,
-      redirectUrl,
-      userIp: ctx.env.ip,
+      const updatedBalance = await balanceService.updateBalance({
+        tx,
+        balance,
+        transaction,
+        wageringChange: Math.ceil(gemAmount * 0.5),
+      })
+
+      await affiliateService.processReferralTransaction({
+        tx,
+        referralId: userId,
+        referrerId,
+        referralCampaignId,
+        referralAction: ReferralAction.Deposit,
+        amount: gemAmount,
+      })
+
+      await gamesCache.balance.set(userId, updatedBalance)
+
+      return updatedBalance
     })
 
-    switch (result.outcome) {
-      case PaymentOutcome.Success:
-        return ctx.json({
-          id: result.deposit.id,
-          method: result.deposit.method,
-          provider: result.deposit.provider,
-          currency: result.deposit.currency,
-          payload: result.deposit.payload,
-        })
-
-      case PaymentOutcome.InvalidAmount:
-        throw new BadRequestException({
-          path: ['amount'],
-          message: 'Недопустимая сумма',
-        })
-
-      case PaymentOutcome.UnsupportedMethod:
-        throw new BadRequestException({
-          path: ['method'],
-          message: `Этот метод оплаты не поддерживается`,
-        })
-
-      case PaymentOutcome.UnsupportedCurrency:
-        throw new BadRequestException({
-          path: ['currency'],
-          message: `Метод оплаты не поддерживает данную валюту`,
-        })
-
-      case PaymentOutcome.ProviderError:
-        throw new BadRequestException({
-          message: `Произошла ошибка на стороне провайдера`,
-        })
-
-      case PaymentOutcome.Failed:
-      default:
-        throw new BadRequestException({
-          path: ['payment'],
-          message: result.error || 'Не удалось произвести пополнение',
-        })
+    const update: BalanceUpdate = {
+      time: Date.now(),
+      mode: UpdateMode.Optimized,
+      available: updatedBalance.available,
     }
+
+    gamesPubsubs.balanceUpdated.publish({
+      userId,
+      update,
+    })
+
+    return ctx.json({
+      status: 'success',
+      balance: update,
+    })
   },
 )

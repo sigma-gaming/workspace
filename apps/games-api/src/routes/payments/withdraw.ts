@@ -1,9 +1,31 @@
 import { BadRequestException } from '@core/exceptions'
 import { tbValidator, TypeboxError } from '@core/server'
-import { Currency, PaymentProvider, WithdrawalMethod } from '@dbs/games-types'
-import { gemInt } from '@games/model'
-import { PaymentOutcome, paymentService, sessionService } from '@games/services'
+import { takeFirstOrThrow } from '@core/utils'
+import { BalanceTable } from '@dbs/games-schema'
+import {
+  Currency,
+  PaymentProvider,
+  ReferralAction,
+  TransactionType,
+  WithdrawalMethod,
+} from '@dbs/games-types'
+import {
+  BalanceUpdate,
+  formatGem,
+  gemFloat,
+  gemInt,
+  UpdateMode,
+} from '@games/model'
+import {
+  affiliateService,
+  balanceService,
+  gamesCache,
+  gamesDb,
+  gamesPubsubs,
+  sessionService,
+} from '@games/services'
 import { Type } from '@sinclair/typebox'
+import { eq } from 'drizzle-orm'
 import { createRouter } from '../../app/router'
 import { limitByIp } from '../../middlewares/rate-limit'
 
@@ -34,62 +56,73 @@ export const withdrawRoute = createRouter().post(
     },
   }),
   async (ctx) => {
-    const { userId } = await sessionService.getHonoSession(ctx)
-    const { gemAmount, provider, method, currency } = ctx.req.valid('json')
+    const { userId, referrerId, referralCampaignId } =
+      await sessionService.getHonoSession(ctx)
+    const { gemAmount } = ctx.req.valid('json')
 
-    const result = await paymentService.createWithdrawal({
-      userId,
-      gemAmount,
-      provider,
-      method,
-      currency,
-      userIp: ctx.env.ip,
+    const updatedBalance = await gamesDb.transaction(async (tx) => {
+      const balance = await tx
+        .select()
+        .from(BalanceTable)
+        .where(eq(BalanceTable.userId, userId))
+        .for('update')
+        .then(takeFirstOrThrow)
+
+      if (balance.available < gemAmount) {
+        throw new BadRequestException({
+          message: 'Недостаточно гемов',
+        })
+      }
+
+      if (balance.wageringRequired > 0) {
+        throw new BadRequestException({
+          message: `Нужно отыграть еще ${formatGem(gemFloat(balance.wageringRequired))}g`,
+        })
+      }
+
+      const transaction = await balanceService.createTransaction({
+        tx,
+        payload: {
+          userId,
+          type: TransactionType.Withdrawal,
+          amount: -gemAmount,
+        },
+      })
+
+      const updatedBalance = await balanceService.updateBalance({
+        tx,
+        balance,
+        transaction,
+      })
+
+      await affiliateService.processReferralTransaction({
+        tx,
+        referralId: userId,
+        referrerId,
+        referralCampaignId,
+        referralAction: ReferralAction.Withdrawal,
+        amount: -gemAmount,
+      })
+
+      await gamesCache.balance.set(userId, updatedBalance)
+
+      return updatedBalance
     })
 
-    switch (result.outcome) {
-      case PaymentOutcome.Success:
-        return ctx.json({
-          id: result.withdrawal.id,
-          method: result.withdrawal.method,
-          provider: result.withdrawal.provider,
-          currency: result.withdrawal.currency,
-          status: result.withdrawal.status,
-        })
-
-      case PaymentOutcome.InsufficientFunds:
-        throw new BadRequestException({
-          path: ['amount'],
-          message: `Недостаточно средств`,
-        })
-
-      case PaymentOutcome.InvalidAmount:
-        throw new BadRequestException({
-          path: ['amount'],
-          message: 'Недопустимая сумма',
-        })
-
-      case PaymentOutcome.UnsupportedMethod:
-        throw new BadRequestException({
-          path: ['method'],
-          message: `Этот метод оплаты не поддерживается`,
-        })
-
-      case PaymentOutcome.UnsupportedCurrency:
-        throw new BadRequestException({
-          path: ['currency'],
-          message: `Метод оплаты не поддерживает данную валюту`,
-        })
-
-      case PaymentOutcome.ProviderError:
-        throw new BadRequestException({
-          message: `Произошла ошибка на стороне провайдера`,
-        })
-
-      case PaymentOutcome.Failed:
-      default:
-        throw new BadRequestException({
-          message: 'Не удалось произвести вывод',
-        })
+    const update: BalanceUpdate = {
+      time: Date.now(),
+      mode: UpdateMode.Optimized,
+      available: updatedBalance.available,
     }
+
+    gamesPubsubs.balanceUpdated.publish({
+      userId,
+      update,
+    })
+
+    return ctx.json({
+      status: 'success',
+      balance: update,
+    })
   },
 )
