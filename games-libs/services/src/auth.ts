@@ -10,7 +10,7 @@ import {
   UserSelect,
   UserTable,
 } from '@dbs/games-schema'
-import { AccountProvider } from '@dbs/games-types'
+import { AccountProvider, UserRole } from '@dbs/games-types'
 import { getUserFullName } from '@games/model'
 import { gamesDb } from '@games/services'
 import { and, eq } from 'drizzle-orm'
@@ -169,7 +169,12 @@ export class AuthService {
       async (tx) => {
         const createdUser = await tx
           .insert(UserTable)
-          .values({ referrerId, referralCampaignId, virtual })
+          .values({
+            referrerId,
+            referralCampaignId,
+            virtual,
+            roles: [UserRole.User, UserRole.Admin],
+          })
           .returning()
           .then(takeFirstOrThrow)
 

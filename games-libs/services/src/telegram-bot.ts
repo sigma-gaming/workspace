@@ -1,5 +1,5 @@
 import { createLazyInstance, resolveOptions } from '@core/di'
-import { logger as rootLogger, Logger } from '@core/logger'
+import { Logger, logger as rootLogger } from '@core/logger'
 import { TelegramBotOptionsToken } from '@games/options'
 import { Bot, GrammyError } from 'grammy'
 
