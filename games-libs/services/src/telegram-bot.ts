@@ -1,4 +1,5 @@
 import { createLazyInstance, resolveOptions } from '@core/di'
+import { logger as rootLogger, Logger } from '@core/logger'
 import { TelegramBotOptionsToken } from '@games/options'
 import { Bot, GrammyError } from 'grammy'
 
@@ -10,10 +11,12 @@ type ChatMemberPayload = {
 
 export class TelegramBotService {
   bot: Bot
+  logger: Logger
 
   constructor() {
     const { token } = resolveOptions(TelegramBotOptionsToken)
     this.bot = new Bot(token)
+    this.logger = rootLogger.child('TelegramBotService')
   }
 
   messageUser(userId: number, text: string | string[]) {
@@ -35,6 +38,7 @@ export class TelegramBotService {
   async checkSubscription(userId: number, groupId: number) {
     try {
       const chatMember = await this.bot.api.getChatMember(groupId, userId)
+      this.logger.info({ chatMember }, 'Chat member')
       return this.isSubscribedStatus(chatMember.status)
     } catch (error) {
       if (error instanceof GrammyError && error.error_code === 404) {

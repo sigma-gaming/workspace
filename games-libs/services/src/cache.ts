@@ -94,7 +94,7 @@ export class GamesCacheRegistry {
     this.detailedProfile = new KeyJsonEntityService<ProfileDetailed>({
       redis,
       redlock,
-      keygen: (token: string) => `${version}:detailedProfile:${token}`,
+      keygen: (userId: string) => `${version}:detailedProfile:${userId}`,
     })
 
     this.user = new KeyJsonEntityService<UserSelect>({
