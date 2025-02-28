@@ -32,6 +32,9 @@
       "@tooling/env/client": [
         "tooling/env/src/client.ts"
       ],
+      "@tooling/env-vite-plugin": [
+        "tooling/env-vite-plugin/src/index.ts"
+      ],
       "@apis/access-api": [
         "apps/access-api/src/client.ts"
       ],

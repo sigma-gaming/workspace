@@ -21,6 +21,7 @@
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",
     "@tooling/env": "workspace:*",
+    "@tooling/env-vite-plugin": "workspace:*",
     "@core/io-client": "workspace:*"
   },
   "devDependencies": {

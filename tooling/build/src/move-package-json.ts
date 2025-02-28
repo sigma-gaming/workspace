@@ -1,7 +1,7 @@
 import commonPathPrefix from 'common-path-prefix'
-import { execa } from 'execa'
 import fs from 'node:fs'
 import path from 'node:path'
+import { $ } from 'zx'
 
 type Options = {
   outputDir: string
@@ -79,6 +79,6 @@ export async function movePackageJson({
 
   if (updatedFields.length > 0) {
     const args = ['pkg', 'set', '--json', ...updatedFields]
-    await execa('npm', args, { cwd: outputDir })
+    await $`npm ${args} --prefix ${outputDir}`
   }
 }
