@@ -6,6 +6,15 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 const monorepo = (end: string) => path.resolve(__dirname, '../..', end)
 
+const ENV = Object.entries(process.env).reduce<Record<string, string>>(
+  (acc, [key, value]) => {
+    if (!key.startsWith('PUBLIC_')) return acc
+    acc[key] = value ?? ''
+    return acc
+  },
+  {},
+)
+
 // https://vitejs.dev/config/
 // eslint-disable-next-line import-x/no-default-export
 export default defineConfig({
@@ -23,6 +32,16 @@ export default defineConfig({
       babel: { babelrc: true },
     }),
     tsconfigPaths(),
+    // {
+    //   name: 'inject-env',
+    //   transformIndexHtml(html) {
+    //     console.log(html)
+    //     return html.replace(
+    //       '<!-- public-env -->',
+    //       `<script type="module">window.PUBLIC_ENV = ${JSON.stringify(ENV)}</script>`,
+    //     )
+    //   },
+    // },
   ],
   build: {
     rollupOptions: {
