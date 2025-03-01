@@ -424,6 +424,9 @@ importers:
 
   tooling/env-vite-plugin:
     dependencies:
+      '@tooling/build':
+        specifier: workspace:*
+        version: link:../build
       '@tooling/env':
         specifier: workspace:*
         version: link:../env
