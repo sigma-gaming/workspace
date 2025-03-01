@@ -12,6 +12,7 @@ ENV NX_DAEMON=true
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
 COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY ./patches ./patches
+COPY ./ssl ./ssl
 COPY package.json ./package.json
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
 COPY ./tooling ./tooling
@@ -21,7 +22,10 @@ COPY ./apps ./apps
 COPY ./testing ./testing
 COPY nx.json ./nx.json
 COPY tsconfig.base.json ./tsconfig.base.json
-COPY ./ssl ./ssl
+COPY orval.config.ts ./orval.config.ts
+COPY orval.download.ts ./orval.download.ts
+COPY orval.sources.ts ./orval.sources.ts
+COPY orval.watch.ts ./orval.watch.ts
 
 # Apps
 
