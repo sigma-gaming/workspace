@@ -21,12 +21,12 @@
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
-    "common-path-prefix": "^3.0.0",
+    "common-path-prefix": "3.0.0",
     "zx": "8.3.2",
-    "fs-extra": "^11.1.1",
-    "rollup": "^4.5.2",
-    "rollup-plugin-dts": "^6.1.0",
-    "rollup-plugin-esbuild": "^6.1.0"
+    "fs-extra": "11.3.0",
+    "rollup": "4.34.9",
+    "rollup-plugin-dts": "6.1.1",
+    "rollup-plugin-esbuild": "6.2.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4"

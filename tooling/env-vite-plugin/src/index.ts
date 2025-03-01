@@ -14,5 +14,5 @@ export function publicEnvPlugin(root: string): Plugin {
         `<script type="module">window.PUBLIC_ENV = ${JSON.stringify(publicEnv)}</script>`,
       )
     },
-  }
+  } as Plugin // fix mad issue from dts plugin
 }
