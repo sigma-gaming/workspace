@@ -485,7 +485,7 @@ const NotConnectedContent = () => {
       <Overlay
         blur={3}
         color="var(--mantine-color-body)"
-        className="flex flex-col items-center md:justify-center px-4 py-24 rounded-lg"
+        className="flex flex-col items-center md:justify-center lg:justify-start xl:justify-center px-4 py-24 rounded-lg"
       >
         <div className="text-center">
           <p className="max-w-[360px]">

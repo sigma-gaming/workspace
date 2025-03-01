@@ -26,7 +26,7 @@ import { DomainApp, getDomains, getDomainsLatest } from './shared/api/domain'
 
 type BotContext = ParseModeFlavor<EmojiFlavor<Context>>
 
-const bot = new Bot<BotContext>(env.telegram.botFullToken)
+const bot = new Bot<BotContext>(env.telegram.botToken)
 
 bot.api.config.use(async (prev, method, payload, signal) => {
   try {

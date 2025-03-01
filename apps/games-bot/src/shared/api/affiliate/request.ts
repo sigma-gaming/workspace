@@ -18,7 +18,7 @@ export async function request<TData>(
     body?: BodyInit | null
   },
 ): Promise<TData> {
-  const requestUrl = new URL(url, env.domainApi.url)
+  const requestUrl = new URL(url, env.affiliateApi.url)
 
   for (const key in params) {
     if (params[key] != null) {

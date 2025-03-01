@@ -1,4 +1,4 @@
-import { handleExceptions } from '@core/client'
+import { $$notifications, handleExceptions } from '@core/client'
 import { createMutation } from '@farfetched/core'
 import { createEvent, createStore, sample } from 'effector'
 import { status } from 'patronum'
@@ -18,6 +18,8 @@ const connectMutation = createMutation({
   name: 'affiliate/connect',
   effect: createApiEffect(postAffiliateConnect),
 })
+
+handleExceptions(connectMutation)
 
 const $isConnected = createStore(false)
   .on(isConnectedFx.doneData, (_, isConnected) => isConnected)
@@ -39,7 +41,14 @@ sample({
   target: connectMutation.start,
 })
 
-handleExceptions(connectMutation)
+sample({
+  clock: connectMutation.finished.success,
+  target: $$notifications.show.prepend(() => ({
+    color: 'green',
+    title: 'Поздравляем!',
+    message: 'Вы успешно подключены к партнерской программе',
+  })),
+})
 
 export const $$affiliate = {
   request,

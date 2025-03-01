@@ -5,11 +5,8 @@ const ServerEnvSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
 
-    PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-
-    PUBLIC_AUTH_API_DOMAIN: z.string(),
+    PUBLIC_AUTH_APP_URL: z.string(),
     PUBLIC_AUTH_API_URL: z.string(),
-    PUBLIC_AUTH_API_VERSION: z.string().default('unknown'),
 
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
@@ -21,10 +18,8 @@ const ServerEnvSchema = z
     GAMES_CACHE_PASSWORD: z.string(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
-    TELEGRAM_BOT_TOKEN: z.string(),
 
     PUBLIC_VK_APP_ID: z.string(),
-    VK_SERVICE_TOKEN: z.string(),
   })
   .transform((raw) => ({
     isDev: raw.NODE_ENV === 'development',
@@ -40,25 +35,20 @@ const ServerEnvSchema = z
       password: raw.GAMES_CACHE_PASSWORD,
     },
 
-    gamesApi: {
-      version: raw.PUBLIC_GAMES_API_VERSION,
+    authApp: {
+      url: raw.PUBLIC_AUTH_APP_URL,
     },
 
     authApi: {
-      domain: raw.PUBLIC_AUTH_API_DOMAIN,
       url: raw.PUBLIC_AUTH_API_URL,
-      version: raw.PUBLIC_AUTH_API_VERSION,
     },
 
     telegram: {
       botId: raw.PUBLIC_TELEGRAM_BOT_ID,
-      botToken: raw.TELEGRAM_BOT_TOKEN,
-      botFullToken: `${raw.PUBLIC_TELEGRAM_BOT_ID}:${raw.TELEGRAM_BOT_TOKEN}`,
     },
 
     vk: {
       appId: raw.PUBLIC_VK_APP_ID,
-      serviceToken: raw.VK_SERVICE_TOKEN,
     },
   }))
 

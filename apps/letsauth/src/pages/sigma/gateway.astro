@@ -10,10 +10,10 @@ export const prerender = false
 export function createTelegramUrl() {
   const params = new URLSearchParams()
   params.set('bot_id', serverEnv.telegram.botId)
-  params.set('origin', serverEnv.authApi.url)
+  params.set('origin', serverEnv.authApp.url)
   params.set('embed', '0')
   params.set('request_access', 'write')
-  const returnTo = `${serverEnv.authApi.url}/sigma/integrations/telegram`
+  const returnTo = `${serverEnv.authApp.url}/sigma/integrations/telegram`
   params.set('return_to', returnTo)
   return `https://oauth.telegram.org/auth?${params.toString()}`
 }
@@ -23,7 +23,7 @@ export function createVkUrl() {
   params.set('uuid', v4())
   params.set('app_id', serverEnv.vk.appId)
   params.set('response_type', 'silent_token')
-  params.set('redirect_uri', `${serverEnv.authApi.url}/sigma/integrations/vk`)
+  params.set('redirect_uri', `${serverEnv.authApp.url}/sigma/integrations/vk`)
   return `https://id.vk.com/auth?${params.toString()}`
 }
 

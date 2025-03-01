@@ -31,7 +31,7 @@ export function createSignInUrl(
   params.set('returnUrl', location.href)
   const referralCampaign = Cookies.get('referralCampaign')
   if (referralCampaign) params.set('referralCampaign', referralCampaign)
-  return `${env.authApi.url}/sigma/gateway?${params.toString()}`
+  return `${env.authApp.url}/sigma/gateway?${params.toString()}`
 }
 
 export function createLogoutUrl() {

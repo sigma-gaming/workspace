@@ -7,8 +7,6 @@ const EnvSchema = z
     GAMES_BOT_PORT: z.coerce.number().optional(),
     GAMES_BOT_INTERNAL_PORT: z.coerce.number(),
 
-    PUBLIC_GAMES_API_VERSION: z.string().default('unknown'),
-
     GAMES_DB_HOST: z.string(),
     GAMES_DB_HEALTH_HOST: z.string(),
     GAMES_DB_DATABASE: z.string().default('postgres'),
@@ -18,6 +16,7 @@ const EnvSchema = z
     GAMES_CACHE_PASSWORD: z.string(),
 
     DOMAIN_API_URL: z.string(),
+    AFFILIATE_API_URL: z.string(),
     GAMES_BOT_URL: z.string().optional(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
@@ -43,12 +42,12 @@ const EnvSchema = z
       password: raw.GAMES_CACHE_PASSWORD,
     },
 
-    gamesApi: {
-      version: raw.PUBLIC_GAMES_API_VERSION,
-    },
-
     domainApi: {
       url: raw.DOMAIN_API_URL,
+    },
+
+    affiliateApi: {
+      url: raw.AFFILIATE_API_URL,
     },
 
     gamesBot: {
@@ -58,7 +57,6 @@ const EnvSchema = z
     telegram: {
       botId: raw.PUBLIC_TELEGRAM_BOT_ID,
       botToken: raw.TELEGRAM_BOT_TOKEN,
-      botFullToken: `${raw.PUBLIC_TELEGRAM_BOT_ID}:${raw.TELEGRAM_BOT_TOKEN}`,
       webhookSecretToken: raw.TELEGRAM_WEBHOOK_SECRET_TOKEN,
     },
   }))

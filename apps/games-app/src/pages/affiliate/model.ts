@@ -42,6 +42,8 @@ const withdrawMutation = createMutation({
   effect: createApiEffect(postAffiliateWithdraw),
 })
 
+handleExceptions(withdrawMutation)
+
 $$balance.receiveUpdates(withdrawMutation, ({ balance }) => balance)
 
 const $settings = getSettingsQuery.$data
@@ -128,8 +130,6 @@ sample({
   clock: reset,
   target: [getSettingsQuery.reset, getCampaignsQuery.reset],
 })
-
-handleExceptions(withdrawMutation)
 
 export const $$affiliatePage = {
   withdraw,
