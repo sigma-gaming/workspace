@@ -1,12 +1,7 @@
 import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { createMutation } from '@farfetched/core'
-import {
-  calculateDiceFullWinAmount,
-  clampBet,
-  gemFloat,
-  gemInt,
-} from '@games/model'
+import { clampBet, gemFloat, gemInt } from '@games/model'
 import type { Rive } from '@rive-app/react-canvas'
 import { attach, combine, createEvent, createStore, sample } from 'effector'
 import { and, combineEvents, condition, delay, not } from 'patronum'
@@ -22,6 +17,7 @@ import {
   postGamesPlayDice,
 } from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
+import { calculateDiceFullWinAmount } from './lib/config'
 
 const playGameMutation = createMutation({
   name: 'games/dice/play',
