@@ -45,8 +45,8 @@ ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-app
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
 RUN pnpm install --frozen-lockfile && \
-  pnpm nx run @apps/games-app:build && \
   pnpm openapi:generate && \
+  pnpm nx run @apps/games-app:build && \
   pnpm sentry-cli releases new -p games-app ${sentry_release} && \
   pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist && \
   pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
