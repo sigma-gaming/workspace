@@ -26,6 +26,7 @@ COPY orval.config.ts ./orval.config.ts
 COPY orval.download.ts ./orval.download.ts
 COPY orval.sources.ts ./orval.sources.ts
 COPY orval.watch.ts ./orval.watch.ts
+COPY ./openapi ./openapi
 
 # Apps
 
