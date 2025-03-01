@@ -1,5 +1,4 @@
 import { Avatar, WithError } from '@core/ui'
-import { AccountProvider } from '@dbs/games-types'
 import { getUserFullName, getUserInitials } from '@games/model'
 import {
   Anchor,
@@ -25,6 +24,8 @@ import {
   VkButton,
 } from '../../entities/provider'
 import { $$user } from '../../entities/user'
+import { AuthenticationAction } from '../../shared/api/access/index.ts'
+import { AccountProvider } from '../../shared/api/core'
 import { $$settingsPage } from './model.ts'
 
 export const SettingsPageView = () => {
@@ -90,9 +91,9 @@ const Profile = () => {
           description="Из какой социальной сети брать информацию для профиля"
           data={accounts.map((account) => ({
             label: ProviderInfoMap[account.provider].label,
-            value: account.provider,
+            value: String(account.provider),
           }))}
-          value={provider}
+          value={provider ? String(provider) : null}
           onChange={(value) => updateProvider(value as AccountProvider | null)}
           allowDeselect={false}
           error={errors.provider[0]}
@@ -131,7 +132,7 @@ const SocialNetworks = () => {
   const accounts = useUnit($$profile.$accounts)
 
   const vkAccount = accounts.find(
-    (account) => account.provider === AccountProvider.VK,
+    (account) => account.provider === AccountProvider.Vk,
   )
 
   const telegramAccount = accounts.find(
@@ -226,12 +227,20 @@ const SocialNetworks = () => {
       {loaded && !hasAllAccounts && (
         <div className="flex flex-col sm:flex-row gap-4">
           {!vkAccount && (
-            <VkButton action="connect" size="sm" fullWidth={true}>
+            <VkButton
+              action={AuthenticationAction.Connect}
+              size="sm"
+              fullWidth={true}
+            >
               Привязать VK ID
             </VkButton>
           )}
           {!telegramAccount && (
-            <TelegramButton action="connect" size="sm" fullWidth={true}>
+            <TelegramButton
+              action={AuthenticationAction.Connect}
+              size="sm"
+              fullWidth={true}
+            >
               Привязать Telegram
             </TelegramButton>
           )}

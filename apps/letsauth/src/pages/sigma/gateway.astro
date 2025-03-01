@@ -2,6 +2,7 @@
 import { v4 } from 'uuid'
 import { z } from 'zod'
 import BaseLayout from '../../layouts/base-layout.astro'
+import { AuthenticationAction } from '../../shared/api/auth'
 import { serverEnv } from '../../shared/env/server'
 
 export const prerender = false
@@ -30,7 +31,7 @@ class InvalidQueryException extends Error {}
 
 const QuerySchema = z.strictObject({
   integration: z.enum(['vk', 'telegram']),
-  action: z.enum(['sign-in', 'connect']),
+  action: z.nativeEnum(AuthenticationAction),
   accessUrl: z.string(),
   returnUrl: z.string(),
   referralCampaign: z.string().optional(),

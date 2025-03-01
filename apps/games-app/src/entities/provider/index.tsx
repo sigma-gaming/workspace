@@ -1,6 +1,7 @@
 import { Icons, LinkButton, LinkButtonProps } from '@core/ui'
-import { AccountProvider } from '@dbs/games-types'
 import Cookies from 'js-cookie'
+import { AuthenticationAction } from '../../shared/api/access'
+import { AccountProvider } from '../../shared/api/core'
 import { env } from '../../shared/env'
 
 type ProviderInfo = {
@@ -9,7 +10,7 @@ type ProviderInfo = {
 }
 
 export const ProviderInfoMap: Record<AccountProvider, ProviderInfo> = {
-  [AccountProvider.VK]: {
+  [AccountProvider.Vk]: {
     label: 'ВКонтакте',
     profileUrl: 'https://vk.com/{{id}}',
   },
@@ -21,7 +22,7 @@ export const ProviderInfoMap: Record<AccountProvider, ProviderInfo> = {
 
 export function createSignInUrl(
   integration: 'vk' | 'telegram',
-  action: 'sign-in' | 'connect',
+  action: AuthenticationAction,
 ) {
   const params = new URLSearchParams()
   params.set('action', action)
@@ -40,7 +41,7 @@ export function createLogoutUrl() {
 }
 
 type SocialButtonProps = Partial<LinkButtonProps> & {
-  action: 'sign-in' | 'connect'
+  action: AuthenticationAction
 }
 
 export const VkButton = ({

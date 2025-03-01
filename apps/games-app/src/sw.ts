@@ -156,47 +156,45 @@ function main() {
         if (domainsResponse.ok) {
           console.info('Domain response is ok, parsing data')
 
-          const domains = await domainsResponse.json()
+          const hosts: string[] = await domainsResponse.json()
 
-          if (!Array.isArray(domains)) {
-            console.info(domains)
+          if (!Array.isArray(hosts)) {
+            console.info(hosts)
 
             throw new TypeError(
-              `Invalid domains response. Expected array, got: ${typeof domains}`,
+              `Invalid domains response. Expected array, got: ${typeof hosts}`,
             )
           }
 
-          const { host, pathname, search } = new URL(event.request.url)
+          const {
+            host: currentHost,
+            pathname,
+            search,
+          } = new URL(event.request.url)
 
-          console.info('Current host:', host)
-          console.info('Actual domains:', domains)
+          console.info('Current host:', currentHost)
+          console.info('Actual hosts:', hosts)
 
-          for (const domain of domains) {
-            console.info('Checking domain:', domain)
+          for (const host of hosts) {
+            console.info('Checking host:', host)
 
-            if (!domain?.host) {
-              console.info('Domain does not contain host')
-              continue
-            }
-
-            if (domain.host === host) {
+            if (currentHost === host) {
               console.info('Host matches, skipping')
               continue
             }
 
             const response = await fetchWithTimeout(
-              new Request(`https://${domain.host}`),
+              new Request(`https://${host}`),
               2500,
             )
 
             if (response.ok) {
-              console.info('Domain is available, redirecting..')
+              console.info('Host is available, redirecting..')
 
-              const url = new URL(`https://${domain.host}${pathname}${search}`)
+              const url = new URL(`https://${host}${pathname}${search}`)
               url.searchParams.set('new', 'true')
 
               console.info('Redirect url:', url.toString())
-
               return Response.redirect(url, 302)
             }
           }

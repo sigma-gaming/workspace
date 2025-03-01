@@ -136,7 +136,7 @@ export function createConfig(options: {
   }
 
   return {
-    content: ['../../core/ui/**/*.{ts,tsx}', ...options.content],
+    content: ['../../core/ui/src/**/*.{ts,tsx}', ...options.content],
     plugins,
     theme,
   }

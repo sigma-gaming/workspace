@@ -35,59 +35,17 @@
       "@tooling/env-vite-plugin": [
         "tooling/env-vite-plugin/src/index.ts"
       ],
-      "@apis/access-api": [
-        "apps/access-api/src/client.ts"
-      ],
-      "@apis/games-api": [
-        "apps/games-api/src/client.ts"
-      ],
-      "@apis/games-ws": [
-        "apps/games-ws/src/client.ts"
-      ],
       "@apis/control-api": [
         "apps/control-api/src/client.ts"
       ],
       "@apis/letsauth": [
         "apps/letsauth/src/client.ts"
       ],
-      "@core/server": [
-        "core/server/src/index.ts"
-      ],
       "@core/exceptions": [
         "core/exceptions/src/index.ts"
       ],
-      "@dbs/games-db": [
-        "dbs/games-db/src/index.ts"
-      ],
-      "@dbs/games-schema": [
-        "dbs/games-schema/src/index.ts"
-      ],
-      "@dbs/games-types": [
-        "dbs/games-types/src/index.ts"
-      ],
-      "@dbs/games-types-private": [
-        "dbs/games-types-private/src/index.ts"
-      ],
       "@games/model": [
         "games-libs/model/src/index.ts"
-      ],
-      "@games/options": [
-        "games-libs/options/src/index.ts"
-      ],
-      "@games/services": [
-        "games-libs/services/src/index.ts"
-      ],
-      "@games/redis": [
-        "games-libs/redis/src/index.ts"
-      ],
-      "@games/engine": [
-        "games-libs/engine/src/index.ts"
-      ],
-      "@core/logger": [
-        "core/logger/src/index.ts"
-      ],
-      "@core/cron-jobs": [
-        "core/cron-jobs/src/index.ts"
       ],
       "@core/forms": [
         "core/forms/src/index.ts"
@@ -98,17 +56,8 @@
       "@core/ui/tailwind": [
         "core/ui/src/tailwind.ts"
       ],
-      "@core/di": [
-        "core/di/src/index.ts"
-      ],
       "@core/client": [
         "core/client/src/index.ts"
-      ],
-      "@core/io-client": [
-        "core/io-client/src/index.ts"
-      ],
-      "@core/flow": [
-        "core/flow/src/index.ts"
       ],
       "@core/utils": [
         "core/utils/src/index.ts"

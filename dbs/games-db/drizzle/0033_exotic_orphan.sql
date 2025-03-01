@@ -1,2 +1,0 @@
-CREATE INDEX IF NOT EXISTS "UserSecurity_lastIP_index" ON "UserSecurity" USING btree ("lastIP");--> statement-breakpoint
-ALTER TABLE "UserSecurity" ADD CONSTRAINT "UserSecurity_userId_unique" UNIQUE("userId");

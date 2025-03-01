@@ -1,24 +1,10 @@
 import { useMedia } from '@core/ui'
-import { Button, Modal } from '@mantine/core'
+import { Modal } from '@mantine/core'
 import { IconCoins, IconWallet } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
-import { memo, useEffect, useRef } from 'react'
-import {
-  $operation,
-  $requiredFieldsFilled,
-  depositMutation,
-  fields,
-  form,
-  withdrawMutation,
-} from './model/form'
+import { memo } from 'react'
+import { $operation } from './model/form'
 import { $opened, close } from './model/modal'
-import { AmountInput } from './ui/amount-input'
-import { CorrectedAmount } from './ui/corrected-amount'
-import { CurrencySelect } from './ui/currency-select'
-import { MethodSelect } from './ui/method-select'
-import { OperationControl } from './ui/operation-control'
-import { ProviderSelect } from './ui/provider-select'
-import { TotalAmount } from './ui/total-amount'
 
 export const PaymentModal = memo(() => {
   const opened = useUnit($opened)
@@ -32,7 +18,7 @@ export const PaymentModal = memo(() => {
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            form.submit()
+            // form.submit()
           }}
           className="grid grid-cols-1 md:grid-cols-2"
         >
@@ -41,9 +27,7 @@ export const PaymentModal = memo(() => {
               <Modal.Title>Платежи</Modal.Title>
               {!isDesktop && <Modal.CloseButton />}
             </Modal.Header>
-            <Modal.Body>
-              <FormStart />
-            </Modal.Body>
+            <Modal.Body>{/* <FormStart /> */}</Modal.Body>
           </div>
           <div className="relative flex flex-col rounded-2xl bg-[#25273e]">
             <Modal.Header className="bg-[#25273e]">
@@ -58,7 +42,7 @@ export const PaymentModal = memo(() => {
               {isDesktop && <Modal.CloseButton />}
             </Modal.Header>
             <Modal.Body className="mt-auto md:sticky bottom-0 flex flex-col">
-              <FormFinish />
+              {/* <FormFinish /> */}
             </Modal.Body>
           </div>
         </form>
@@ -67,51 +51,51 @@ export const PaymentModal = memo(() => {
   )
 })
 
-const FormStart = memo(() => {
-  const currencyInputRef = useRef<HTMLInputElement>(null)
-  const providerInputRef = useRef<HTMLInputElement>(null)
-  const amountInputRef = useRef<HTMLInputElement>(null)
-  const selectedMethod = useUnit(fields.method.$value)
+// const FormStart = memo(() => {
+//   const currencyInputRef = useRef<HTMLInputElement>(null)
+//   const providerInputRef = useRef<HTMLInputElement>(null)
+//   const amountInputRef = useRef<HTMLInputElement>(null)
+//   const selectedMethod = useUnit(fields.method.$value)
 
-  useEffect(() => {
-    if (!selectedMethod) return
+//   useEffect(() => {
+//     if (!selectedMethod) return
 
-    for (const input of [currencyInputRef, providerInputRef]) {
-      if (!input.current) continue
-      if (input.current.disabled) continue
-      input.current.scrollIntoView({ behavior: 'smooth' })
-      return
-    }
+//     for (const input of [currencyInputRef, providerInputRef]) {
+//       if (!input.current) continue
+//       if (input.current.disabled) continue
+//       input.current.scrollIntoView({ behavior: 'smooth' })
+//       return
+//     }
 
-    const amountInput = amountInputRef.current
-    if (!amountInput) return
-    amountInput.scrollIntoView({ behavior: 'smooth' })
-  }, [selectedMethod])
+//     const amountInput = amountInputRef.current
+//     if (!amountInput) return
+//     amountInput.scrollIntoView({ behavior: 'smooth' })
+//   }, [selectedMethod])
 
-  return (
-    <div className="flex flex-col gap-4">
-      <OperationControl />
-      <MethodSelect />
-      <CurrencySelect ref={currencyInputRef} />
-      <ProviderSelect ref={providerInputRef} />
-      <AmountInput ref={amountInputRef} />
-      <CorrectedAmount />
-    </div>
-  )
-})
+//   return (
+//     <div className="flex flex-col gap-4">
+//       <OperationControl />
+//       <MethodSelect />
+//       <CurrencySelect ref={currencyInputRef} />
+//       <ProviderSelect ref={providerInputRef} />
+//       <AmountInput ref={amountInputRef} />
+//       <CorrectedAmount />
+//     </div>
+//   )
+// })
 
-const FormFinish = memo(() => {
-  const requiredFieldsFilled = useUnit($requiredFieldsFilled)
-  const { pending: depositPending } = useUnit(depositMutation)
-  const { pending: withdrawPending } = useUnit(withdrawMutation)
-  const pending = depositPending || withdrawPending
+// const FormFinish = memo(() => {
+// const requiredFieldsFilled = useUnit($requiredFieldsFilled)
+// const { pending: depositPending } = useUnit(depositMutation)
+// const { pending: withdrawPending } = useUnit(withdrawMutation)
+// const pending = depositPending || withdrawPending
 
-  return (
-    <div className="grow flex flex-col gap-4 justify-end">
-      <TotalAmount />
-      <Button type="submit" loading={pending} disabled={!requiredFieldsFilled}>
-        Продолжить
-      </Button>
-    </div>
-  )
-})
+//   return (
+//     <div className="grow flex flex-col gap-4 justify-end">
+//       <TotalAmount />
+//       <Button type="submit" loading={pending} disabled={!requiredFieldsFilled}>
+//         Продолжить
+//       </Button>
+//     </div>
+//   )
+// })

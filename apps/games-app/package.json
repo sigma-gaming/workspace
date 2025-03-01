@@ -9,7 +9,7 @@
     "dev": "dotenv -e .env.development pnpm create-env && vite",
     "build": "vite build",
     "start": "NODE_ENV=production node server.js",
-    "preview": "NODE_ENV=development dotenv -e .env.development nodemon ./server.js",
+    "preview": "NODE_ENV=development dotenv -e .env.development node ./server.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,tsx}\"",
     "lint:fix": "pnpm lint --fix"
@@ -21,10 +21,6 @@
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",
     "@tooling/env": "workspace:*",
-    "@tooling/env-vite-plugin": "workspace:*",
-    "@core/io-client": "workspace:*"
-  },
-  "devDependencies": {
-    "@dbs/games-schema": "workspace:*"
+    "@tooling/env-vite-plugin": "workspace:*"
   }
 }

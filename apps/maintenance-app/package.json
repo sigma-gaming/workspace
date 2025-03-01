@@ -8,7 +8,7 @@
     "dev": "dotenv -e .env.development pnpm create-env && vite",
     "build": "vite build",
     "start": "NODE_ENV=production node server.js",
-    "preview": "NODE_ENV=development dotenv -e .env.development nodemon ./server.js",
+    "preview": "NODE_ENV=development dotenv -e .env.development node ./server.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"

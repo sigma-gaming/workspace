@@ -1,1 +1,0 @@
-ALTER TYPE "Game" ADD VALUE 'Pincode';

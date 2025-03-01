@@ -1,0 +1,118 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://domain.sigma.local:5150"
+    },
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/domains": {
+      "get": {
+        "tags": [
+          "Domain"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DomainApp"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Domain"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/domains/latest": {
+      "get": {
+        "tags": [
+          "Domain"
+        ],
+        "parameters": [
+          {
+            "name": "app",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DomainApp"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Domain"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Domain": {
+        "required": [
+          "app",
+          "createdAt",
+          "host"
+        ],
+        "type": "object",
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "app": {
+            "$ref": "#/components/schemas/DomainApp"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DomainApp": {
+        "enum": [
+          "CoreApp",
+          "CoreApi",
+          "ControlApp"
+        ],
+        "type": "string"
+      }
+    }
+  }
+}

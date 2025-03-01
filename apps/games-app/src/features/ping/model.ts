@@ -1,18 +1,17 @@
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import { interval } from 'patronum'
+import { getGamesPing } from '../../shared/api/core'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
-import { gamesWs } from '../../shared/api/games-ws'
 
 const ALPHA = 0.25 // Smoothing factor
 const OUTLIER_MULTIPLIER = 0.4
 const SPIKE_LIMIT = 2
 
-const pingFx = createApiEffect('query', gamesApi.games.ping.$get)
+const pingFx = createApiEffect(getGamesPing)
 
 const measurePingFx = createEffect(async () => {
   const startTime = performance.now()
-  await pingFx(0)
+  await pingFx()
   return performance.now() - startTime
 })
 
@@ -83,9 +82,6 @@ sample({
   fn: (updates) => updates.spikeCount,
   target: $spikeCount,
 })
-
-gamesWs.on('connect', () => initialize())
-gamesWs.on('disconnect', () => reset())
 
 export const $$ping = {
   initialize,

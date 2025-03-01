@@ -1,6 +1,7 @@
+import { noop } from '@core/utils'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
-import { accessApi } from '../../shared/api/access'
+import { postRefresh } from '../../shared/api/access'
 import { createApiEffect } from '../../shared/api/effects'
 import { env } from '../../shared/env'
 import { createLogoutUrl } from '../provider'
@@ -21,7 +22,7 @@ function isExpiringSoon(expiresAt: string | null) {
   return new Date(expiresAt) < new Date(Date.now() + threshold)
 }
 
-const refreshSessionFx = createApiEffect('json', accessApi.refresh.$post)
+const refreshSessionFx = createApiEffect(postRefresh)
 
 const redirectToLogoutFx = createEffect(() => {
   window.location.replace(createLogoutUrl())
@@ -43,6 +44,7 @@ sample({
   clock: refreshIfExpiringSoon,
   source: $expiresAt,
   filter: isExpiringSoon,
+  fn: noop,
   target: refreshSessionFx,
 })
 

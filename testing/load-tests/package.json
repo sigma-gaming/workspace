@@ -5,16 +5,15 @@
   "private": true,
   "scripts": {
     "games": "artillery run tests/games.yaml --insecure",
+    "dotnet": "k6 run --compatibility-mode=experimental_enhanced tests/dotnet.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
-    "@core/logger": "workspace:*",
-    "@dbs/games-schema": "workspace:*",
     "@games/model": "workspace:*"
   },
   "devDependencies": {
-    "@core/server": "workspace:*"
+    "@types/k6": "0.54.2"
   }
 }

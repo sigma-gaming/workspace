@@ -1,29 +1,31 @@
 import { handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
-import { subscriptionFactory } from '@core/io-client'
-import { ChatMessageAttachment, ChatMessageType } from '@dbs/games-types'
 import { createMutation } from '@farfetched/core'
-import { ChatMessageDetailed, ChatValidation } from '@games/model'
 import { invoke } from '@withease/factories'
 import { createEvent, createStore, sample } from 'effector'
-import { v4, v7 } from 'uuid'
+import { v7 } from 'uuid'
+import { z } from 'zod'
 import { $$profile } from '../../entities/profile'
 import { $$user } from '../../entities/user'
+import {
+  ChatMessage,
+  ChatMessageAttachment,
+  ChatMessageAttachmentType,
+  ChatMessageType,
+  getChatLastMessages,
+  postChatSendMessage,
+} from '../../shared/api/core'
+import { $$coreWs, EventName } from '../../shared/api/core-ws'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
-import { gamesWs } from '../../shared/api/games-ws'
 
 const initialize = createEvent()
 const reset = createEvent()
 
-const getLastMessagesFx = createApiEffect(
-  'query',
-  gamesApi.chat.getLastMessages.$get,
-)
+const getLastMessagesFx = createApiEffect(getChatLastMessages)
 
 const sendMessageMutation = createMutation({
   name: 'chat/sendMessage',
-  effect: createApiEffect('json', gamesApi.chat.sendMessage.$post),
+  effect: createApiEffect(postChatSendMessage),
 })
 
 const $loadingMessages = createStore(true)
@@ -31,7 +33,7 @@ const $loadingMessages = createStore(true)
   .reset(reset)
 
 const { receivedData: messageReceived } = invoke(() => {
-  return subscriptionFactory({ ws: gamesWs, event: 'chat/message' })
+  return $$coreWs.subscriptionFactory(EventName.ChatMessageCreated)
 })
 
 const fields = {
@@ -45,12 +47,25 @@ const fields = {
 
 export const form = createForm({
   fields,
-  schema: ChatValidation.MessagePayloadSchema.omit({ trackingId: true }),
+  schema: z.strictObject({
+    text: z
+      .string()
+      .min(1, 'Слишком короткое сообщение')
+      .max(512, 'Слишком длинное сообщение'),
+    attachments: z
+      .array(
+        z.object({
+          type: z.literal(ChatMessageAttachmentType.Game),
+          gameRecordId: z.string().uuid(),
+        }),
+      )
+      .max(1, 'Доступно только одно вложение'),
+  }),
 })
 
 handleExceptions(sendMessageMutation, { form })
 
-export type ExtendedMessage = ChatMessageDetailed & {
+export type ExtendedMessage = ChatMessage & {
   temporary?: boolean
 }
 
@@ -104,7 +119,7 @@ sample({
 
 const submitted = sample({
   source: form.submitted,
-  fn: (payload) => ({ ...payload, trackingId: v4() }),
+  fn: (payload) => ({ ...payload, trackingId: v7() }),
 })
 
 sample({
@@ -117,34 +132,28 @@ sample({
   source: {
     user: $$user.$user,
     senderName: $$profile.$name,
-    profile: $$profile.$profile,
+    userDetails: $$profile.$userDetails,
     messages: $messages,
   },
-  fn: ({ user, senderName, profile, messages }, payload) => {
-    return messages.concat({
-      /*
-       * Should not be possible real id to prevent any conflicts
-       * For example, if someone sends a message in the same moment, its id may be the same as generated here
-       * Last message ID: 1
-       * Your new message temporary ID: 2
-       * Another user's message real ID: 2 (causes the conflict, as there are two messages with the same ID)
-       * Your new message real ID: 3
-       */
+  fn: ({ user, senderName, userDetails, messages }, payload) => {
+    const message: ExtendedMessage = {
       id: v7(),
       createdAt: new Date().toISOString(),
       type: ChatMessageType.UserMessage,
       attachments: payload.attachments,
       senderName,
-      senderUsername: profile!.username,
-      senderImage: profile!.image,
+      senderUsername: userDetails!.profile.username,
+      senderImage: userDetails!.profile.image,
       senderRoles: user!.roles,
       userId: user!.id,
       text: payload.text,
       temporary: true,
       isPinned: false,
       trackingId: payload.trackingId,
-      profileId: profile!.id,
-    })
+      profileId: userDetails!.profile.id,
+    }
+
+    return messages.concat(message)
   },
   target: $messages,
 })

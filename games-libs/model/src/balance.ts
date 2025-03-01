@@ -1,11 +1,4 @@
 import { clampNumber } from '@core/utils'
-import { Update } from './updates'
-
-export type BalanceDetailed = {
-  available: number
-}
-
-export type BalanceUpdate = Update & BalanceDetailed
 
 export function gemInt(amount: number) {
   return amount * 100

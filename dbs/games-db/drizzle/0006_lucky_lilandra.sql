@@ -1,1 +1,0 @@
-ALTER TABLE "UserSecurity" ALTER COLUMN "lastIP" DROP NOT NULL;

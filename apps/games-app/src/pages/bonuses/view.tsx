@@ -1,6 +1,6 @@
-import { GlobalTaskKey } from '@dbs/games-types'
 import clsx from 'clsx'
 import { ReactNode } from 'react'
+import { GlobalTaskKey } from '../../shared/api/core'
 import { GlobalTaskCard } from './ui/global-task-card'
 import { PromocodeCard } from './ui/promocode-card'
 

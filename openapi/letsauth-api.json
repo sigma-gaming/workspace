@@ -1,0 +1,142 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://api.auth.local:5140"
+    },
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/authenticate": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AuthenticatePayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AuthenticatePayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AuthenticatePayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthenticateOutcome": {
+        "enum": [
+          "SignedIn",
+          "SignedUp",
+          "Connected",
+          "NotAuthenticated"
+        ],
+        "type": "string"
+      },
+      "AuthenticatePayload": {
+        "required": [
+          "action",
+          "app",
+          "integration",
+          "payload"
+        ],
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "action": {
+            "$ref": "#/components/schemas/AuthenticationAction"
+          },
+          "integration": {
+            "$ref": "#/components/schemas/AuthenticationIntegration"
+          },
+          "payload": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthenticateResponse": {
+        "required": [
+          "outcome"
+        ],
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "$ref": "#/components/schemas/AuthenticateOutcome"
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AuthenticationAction": {
+        "enum": [
+          "SignIn",
+          "Connect"
+        ],
+        "type": "string"
+      },
+      "AuthenticationIntegration": {
+        "enum": [
+          "Vk",
+          "Telegram"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "Authorization header using the Bearer scheme (session)",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  }
+}

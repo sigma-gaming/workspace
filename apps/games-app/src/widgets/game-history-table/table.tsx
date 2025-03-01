@@ -1,6 +1,4 @@
 import { Icons, Table } from '@core/ui'
-import { GameRecordSelect } from '@dbs/games-schema'
-import { Game, GameOutcome, GameSnapshot } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
 import { Card, LoadingOverlay, Tabs, Text } from '@mantine/core'
 import { useIsFirstRender } from '@mantine/hooks'
@@ -12,6 +10,12 @@ import { memo, ReactNode, useEffect, useRef } from 'react'
 import { $$session } from '../../entities/session'
 import { $$gameHistory, Tab } from '../../features/game-history'
 import { routes } from '../../routing'
+import {
+  Game,
+  GameOutcome,
+  GameRecord,
+  GameSnapshot,
+} from '../../shared/api/core'
 import styles from './table.module.css'
 
 const gameToLabelMap: Record<Game, string> = {
@@ -160,7 +164,7 @@ const MyGamesTable = () => {
 const cellDesktop = 'hidden sm:table-cell lg:hidden xl:table-cell'
 const cellLargeDesktop = 'hidden sm:table-cell lg:hidden 2xl:table-cell'
 
-const HistoryTable = memo(({ records }: { records: GameRecordSelect[] }) => {
+const HistoryTable = memo(({ records }: { records: GameRecord[] }) => {
   // Used to skip animation of first render
   const isFirstRender = useIsFirstRender()
 
@@ -222,7 +226,7 @@ const TableEmpty = () => {
 }
 
 const HistoryRow = memo(
-  ({ record, animated }: { record: GameRecordSelect; animated: boolean }) => {
+  ({ record, animated }: { record: GameRecord; animated: boolean }) => {
     const route = gameToRouteMap[record.game]
     const hasWon = record.outcome === GameOutcome.Win
     const highlight = hasWon ? 'success' : 'default'

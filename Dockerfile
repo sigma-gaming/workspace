@@ -6,31 +6,19 @@ RUN corepack enable
 RUN apt-get update
 RUN apt-get install -y ca-certificates
 
-FROM base AS dependencies-base
+FROM base AS prebuild
 WORKDIR /build
+ENV NX_DAEMON=true
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
 COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY ./patches ./patches
-RUN pnpm fetch
-
-FROM dependencies-base AS dependencies-tree
 COPY package.json ./package.json
 COPY pnpm-lock.yaml ./pnpm-lock.yaml
 COPY ./tooling ./tooling
 COPY ./core ./core
-COPY ./dbs ./dbs
 COPY ./games-libs ./games-libs
 COPY ./apps ./apps
 COPY ./testing ./testing
-
-FROM dependencies-tree AS dependencies-prod
-RUN pnpm install --offline --prod
-
-FROM dependencies-tree AS dependencies-dev
-RUN pnpm install --offline
-
-FROM dependencies-dev AS prebuild
-ENV NX_DAEMON=true
 COPY nx.json ./nx.json
 COPY tsconfig.base.json ./tsconfig.base.json
 COPY ./ssl ./ssl
@@ -51,16 +39,21 @@ ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-app
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm nx run @apps/games-app:build && \
+RUN pnpm install --frozen-lockfile && \
+  pnpm nx run @apps/games-app:build && \
+  pnpm openapi:generate && \
   pnpm sentry-cli releases new -p games-app ${sentry_release} && \
   pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist && \
   pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
 
 FROM prebuild AS control-app-build
-RUN pnpm nx run @apps/control-app:build
+RUN pnpm install --frozen-lockfile && \
+  pnpm openapi:generate && \
+  pnpm nx run @apps/control-app:build
 
 FROM prebuild AS maintenance-app-build
-RUN pnpm nx run @apps/maintenance-app:build
+RUN pnpm install --frozen-lockfile && \
+  pnpm nx run @apps/maintenance-app:build
 
 FROM app-base AS games-app
 WORKDIR /app
@@ -80,73 +73,15 @@ COPY --from=maintenance-app-build /build/apps/maintenance-app/nginx.conf /etc/ng
 COPY --from=maintenance-app-build /build/apps/maintenance-app/dist ./
 RUN chmod -R 755 /app
 
-# API Base
+# APIs
 
 FROM base AS api-base
 ENV NODE_ENV=production
 
-# APIs
-
-FROM prebuild AS games-api-build
-ARG sentry_auth_token
-ARG sentry_release
-ENV SENTRY_ORG=sigma-games
-ENV SENTRY_PROJECT=games-api
-ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm nx run @apis/games-api:build && \
-  pnpm sentry-cli releases new -p games-api ${sentry_release} && \
-  pnpm sentry-cli sourcemaps inject /build/apps/games-api/dist && \
-  pnpm sentry-cli sourcemaps upload /build/apps/games-api/dist --release ${sentry_release}
-
-FROM prebuild AS games-tasks-build
-ARG sentry_auth_token
-ARG sentry_release
-ENV SENTRY_ORG=sigma-games
-ENV SENTRY_PROJECT=games-tasks
-ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm nx run @apis/games-tasks:build && \
-  pnpm sentry-cli releases new -p games-tasks ${sentry_release} && \
-  pnpm sentry-cli sourcemaps inject /build/apps/games-tasks/dist && \
-  pnpm sentry-cli sourcemaps upload /build/apps/games-tasks/dist --release ${sentry_release}
-
-FROM prebuild AS control-api-build
-RUN pnpm nx run @apis/control-api:build
-
-FROM prebuild AS redirect-api-build
-RUN pnpm nx run @apis/redirect-api:build
-
-FROM prebuild AS access-api-build
-RUN pnpm nx run @apis/access-api:build
-
-FROM prebuild AS payment-api-build
-RUN pnpm nx run @apis/payment-api:build
-
 FROM prebuild AS letsauth-build
-RUN pnpm nx run @apis/letsauth:build
-
-FROM api-base AS games-api
-COPY --from=games-api-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/games-api/dist/main.js" ]
-
-FROM api-base AS games-tasks
-COPY --from=games-tasks-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/games-tasks/dist/main.js" ]
-
-FROM api-base AS control-api
-COPY --from=control-api-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/control-api/dist/main.js" ]
-
-FROM api-base AS redirect-api
-COPY --from=redirect-api-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/redirect-api/dist/main.js" ]
-
-FROM api-base AS access-api
-COPY --from=access-api-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/access-api/dist/main.js" ]
-
-FROM api-base AS payment-api
-COPY --from=payment-api-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/payment-api/dist/main.js" ]
+RUN pnpm install --frozen-lockfile && \
+  pnpm openapi:generate && \
+  pnpm nx run @apis/letsauth:build
 
 FROM api-base AS letsauth
 COPY --from=letsauth-build /build ./
@@ -154,47 +89,21 @@ ENV HOST=0.0.0.0
 # PORT is set from outside
 CMD [ "node", "--max_semi_space_size=64", "apps/letsauth/dist/server/entry.mjs" ]
 
-# WS APIs
-
-FROM prebuild AS games-ws-build
-ARG sentry_auth_token
-ARG sentry_release
-ENV SENTRY_ORG=sigma-games
-ENV SENTRY_PROJECT=games-ws
-ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm nx run @apis/games-ws:build && \
-  pnpm sentry-cli releases new -p games-ws ${sentry_release} && \
-  pnpm sentry-cli sourcemaps inject /build/apps/games-ws/dist && \
-  pnpm sentry-cli sourcemaps upload /build/apps/games-ws/dist --release ${sentry_release}
-
-FROM api-base AS games-ws
-WORKDIR /workspace
-COPY --from=games-ws-build /build ./
-CMD [ "node", "--max_semi_space_size=64", "apps/games-ws/dist/main.js" ]
-
 # Bot base
 
-FROM node:18.20.5-slim AS bot-base
+FROM node:22.14-slim AS bot-base
 ENV NODE_ENV=production
 
 # Bots
 
 FROM prebuild AS games-bot-build
-RUN pnpm nx run @bots/games-bot:build
+RUN pnpm install --frozen-lockfile && \
+  pnpm openapi:generate && \
+  pnpm nx run @bots/games-bot:build
 
 FROM bot-base AS games-bot
 COPY --from=games-bot-build /build ./
 CMD [ "node", "--max_semi_space_size=64", "apps/games-bot/dist/main.js" ]
-
-# Migrations
-
-FROM prebuild AS games-db-migration-build
-RUN pnpm nx run @migrations/games-db-migration:build
-
-FROM base AS games-db-migration
-WORKDIR /workspace
-COPY --from=games-db-migration-build /build ./
-CMD [ "node", "apps/games-db-migration/dist/main.js" ]
 
 # GCR Cleaner
 

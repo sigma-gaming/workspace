@@ -1,5 +1,3 @@
-import { subscriptionFactory } from '@core/io-client'
-import { GameRecordSelect } from '@dbs/games-schema'
 import { createFactory, invoke } from '@withease/factories'
 import {
   combine,
@@ -11,49 +9,43 @@ import {
 } from 'effector'
 import { and, interval, status } from 'patronum'
 import { $$session } from '../../entities/session'
+import {
+  GameRecord,
+  getGamesHistoryBigWins,
+  getGamesHistoryLastWins,
+  getGamesHistoryMyGames,
+} from '../../shared/api/core'
+import { $$coreWs, EventName } from '../../shared/api/core-ws'
 import { createApiEffect } from '../../shared/api/effects'
-import { gamesApi } from '../../shared/api/games'
-import { gamesWs } from '../../shared/api/games-ws'
 
 export type Tab = 'last-wins' | 'big-wins' | 'my-games'
 
 const initialize = createEvent()
 const reset = createEvent()
-const appendMyGame = createEvent<GameRecordSelect>()
+const appendMyGame = createEvent<GameRecord>()
 const resetMyGames = createEvent()
 const setTab = createEvent<Tab | null>()
 const resetTab = createEvent()
 
-const getLastWinsFx = createApiEffect(
-  'query',
-  gamesApi.gameHistory.getLastWins.$get,
-)
-
-const getBigWinsFx = createApiEffect(
-  'query',
-  gamesApi.gameHistory.getBigWins.$get,
-)
-
-const getMyGamesFx = createApiEffect(
-  'query',
-  gamesApi.gameHistory.getMyGames.$get,
-)
+const getLastWinsFx = createApiEffect(getGamesHistoryLastWins)
+const getBigWinsFx = createApiEffect(getGamesHistoryBigWins)
+const getMyGamesFx = createApiEffect(getGamesHistoryMyGames)
 
 const $lastWinsLoaded = status(getLastWinsFx).map((status) => status === 'done')
 const $bigWinsLoaded = status(getBigWinsFx).map((status) => status === 'done')
 
 const { receivedData: lastWinsReceived } = invoke(() => {
-  return subscriptionFactory({ ws: gamesWs, event: 'gameHistory/lastWins' })
+  return $$coreWs.subscriptionFactory(EventName.LastWinsUpdated)
 })
 
 const { receivedData: bigWinsReceived } = invoke(() => {
-  return subscriptionFactory({ ws: gamesWs, event: 'gameHistory/bigWins' })
+  return $$coreWs.subscriptionFactory(EventName.BigWinsUpdated)
 })
 
 const feedFactory = createFactory(
   (options: {
-    getInitialFx: Effect<unknown, GameRecordSelect[]>
-    recordsReceived: Event<GameRecordSelect[]>
+    getInitialFx: Effect<any, GameRecord[]>
+    recordsReceived: Event<GameRecord[]>
   }) => {
     const { getInitialFx, recordsReceived } = options
 
@@ -61,9 +53,9 @@ const feedFactory = createFactory(
       .on(getInitialFx.done, () => true)
       .reset(reset)
 
-    const $queue = createStore<GameRecordSelect[]>([])
+    const $queue = createStore<GameRecord[]>([])
 
-    const $feed = createStore<GameRecordSelect[]>([])
+    const $feed = createStore<GameRecord[]>([])
       .on(getInitialFx.doneData, (_, records) => records)
       .reset(reset)
 
@@ -131,7 +123,7 @@ const $myGamesLoaded = createStore(false)
   .on(getMyGamesFx.done, () => true)
   .reset(reset, resetMyGames)
 
-const $myGames = createStore<GameRecordSelect[]>([])
+const $myGames = createStore<GameRecord[]>([])
   .on(getMyGamesFx.doneData, (_, myGames) => myGames)
   .reset(reset, resetMyGames)
 

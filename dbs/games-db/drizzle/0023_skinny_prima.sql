@@ -1,1 +1,0 @@
-ALTER TABLE "Transaction" ADD COLUMN "idn" serial NOT NULL;

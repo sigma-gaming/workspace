@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS "userIdIdx" ON "Transaction" USING btree ("userId");

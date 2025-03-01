@@ -1,15 +1,3 @@
-import './setup'
-import { shutdownAll } from '@core/di'
-import { logger } from '@core/logger'
-import {
-  createErrorHandler,
-  createServer,
-  HonoUwsEnv,
-  loggerMiddleware,
-  requestIdMiddleware,
-} from '@core/server'
-import { DomainApp } from '@dbs/games-types-private'
-import { affiliateService, domainService } from '@games/services'
 import { autoRetry } from '@grammyjs/auto-retry'
 import { emoji, EmojiFlavor } from '@grammyjs/emoji'
 import {
@@ -19,6 +7,7 @@ import {
   type ParseModeFlavor,
 } from '@grammyjs/parse-mode'
 import { limit } from '@grammyjs/ratelimiter'
+import { serve, ServerType } from '@hono/node-server'
 import {
   API_CONSTANTS,
   Bot,
@@ -27,26 +16,24 @@ import {
   webhookCallback,
 } from 'grammy'
 import { Hono } from 'hono'
-import { TemplatedApp } from 'uWebSockets.js'
 import { internalApp } from './app/internal'
 import { env } from './env'
-
-await domainService.waitForInitialization()
+import {
+  getCampaignsByCodeCode,
+  postCampaignsIdIncrementVisits,
+} from './shared/api/affiliate'
+import { DomainApp, getDomains, getDomainsLatest } from './shared/api/domain'
 
 type BotContext = ParseModeFlavor<EmojiFlavor<Context>>
 
 const bot = new Bot<BotContext>(env.telegram.botFullToken)
 
 bot.api.config.use(async (prev, method, payload, signal) => {
-  logger.info(`Method: ${method}`)
-  logger.info(`Payload: ${JSON.stringify(payload)}`)
-
   try {
     const response = await prev(method, payload, signal)
-    logger.info(`Response: ${JSON.stringify(response)}`)
     return response
   } catch (error) {
-    logger.error(error)
+    console.error(error)
     throw error
   }
 })
@@ -65,16 +52,15 @@ bot.use(limit({ limit: 3, timeFrame: 2000 }))
 
 async function getStartReferralCampaign(match: string) {
   if (!match) return null
-  const campaign = await affiliateService.getCampaign(match)
+  const campaign = await getCampaignsByCodeCode(match)
   if (!campaign) return null
   return campaign
 }
 
 bot.command('start', async (ctx) => {
-  logger.info('Start command received')
   const campaign = await getStartReferralCampaign(ctx.match)
 
-  const latestDomain = domainService.getLatestDomain(DomainApp.GamesApp)
+  const latestDomain = await getDomainsLatest({ app: DomainApp.CoreApp })
 
   if (!latestDomain) {
     throw new Error('Actual domain not found')
@@ -84,8 +70,7 @@ bot.command('start', async (ctx) => {
 
   if (campaign) {
     url.searchParams.set('r', campaign.code)
-
-    affiliateService.incrementCampaignVisits({ campaignId: campaign.id })
+    postCampaignsIdIncrementVisits(campaign.id)
   }
 
   const keyboard = new InlineKeyboard().url('Перейти на сайт', url.toString())
@@ -102,7 +87,7 @@ bot.command('start', async (ctx) => {
 })
 
 bot.command('domains', async (ctx) => {
-  const domains = domainService.getDomainsByApp(DomainApp.GamesApp)
+  const domains = await getDomains({ app: DomainApp.CoreApp })
 
   const keyboard = new InlineKeyboard(
     domains.map((domain) => [
@@ -130,13 +115,13 @@ bot.command('help', async (ctx) => {
   )
 })
 
-let server: TemplatedApp | undefined
+let server: ServerType | null = null
 
 if (env.isDev) {
-  bot.catch(logger.error)
+  bot.catch(console.error)
   bot.start()
 
-  logger.info('🚀 Bot long polling started')
+  console.info('🚀 Bot long polling started')
 } else {
   const url = env.gamesBot.url
 
@@ -148,37 +133,21 @@ if (env.isDev) {
     throw new Error('GAMES_BOT_PORT is not set')
   }
 
-  const app = new Hono<HonoUwsEnv>()
-    .use(requestIdMiddleware)
-    .use(loggerMiddleware)
-    .post(
-      '/',
-      webhookCallback(bot, 'hono', {
-        secretToken: env.telegram.webhookSecretToken,
-      }),
-    )
-    .onError(
-      createErrorHandler({
-        showOriginalError: false,
-        onInternalError: (error) => {
-          logger.error(error)
-        },
-      }),
-    )
+  const app = new Hono().post(
+    '/',
+    webhookCallback(bot, 'hono', {
+      secretToken: env.telegram.webhookSecretToken,
+    }),
+  )
 
-  server = createServer({
-    app,
-    trustProxy: true,
+  server = serve({
+    fetch: app.fetch,
+    port: env.ports.public,
   })
 
-  server.listen(env.ports.public, (token) => {
-    if (!token) {
-      logger.error('Failed to start Games Bot')
-      process.exit(1)
-    }
-
-    logger.info(`🚀 Webhook server started at port ${env.ports.public}`)
-    logger.info(`🚀 Bot ready at ${url}`)
+  server.on('listening', () => {
+    console.info(`🚀 Webhook server started at port ${env.ports.public}`)
+    console.info(`🚀 Bot ready at ${url}`)
 
     bot.api
       .setWebhook(url, {
@@ -186,11 +155,11 @@ if (env.isDev) {
         allowed_updates: API_CONSTANTS.ALL_UPDATE_TYPES,
       })
       .then((is) => {
-        logger.info(`Webhook ${is ? 'set' : 'failed to set'}`)
+        console.info(`Webhook ${is ? 'set' : 'failed to set'}`)
       })
       .catch((error) => {
-        logger.info('Failed to set webhook')
-        logger.error(error)
+        console.info('Failed to set webhook')
+        console.error(error)
       })
   })
 }
@@ -201,28 +170,23 @@ bot.api.setMyCommands([
   { command: 'help', description: 'Показать доступные команды' },
 ])
 
-const internalServer = createServer({
-  app: internalApp,
-  trustProxy: true,
+const internalServer = serve({
+  fetch: internalApp.fetch,
+  port: env.ports.internal,
 })
 
-internalServer.listen(env.ports.internal, (token) => {
-  if (!token) {
-    logger.error('Failed to start Internal API')
-    process.exit(1)
-  }
-
-  logger.info(`🚀 Internal API ready at :${env.ports.internal}`)
+internalServer.on('listening', () => {
+  console.info(`🚀 Internal API ready at :${env.ports.internal}`)
 })
 
 process.on('uncaughtException', (error) => {
-  logger.info('Uncaught exception')
-  logger.error(error)
+  console.info('Uncaught exception')
+  console.error(error)
 })
 
 process.on('unhandledRejection', (error) => {
-  logger.info('Unhandled rejection')
-  logger.error(error)
+  console.info('Unhandled rejection')
+  console.error(error)
 })
 
 let exited = false
@@ -231,29 +195,23 @@ async function handleExit() {
   if (exited) return
   exited = true
 
-  logger.info('Exit signal received')
+  console.info('Exit signal received')
 
   if (env.isDev) {
-    logger.info('Shutting down services..')
-    await shutdownAll()
-
-    logger.info('Exiting..')
+    console.info('Exiting..')
     process.exit(0)
   }
 
   setTimeout(() => {
-    logger.info('Timeout, exiting..')
+    console.info('Timeout, exiting..')
     process.exit(0)
   }, 5000)
 
-  logger.info('Closing servers..')
+  console.info('Closing servers..')
   internalServer.close()
-  logger.info('Servers closed')
+  console.info('Servers closed')
 
-  logger.info('Shutting down services..')
-  await shutdownAll()
-
-  logger.info('Exiting..')
+  console.info('Exiting..')
   process.exit(0)
 }
 

@@ -1,70 +1,94 @@
-import { ZodIssue } from 'zod'
-
-export class RouteException<TPayload = void> extends Error {
-  name = 'RouteException'
-  statusCode = 400
+export class HttpException<TPayload = unknown> extends Error {
+  statusCode: number
   payload: TPayload
+  response?: Response
 
-  constructor(payload: TPayload) {
-    super('Route exception')
+  constructor(statusCode: number, payload: TPayload, response?: Response) {
+    super('HTTP exception')
+    this.statusCode = statusCode
     this.payload = payload
+    this.response = response
   }
 }
 
-export class MaintenanceException extends RouteException {
-  name = 'MaintenanceException'
-  statusCode = 503
+export class MaintenanceException extends HttpException<void> {
   message = 'Maintenance mode enabled'
+
+  constructor(payload: void) {
+    super(503, payload)
+  }
 }
 
-export class InternalServerException extends RouteException<{
-  cause?: Error
-} | void> {
-  name = 'InternalServerException'
-  statusCode = 500
+export class InternalServerException extends HttpException<void> {
   message = 'Internal server error'
+
+  constructor() {
+    super(500)
+  }
 }
 
-export class CloudflareChallengeException extends RouteException {
-  name = 'CloudflareChallengeException'
-  statusCode = 403
+export class CloudflareChallengeException extends HttpException<void> {
   message = 'Cloudflare challenge'
+
+  constructor() {
+    super(403)
+  }
 }
 
-export class ResourceLockedException extends RouteException {
-  name = 'ResourceLockedException'
-  statusCode = 423
+export class ResourceLockedException extends HttpException<void> {
   message = 'Resource is locked'
+
+  constructor() {
+    super(423)
+  }
 }
 
-export class NotFoundException extends RouteException {
-  name = 'NotFoundException'
-  statusCode = 404
+export class NotFoundException extends HttpException<void> {
   message = 'Not found'
+
+  constructor() {
+    super(404)
+  }
 }
 
-export class TimeoutException extends RouteException {
-  name = 'TimeoutException'
-  statusCode = 408
+export class TimeoutException extends HttpException<void> {
   message = 'Timed out'
+
+  constructor() {
+    super(408)
+  }
 }
 
-export class ConflictException extends RouteException {
-  name = 'ConflictException'
-  statusCode = 409
+export class ConflictException extends HttpException<void> {
   message = 'Conflict'
+
+  constructor() {
+    super(409)
+  }
 }
 
-export class UnprocessableContentException extends RouteException {
-  name = 'UnprocessableContentException'
-  statusCode = 422
+export class UnprocessableContentException extends HttpException<void> {
   message = 'Unprocessable content'
+
+  constructor() {
+    super(422)
+  }
 }
 
-export class TooManyRequestsException extends RouteException {
-  name = 'TooManyRequestsException'
-  statusCode = 429
+export class TooManyRequestsException extends HttpException<void> {
   message = 'Too many requests'
+
+  constructor() {
+    super(429)
+  }
+}
+
+export class TooManyConnectionsException extends HttpException<void> {
+  message = 'Too many connections'
+
+  constructor() {
+    super(429)
+  }
 }
 
 export enum SocketRejectionReason {
@@ -72,29 +96,28 @@ export enum SocketRejectionReason {
   Unknown = 'Unknown',
 }
 
-export class TooManyConnectionsException extends RouteException {
-  name = 'TooManyConnectionsException'
-  statusCode = 429
-  message = 'Too many connections'
-  data = { reason: SocketRejectionReason.TooManyConnections }
-}
-
-export class UnauthorizedException extends RouteException {
-  name = 'UnauthorizedException'
-  statusCode = 403
+export class UnauthorizedException extends HttpException<void> {
   message = 'Not authorized'
+
+  constructor() {
+    super(403)
+  }
 }
 
-export class NotAuthenticatedException extends RouteException {
-  name = 'NotAuthenticatedException'
-  statusCode = 401
+export class NotAuthenticatedException extends HttpException<void> {
   message = 'Not authenticated'
+
+  constructor() {
+    super(401)
+  }
 }
 
-export class SessionExpiredException extends RouteException {
-  name = 'SessionExpiredException'
-  statusCode = 401
+export class SessionExpiredException extends HttpException<void> {
   message = 'Session expired'
+
+  constructor() {
+    super(401)
+  }
 }
 
 type BadRequestExceptionPayload = {
@@ -102,19 +125,22 @@ type BadRequestExceptionPayload = {
   message: string
 }
 
-export class BadRequestException extends RouteException<BadRequestExceptionPayload> {
-  name = 'BadRequestException'
-  statusCode = 400
+export class BadRequestException extends HttpException<BadRequestExceptionPayload> {
   message = 'Bad request'
+
+  constructor(payload: BadRequestExceptionPayload) {
+    super(400, payload)
+  }
 }
 
 type ValidationExceptionPayload = {
-  issues?: ZodIssue[]
-  fieldErrors: Record<string, string[] | undefined>
+  errors: Record<string, string[] | undefined>
 }
 
-export class ValidationException extends RouteException<ValidationExceptionPayload> {
-  name = 'ValidationException'
-  statusCode = 400
+export class ValidationException extends HttpException<ValidationExceptionPayload> {
   message = 'Validation error'
+
+  constructor(payload: ValidationExceptionPayload) {
+    super(400, payload)
+  }
 }

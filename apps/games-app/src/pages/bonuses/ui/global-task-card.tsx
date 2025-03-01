@@ -1,6 +1,4 @@
 import { Icons, LinkButton, useMedia } from '@core/ui'
-import { GlobalTaskSelect } from '@dbs/games-schema'
-import { GlobalTaskKey, TaskStatus } from '@dbs/games-types'
 import { formatGem, gemFloat } from '@games/model'
 import { Button, Card, Skeleton, Tooltip } from '@mantine/core'
 import { IconCircleCheck, IconRefresh } from '@tabler/icons-react'
@@ -8,6 +6,7 @@ import clsx from 'clsx'
 import { useUnit } from 'effector-react'
 import { ReactNode } from 'react'
 import { $$session } from '../../../entities/session'
+import { GlobalTask, GlobalTaskKey, TaskStatus } from '../../../shared/api/core'
 import bonusTelegramSrc from '../assets/bonus-telegram-400.webp'
 import bonusVkSrc from '../assets/bonus-vk-400.webp'
 import { $$bonusesPage } from '../model'
@@ -31,7 +30,7 @@ const imageMap: Record<GlobalTaskKey, string> = {
 type Action = {
   name: string
   target: '_blank' | '_self'
-  createUrl: (task: GlobalTaskSelect) => string | null
+  createUrl: (task: GlobalTask) => string | null
 }
 
 const actionMap: Record<GlobalTaskKey, Action> = {

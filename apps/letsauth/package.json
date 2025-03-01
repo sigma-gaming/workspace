@@ -3,9 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "./src/client.ts",
-  "module": "./src/client.ts",
-  "types": "./src/client.ts",
   "scripts": {
     "copy-env": "copy-env",
     "dev": "dotenv -e .env.development astro dev",
@@ -18,17 +15,11 @@
   },
   "dependencies": {
     "astro": "^4.16.6",
-    "@games/model": "workspace:*",
     "@core/client": "workspace:*",
     "@core/exceptions": "workspace:*",
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",
     "@tooling/env": "workspace:*",
-    "@core/server": "workspace:*",
-    "@core/io-client": "workspace:*",
     "@itsmatteomanf/astro-early-hints": "0.3.3"
-  },
-  "devDependencies": {
-    "@dbs/games-schema": "workspace:*"
   }
 }

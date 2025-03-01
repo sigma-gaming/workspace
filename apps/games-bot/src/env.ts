@@ -17,6 +17,7 @@ const EnvSchema = z
     GAMES_CACHE_HOST: z.string(),
     GAMES_CACHE_PASSWORD: z.string(),
 
+    DOMAIN_API_URL: z.string(),
     GAMES_BOT_URL: z.string().optional(),
 
     PUBLIC_TELEGRAM_BOT_ID: z.string(),
@@ -44,6 +45,10 @@ const EnvSchema = z
 
     gamesApi: {
       version: raw.PUBLIC_GAMES_API_VERSION,
+    },
+
+    domainApi: {
+      url: raw.DOMAIN_API_URL,
     },
 
     gamesBot: {

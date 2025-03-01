@@ -9,13 +9,13 @@ import Cookies from 'js-cookie'
 import { $$affiliate } from '../entities/affiliate'
 import { $$audio } from '../entities/audio'
 import { $$balance } from '../entities/balance'
-import { $$profile } from '../entities/profile'
 import { $$session } from '../entities/session'
 import { $$user } from '../entities/user'
 import { $$maintenance } from '../features/maintenance'
 import { $$notificationEvents } from '../features/notification-events'
+import { $$ping } from '../features/ping'
 import { removeQueryParam, router } from '../routing'
-import { $$gamesWs } from '../shared/api/games-ws'
+import { $$coreWs } from '../shared/api/core-ws/model'
 import { env } from '../shared/env'
 import { $$chatWidget } from '../widgets/chat'
 
@@ -30,6 +30,8 @@ sample({
 sample({
   clock: started,
   target: [
+    $$ping.initialize,
+    $$coreWs.connect,
     $$audio.initialize,
     $$notificationEvents.initialize,
     $$chatWidget.initialize,
@@ -42,7 +44,6 @@ sample({
   filter: $$session.$loggedIn,
   target: [
     $$user.request,
-    $$profile.request,
     $$balance.request,
     $$affiliate.request,
     $$session.refreshIfExpiringSoon,
@@ -60,7 +61,7 @@ sample({
   fn: (query) => query.r,
   filter: (query) => Boolean(query.r),
   target: createEffect((code: string) => {
-    Cookies.set('referralCampaign', code, {
+    Cookies.set('referral_campaign', code, {
       domain: env.domain,
       expires: 365,
     })
@@ -92,7 +93,7 @@ sample({
 })
 
 sample({
-  clock: $$gamesWs.rejected,
+  clock: $$coreWs.rejected,
   filter: (reason) => reason === SocketRejectionReason.TooManyConnections,
   target: $$notifications.show.prepend(() => ({
     color: 'red',

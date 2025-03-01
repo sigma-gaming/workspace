@@ -1,1 +1,0 @@
-ALTER TABLE "Balance" DROP COLUMN IF EXISTS "totalRTP";

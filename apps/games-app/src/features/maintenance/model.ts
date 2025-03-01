@@ -1,9 +1,9 @@
-import { subscriptionFactory } from '@core/io-client'
 import { invoke } from '@withease/factories'
 import { createEffect, createEvent, createStore, sample } from 'effector'
 import Cookies from 'js-cookie'
 import { interval } from 'patronum'
-import { gamesWs } from '../../shared/api/games-ws'
+import { EventName } from '../../shared/api/core-ws'
+import { $$coreWs } from '../../shared/api/core-ws/model'
 import { env } from '../../shared/env'
 
 const MAX_SECONDS_PREPARING = 60
@@ -28,7 +28,7 @@ const reloadPageFx = createEffect(() => {
 })
 
 const { receivedData: maintenanceStarted } = invoke(() => {
-  return subscriptionFactory({ ws: gamesWs, event: 'maintenance/started' })
+  return $$coreWs.subscriptionFactory(EventName.MaintenanceStarted)
 })
 
 const maintenancePreparing = Cookies.get('maintenancePreparing')

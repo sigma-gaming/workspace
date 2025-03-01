@@ -1,1 +1,0 @@
-ALTER TABLE "Profile" ALTER COLUMN "name" SET NOT NULL;
