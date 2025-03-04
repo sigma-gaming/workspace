@@ -66,74 +66,16 @@ jobs:
         id: affected
         run: echo "affected_apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
 
-  build:
-    name: Build
-    needs: [affected, timestamp]
+  build-in-cloud:
+    name: Build Docker Images in Google Cloud
     runs-on: [ubuntu-22.04]
-
+    needs: [timestamp, affected]
     if: needs.affected.outputs.apps != '[]'
-
-    strategy:
-      fail-fast: false
-      matrix:
-        packageName: ${{ fromJson(needs.affected.outputs.apps) }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Parse package name
-        id: parse
-        uses: release-kit/regex@v1
-        with:
-          string: ${{ matrix.packageName }}
-          pattern: '^@?(?<scope>.*)\/(?<name>.*)$'
-
-      - name: Check if hash check should be used
-        id: hash-check
-        run: |
-          if [[ "${{ steps.parse.outputs.scope }}" =~ ^(apps|apis|bots)$ ]]; then
-            echo "should_check=true" >> $GITHUB_OUTPUT
-          else
-            echo "should_check=false" >> $GITHUB_OUTPUT
-          fi
-
-      - uses: pnpm/action-setup@v4
-        if: steps.hash-check.outputs.should_check == 'true'
-        id: pnpm
-        with:
-          run_install: false
-
-      - name: Install Node.js
-        if: steps.hash-check.outputs.should_check == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - uses: oven-sh/setup-bun@v2
-        if: steps.hash-check.outputs.should_check == 'true'
-        with:
-          bun-version: 1.2.3
-
-      - name: Install dependencies
-        if: steps.hash-check.outputs.should_check == 'true'
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate OpenAPI clients
-        if: steps.hash-check.outputs.should_check == 'true'
-        run: pnpm openapi:generate
-
-      - name: Build package
-        if: steps.hash-check.outputs.should_check == 'true'
-        run: pnpm nx run ${{ matrix.packageName }}:build
-
-      - name: Calculate hash for dist and additional files
-        id: calculate-hash
-        if: steps.hash-check.outputs.should_check == 'true'
-        run: |
-          echo "hash=${{ hashFiles(format('apps/{0}/dist/**', steps.parse.outputs.name), format('apps/{0}/scripts/**', steps.parse.outputs.name), format('apps/{0}/nginx.conf', steps.parse.outputs.name)) }}" >> $GITHUB_OUTPUT
 
       - name: Gcloud auth
         uses: google-github-actions/auth@v2
@@ -148,61 +90,92 @@ jobs:
 
       - name: Build on Google Cloud
         run: |
-          image=${{ env.DOCKER_REGISTRY }}/${{ steps.parse.outputs.scope }}/${{ steps.parse.outputs.name }}
+          apps_json='${{ needs.affected.outputs.apps }}'
 
-          cat <<EOF > cloudbuild.yaml
-          steps:
-            - name: 'gcr.io/cloud-builders/gsutil'
-              id: 'check-cache'
-              entrypoint: 'sh'
-              args:
-                - '-c'
-                - |
-                  if [ "${{ steps.hash-check.outputs.should_check }}" = "true" ]; then
-                    echo "Checking cache for hash: ${{ steps.calculate-hash.outputs.hash }}"
-                    if gsutil -q stat gs://sigma-games_cloudbuild_cache/build-hash/${{ steps.calculate-hash.outputs.hash }}; then
-                      echo "Cache hit for ${{ steps.calculate-hash.outputs.hash }}. Exiting build."
-                      exit 0
-                    else
-                      echo "Cache miss for ${{ steps.calculate-hash.outputs.hash }}. Proceeding with build."
-                    fi
-                  else
-                    echo "Hash check disabled for this image. Proceeding with build."
-                  fi
+          TIMESTAMP="${{ needs.timestamp.outputs.timestamp }}"
+          BASE_CACHE_IMAGE="${DOCKER_REGISTRY}/nodejs-cache"
+          PREBUILD_CACHE_IMAGE="${DOCKER_REGISTRY}/nodejs-prebuild"
 
-            - name: "gcr.io/cloud-builders/docker"
-              id: "build"
-              waitFor: ['check-cache']
-              env:
-                - "DOCKER_BUILDKIT=1"
-              args:
-                - build
-                - --target=${{ steps.parse.outputs.name }}
-                - --tag=$image:latest
-                - --tag=$image:dev-${{ needs.timestamp.outputs.timestamp }}
-                - --build-arg=sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
-                - --build-arg=sentry_release=dev-${{ needs.timestamp.outputs.timestamp }}
-                - .
+          echo "steps:" > cloudbuild.yaml
 
-            - name: 'gcr.io/cloud-builders/gsutil'
-              id: 'save-cache'
-              waitFor: ['build']
-              entrypoint: 'sh'
-              args:
-                - '-c'
-                - |
-                  if [ "${{ steps.hash-check.outputs.should_check }}" = "true" ]; then
-                    echo "Saving hash ${{ steps.calculate-hash.outputs.hash }} to GCS"
-                    echo "Build completed successfully" | gsutil cp - gs://sigma-games_cloudbuild_cache/build-hash/${{ steps.calculate-hash.outputs.hash }}
-                  else
-                    echo "Hash saving skipped as hash check is disabled."
-                  fi
+          cat <<EOF >> cloudbuild.yaml
+          - name: "gcr.io/cloud-builders/docker"
+            id: "build-base"
+            waitFor: ["-"]
+            env:
+              - "DOCKER_BUILDKIT=1"
+            args:
+              - build
+              - --target=dependencies
+              - --tag=${BASE_CACHE_IMAGE}
+              - .
 
-          images:
-            - $image:latest
-            - $image:dev-${{ needs.timestamp.outputs.timestamp }}
           EOF
 
+          cat <<EOF >> cloudbuild.yaml
+          - name: "gcr.io/cloud-builders/docker"
+            id: "push-base"
+            waitFor: ["build-base"]
+            env:
+              - "DOCKER_BUILDKIT=1"
+            args:
+              - push
+              - ${BASE_CACHE_IMAGE}
+
+          EOF
+
+          cat <<EOF >> cloudbuild.yaml
+          - name: "gcr.io/cloud-builders/docker"
+            id: "prebuild"
+            waitFor: ["build-base"]
+            env:
+              - "DOCKER_BUILDKIT=1"
+            args:
+              - build
+              - --target=prebuild
+              - --tag=${PREBUILD_CACHE_IMAGE}
+              - .
+
+          EOF
+
+          IMAGES=""
+
+          for package in $(echo "$apps_json" | jq -r '.[]'); do
+            image_name=$(echo "$package" | sed 's/^@//')
+            target_name=$(echo "$image_name" | awk -F'/' '{print $NF}')
+
+            FULL_IMAGE="${DOCKER_REGISTRY}/${image_name}"
+
+            cat <<EOF >> cloudbuild.yaml
+
+          - name: "gcr.io/cloud-builders/docker"
+            id: "build-$(echo "$image_name" | tr '/' '-')"
+            waitFor: ["push-base", "prebuild"]
+            env:
+              - "DOCKER_BUILDKIT=1"
+            args:
+              - build
+              - --cache-from=${PREBUILD_CACHE_IMAGE}
+              - --target=${target_name}
+              - --tag=${FULL_IMAGE}:latest
+              - --tag=${FULL_IMAGE}:dev-${TIMESTAMP}
+              - --build-arg=sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+              - --build-arg=sentry_release=dev-${TIMESTAMP}
+              - .
+          EOF
+
+            # Добавляем теги в общий список
+            IMAGES="${IMAGES}  - ${FULL_IMAGE}:latest\n  - ${FULL_IMAGE}:dev-${TIMESTAMP}\n"
+          done
+
+          echo "images:" >> cloudbuild.yaml
+          echo -e "${IMAGES}" >> cloudbuild.yaml
+
+          echo "===== Generated cloudbuild.yaml ====="
+          cat cloudbuild.yaml
+
+      - name: Submit build to Cloud Build
+        run: |
           gcloud builds submit . \
             --config cloudbuild.yaml \
             --region europe-west1 \

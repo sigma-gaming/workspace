@@ -6,20 +6,24 @@ RUN corepack enable
 RUN apt-get update
 RUN apt-get install -y ca-certificates
 
-FROM base AS prebuild
+FROM base AS dependencies
 WORKDIR /build
-ENV NX_DAEMON=true
-COPY pnpm-lock.yaml ./pnpm-lock.yaml
-COPY pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY .npmrc ./
+COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
 COPY ./patches ./patches
-COPY ./ssl ./ssl
+RUN pnpm fetch
+
+FROM dependencies AS prebuild
 COPY package.json ./package.json
-COPY pnpm-lock.yaml ./pnpm-lock.yaml
 COPY ./tooling ./tooling
 COPY ./core ./core
 COPY ./games-libs ./games-libs
 COPY ./apps ./apps
 COPY ./testing ./testing
+RUN pnpm install --offline
+
+ENV NX_DAEMON=true
 COPY nx.json ./nx.json
 COPY tsconfig.base.json ./tsconfig.base.json
 COPY orval.config.ts ./orval.config.ts
@@ -27,6 +31,8 @@ COPY orval.download.ts ./orval.download.ts
 COPY orval.sources.ts ./orval.sources.ts
 COPY orval.watch.ts ./orval.watch.ts
 COPY ./openapi ./openapi
+COPY ./ssl ./ssl
+RUN pnpm openapi:generate
 
 # Apps
 
@@ -44,21 +50,16 @@ ARG sentry_release
 ENV SENTRY_ORG=sigma-games
 ENV SENTRY_PROJECT=games-app
 ENV SENTRY_AUTH_TOKEN=${sentry_auth_token}
-RUN pnpm install --frozen-lockfile && \
-  pnpm openapi:generate && \
-  pnpm nx run @apps/games-app:build && \
+RUN pnpm nx run @apps/games-app:build && \
   pnpm sentry-cli releases new -p games-app ${sentry_release} && \
   pnpm sentry-cli sourcemaps inject /build/apps/games-app/dist && \
   pnpm sentry-cli sourcemaps upload /build/apps/games-app/dist --release ${sentry_release}
 
 FROM prebuild AS control-app-build
-RUN pnpm install --frozen-lockfile && \
-  pnpm openapi:generate && \
-  pnpm nx run @apps/control-app:build
+RUN pnpm nx run @apps/control-app:build
 
 FROM prebuild AS maintenance-app-build
-RUN pnpm install --frozen-lockfile && \
-  pnpm nx run @apps/maintenance-app:build
+RUN pnpm nx run @apps/maintenance-app:build
 
 FROM app-base AS games-app
 WORKDIR /app
@@ -84,9 +85,7 @@ FROM base AS api-base
 ENV NODE_ENV=production
 
 FROM prebuild AS letsauth-build
-RUN pnpm install --frozen-lockfile && \
-  pnpm openapi:generate && \
-  pnpm nx run @apis/letsauth:build
+RUN pnpm nx run @apis/letsauth:build
 
 FROM api-base AS letsauth
 COPY --from=letsauth-build /build ./
@@ -102,9 +101,7 @@ ENV NODE_ENV=production
 # Bots
 
 FROM prebuild AS games-bot-build
-RUN pnpm install --frozen-lockfile && \
-  pnpm openapi:generate && \
-  pnpm nx run @bots/games-bot:build
+RUN pnpm nx run @bots/games-bot:build
 
 FROM bot-base AS games-bot
 COPY --from=games-bot-build /build ./
