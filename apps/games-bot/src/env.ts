@@ -7,14 +7,6 @@ const EnvSchema = z
     GAMES_BOT_PORT: z.coerce.number().optional(),
     GAMES_BOT_INTERNAL_PORT: z.coerce.number(),
 
-    GAMES_DB_HOST: z.string(),
-    GAMES_DB_HEALTH_HOST: z.string(),
-    GAMES_DB_DATABASE: z.string().default('postgres'),
-    GAMES_DB_USER: z.string(),
-    GAMES_DB_PASSWORD: z.string(),
-    GAMES_CACHE_HOST: z.string(),
-    GAMES_CACHE_PASSWORD: z.string(),
-
     DOMAIN_API_URL: z.string(),
     AFFILIATE_API_URL: z.string(),
     GAMES_BOT_URL: z.string().optional(),
@@ -32,16 +24,6 @@ const EnvSchema = z
       internal: raw.GAMES_BOT_INTERNAL_PORT,
     },
 
-    gamesDb: {
-      url: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
-      healthUrl: `postgresql://${raw.GAMES_DB_USER}:${raw.GAMES_DB_PASSWORD}@${raw.GAMES_DB_HEALTH_HOST}:5432/${raw.GAMES_DB_DATABASE}`,
-    },
-
-    gamesCache: {
-      host: raw.GAMES_CACHE_HOST,
-      password: raw.GAMES_CACHE_PASSWORD,
-    },
-
     domainApi: {
       url: raw.DOMAIN_API_URL,
     },
@@ -55,7 +37,6 @@ const EnvSchema = z
     },
 
     telegram: {
-      botId: raw.PUBLIC_TELEGRAM_BOT_ID,
       botToken: raw.TELEGRAM_BOT_TOKEN,
       webhookSecretToken: raw.TELEGRAM_WEBHOOK_SECRET_TOKEN,
     },
