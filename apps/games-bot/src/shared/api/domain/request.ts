@@ -37,6 +37,10 @@ export async function request<TData>(
     body,
   })
 
+  console.log(response.status)
+  console.log(response.statusText)
+  console.log(response.headers)
+
   if (!response.ok) {
     const status = response.status
     const contentType = response.headers.get('content-type')
