@@ -37,6 +37,9 @@ export async function request<TData>(
     body,
   })
 
+  console.log(requestUrl.toString())
+  console.log(requestHeaders)
+  console.log(await response.clone().text())
   console.log(response.status)
   console.log(response.statusText)
   console.log(response.headers)
