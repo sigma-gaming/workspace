@@ -3,6 +3,12 @@ name: Build development images with Google Cloud Build
 on:
   push:
     branches: ['main']
+  workflow_dispatch:
+    inputs:
+      from:
+        description: SHA for base commit to find affected apps
+      to:
+        description: SHA for head commit to find affected apps
 
 env:
   DOCKER_REGISTRY: europe-west4-docker.pkg.dev/${{ secrets.GCLOUD_PROJECT_ID }}/docker
@@ -57,14 +63,21 @@ jobs:
         run: pnpm openapi:generate
 
       - name: Derive appropriate SHAs for base and head for `nx affected` commands
+        id: shas
         uses: nrwl/nx-set-shas@v4
 
       - name: Run checks for affected packages
         run: pnpm check:affected
+        env:
+          NX_BASE: ${{ github.event.inputs.from || steps.shas.outputs.base }}
+          NX_HEAD: ${{ github.event.inputs.to || steps.shas.outputs.head }}
 
       - name: Output affected apps
         id: affected
         run: echo "affected_apps=$(pnpm nx show projects --type=app --affected --json)" >> $GITHUB_OUTPUT
+        env:
+          NX_BASE: ${{ github.event.inputs.from || steps.shas.outputs.base }}
+          NX_HEAD: ${{ github.event.inputs.to || steps.shas.outputs.head }}
 
   build-in-cloud:
     name: Build Docker Images in Google Cloud
