@@ -106,52 +106,6 @@ jobs:
           apps_json='${{ needs.affected.outputs.apps }}'
 
           TIMESTAMP="${{ needs.timestamp.outputs.timestamp }}"
-          BASE_CACHE_IMAGE="${DOCKER_REGISTRY}/nodejs-cache"
-          PREBUILD_CACHE_IMAGE="${DOCKER_REGISTRY}/nodejs-prebuild"
-
-          echo "steps:" > cloudbuild.yaml
-
-          cat <<EOF >> cloudbuild.yaml
-          - name: "gcr.io/cloud-builders/docker"
-            id: "build-base"
-            waitFor: ["-"]
-            env:
-              - "DOCKER_BUILDKIT=1"
-            args:
-              - build
-              - --target=dependencies
-              - --tag=${BASE_CACHE_IMAGE}
-              - .
-
-          EOF
-
-          cat <<EOF >> cloudbuild.yaml
-          - name: "gcr.io/cloud-builders/docker"
-            id: "push-base"
-            waitFor: ["build-base"]
-            env:
-              - "DOCKER_BUILDKIT=1"
-            args:
-              - push
-              - ${BASE_CACHE_IMAGE}
-
-          EOF
-
-          cat <<EOF >> cloudbuild.yaml
-          - name: "gcr.io/cloud-builders/docker"
-            id: "prebuild"
-            waitFor: ["build-base"]
-            env:
-              - "DOCKER_BUILDKIT=1"
-            args:
-              - build
-              - --target=prebuild
-              - --tag=${PREBUILD_CACHE_IMAGE}
-              - .
-
-          EOF
-
-          IMAGES=""
 
           for package in $(echo "$apps_json" | jq -r '.[]'); do
             image_name=$(echo "$package" | sed 's/^@//')
@@ -161,35 +115,32 @@ jobs:
 
             cat <<EOF >> cloudbuild.yaml
 
+          steps:
           - name: "gcr.io/cloud-builders/docker"
             id: "build-$(echo "$image_name" | tr '/' '-')"
-            waitFor: ["push-base", "prebuild"]
             env:
               - "DOCKER_BUILDKIT=1"
             args:
               - build
-              - --cache-from=${PREBUILD_CACHE_IMAGE}
               - --target=${target_name}
               - --tag=${FULL_IMAGE}:latest
               - --tag=${FULL_IMAGE}:dev-${TIMESTAMP}
               - --build-arg=sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
               - --build-arg=sentry_release=dev-${TIMESTAMP}
               - .
+          
+          images:
+            - ${FULL_IMAGE}:latest
+            - ${FULL_IMAGE}:dev-${TIMESTAMP}
           EOF
 
-            # Добавляем теги в общий список
-            IMAGES="${IMAGES}  - ${FULL_IMAGE}:latest\n  - ${FULL_IMAGE}:dev-${TIMESTAMP}\n"
+            gcloud builds submit . \
+              --config cloudbuild.yaml \
+              --region europe-west1 \
+              --async
+
+            echo "Submitted build for ${FULL_IMAGE}"
+            cat cloudbuild.yaml
+
+            rm cloudbuild.yaml
           done
-
-          echo "images:" >> cloudbuild.yaml
-          echo -e "${IMAGES}" >> cloudbuild.yaml
-
-          echo "===== Generated cloudbuild.yaml ====="
-          cat cloudbuild.yaml
-
-      - name: Submit build to Cloud Build
-        run: |
-          gcloud builds submit . \
-            --config cloudbuild.yaml \
-            --region europe-west1 \
-            --async
