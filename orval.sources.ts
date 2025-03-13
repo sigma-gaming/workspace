@@ -37,7 +37,7 @@ export const sources = {
     file: './openapi/letsauth-api.json',
     url: 'https://api.auth.local:5140/openapi/v1.json',
     watch: true,
-    targets: ['./apps/letsauth/src/shared/api/auth/generated'],
+    targets: ['./apps/letsauth-app/src/shared/api/auth/generated'],
   },
   domainApi: {
     file: './openapi/domain-api.json',
