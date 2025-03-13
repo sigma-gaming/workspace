@@ -324,7 +324,7 @@ importers:
         specifier: workspace:*
         version: link:../../tooling/env
 
-  apps/letsauth:
+  apps/letsauth-app:
     dependencies:
       '@core/client':
         specifier: workspace:*
