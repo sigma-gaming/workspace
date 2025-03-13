@@ -15,7 +15,7 @@
     "dev": "nx run-many -t dev --parallel 10",
     "dev:games": "nx run @apps/games-app:dev",
     "dev:bot": "nx run @bots/games-bot:dev",
-    "dev:auth": "nx run @apps/letsauth:dev",
+    "dev:auth": "nx run @apps/letsauth-app:dev",
     "dev:control": "nx run @apps/control-app:dev",
     "check": "CI=true pnpm nx run-many -t build test lint typecheck --parallel 5",
     "check:affected": "CI=true pnpm nx affected -t build test lint typecheck --parallel 5",

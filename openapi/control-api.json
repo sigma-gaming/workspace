@@ -1,0 +1,682 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://control-api.sigma.local:5090"
+    },
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "paths": {
+    "/maintenance/state": {
+      "get": {
+        "tags": [
+          "Maintenance"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetMaintenanceStateResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Maintenance"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateMaintenanceStatePayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateMaintenanceStatePayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateMaintenanceStatePayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateMaintenanceStateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/send": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SendNotificationPayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SendNotificationPayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SendNotificationPayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendNotificationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/actual": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Notification"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/promocodes/random": {
+      "get": {
+        "tags": [
+          "Promocodes"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratePromocodeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/promocodes/create": {
+      "post": {
+        "tags": [
+          "Promocodes"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePromocodePayload"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePromocodePayload"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/CreatePromocodePayload"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePromocodeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/details": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Account": {
+        "required": [
+          "createdAt",
+          "id",
+          "provider",
+          "providerUserFirstName",
+          "providerUserId",
+          "updatedAt",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "providerUserId": {
+            "type": "string"
+          },
+          "providerUsername": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerUserFirstName": {
+            "type": "string"
+          },
+          "providerUserLastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerUserImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/AccountProvider"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AccountProvider": {
+        "enum": [
+          "Vk",
+          "Telegram"
+        ],
+        "type": "string"
+      },
+      "CreatePromocodePayload": {
+        "required": [
+          "bonusType",
+          "campaign",
+          "count",
+          "expiresAt",
+          "isActive",
+          "maxUsages",
+          "payout",
+          "wageringMultiplier"
+        ],
+        "type": "object",
+        "properties": {
+          "campaign": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "count": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "bonusType": {
+            "$ref": "#/components/schemas/PromocodeBonusType"
+          },
+          "payout": {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int64"
+          },
+          "wageringMultiplier": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxUsages": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreatePromocodeResponse": {
+        "required": [
+          "codes"
+        ],
+        "type": "object",
+        "properties": {
+          "codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "GeneratePromocodeResponse": {
+        "required": [
+          "promocode"
+        ],
+        "type": "object",
+        "properties": {
+          "promocode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetMaintenanceStateResponse": {
+        "required": [
+          "backgroundJobsEnabled",
+          "maintenanceEnabled"
+        ],
+        "type": "object",
+        "properties": {
+          "maintenanceEnabled": {
+            "type": "boolean"
+          },
+          "backgroundJobsEnabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Notification": {
+        "required": [
+          "autoClose",
+          "autoCloseMs",
+          "createdAt",
+          "expiresAt",
+          "id",
+          "kind",
+          "message",
+          "title",
+          "withCloseButton"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/NotificationKind"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "autoClose": {
+            "type": "boolean"
+          },
+          "autoCloseMs": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withCloseButton": {
+            "type": "boolean"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NotificationKind": {
+        "enum": [
+          "Success",
+          "Info",
+          "Warning",
+          "Failure"
+        ],
+        "type": "string"
+      },
+      "Profile": {
+        "required": [
+          "createdAt",
+          "hasCustomName",
+          "id",
+          "name",
+          "updatedAt",
+          "usedProvider",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "hasCustomName": {
+            "type": "boolean"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "usedProvider": {
+            "$ref": "#/components/schemas/AccountProvider"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PromocodeBonusType": {
+        "enum": [
+          "DepositMultiplier",
+          "DepositFixed",
+          "Payout"
+        ],
+        "type": "string"
+      },
+      "SendNotificationPayload": {
+        "required": [
+          "autoClose",
+          "autoCloseMs",
+          "expiresAt",
+          "kind",
+          "message",
+          "title",
+          "withCloseButton"
+        ],
+        "type": "object",
+        "properties": {
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "message": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/NotificationKind"
+          },
+          "autoClose": {
+            "type": "boolean"
+          },
+          "autoCloseMs": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withCloseButton": {
+            "type": "boolean"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendNotificationResponse": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateMaintenanceStatePayload": {
+        "required": [
+          "backgroundJobsEnabled",
+          "maintenanceEnabled"
+        ],
+        "type": "object",
+        "properties": {
+          "maintenanceEnabled": {
+            "type": "boolean"
+          },
+          "backgroundJobsEnabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateMaintenanceStateResponse": {
+        "required": [
+          "backgroundJobsEnabled",
+          "maintenanceEnabled"
+        ],
+        "type": "object",
+        "properties": {
+          "maintenanceEnabled": {
+            "type": "boolean"
+          },
+          "backgroundJobsEnabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDetails": {
+        "required": [
+          "accounts",
+          "profile",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserPublic"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/Profile"
+          },
+          "accounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Account"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserPublic": {
+        "required": [
+          "id",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "profileId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserRole": {
+        "enum": [
+          "User",
+          "Admin",
+          "Moderator",
+          "Support"
+        ],
+        "type": "string"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "Authorization header using the Bearer scheme (session id)",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  }
+}

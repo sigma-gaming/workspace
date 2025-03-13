@@ -270,6 +270,30 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.2)(sugarss@4.0.1(postcss@8.5.1))(terser@5.39.0)
 
+  apps/control-app:
+    dependencies:
+      '@core/client':
+        specifier: workspace:*
+        version: link:../../core/client
+      '@core/exceptions':
+        specifier: workspace:*
+        version: link:../../core/exceptions
+      '@core/forms':
+        specifier: workspace:*
+        version: link:../../core/forms
+      '@core/ui':
+        specifier: workspace:*
+        version: link:../../core/ui
+      '@games/model':
+        specifier: workspace:*
+        version: link:../../games-libs/model
+      '@tooling/env':
+        specifier: workspace:*
+        version: link:../../tooling/env
+      '@tooling/env-vite-plugin':
+        specifier: workspace:*
+        version: link:../../tooling/env-vite-plugin
+
   apps/games-app:
     dependencies:
       '@core/client':

@@ -18,11 +18,20 @@ export const sources = {
     watch: true,
     targets: ['./apps/games-app/src/shared/api/core-ws/generated'],
   },
+  controlApi: {
+    file: './openapi/control-api.json',
+    url: 'https://control-api.sigma.local:5090/openapi/v1.json',
+    watch: true,
+    targets: ['./apps/control-app/src/shared/api/control/generated'],
+  },
   accessApi: {
     file: './openapi/access-api.json',
     url: 'https://access.sigma.local:5120/openapi/v1.json',
     watch: true,
-    targets: ['./apps/games-app/src/shared/api/access/generated'],
+    targets: [
+      './apps/games-app/src/shared/api/access/generated',
+      './apps/control-app/src/shared/api/access/generated',
+    ],
   },
   letsauthApi: {
     file: './openapi/letsauth-api.json',

@@ -1,23 +1,22 @@
 {
-  "name": "@apps/games-app",
+  "name": "@apps/control-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "copy-env": "copy-env",
-    "create-env": "node ./scripts/create-env.js",
-    "dev": "dotenv -e .env.development pnpm vite",
+    "dev": "dotenv -e .env.development vite",
     "build": "vite build",
     "start": "NODE_ENV=production node server.js",
     "preview": "NODE_ENV=development dotenv -e .env.development node ./server.js",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,tsx}\"",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,mts,jsx,tsx}\"",
     "lint:fix": "pnpm lint --fix"
   },
   "dependencies": {
     "@games/model": "workspace:*",
-    "@core/client": "workspace:*",
     "@core/exceptions": "workspace:*",
+    "@core/client": "workspace:*",
     "@core/forms": "workspace:*",
     "@core/ui": "workspace:*",
     "@tooling/env": "workspace:*",

@@ -79,19 +79,19 @@ COPY --from=maintenance-app-build /build/apps/maintenance-app/nginx.conf /etc/ng
 COPY --from=maintenance-app-build /build/apps/maintenance-app/dist ./
 RUN chmod -R 755 /app
 
-# APIs
+# Servers
 
-FROM base AS api-base
+FROM base AS server-base
 ENV NODE_ENV=production
 
-FROM prebuild AS letsauth-build
-RUN pnpm nx run @apis/letsauth:build
+FROM prebuild AS letsauth-app-build
+RUN pnpm nx run @apps/letsauth-app:build
 
-FROM api-base AS letsauth
-COPY --from=letsauth-build /build ./
+FROM server-base AS letsauth-app
+COPY --from=letsauth-app-build /build ./
 ENV HOST=0.0.0.0
 # PORT is set from outside
-CMD [ "node", "--max_semi_space_size=64", "apps/letsauth/dist/server/entry.mjs" ]
+CMD [ "node", "--max_semi_space_size=64", "apps/letsauth-app/dist/server/entry.mjs" ]
 
 # Bot base
 

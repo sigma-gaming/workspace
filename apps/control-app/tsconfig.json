@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "lib": [
+      "ES2020",
+      "DOM.Iterable",
+      "DOM"
+    ]
+  },
+  "include": [
+    "src",
+    "scripts",
+    "**.ts",
+    "**.js",
+    "**.mjs",
+    "**.cjs"
+  ]
+}
