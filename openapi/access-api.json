@@ -113,7 +113,7 @@
     "securitySchemes": {
       "Bearer": {
         "type": "apiKey",
-        "description": "Authorization header using the Bearer scheme (session)",
+        "description": "Authorization header using the Bearer scheme (session id)",
         "name": "Authorization",
         "in": "header"
       }
