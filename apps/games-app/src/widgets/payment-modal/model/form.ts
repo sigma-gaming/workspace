@@ -1,50 +1,85 @@
+import { createStatus, handleExceptions } from '@core/client'
+import { createField, createForm } from '@core/forms'
+import { createMutation } from '@farfetched/core'
 import { gemInt } from '@games/model'
-import { createEvent, createStore, sample } from 'effector'
-import { interval } from 'patronum'
+import { combine, createEvent, createStore, sample } from 'effector'
+import { and, condition, interval } from 'patronum'
+import { z } from 'zod'
 import {
   Currency,
   CurrencyExchangeRates,
+  DepositMethod,
+  DepositMethodConfig,
   getPaymentsCurrencyRates,
+  getPaymentsDepositMethods,
+  getPaymentsWallets,
+  getPaymentsWithdrawalMethods,
+  PaymentProvider,
+  postPaymentsDeposit,
+  postPaymentsWallets,
+  postPaymentsWithdrawal,
+  UserWallet,
+  WithdrawalMethod,
+  WithdrawalMethodConfig,
 } from '../../../shared/api/core'
 import { createApiEffect } from '../../../shared/api/effects'
 import { destroy, initialize } from './shared'
 
 export type Operation = 'deposit' | 'withdrawal'
 
-// function correctAmount(amount: number) {
-//   const correction = Math.floor(Math.random() * 50) + 1
-//   return amount + gemInt(correction)
-// }
-
-// const getConfigFx = createApiEffect('query', gamesApi.payments.getConfig.$get)
+const getDepositConfigsFx = createApiEffect(getPaymentsDepositMethods)
+const getWithdrawalConfigsFx = createApiEffect(getPaymentsWithdrawalMethods)
+const getWalletsFx = createApiEffect(getPaymentsWallets)
 const getCurrencyRatesFx = createApiEffect(getPaymentsCurrencyRates)
 
-// export const depositMutation = createMutation({
-//   name: 'payments/deposit',
-//   effect: createApiEffect('json', gamesApi.payments.deposit.$post),
-// })
+export const createWalletMutation = createMutation({
+  name: 'payments/createWallet',
+  effect: createApiEffect(postPaymentsWallets),
+})
 
-// export const withdrawMutation = createMutation({
-//   name: 'payments/withdraw',
-//   effect: createApiEffect('json', gamesApi.payments.withdraw.$post),
-// })
+export const depositMutation = createMutation({
+  name: 'payments/deposit',
+  effect: createApiEffect(postPaymentsDeposit),
+})
 
-// handleExceptions(depositMutation)
-// handleExceptions(withdrawMutation)
+export const withdrawMutation = createMutation({
+  name: 'payments/withdraw',
+  effect: createApiEffect(postPaymentsWithdrawal),
+})
+
+handleExceptions(createWalletMutation)
+handleExceptions(depositMutation)
+handleExceptions(withdrawMutation)
 
 export const operationChanged = createEvent<Operation>()
 export const refreshCorrectionAmount = createEvent()
 export const amountCorrectionRefreshed = createEvent<number>()
 
-// export const { $succeeded: $configLoaded } = createStatus(getConfigFx)
+export const { $succeeded: $depositConfigsLoaded } =
+  createStatus(getDepositConfigsFx)
+export const { $succeeded: $withdrawalConfigsLoaded } = createStatus(
+  getWithdrawalConfigsFx,
+)
 
 export const $operation = createStore<Operation>('deposit')
   .on(operationChanged, (_, operation) => operation)
   .reset(destroy)
 
-// const $config = createStore<PaymentConfigLists | null>(null)
-//   .on(getConfigFx.doneData, (_, lists) => lists)
-//   .reset(destroy)
+const $depositConfigs = createStore<DepositMethodConfig[]>([])
+  .on(getDepositConfigsFx.doneData, (_, lists) => lists)
+  .reset(destroy)
+
+const $withdrawalConfigs = createStore<WithdrawalMethodConfig[]>([])
+  .on(getWithdrawalConfigsFx.doneData, (_, lists) => lists)
+  .reset(destroy)
+
+export const $wallets = createStore<UserWallet[]>([])
+  .on(getWalletsFx.doneData, (_, wallets) => wallets)
+  .on(createWalletMutation.finished.success, (wallets, { result: wallet }) => [
+    ...wallets,
+    wallet,
+  ])
+  .reset(destroy)
 
 export const $exchangeRates = createStore<CurrencyExchangeRates | null>({
   map: {
@@ -58,140 +93,156 @@ const INITIAL_AMOUNT = gemInt(1000)
 export const $correctedAmount = createStore(INITIAL_AMOUNT)
 export const $amountCorrectedFor = createStore(INITIAL_AMOUNT)
 
-// Deposit form
-// export const fields = {
-//   amount: createField({
-//     emptyValue: INITIAL_AMOUNT,
-//   }),
-//   provider: createField<PaymentProvider | null>({
-//     emptyValue: null,
-//   }),
-//   currency: createField<Currency | null>({
-//     emptyValue: null,
-//   }),
-//   method: createField<DepositMethod | null>({
-//     emptyValue: null,
-//   }),
-// }
+export const fields = {
+  gemAmount: createField({
+    emptyValue: INITIAL_AMOUNT,
+  }),
+  provider: createField<PaymentProvider | null>({
+    emptyValue: null,
+  }),
+  currency: createField<Currency | null>({
+    emptyValue: null,
+  }),
+  method: createField<DepositMethod | WithdrawalMethod | null>({
+    emptyValue: null,
+  }),
+}
 
-// export const form = createForm({
-//   fields,
-//   schema: z.object({
-//     amount: z.number().min(1),
-//     provider: z.nativeEnum(PaymentProvider),
-//     method: z.union([
-//       z.nativeEnum(DepositMethod),
-//       z.nativeEnum(WithdrawalMethod),
-//     ]),
-//     currency: z.nativeEnum(Currency),
-//   }),
-// })
+export const form = createForm({
+  fields,
+  schema: z.object({
+    gemAmount: z.number().min(1),
+    provider: z.nativeEnum(PaymentProvider),
+    method: z.union([
+      z.nativeEnum(DepositMethod),
+      z.nativeEnum(WithdrawalMethod),
+    ]),
+    currency: z.nativeEnum(Currency),
+  }),
+})
 
-// export const $requiredFieldsFilled = and(
-//   fields.amount.$value,
-//   fields.provider.$value,
-//   fields.currency.$value,
-//   fields.method.$value,
-// )
+export const $requiredFieldsFilled = and(
+  fields.gemAmount.$value,
+  fields.provider.$value,
+  fields.currency.$value,
+  fields.method.$value,
+)
 
-// export const $methods = combine(
-//   $config,
-//   $operation,
-//   (lists, operation) => lists?.[operation] ?? [],
-// )
+export const $methods = combine(
+  $depositConfigs,
+  $withdrawalConfigs,
+  $operation,
+  (depositMethods, withdrawalMethods, operation) => {
+    const configs = operation === 'deposit' ? depositMethods : withdrawalMethods
+    return Array.from(new Set(configs.map((c) => c.method)))
+  },
+)
 
-// export const $methodConfig = combine(
-//   $methods,
-//   fields.method.$value,
-//   (methods, method) => {
-//     if (!method) return null
-//     if (methods.length === 0) return null
-//     return methods.find((c) => c.method === method) ?? null
-//   },
-// )
+export const $methodConfigs = combine(
+  $depositConfigs,
+  $withdrawalConfigs,
+  $operation,
+  $methods,
+  fields.method.$value,
+  (depositConfigs, withdrawalConfigs, operation, methods, method) => {
+    if (!method) return []
+    if (methods.length === 0) return []
+    const configs = operation === 'deposit' ? depositConfigs : withdrawalConfigs
+    return configs.filter((c) => c.method === method)
+  },
+)
 
-// export const $isP2pMethod = $methodConfig.map((methodConfig) => {
-//   return Boolean(methodConfig?.isP2p)
-// })
+export const $currencies = $methodConfigs.map((methodConfigs) => {
+  const all = methodConfigs.map((c) => c.currency)
+  return Array.from(new Set(all))
+})
 
-// export const $currencies = $methodConfig.map((methodConfig) => {
-//   return methodConfig?.currencies ?? []
-// })
+export const $currencyConfigs = combine(
+  $methodConfigs,
+  fields.currency.$value,
+  (methodConfigs, currency) => {
+    if (!currency) return []
+    return methodConfigs.filter((c) => c.currency === currency)
+  },
+)
 
-// export const $currencyConfig = combine(
-//   $currencies,
-//   fields.currency.$value,
-//   (currencies, currency) => {
-//     if (!currency) return null
-//     if (currencies.length === 0) return null
-//     return currencies.find((c) => c.currency === currency) ?? null
-//   },
-// )
+export const $providers = combine(
+  $methodConfigs,
+  fields.currency.$value,
+  (methodConfigs, currency) => {
+    if (!currency) return []
+    return methodConfigs
+      .filter((c) => c.currency === currency)
+      .map((c) => c.provider)
+  },
+)
 
-// export const $providers = $currencyConfig.map((currencyConfig) => {
-//   return currencyConfig?.providers ?? []
-// })
+export const $selectedConfig = combine(
+  $methodConfigs,
+  fields.currency.$value,
+  fields.provider.$value,
+  (methodConfigs, currency, provider) => {
+    if (!currency) return null
+    if (!provider) return null
 
-// export const $providerConfig = combine(
-//   $providers,
-//   fields.provider.$value,
-//   (providers, provider) => {
-//     if (!provider) return null
-//     if (providers.length === 0) return null
-//     return providers.find((c) => c.provider === provider) ?? null
-//   },
-// )
+    const config = methodConfigs.find(
+      (c) => c.currency === currency && c.provider === provider,
+    )
 
-// export const $exchangeRate = combine(
-//   fields.currency.$value,
-//   $exchangeRates,
-//   (currency, exchangeRates) => {
-//     if (!currency) return null
-//     if (!exchangeRates) return null
-//     return exchangeRates[currency] ?? null
-//   },
-// )
+    return config ?? null
+  },
+)
 
-// export const $exchangeRateMissing = combine(
-//   fields.currency.$value,
-//   $exchangeRates,
-//   (currency, exchangeRates) => {
-//     if (!currency) return false
-//     if (!exchangeRates) return false
-//     return typeof exchangeRates[currency] === 'undefined'
-//   },
-// )
+export const $exchangeRate = combine(
+  fields.currency.$value,
+  $exchangeRates,
+  (currency, exchangeRates) => {
+    if (!currency) return null
+    if (!exchangeRates) return null
+    return exchangeRates.map[currency] ?? null
+  },
+)
 
-// export const $totalAmount = combine(
-//   $operation,
-//   $providerConfig,
-//   $exchangeRate,
-//   $correctedAmount,
-//   (operation, providerConfig, exchangeRate, correctedAmount) => {
-//     if (typeof exchangeRate !== 'number') {
-//       return 0
-//     }
+export const $exchangeRateMissing = combine(
+  fields.currency.$value,
+  $exchangeRates,
+  (currency, exchangeRates) => {
+    if (!currency) return false
+    if (!exchangeRates) return false
+    return typeof exchangeRates.map[currency] === 'undefined'
+  },
+)
 
-//     let commissionRate = 0
+export const $totalAmount = combine(
+  $operation,
+  $selectedConfig,
+  $exchangeRate,
+  $correctedAmount,
+  (operation, config, exchangeRate, correctedAmount) => {
+    if (typeof exchangeRate !== 'number') {
+      return 0
+    }
 
-//     if (providerConfig) {
-//       commissionRate = providerConfig.entry.commissionRate
-//     }
+    let commissionRate = 0
 
-//     const currencyAmount = correctedAmount / exchangeRate
+    if (config) {
+      commissionRate = config.commissionRate
+    }
 
-//     return Math.round(
-//       operation === 'deposit'
-//         ? currencyAmount * (1 + commissionRate)
-//         : currencyAmount * (1 - commissionRate),
-//     )
-//   },
-// )
+    const currencyAmount = correctedAmount / exchangeRate
 
-// sample({
-//   clock: initialize,
-//   target: getConfigFx,
-// })
+    return Math.round(
+      operation === 'deposit'
+        ? currencyAmount * (1 + commissionRate)
+        : currencyAmount * (1 - commissionRate),
+    )
+  },
+)
+
+sample({
+  clock: initialize,
+  target: [getDepositConfigsFx, getWithdrawalConfigsFx, getCurrencyRatesFx],
+})
 
 const { tick: exchangeRatesRequested } = interval({
   start: initialize,
@@ -206,79 +257,52 @@ sample({
   target: getCurrencyRatesFx,
 })
 
-// sample({
-//   clock: $operation,
-//   target: fields.method.reset,
-// })
-
-// sample({
-//   clock: fields.method.$value,
-//   source: $currencies,
-//   fn: (currencies) => {
-//     if (currencies.length === 0) return null
-//     return currencies[0]?.currency ?? null
-//   },
-//   target: fields.currency.update,
-// })
-
-// sample({
-//   clock: fields.currency.$value,
-//   source: $providers,
-//   fn: (providers) => {
-//     if (providers.length === 0) return null
-//     return providers[0]?.provider ?? null
-//   },
-//   target: fields.provider.update,
-// })
-
-// sample({
-//   clock: $providerConfig,
-//   source: fields.amount.$value,
-//   filter: Boolean,
-//   fn: (amount, config) => {
-//     if (!config) return amount
-//     if (amount === 0) return 0
-//     const { minAmount, maxAmount } = config.entry
-//     return Math.min(maxAmount, Math.max(minAmount, amount))
-//   },
-//   target: fields.amount.update,
-// })
-
-// sample({
-//   clock: [$isP2pMethod, fields.amount.$value, refreshCorrectionAmount],
-//   source: fields.amount.$value,
-//   target: amountCorrectionRefreshed,
-// })
-
-// sample({
-//   clock: amountCorrectionRefreshed,
-//   source: $isP2pMethod,
-//   fn: (isP2pMethod, amount) => {
-//     if (!isP2pMethod) return amount
-//     return correctAmount(amount)
-//   },
-//   target: $correctedAmount,
-// })
-
 sample({
-  source: amountCorrectionRefreshed,
-  target: $amountCorrectedFor,
+  clock: $operation,
+  target: fields.method.reset,
 })
 
-// const finalValuesSubmitted = sample({
-//   clock: form.submitted,
-//   source: $correctedAmount,
-//   fn: (gemAmount, { amount, ...values }) => ({ ...values, gemAmount }),
-// })
+sample({
+  clock: fields.method.$value,
+  source: $methodConfigs,
+  fn: (configs) => {
+    if (configs.length === 0) return null
+    return configs[0]?.currency ?? null
+  },
+  target: fields.currency.update,
+})
 
-// condition({
-//   source: finalValuesSubmitted,
-//   if: $operation.map((operation) => operation === 'deposit'),
-//   then: depositMutation.start,
-//   else: withdrawMutation.start,
-// })
+sample({
+  clock: fields.currency.$value,
+  source: $currencyConfigs,
+  fn: (configs) => {
+    if (configs.length === 0) return null
+    return configs[0]?.provider ?? null
+  },
+  target: fields.provider.update,
+})
 
-// sample({
-//   clock: destroy,
-//   target: [form.reset],
-// })
+sample({
+  clock: $selectedConfig,
+  source: fields.gemAmount.$value,
+  filter: Boolean,
+  fn: (amount, config) => {
+    if (!config) return amount
+    if (amount === 0) return 0
+    const { minAmount, maxAmount } = config
+    return Math.min(maxAmount, Math.max(minAmount, amount))
+  },
+  target: fields.gemAmount.update,
+})
+
+condition({
+  source: form.submitted,
+  if: $operation.map((operation) => operation === 'deposit'),
+  then: depositMutation.start,
+  else: withdrawMutation.start,
+})
+
+sample({
+  clock: destroy,
+  target: [form.reset],
+})

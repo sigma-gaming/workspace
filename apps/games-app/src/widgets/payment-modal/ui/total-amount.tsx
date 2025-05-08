@@ -1,6 +1,13 @@
 import { Icons } from '@core/ui'
-import { ReactNode } from 'react'
+import { useUnit } from 'effector-react'
+import { memo, ReactNode } from 'react'
 import { Currency } from '../../../shared/api/core'
+import {
+  $exchangeRateMissing,
+  $exchangeRates,
+  $totalAmount,
+  fields,
+} from '../model/form'
 
 const formatters = {
   rub: new Intl.NumberFormat('ru-RU', {
@@ -65,45 +72,45 @@ export const currencyIconMap: Partial<Record<Currency, ReactNode>> = {
   [Currency.Ton]: <Icons.Ton className="size-6" />,
 }
 
-// export const TotalAmount = memo(() => {
-//   const totalAmount = useUnit($totalAmount)
-//   const selectedCurrency = useUnit(fields.currency.$value)
-//   const exchangeRates = useUnit($exchangeRates)
-//   const exchangeRateMissing = useUnit($exchangeRateMissing)
+export const TotalAmount = memo(() => {
+  const totalAmount = useUnit($totalAmount)
+  const selectedCurrency = useUnit(fields.currency.$value)
+  const exchangeRates = useUnit($exchangeRates)
+  const exchangeRateMissing = useUnit($exchangeRateMissing)
 
-//   if (!exchangeRates || !selectedCurrency) {
-//     return null
-//   }
+  if (!exchangeRates || !selectedCurrency) {
+    return null
+  }
 
-//   const icon = currencyIconMap[selectedCurrency]
+  const icon = currencyIconMap[selectedCurrency]
 
-//   if (exchangeRateMissing) {
-//     return (
-//       <div className="flex flex-col gap-2">
-//         <div className="flex items-center gap-2">
-//           {icon && <div className="shrink-0">{icon}</div>}
-//           <p className="text-4xl font-[450] truncate">?</p>
-//         </div>
-//         <p className="text-sm leading-tight text-dimmed opacity-80">
-//           К сожалению, нам не&nbsp;удалось расчитать курс обмена&nbsp;валюты.
-//           Рекомендуем проверить сумму на&nbsp;следующем шаге
-//         </p>
-//       </div>
-//     )
-//   }
+  if (exchangeRateMissing) {
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          {icon && <div className="shrink-0">{icon}</div>}
+          <p className="text-4xl font-[450] truncate">?</p>
+        </div>
+        <p className="text-sm leading-tight text-dimmed opacity-80">
+          К сожалению, нам не&nbsp;удалось расчитать курс обмена&nbsp;валюты.
+          Рекомендуем проверить сумму на&nbsp;следующем шаге
+        </p>
+      </div>
+    )
+  }
 
-//   return (
-//     <div className="flex flex-col gap-2">
-//       <div className="flex items-center gap-2">
-//         {icon && <div className="shrink-0">{icon}</div>}
-//         <p className="text-4xl font-[450] truncate">
-//           {currencyFormatterMap[selectedCurrency](totalAmount)}
-//         </p>
-//       </div>
-//       <p className="text-sm leading-tight text-dimmed opacity-80">
-//         Итоговая сумма с&nbsp;комиссией. Финальная сумма на стороне провайдера
-//         может отличаться от&nbsp;показанной
-//       </p>
-//     </div>
-//   )
-// })
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        {icon && <div className="shrink-0">{icon}</div>}
+        <p className="text-4xl font-[450] truncate">
+          {currencyFormatterMap[selectedCurrency](totalAmount)}
+        </p>
+      </div>
+      <p className="text-sm leading-tight text-dimmed opacity-80">
+        Итоговая сумма с&nbsp;комиссией. Финальная сумма на стороне провайдера
+        может отличаться от&nbsp;показанной
+      </p>
+    </div>
+  )
+})

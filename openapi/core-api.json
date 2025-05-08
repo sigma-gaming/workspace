@@ -1096,52 +1096,6 @@
         },
         "additionalProperties": false
       },
-      "AccountEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "providerUserId": {
-            "type": "string"
-          },
-          "providerUsername": {
-            "type": "string",
-            "nullable": true
-          },
-          "providerUserFirstName": {
-            "type": "string"
-          },
-          "providerUserLastName": {
-            "type": "string",
-            "nullable": true
-          },
-          "providerUserImage": {
-            "type": "string",
-            "nullable": true
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "provider": {
-            "$ref": "#/components/schemas/AccountProvider"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
-      },
       "AccountProvider": {
         "enum": [
           "Vk",
@@ -1179,77 +1133,6 @@
           },
           "balance": {
             "$ref": "#/components/schemas/BalancePublicUserUpdate"
-          }
-        },
-        "additionalProperties": false
-      },
-      "BalanceEntity": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "available": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "wageringRequired": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalBet": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalWon": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalLost": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalBetCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "maxWin": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "maxMultiplier": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "maxWinGameId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "maxMultiplierGameId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "maxMultiplierGame": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GameRecordEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "maxWinGame": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GameRecordEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
           }
         },
         "additionalProperties": false
@@ -1427,88 +1310,6 @@
           "Game"
         ],
         "type": "string"
-      },
-      "ChatMessageEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "trackingId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "text": {
-            "type": "string",
-            "nullable": true
-          },
-          "attachments": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ChatMessageAttachmentGame"
-                }
-              ]
-            }
-          },
-          "senderName": {
-            "type": "string",
-            "nullable": true
-          },
-          "senderUsername": {
-            "type": "string",
-            "nullable": true
-          },
-          "senderImage": {
-            "type": "string",
-            "nullable": true
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "isPinned": {
-            "type": "boolean"
-          },
-          "profileId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "type": {
-            "$ref": "#/components/schemas/ChatMessageType"
-          },
-          "senderRoles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserRole"
-            }
-          },
-          "profile": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ProfileEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "user": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       },
       "ChatMessagePayload": {
         "required": [
@@ -1780,13 +1581,25 @@
         },
         "additionalProperties": false
       },
-      "DepositEntity": {
+      "Deposit": {
+        "required": [
+          "createdAt",
+          "currency",
+          "currencyAmount",
+          "gemAmount",
+          "id",
+          "method",
+          "payload",
+          "provider",
+          "providerAmount",
+          "providerTransactionId",
+          "status",
+          "type",
+          "updatedAt",
+          "userId"
+        ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -1822,6 +1635,10 @@
             "format": "uuid",
             "nullable": true
           },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "providerTransactionId": {
             "type": "string"
           },
@@ -1842,17 +1659,6 @@
           },
           "type": {
             "$ref": "#/components/schemas/DepositType"
-          },
-          "transaction": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TransactionEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
           }
         },
         "additionalProperties": false
@@ -1908,8 +1714,7 @@
       },
       "DepositMethod": {
         "enum": [
-          "Plisio",
-          "CryptoCloud"
+          "Crypto"
         ],
         "type": "string"
       },
@@ -1942,7 +1747,7 @@
           "deposit": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/DepositEntity"
+                "$ref": "#/components/schemas/Deposit"
               }
             ],
             "nullable": true
@@ -2133,83 +1938,6 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "GameRecordEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "game": {
-            "$ref": "#/components/schemas/Game"
-          },
-          "outcome": {
-            "$ref": "#/components/schemas/GameOutcome"
-          },
-          "snapshot": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/GameSnapshotDice"
-              },
-              {
-                "$ref": "#/components/schemas/GameSnapshotPincode"
-              }
-            ]
-          },
-          "bet": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "multiplier": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "payout": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "previewUserName": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "transactionId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "balanceMaxMultiplierGames": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BalanceEntity"
-            }
-          },
-          "balanceMaxWinGames": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BalanceEntity"
-            }
-          },
-          "transaction": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TransactionEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
           }
         },
         "additionalProperties": false
@@ -2581,56 +2309,6 @@
         },
         "additionalProperties": false
       },
-      "NotificationEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "kind": {
-            "$ref": "#/components/schemas/NotificationKind"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "title": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "autoClose": {
-            "type": "boolean"
-          },
-          "autoCloseMs": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "withCloseButton": {
-            "type": "boolean"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "user": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
       "NotificationKind": {
         "enum": [
           "Success",
@@ -2814,291 +2492,11 @@
         },
         "additionalProperties": false
       },
-      "ProfileEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "name": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string",
-            "nullable": true
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "hasCustomName": {
-            "type": "boolean"
-          },
-          "image": {
-            "type": "string",
-            "nullable": true
-          },
-          "usedProvider": {
-            "$ref": "#/components/schemas/AccountProvider"
-          },
-          "chatMessages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ChatMessageEntity"
-            }
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PromocodeBonus": {
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/PromocodeBonusDepositFixed"
-          },
-          {
-            "$ref": "#/components/schemas/PromocodeBonusPayout"
-          },
-          {
-            "$ref": "#/components/schemas/PromocodeBonusDepositMultiplier"
-          }
-        ],
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "type",
-          "mapping": {
-            "DepositFixed": "#/components/schemas/PromocodeBonusDepositFixed",
-            "Payout": "#/components/schemas/PromocodeBonusPayout",
-            "DepositMultiplier": "#/components/schemas/PromocodeBonusDepositMultiplier"
-          }
-        }
-      },
-      "PromocodeBonusDepositFixed": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "enum": [
-              "DepositFixed"
-            ],
-            "type": "string",
-            "readOnly": true
-          },
-          "payout": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "minDeposit": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "activeHours": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PromocodeBonusDepositMultiplier": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "enum": [
-              "DepositMultiplier"
-            ],
-            "type": "string",
-            "readOnly": true
-          },
-          "multiplier": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "minDeposit": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "maxPayout": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "activeHours": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PromocodeBonusPayout": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "enum": [
-              "Payout"
-            ],
-            "type": "string",
-            "readOnly": true
-          },
-          "payout": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
       "PromocodeBonusType": {
         "enum": [
           "DepositMultiplier",
           "DepositFixed",
           "Payout"
-        ],
-        "type": "string"
-      },
-      "PromocodeEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "code": {
-            "type": "string"
-          },
-          "wageringMultiplier": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "usages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "maxUsages": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "bonus": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/PromocodeBonusDepositMultiplier"
-              },
-              {
-                "$ref": "#/components/schemas/PromocodeBonusDepositFixed"
-              },
-              {
-                "$ref": "#/components/schemas/PromocodeBonusPayout"
-              }
-            ]
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "campaign": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdBy": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "bonusType": {
-            "$ref": "#/components/schemas/PromocodeBonusType"
-          },
-          "createdByNavigation": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "promocodeUsages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PromocodeUsageEntity"
-            }
-          },
-          "user": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "PromocodeUsageEntity": {
-        "type": "object",
-        "properties": {
-          "promocodeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "status": {
-            "$ref": "#/components/schemas/PromocodeUsageStatus"
-          },
-          "promocode": {
-            "$ref": "#/components/schemas/PromocodeEntity"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PromocodeUsageStatus": {
-        "enum": [
-          "Applied",
-          "Pending"
         ],
         "type": "string"
       },
@@ -3150,59 +2548,6 @@
         },
         "additionalProperties": false
       },
-      "ReferralCampaignEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "name": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "totalVisits": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "totalSignups": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "referrerId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "referrer": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "referrerTransactions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ReferrerTransactionEntity"
-            }
-          },
-          "sessions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SessionEntity"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "ReferrerBalance": {
         "required": [
           "available",
@@ -3217,23 +2562,6 @@
           "available": {
             "type": "integer",
             "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ReferrerBalanceEntity": {
-        "type": "object",
-        "properties": {
-          "referrerId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "available": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "referrer": {
-            "$ref": "#/components/schemas/UserEntity"
           }
         },
         "additionalProperties": false
@@ -3264,28 +2592,6 @@
         },
         "additionalProperties": false
       },
-      "ReferrerPayoutEntity": {
-        "type": "object",
-        "properties": {
-          "referrerId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "nextPayoutAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lastPayoutAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "referrer": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
-      },
       "ReferrerSettings": {
         "required": [
           "referrerId",
@@ -3300,23 +2606,6 @@
           "revShare": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ReferrerSettingsEntity": {
-        "type": "object",
-        "properties": {
-          "referrerId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "revShare": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "referrer": {
-            "$ref": "#/components/schemas/UserEntity"
           }
         },
         "additionalProperties": false
@@ -3379,244 +2668,11 @@
         },
         "additionalProperties": false
       },
-      "ReferrerTransactionEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "amount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "referrerId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "isProcessed": {
-            "type": "boolean"
-          },
-          "referralId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "referralCampaignId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "referralAction": {
-            "$ref": "#/components/schemas/ReferralAction"
-          },
-          "referralName": {
-            "type": "string"
-          },
-          "referralImage": {
-            "type": "string",
-            "nullable": true
-          },
-          "referralUsername": {
-            "type": "string",
-            "nullable": true
-          },
-          "referral": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "referralCampaign": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ReferralCampaignEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "referrer": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ReferrerWithdrawalEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "amount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "referrerId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "referrer": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "SessionEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "expiresAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "roles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserRole"
-            }
-          },
-          "referrerId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "referralCampaignId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "provider": {
-            "$ref": "#/components/schemas/AccountProvider"
-          },
-          "referralCampaign": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ReferralCampaignEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "referrer": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
-      },
       "TaskStatus": {
         "enum": [
           "Pending",
           "Completed",
           "Claimed"
-        ],
-        "type": "string"
-      },
-      "TransactionEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "amount": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "gameRecordId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "type": {
-            "$ref": "#/components/schemas/TransactionType"
-          },
-          "game": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Game"
-              }
-            ],
-            "nullable": true
-          },
-          "deposits": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DepositEntity"
-            }
-          },
-          "gameRecords": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GameRecordEntity"
-            }
-          },
-          "user": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "withdrawals": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WithdrawalEntity"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "TransactionType": {
-        "enum": [
-          "Deposit",
-          "Withdrawal",
-          "Transfer",
-          "Bonus",
-          "Bet",
-          "Win",
-          "Loss",
-          "Refund"
         ],
         "type": "string"
       },
@@ -3673,220 +2729,6 @@
         },
         "additionalProperties": false
       },
-      "UserEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "profileId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "referrerId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "referralCampaignId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "virtual": {
-            "type": "boolean"
-          },
-          "roles": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserRole"
-            }
-          },
-          "accounts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AccountEntity"
-            }
-          },
-          "balance": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BalanceEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "referrer": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "profile": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ProfileEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "userSecurity": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserSecurityEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "userStats": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserStatsEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "referrerBalance": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ReferrerBalanceEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "referrerPayout": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ReferrerPayoutEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "referrerSettings": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ReferrerSettingsEntity"
-              }
-            ],
-            "nullable": true
-          },
-          "chatMessages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ChatMessageEntity"
-            }
-          },
-          "deposits": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DepositEntity"
-            }
-          },
-          "gameRecords": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GameRecordEntity"
-            }
-          },
-          "inverseReferrer": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserEntity"
-            }
-          },
-          "notifications": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NotificationEntity"
-            }
-          },
-          "promocodeCreatedByNavigations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PromocodeEntity"
-            }
-          },
-          "promocodeUsages": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PromocodeUsageEntity"
-            }
-          },
-          "promocodeUsers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PromocodeEntity"
-            }
-          },
-          "referralCampaigns": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ReferralCampaignEntity"
-            }
-          },
-          "referrerTransactionReferrals": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ReferrerTransactionEntity"
-            }
-          },
-          "referrerTransactionReferrers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ReferrerTransactionEntity"
-            }
-          },
-          "referrerWithdrawals": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ReferrerWithdrawalEntity"
-            }
-          },
-          "sessionReferrers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SessionEntity"
-            }
-          },
-          "sessionUsers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SessionEntity"
-            }
-          },
-          "transactions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TransactionEntity"
-            }
-          },
-          "withdrawals": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WithdrawalEntity"
-            }
-          },
-          "userWallets": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserWalletEntity"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "UserPublic": {
         "required": [
           "id",
@@ -3920,139 +2762,6 @@
           "Support"
         ],
         "type": "string"
-      },
-      "UserSecurityEntity": {
-        "type": "object",
-        "properties": {
-          "lastIp": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressUsdt": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressUsdc": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressTrx": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressEth": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressBtc": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressLtc": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressTon": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressDoge": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressBnb": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressXmr": {
-            "type": "string",
-            "nullable": true
-          },
-          "addressSol": {
-            "type": "string",
-            "nullable": true
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "whitelisted": {
-            "type": "boolean"
-          },
-          "ipScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressTonScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressUsdtScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressUsdcScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressTrxScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressEthScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressBtcScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressLtcScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressDogeScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressBnbScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressXmrScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "addressSolScore": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserStatsEntity": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "depositCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "withdrawCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
       },
       "UserWallet": {
         "required": [
@@ -4098,43 +2807,6 @@
         },
         "additionalProperties": false
       },
-      "UserWalletEntity": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "userId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "provider": {
-            "$ref": "#/components/schemas/PaymentProvider"
-          },
-          "currency": {
-            "$ref": "#/components/schemas/Currency"
-          },
-          "walletAddress": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
-          }
-        },
-        "additionalProperties": false
-      },
       "WithdrawResponse": {
         "required": [
           "balance",
@@ -4151,13 +2823,23 @@
         },
         "additionalProperties": false
       },
-      "WithdrawalEntity": {
+      "Withdrawal": {
+        "required": [
+          "createdAt",
+          "currency",
+          "currencyAmount",
+          "gemAmount",
+          "id",
+          "method",
+          "provider",
+          "providerAmount",
+          "providerTransactionId",
+          "status",
+          "updatedAt",
+          "userId"
+        ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -4166,15 +2848,6 @@
             "type": "string",
             "format": "date-time"
           },
-          "status": {
-            "$ref": "#/components/schemas/PaymentStatus"
-          },
-          "method": {
-            "$ref": "#/components/schemas/WithdrawalMethod"
-          },
-          "provider": {
-            "$ref": "#/components/schemas/PaymentProvider"
-          },
           "gemAmount": {
             "type": "integer",
             "format": "int64"
@@ -4182,12 +2855,6 @@
           "currencyAmount": {
             "type": "number",
             "format": "double"
-          },
-          "providerAmount": {
-            "type": "string"
-          },
-          "currency": {
-            "$ref": "#/components/schemas/Currency"
           },
           "userId": {
             "type": "string",
@@ -4198,27 +2865,34 @@
             "format": "uuid",
             "nullable": true
           },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "providerTransactionId": {
             "type": "string"
           },
-          "transaction": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TransactionEntity"
-              }
-            ],
-            "nullable": true
+          "providerAmount": {
+            "type": "string"
           },
-          "user": {
-            "$ref": "#/components/schemas/UserEntity"
+          "status": {
+            "$ref": "#/components/schemas/PaymentStatus"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "method": {
+            "$ref": "#/components/schemas/WithdrawalMethod"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/PaymentProvider"
           }
         },
         "additionalProperties": false
       },
       "WithdrawalMethod": {
         "enum": [
-          "Plisio",
-          "CryptoCloud"
+          "Crypto"
         ],
         "type": "string"
       },
@@ -4255,7 +2929,7 @@
           "withdrawal": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/WithdrawalEntity"
+                "$ref": "#/components/schemas/Withdrawal"
               }
             ],
             "nullable": true
