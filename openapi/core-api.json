@@ -573,17 +573,57 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/DepositOutput"
+                  "$ref": "#/components/schemas/Deposit"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DepositOutput"
+                  "$ref": "#/components/schemas/Deposit"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DepositOutput"
+                  "$ref": "#/components/schemas/Deposit"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -633,17 +673,57 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/WithdrawalOutput"
+                  "$ref": "#/components/schemas/Withdrawal"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WithdrawalOutput"
+                  "$ref": "#/components/schemas/Withdrawal"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WithdrawalOutput"
+                  "$ref": "#/components/schemas/Withdrawal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1586,15 +1666,15 @@
           "createdAt",
           "currency",
           "currencyAmount",
+          "flow",
+          "flowDetails",
           "gemAmount",
           "id",
           "method",
-          "payload",
           "provider",
           "providerAmount",
           "providerTransactionId",
           "status",
-          "type",
           "updatedAt",
           "userId"
         ],
@@ -1616,13 +1696,13 @@
             "type": "number",
             "format": "double"
           },
-          "payload": {
+          "flowDetails": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/DepositPayloadRedirect"
+                "$ref": "#/components/schemas/DepositFlowDetailsRedirect"
               },
               {
-                "$ref": "#/components/schemas/DepositPayloadWhiteLabel"
+                "$ref": "#/components/schemas/DepositFlowDetailsWhiteLabel"
               }
             ]
           },
@@ -1657,8 +1737,77 @@
           "provider": {
             "$ref": "#/components/schemas/PaymentProvider"
           },
-          "type": {
-            "$ref": "#/components/schemas/DepositType"
+          "flow": {
+            "$ref": "#/components/schemas/DepositFlow"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DepositFlow": {
+        "enum": [
+          "Redirect",
+          "WhiteLabel"
+        ],
+        "type": "string"
+      },
+      "DepositFlowDetails": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/DepositFlowDetailsWhiteLabel"
+          },
+          {
+            "$ref": "#/components/schemas/DepositFlowDetailsRedirect"
+          }
+        ],
+        "additionalProperties": false,
+        "discriminator": {
+          "propertyName": "flow",
+          "mapping": {
+            "WhiteLabel": "#/components/schemas/DepositFlowDetailsWhiteLabel",
+            "Redirect": "#/components/schemas/DepositFlowDetailsRedirect"
+          }
+        }
+      },
+      "DepositFlowDetailsRedirect": {
+        "required": [
+          "flow",
+          "redirectUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "flow": {
+            "enum": [
+              "Redirect"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "redirectUrl": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DepositFlowDetailsWhiteLabel": {
+        "required": [
+          "flow",
+          "instructions"
+        ],
+        "type": "object",
+        "properties": {
+          "flow": {
+            "enum": [
+              "WhiteLabel"
+            ],
+            "type": "string",
+            "readOnly": true
+          },
+          "instructions": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DepositInstructionsCryptoWallet"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -1720,6 +1869,7 @@
       },
       "DepositMethodConfig": {
         "required": [
+          "flow",
           "method"
         ],
         "type": "object",
@@ -1731,136 +1881,28 @@
         "properties": {
           "method": {
             "$ref": "#/components/schemas/DepositMethod"
+          },
+          "flow": {
+            "$ref": "#/components/schemas/DepositFlow"
           }
         },
         "additionalProperties": false
       },
-      "DepositOutput": {
-        "required": [
-          "outcome"
-        ],
+      "ErrorResponse": {
         "type": "object",
         "properties": {
-          "outcome": {
-            "$ref": "#/components/schemas/PaymentOutcome"
-          },
-          "deposit": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Deposit"
-              }
-            ],
-            "nullable": true
-          },
-          "minAmount": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "maxAmount": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "currency": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ],
-            "nullable": true
-          },
-          "method": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DepositMethod"
-              }
-            ],
-            "nullable": true
-          },
-          "provider": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PaymentProvider"
-              }
-            ],
-            "nullable": true
-          },
-          "error": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DepositPayload": {
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/DepositPayloadWhiteLabel"
-          },
-          {
-            "$ref": "#/components/schemas/DepositPayloadRedirect"
-          }
-        ],
-        "additionalProperties": false,
-        "discriminator": {
-          "propertyName": "type",
-          "mapping": {
-            "WhiteLabel": "#/components/schemas/DepositPayloadWhiteLabel",
-            "Redirect": "#/components/schemas/DepositPayloadRedirect"
-          }
-        }
-      },
-      "DepositPayloadRedirect": {
-        "required": [
-          "redirectUrl",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "enum": [
-              "Redirect"
-            ],
-            "type": "string",
-            "readOnly": true
-          },
-          "redirectUrl": {
+          "message": {
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DepositPayloadWhiteLabel": {
-        "required": [
-          "instructions",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "type": {
-            "enum": [
-              "WhiteLabel"
-            ],
-            "type": "string",
-            "readOnly": true
           },
-          "instructions": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/DepositInstructionsCryptoWallet"
-              }
-            ]
+          "path": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
-      },
-      "DepositType": {
-        "enum": [
-          "Redirect",
-          "WhiteLabel"
-        ],
-        "type": "string"
       },
       "Game": {
         "enum": [
@@ -2348,19 +2390,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "PaymentOutcome": {
-        "enum": [
-          0,
-          1,
-          2,
-          3,
-          4,
-          5,
-          6
-        ],
-        "type": "integer",
-        "format": "int32"
       },
       "PaymentProvider": {
         "enum": [
@@ -2913,74 +2942,6 @@
           "processingTimeHours": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "WithdrawalOutput": {
-        "required": [
-          "outcome"
-        ],
-        "type": "object",
-        "properties": {
-          "outcome": {
-            "$ref": "#/components/schemas/PaymentOutcome"
-          },
-          "withdrawal": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Withdrawal"
-              }
-            ],
-            "nullable": true
-          },
-          "updatedBalance": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "available": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "minAmount": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "maxAmount": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "currency": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ],
-            "nullable": true
-          },
-          "method": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/WithdrawalMethod"
-              }
-            ],
-            "nullable": true
-          },
-          "provider": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PaymentProvider"
-              }
-            ],
-            "nullable": true
-          },
-          "error": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false

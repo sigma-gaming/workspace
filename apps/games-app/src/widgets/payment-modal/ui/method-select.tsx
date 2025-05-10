@@ -1,11 +1,18 @@
 import { Icons } from '@core/ui'
 import { Radio, Skeleton } from '@mantine/core'
 import { useUnit } from 'effector-react'
-import { memo, ReactNode, useEffect, useLayoutEffect, useRef } from 'react'
+import {
+  memo,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react'
 import { DepositMethod, WithdrawalMethod } from '../../../shared/api/core'
 import {
   $depositConfigsLoaded,
-  $methods,
+  $methodOptions,
   $operation,
   $withdrawalConfigsLoaded,
   fields,
@@ -41,7 +48,7 @@ export const MethodSelect = memo(() => {
   const withdrawalConfigsLoaded = useUnit($withdrawalConfigsLoaded)
   const configsLoaded = depositConfigsLoaded && withdrawalConfigsLoaded
   const operation = useUnit($operation)
-  const methods = useUnit($methods)
+  const methods = useUnit($methodOptions)
   const selectedMethod = useUnit(fields.method.$value)
   const methodListOuterRef = useRef<HTMLDivElement>(null)
   const methodListRef = useRef<HTMLDivElement>(null)
@@ -64,7 +71,9 @@ export const MethodSelect = memo(() => {
     return colorMap[method as keyof typeof colorMap]
   }
 
-  const handleMethodListScroll = () => {
+  const handleMethodListScroll = useCallback(() => {
+    if (methods.length < 2) return
+
     const methodListOuter = methodListOuterRef.current
     const methodList = methodListRef.current
     if (!methodListOuter || !methodList) return
@@ -74,12 +83,11 @@ export const MethodSelect = memo(() => {
       methodList.scrollTop + methodList.offsetHeight === methodList.scrollHeight
     methodListOuter.dataset.topShadow = String(!isOnTop)
     methodListOuter.dataset.bottomShadow = String(!isOnBottom)
-  }
+  }, [methods])
 
   useLayoutEffect(() => {
-    if (methods.length === 0) return
     handleMethodListScroll()
-  }, [methods])
+  }, [handleMethodListScroll])
 
   useEffect(() => {
     if (!selectedMethod) return

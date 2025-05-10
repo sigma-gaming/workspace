@@ -3,11 +3,12 @@ import { createField, createForm } from '@core/forms'
 import { createMutation } from '@farfetched/core'
 import { gemInt } from '@games/model'
 import { combine, createEvent, createStore, sample } from 'effector'
-import { and, condition, interval } from 'patronum'
+import { and, condition, interval, or } from 'patronum'
 import { z } from 'zod'
 import {
   Currency,
   CurrencyExchangeRates,
+  DepositFlow,
   DepositMethod,
   DepositMethodConfig,
   getPaymentsCurrencyRates,
@@ -106,6 +107,9 @@ export const fields = {
   method: createField<DepositMethod | WithdrawalMethod | null>({
     emptyValue: null,
   }),
+  flow: createField<DepositFlow | null>({
+    emptyValue: null,
+  }),
 }
 
 export const form = createForm({
@@ -126,72 +130,113 @@ export const $requiredFieldsFilled = and(
   fields.provider.$value,
   fields.currency.$value,
   fields.method.$value,
+  or(
+    $operation.map((operation) => operation === 'withdrawal'),
+    fields.flow.$value,
+  ),
 )
 
-export const $methods = combine(
-  $depositConfigs,
-  $withdrawalConfigs,
-  $operation,
-  (depositMethods, withdrawalMethods, operation) => {
-    const configs = operation === 'deposit' ? depositMethods : withdrawalMethods
-    return Array.from(new Set(configs.map((c) => c.method)))
-  },
-)
+type Filters = {
+  [key in keyof DepositMethodConfig | keyof WithdrawalMethodConfig]?:
+    | string
+    | null
+}
 
-export const $methodConfigs = combine(
-  $depositConfigs,
-  $withdrawalConfigs,
-  $operation,
-  $methods,
+export const $filters = combine(
   fields.method.$value,
-  (depositConfigs, withdrawalConfigs, operation, methods, method) => {
-    if (!method) return []
-    if (methods.length === 0) return []
-    const configs = operation === 'deposit' ? depositConfigs : withdrawalConfigs
-    return configs.filter((c) => c.method === method)
-  },
-)
-
-export const $currencies = $methodConfigs.map((methodConfigs) => {
-  const all = methodConfigs.map((c) => c.currency)
-  return Array.from(new Set(all))
-})
-
-export const $currencyConfigs = combine(
-  $methodConfigs,
-  fields.currency.$value,
-  (methodConfigs, currency) => {
-    if (!currency) return []
-    return methodConfigs.filter((c) => c.currency === currency)
-  },
-)
-
-export const $providers = combine(
-  $methodConfigs,
-  fields.currency.$value,
-  (methodConfigs, currency) => {
-    if (!currency) return []
-    return methodConfigs
-      .filter((c) => c.currency === currency)
-      .map((c) => c.provider)
-  },
-)
-
-export const $selectedConfig = combine(
-  $methodConfigs,
   fields.currency.$value,
   fields.provider.$value,
-  (methodConfigs, currency, provider) => {
-    if (!currency) return null
-    if (!provider) return null
+  fields.flow.$value,
+  (method, currency, provider, flow): Filters => ({
+    method,
+    currency,
+    provider,
+    flow,
+  }),
+)
 
-    const config = methodConfigs.find(
-      (c) => c.currency === currency && c.provider === provider,
-    )
+function pickFilters(filters: Filters, keys: Array<keyof Filters>) {
+  const picked: Filters = {}
+  let key: keyof Filters
+  for (key in filters) {
+    if (!keys.includes(key)) continue
+    picked[key] = filters[key]
+  }
+  return picked
+}
 
-    return config ?? null
+function filter(
+  configs: Array<DepositMethodConfig | WithdrawalMethodConfig>,
+  filters: Filters,
+) {
+  return configs.filter((config) => {
+    return Object.entries(filters).every(([key, value]) => {
+      if (value === null) return true
+      return config[key as keyof typeof config] === value
+    })
+  })
+}
+
+function unique<T>(array: Array<T>) {
+  return Array.from(new Set(array))
+}
+
+export const $configs = combine(
+  $operation,
+  $depositConfigs,
+  $withdrawalConfigs,
+  (operation, depositConfigs, withdrawalConfigs) => {
+    return operation === 'deposit' ? depositConfigs : withdrawalConfigs
   },
 )
+
+export const $methodOptions = $configs.map((configs) => {
+  return unique(configs.map((config) => config.method))
+})
+
+export const $currencyOptions = combine(
+  $configs,
+  $filters,
+  (configs, filters) => {
+    return unique(
+      filter(configs, pickFilters(filters, ['method'])).map(
+        (config) => config.currency,
+      ),
+    )
+  },
+)
+
+export const $providerOptions = combine(
+  $configs,
+  $filters,
+  (configs, filters) => {
+    return unique(
+      filter(configs, pickFilters(filters, ['method', 'currency'])).map(
+        (config) => config.provider,
+      ),
+    )
+  },
+)
+
+export const $flowOptions = combine($configs, $filters, (configs, filters) => {
+  return unique(
+    filter(
+      configs,
+      pickFilters(filters, ['method', 'currency', 'provider']),
+    ).map((config) => (config as DepositMethodConfig).flow),
+  )
+})
+
+export const $filteredConfigs = combine(
+  $configs,
+  $filters,
+  (configs, filters) => filter(configs, filters),
+)
+
+export const $selectedConfig = combine($filteredConfigs, (configs) => {
+  if (configs.length !== 1) return null
+  return configs[0]!
+})
 
 export const $exchangeRate = combine(
   fields.currency.$value,
@@ -264,22 +309,23 @@ sample({
 
 sample({
   clock: fields.method.$value,
-  source: $methodConfigs,
-  fn: (configs) => {
-    if (configs.length === 0) return null
-    return configs[0]?.currency ?? null
-  },
+  source: $currencyOptions,
+  fn: (options) => options[0] ?? null,
   target: fields.currency.update,
 })
 
 sample({
   clock: fields.currency.$value,
-  source: $currencyConfigs,
-  fn: (configs) => {
-    if (configs.length === 0) return null
-    return configs[0]?.provider ?? null
-  },
+  source: $providerOptions,
+  fn: (options) => options[0] ?? null,
   target: fields.provider.update,
+})
+
+sample({
+  clock: fields.provider.$value,
+  source: $flowOptions,
+  fn: (options) => options[0] ?? null,
+  target: fields.flow.update,
 })
 
 sample({

@@ -2,13 +2,13 @@ import { Select } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { forwardRef, memo } from 'react'
 import { PaymentProvider } from '../../../shared/api/core'
-import { $operation, $providers, fields } from '../model/form'
+import { $operation, $providerOptions, fields } from '../model/form'
 
 export const ProviderSelect = memo(
   forwardRef<HTMLInputElement>((_, ref) => {
     const operation = useUnit($operation)
     const selectedProvider = useUnit(fields.provider.$value)
-    const providers = useUnit($providers)
+    const providers = useUnit($providerOptions)
 
     if (providers.length <= 1) {
       return null

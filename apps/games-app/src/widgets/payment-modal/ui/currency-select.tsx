@@ -2,12 +2,7 @@ import { Select } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { forwardRef, memo } from 'react'
 import { Currency } from '../../../shared/api/core'
-import {
-  $currencies,
-  $currencyConfigs,
-  $operation,
-  fields,
-} from '../model/form'
+import { $currencyOptions, $operation, fields } from '../model/form'
 
 const currencyLabelMap: Record<Currency, string> = {
   [Currency.Rub]: 'Рубль',
@@ -33,11 +28,10 @@ export const CurrencySelect = memo(
   forwardRef<HTMLInputElement>((_, ref) => {
     const operation = useUnit($operation)
     const selectedCurrency = useUnit(fields.currency.$value)
-    const selectedProvider = useUnit(fields.provider.$value)
-    const currencies = useUnit($currencies)
-    const currencyConfigs = useUnit($currencyConfigs)
+    const selectedMethod = useUnit(fields.method.$value)
+    const currencies = useUnit($currencyOptions)
 
-    if (currencyConfigs.length < 2) {
+    if (currencies.length < 2 || !selectedMethod) {
       return null
     }
 
@@ -50,7 +44,6 @@ export const CurrencySelect = memo(
         value={selectedCurrency ? String(selectedCurrency) : null}
         onChange={(value) => fields.currency.update(value as Currency)}
         allowDeselect={false}
-        disabled={!selectedProvider || currencies.length < 2}
         data={currencies.map((currency) => ({
           label: currencyLabelMap[currency],
           value: String(currency),
