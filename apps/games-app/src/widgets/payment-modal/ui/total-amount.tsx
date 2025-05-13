@@ -99,6 +99,8 @@ export const TotalAmount = memo(() => {
     )
   }
 
+  console.log({ totalAmount, selectedCurrency })
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">

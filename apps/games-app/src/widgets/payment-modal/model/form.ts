@@ -7,7 +7,7 @@ import { and, condition, interval, or } from 'patronum'
 import { z } from 'zod'
 import {
   Currency,
-  CurrencyExchangeRates,
+  CurrencyExchangeRate,
   DepositFlow,
   DepositMethod,
   DepositMethodConfig,
@@ -82,21 +82,25 @@ export const $wallets = createStore<UserWallet[]>([])
   ])
   .reset(destroy)
 
-export const $exchangeRates = createStore<CurrencyExchangeRates | null>({
-  map: {
-    [Currency.Rub]: gemInt(1),
-  },
-})
+export const $exchangeRates = createStore<CurrencyExchangeRate[]>([
+  { currency: Currency.Rub, gems: gemInt(1) },
+])
   .on(getCurrencyRatesFx.doneData, (_, rates) => rates)
   .reset(destroy)
 
-const INITIAL_AMOUNT = gemInt(1000)
-export const $correctedAmount = createStore(INITIAL_AMOUNT)
-export const $amountCorrectedFor = createStore(INITIAL_AMOUNT)
+export const $exchangeRatesMap = $exchangeRates.map((rates) => {
+  return rates.reduce(
+    (acc, rate) => {
+      acc[rate.currency] = rate.gems
+      return acc
+    },
+    {} as Record<Currency, number>,
+  )
+})
 
 export const fields = {
   gemAmount: createField({
-    emptyValue: INITIAL_AMOUNT,
+    emptyValue: gemInt(1000),
   }),
   provider: createField<PaymentProvider | null>({
     emptyValue: null,
@@ -240,21 +244,19 @@ export const $selectedConfig = combine($filteredConfigs, (configs) => {
 
 export const $exchangeRate = combine(
   fields.currency.$value,
-  $exchangeRates,
-  (currency, exchangeRates) => {
+  $exchangeRatesMap,
+  (currency, exchangeRatesMap) => {
     if (!currency) return null
-    if (!exchangeRates) return null
-    return exchangeRates.map[currency] ?? null
+    return exchangeRatesMap[currency] ?? null
   },
 )
 
 export const $exchangeRateMissing = combine(
   fields.currency.$value,
-  $exchangeRates,
-  (currency, exchangeRates) => {
+  $exchangeRatesMap,
+  (currency, exchangeRatesMap) => {
     if (!currency) return false
-    if (!exchangeRates) return false
-    return typeof exchangeRates.map[currency] === 'undefined'
+    return typeof exchangeRatesMap[currency] === 'undefined'
   },
 )
 
@@ -262,25 +264,22 @@ export const $totalAmount = combine(
   $operation,
   $selectedConfig,
   $exchangeRate,
-  $correctedAmount,
-  (operation, config, exchangeRate, correctedAmount) => {
+  fields.gemAmount.$value,
+  (operation, config, exchangeRate, gemAmount) => {
     if (typeof exchangeRate !== 'number') {
       return 0
     }
 
-    let commissionRate = 0
+    // let commissionRate = 0
 
-    if (config) {
-      commissionRate = config.commissionRate
-    }
+    // if (config) {
+    //   commissionRate = config.commissionRate / 100
+    // }
 
-    const currencyAmount = correctedAmount / exchangeRate
+    const currencyAmount = gemAmount / exchangeRate
 
-    return Math.round(
-      operation === 'deposit'
-        ? currencyAmount * (1 + commissionRate)
-        : currencyAmount * (1 - commissionRate),
-    )
+    // TODO: Add comission
+    return currencyAmount
   },
 )
 

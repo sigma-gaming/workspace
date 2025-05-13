@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.4",
   "info": {
     "title": "API",
     "version": "v1"
@@ -447,7 +447,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurrencyExchangeRates"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CurrencyExchangeRate"
+                  }
                 }
               }
             }
@@ -1578,85 +1581,19 @@
         ],
         "type": "string"
       },
-      "CurrencyExchangeRates": {
+      "CurrencyExchangeRate": {
         "required": [
-          "map"
+          "currency",
+          "gems"
         ],
         "type": "object",
         "properties": {
-          "map": {
-            "type": "object",
-            "properties": {
-              "Rub": {
-                "type": "number",
-                "format": "double"
-              },
-              "Kzt": {
-                "type": "number",
-                "format": "double"
-              },
-              "Kgs": {
-                "type": "number",
-                "format": "double"
-              },
-              "Uzs": {
-                "type": "number",
-                "format": "double"
-              },
-              "Uah": {
-                "type": "number",
-                "format": "double"
-              },
-              "Usd": {
-                "type": "number",
-                "format": "double"
-              },
-              "Eur": {
-                "type": "number",
-                "format": "double"
-              },
-              "Trx": {
-                "type": "number",
-                "format": "double"
-              },
-              "UsdtTrc20": {
-                "type": "number",
-                "format": "double"
-              },
-              "UsdtErc20": {
-                "type": "number",
-                "format": "double"
-              },
-              "Btc": {
-                "type": "number",
-                "format": "double"
-              },
-              "Ltc": {
-                "type": "number",
-                "format": "double"
-              },
-              "Ton": {
-                "type": "number",
-                "format": "double"
-              },
-              "Not": {
-                "type": "number",
-                "format": "double"
-              },
-              "Eth": {
-                "type": "number",
-                "format": "double"
-              },
-              "Bnb": {
-                "type": "number",
-                "format": "double"
-              },
-              "Doge": {
-                "type": "number",
-                "format": "double"
-              }
-            },
-            "additionalProperties": false
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "gems": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
