@@ -1,7 +1,7 @@
 import { GemInput, Icons } from '@core/ui'
 import { formatGem, gemFloat } from '@games/model'
 import { useUnit } from 'effector-react'
-import { forwardRef, memo, useEffect, useState } from 'react'
+import { forwardRef, memo } from 'react'
 import { $operation, $selectedConfig, fields } from '../model/form'
 
 export const AmountInput = memo(
@@ -18,22 +18,6 @@ export const AmountInput = memo(
     const gemAmount = useUnit(fields.gemAmount.$value)
     const selectedCurrency = useUnit(fields.currency.$value)
     const selectedConfig = useUnit($selectedConfig)
-    const [internal, setInternal] = useState(() => gemAmount)
-
-    useEffect(() => {
-      setInternal(gemAmount)
-    }, [gemAmount])
-
-    const syncValue = (value: number) => {
-      fields.gemAmount.update(value)
-    }
-
-    useEffect(() => {
-      const input = ref.current
-      if (!input) return
-      if (document.activeElement === input) return
-      syncValue(internal)
-    }, [ref, internal])
 
     const getRequirements = () => {
       if (!selectedConfig) return null
@@ -62,20 +46,10 @@ export const AmountInput = memo(
           'Сумма гемов к ' + (operation === 'deposit' ? 'пополнению' : 'выводу')
         }
         placeholder="Введите сумму"
-        value={internal}
-        onChange={setInternal}
-        onBlur={() => {
-          let updated = internal
-
-          if (selectedConfig) {
-            const { minAmount, maxAmount } = selectedConfig
-            if (internal < minAmount) updated = minAmount
-            else if (internal > maxAmount) updated = maxAmount
-          }
-
-          setInternal(updated)
-          syncValue(updated)
-        }}
+        value={gemAmount}
+        onChange={fields.gemAmount.update}
+        min={selectedConfig?.minAmount ?? 1}
+        max={selectedConfig?.maxAmount ?? 10000}
         disabled={!selectedCurrency}
         leftSectionPointerEvents="none"
         leftSection={<Icons.Gem className="mx-2 size-5 text-primary-400" />}

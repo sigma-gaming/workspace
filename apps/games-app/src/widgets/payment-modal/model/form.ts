@@ -270,16 +270,17 @@ export const $totalAmount = combine(
       return 0
     }
 
-    // let commissionRate = 0
+    let commissionRate = 0
 
-    // if (config) {
-    //   commissionRate = config.commissionRate / 100
-    // }
+    if (config) {
+      commissionRate = config.commissionRate / 10000
+    }
 
     const currencyAmount = gemAmount / exchangeRate
 
-    // TODO: Add comission
-    return currencyAmount
+    return operation === 'deposit'
+      ? currencyAmount * (1 + commissionRate)
+      : currencyAmount * (1 - commissionRate)
   },
 )
 
@@ -336,6 +337,20 @@ sample({
     if (amount === 0) return 0
     const { minAmount, maxAmount } = config
     return Math.min(maxAmount, Math.max(minAmount, amount))
+  },
+  target: fields.gemAmount.update,
+})
+
+sample({
+  clock: fields.gemAmount.$value,
+  source: $selectedConfig,
+  filter: (config, gemAmount) => {
+    if (!config) return false
+    return gemAmount > config.maxAmount || gemAmount < config.minAmount
+  },
+  fn: (config, gemAmount) => {
+    if (!config) return gemAmount
+    return Math.min(config.maxAmount, Math.max(config.minAmount, gemAmount))
   },
   target: fields.gemAmount.update,
 })
