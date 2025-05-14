@@ -1,5 +1,5 @@
 import { GemInput, Icons } from '@core/ui'
-import { formatGem, gemFloat } from '@games/model'
+import { formatGem, gemFloat, gemInt } from '@games/model'
 import { useUnit } from 'effector-react'
 import { forwardRef, memo } from 'react'
 import { $operation, $selectedConfig, fields } from '../model/form'
@@ -48,8 +48,8 @@ export const AmountInput = memo(
         placeholder="Введите сумму"
         value={gemAmount}
         onChange={fields.gemAmount.update}
-        min={selectedConfig?.minAmount ?? 1}
-        max={selectedConfig?.maxAmount ?? 10000}
+        min={selectedConfig?.minAmount ?? gemInt(1)}
+        max={selectedConfig?.maxAmount ?? gemInt(10000)}
         disabled={!selectedCurrency}
         leftSectionPointerEvents="none"
         leftSection={<Icons.Gem className="mx-2 size-5 text-primary-400" />}
