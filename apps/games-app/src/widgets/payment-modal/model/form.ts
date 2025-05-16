@@ -2,7 +2,8 @@ import { createStatus, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { createMutation } from '@farfetched/core'
 import { gemInt } from '@games/model'
-import { combine, createEvent, createStore, sample } from 'effector'
+import { $$modals } from 'apps/games-app/src/routing'
+import { combine, createStore, sample } from 'effector'
 import { and, condition, interval, or } from 'patronum'
 import { z } from 'zod'
 import {
@@ -24,9 +25,8 @@ import {
   WithdrawalMethodConfig,
 } from '../../../shared/api/core'
 import { createApiEffect } from '../../../shared/api/effects'
+import { Operation } from './modal'
 import { destroy, initialize } from './shared'
-
-export type Operation = 'deposit' | 'withdrawal'
 
 const getDepositConfigsFx = createApiEffect(getPaymentsDepositMethods)
 const getWithdrawalConfigsFx = createApiEffect(getPaymentsWithdrawalMethods)
@@ -52,19 +52,19 @@ handleExceptions(createWalletMutation)
 handleExceptions(depositMutation)
 handleExceptions(withdrawMutation)
 
-export const operationChanged = createEvent<Operation>()
-export const refreshCorrectionAmount = createEvent()
-export const amountCorrectionRefreshed = createEvent<number>()
-
 export const { $succeeded: $depositConfigsLoaded } =
   createStatus(getDepositConfigsFx)
 export const { $succeeded: $withdrawalConfigsLoaded } = createStatus(
   getWithdrawalConfigsFx,
 )
 
-export const $operation = createStore<Operation>('deposit')
-  .on(operationChanged, (_, operation) => operation)
-  .reset(destroy)
+export const $operation = $$modals.$active.map((modal) => {
+  if (modal === Operation.Deposit || modal === Operation.Withdrawal) {
+    return modal
+  }
+
+  return null
+})
 
 const $depositConfigs = createStore<DepositMethodConfig[]>([])
   .on(getDepositConfigsFx.doneData, (_, lists) => lists)
@@ -135,7 +135,7 @@ export const $requiredFieldsFilled = and(
   fields.currency.$value,
   fields.method.$value,
   or(
-    $operation.map((operation) => operation === 'withdrawal'),
+    $operation.map((operation) => operation === Operation.Withdrawal),
     fields.flow.$value,
   ),
 )
@@ -303,8 +303,10 @@ sample({
 })
 
 sample({
-  clock: $operation,
-  target: fields.method.reset,
+  clock: [$operation, getDepositConfigsFx.done, getWithdrawalConfigsFx.done],
+  source: $methodOptions,
+  fn: (options) => options[0] ?? null,
+  target: fields.method.update,
 })
 
 sample({
@@ -357,7 +359,7 @@ sample({
 
 condition({
   source: form.submitted,
-  if: $operation.map((operation) => operation === 'deposit'),
+  if: $operation.map((operation) => operation === Operation.Deposit),
   then: depositMutation.start,
   else: withdrawMutation.start,
 })

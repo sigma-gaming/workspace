@@ -1,7 +1,7 @@
 import { GemInput, Icons } from '@core/ui'
 import { formatGem, gemFloat, gemInt } from '@games/model'
 import { useUnit } from 'effector-react'
-import { forwardRef, memo } from 'react'
+import { forwardRef, memo, useEffect } from 'react'
 import { $operation, $selectedConfig, fields } from '../model/form'
 
 export const AmountInput = memo(
@@ -15,6 +15,7 @@ export const AmountInput = memo(
     }
 
     const operation = useUnit($operation)
+    const provider = useUnit(fields.provider.$value)
     const gemAmount = useUnit(fields.gemAmount.$value)
     const selectedCurrency = useUnit(fields.currency.$value)
     const selectedConfig = useUnit($selectedConfig)
@@ -31,6 +32,11 @@ export const AmountInput = memo(
       const length = requirements?.length ?? 0
       return Math.max(length * 7 + 24, 12)
     }
+
+    useEffect(() => {
+      if (!provider) return
+      ref.current?.focus()
+    }, [ref, provider])
 
     return (
       <GemInput

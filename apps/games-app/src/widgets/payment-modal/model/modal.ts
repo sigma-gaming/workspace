@@ -1,10 +1,21 @@
-import { createEvent, createStore } from 'effector'
+import { $$modals } from 'apps/games-app/src/routing'
 
-export const openDeposit = createEvent()
-export const openWithdraw = createEvent()
-export const close = createEvent()
+export enum Operation {
+  Deposit = 'deposit',
+  Withdrawal = 'withdrawal',
+}
 
-export const $opened = createStore(false)
-  .on(openDeposit, () => true)
-  .on(openWithdraw, () => true)
-  .on(close, () => false)
+const openDeposit = $$modals.open.prepend(() => Operation.Deposit)
+const openWithdrawal = $$modals.open.prepend(() => Operation.Withdrawal)
+const close = $$modals.close
+
+const $opened = $$modals.$active.map((modal) => {
+  return modal === Operation.Deposit || modal === Operation.Withdrawal
+})
+
+export const $$paymentModal = {
+  $opened,
+  openDeposit,
+  openWithdrawal,
+  close,
+}

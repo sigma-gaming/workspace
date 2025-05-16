@@ -108,7 +108,7 @@ export const MiniProfile = () => {
         </Menu.Item>
 
         <Menu.Item
-          onClick={() => $$paymentModal.openWithdraw()}
+          onClick={() => $$paymentModal.openWithdrawal()}
           leftSection={
             <IconCoins style={{ width: rem(16), height: rem(16) }} />
           }

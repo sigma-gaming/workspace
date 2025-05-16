@@ -18,7 +18,59 @@
     @apply text-yellow-400 bg-yellow-400 bg-opacity-25;
   }
 
+  &[data-color="amber"] {
+    @apply text-amber-400 bg-amber-400 bg-opacity-25;
+  }
+
   &[data-color="green"] {
     @apply text-green-400 bg-green-400 bg-opacity-25;
+  }
+
+  &[data-color="emerald"] {
+    @apply text-emerald-400 bg-emerald-400 bg-opacity-25;
+  }
+
+  &[data-color="sky"] {
+    @apply text-sky-400 bg-sky-400 bg-opacity-25;
+  }
+
+  &[data-color="cyan"] {
+    @apply text-cyan-400 bg-cyan-400 bg-opacity-25;
+  }
+
+  &[data-color="blue"] {
+    @apply text-blue-400 bg-blue-400 bg-opacity-25;
+  }
+
+  &[data-color="indigo"] {
+    @apply text-indigo-400 bg-indigo-400 bg-opacity-25;
+  }
+
+  &[data-color="purple"] {
+    @apply text-purple-400 bg-purple-400 bg-opacity-25;
+  }
+
+  &[data-color="pink"] {
+    @apply text-pink-400 bg-pink-400 bg-opacity-25;
+  }
+
+  &[data-color="rose"] {
+    @apply text-rose-400 bg-rose-400 bg-opacity-25;
+  }
+
+  &[data-color="violet"] {
+    @apply text-violet-400 bg-violet-400 bg-opacity-25;
+  }
+
+  &[data-color="teal"] {
+    @apply text-teal-400 bg-teal-400 bg-opacity-25;
+  }
+
+  &[data-color="lime"] {
+    @apply text-lime-400 bg-lime-400 bg-opacity-25;
+  }
+
+  &[data-color="fuchsia"] {
+    @apply text-fuchsia-400 bg-fuchsia-400 bg-opacity-25;
   }
 }

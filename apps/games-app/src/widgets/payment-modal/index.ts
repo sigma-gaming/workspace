@@ -1,2 +1,2 @@
-export { $$paymentModal } from './model'
+export { $$paymentModal } from './model/modal'
 export { PaymentModal } from './view'

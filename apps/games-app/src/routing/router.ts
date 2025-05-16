@@ -1,4 +1,4 @@
-import { createHistoryRouter } from 'atomic-router'
+import { createHistoryRouter, UnmappedRouteObject } from 'atomic-router'
 import {
   affiliate,
   bonuses,
@@ -19,7 +19,7 @@ const routes = [
   { path: '/affiliate', route: affiliate },
   { path: '/callbacks/payment/success', route: paymentSuccessCallback },
   { path: '/callbacks/payment/failure', route: paymentFailureCallback },
-]
+] satisfies UnmappedRouteObject<any>[]
 
 export const router = createHistoryRouter({
   routes,

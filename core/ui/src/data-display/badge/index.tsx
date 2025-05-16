@@ -2,7 +2,24 @@ import clsx from 'clsx'
 import { ReactNode } from 'react'
 import styles from './styles.module.css'
 
-export type BadgeColor = 'red' | 'orange' | 'yellow' | 'green'
+export type BadgeColor =
+  | 'red'
+  | 'orange'
+  | 'yellow'
+  | 'green'
+  | 'emerald'
+  | 'sky'
+  | 'cyan'
+  | 'blue'
+  | 'indigo'
+  | 'purple'
+  | 'pink'
+  | 'rose'
+  | 'amber'
+  | 'fuchsia'
+  | 'violet'
+  | 'teal'
+  | 'lime'
 
 type Props = {
   className?: string

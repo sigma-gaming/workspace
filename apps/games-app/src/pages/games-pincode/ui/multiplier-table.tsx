@@ -1,6 +1,7 @@
 import { Badge, BadgeColor } from '@core/ui'
 import clsx from 'clsx'
 import { useUnit } from 'effector-react'
+import { PincodeMode } from '../../../shared/api/core'
 import { getPincodeMultiplierMap } from '../lib/config'
 import { $$pincodePage } from '../model'
 import styles from './styles.module.css'
@@ -17,11 +18,25 @@ const combinedCombinations: Array<{
   },
 ]
 
-function getColor(multiplier: number) {
-  if (multiplier >= 250) return 'green'
-  if (multiplier >= 100) return 'yellow'
-  if (multiplier >= 50) return 'orange'
-  return 'red'
+function getEasyColor(multiplier: number): BadgeColor {
+  if (multiplier >= 270) return 'amber'
+  if (multiplier >= 135) return 'rose'
+  if (multiplier >= 100) return 'fuchsia'
+  if (multiplier >= 50) return 'violet'
+  return 'sky'
+}
+
+function getHardcoreColor(multiplier: number): BadgeColor {
+  if (multiplier >= 750) return 'amber'
+  if (multiplier >= 400) return 'rose'
+  if (multiplier >= 300) return 'fuchsia'
+  if (multiplier >= 100) return 'violet'
+  return 'sky'
+}
+
+function getColor(mode: PincodeMode, multiplier: number) {
+  if (mode === PincodeMode.Easy) return getEasyColor(multiplier)
+  return getHardcoreColor(multiplier)
 }
 
 export const MultiplierTable = () => {
@@ -73,7 +88,7 @@ export const MultiplierTable = () => {
           key={label}
           label={label}
           multiplier={multiplier}
-          color={getColor(multiplier)}
+          color={getColor(mode, multiplier)}
           highlighted={
             Boolean(highlightedCombination) &&
             combinations.includes(highlightedCombination!)

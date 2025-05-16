@@ -166,6 +166,9 @@ export const theme = createTheme({
     }),
     Select: Select.extend({
       classNames: selectClassNames,
+      defaultProps: {
+        rightSectionPointerEvents: 'none',
+      },
     }),
     Switch: Switch.extend({
       classNames: switchClassNames,

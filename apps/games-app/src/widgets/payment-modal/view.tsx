@@ -3,6 +3,7 @@ import { Button, Modal } from '@mantine/core'
 import { IconCoins, IconWallet } from '@tabler/icons-react'
 import { useUnit } from 'effector-react'
 import { memo, useEffect, useRef } from 'react'
+import { $$modals } from '../../routing'
 import {
   $operation,
   $requiredFieldsFilled,
@@ -11,7 +12,8 @@ import {
   form,
   withdrawMutation,
 } from './model/form'
-import { $opened, close } from './model/modal'
+import { $$paymentModal } from './model/modal'
+import { destroy, initialize } from './model/shared'
 import { AmountInput } from './ui/amount-input'
 import { CurrencySelect } from './ui/currency-select'
 import { MethodSelect } from './ui/method-select'
@@ -20,12 +22,21 @@ import { ProviderSelect } from './ui/provider-select'
 import { TotalAmount } from './ui/total-amount'
 
 export const PaymentModal = memo(() => {
-  const opened = useUnit($opened)
+  const opened = useUnit($$paymentModal.$opened)
   const operation = useUnit($operation)
   const isDesktop = useMedia({ from: 'md' })
 
+  useEffect(() => {
+    if (!opened) return
+    initialize()
+    return () => {
+      // delay for modal animation
+      setTimeout(destroy, 200)
+    }
+  }, [opened])
+
   return (
-    <Modal.Root opened={opened} onClose={close} size="lg" centered>
+    <Modal.Root opened={opened} onClose={$$modals.close} size="lg" centered>
       <Modal.Overlay />
       <Modal.Content>
         <form

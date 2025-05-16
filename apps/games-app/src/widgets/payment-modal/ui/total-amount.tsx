@@ -104,7 +104,7 @@ export const TotalAmount = memo(() => {
       <div className="flex items-center gap-2">
         {icon && <div className="shrink-0">{icon}</div>}
         <p className="text-4xl font-[450] truncate">
-          {currencyFormatterMap[selectedCurrency](totalAmount)}
+          ≈ {currencyFormatterMap[selectedCurrency](totalAmount)}
         </p>
       </div>
       <p className="text-sm leading-tight text-dimmed opacity-80">

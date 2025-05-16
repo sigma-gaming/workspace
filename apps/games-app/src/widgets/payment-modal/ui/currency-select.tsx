@@ -31,7 +31,7 @@ export const CurrencySelect = memo(
     const selectedMethod = useUnit(fields.method.$value)
     const currencies = useUnit($currencyOptions)
 
-    if (currencies.length < 2 || !selectedMethod) {
+    if (!selectedMethod) {
       return null
     }
 
