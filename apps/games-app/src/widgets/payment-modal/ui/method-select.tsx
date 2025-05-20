@@ -13,10 +13,10 @@ import { DepositMethod, WithdrawalMethod } from '../../../shared/api/core'
 import {
   $depositConfigsLoaded,
   $methodOptions,
-  $operation,
   $withdrawalConfigsLoaded,
   fields,
 } from '../model/form'
+import { $operation } from '../model/modal'
 import styles from './method-select.module.css'
 
 const depositMethodLabelMap: Record<DepositMethod, string> = {

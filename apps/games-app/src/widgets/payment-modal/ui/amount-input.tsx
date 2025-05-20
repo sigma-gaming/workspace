@@ -2,7 +2,8 @@ import { GemInput, Icons } from '@core/ui'
 import { formatGem, gemFloat, gemInt } from '@games/model'
 import { useUnit } from 'effector-react'
 import { forwardRef, memo, useEffect } from 'react'
-import { $operation, $selectedConfig, fields } from '../model/form'
+import { $selectedConfig, fields } from '../model/form'
+import { $operation } from '../model/modal'
 
 export const AmountInput = memo(
   forwardRef<HTMLInputElement>((_, ref) => {

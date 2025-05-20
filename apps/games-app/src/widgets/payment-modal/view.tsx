@@ -5,15 +5,14 @@ import { useUnit } from 'effector-react'
 import { memo, useEffect, useRef } from 'react'
 import { $$modals } from '../../routing'
 import {
-  $operation,
+  $creatingPayment,
   $requiredFieldsFilled,
-  depositMutation,
   fields,
   form,
-  withdrawMutation,
 } from './model/form'
-import { $$paymentModal } from './model/modal'
+import { $opened, $operation } from './model/modal'
 import { destroy, initialize } from './model/shared'
+import { closePayment } from './model/status'
 import { AmountInput } from './ui/amount-input'
 import { CurrencySelect } from './ui/currency-select'
 import { MethodSelect } from './ui/method-select'
@@ -22,7 +21,7 @@ import { ProviderSelect } from './ui/provider-select'
 import { TotalAmount } from './ui/total-amount'
 
 export const PaymentModal = memo(() => {
-  const opened = useUnit($$paymentModal.$opened)
+  const opened = useUnit($opened)
   const operation = useUnit($operation)
   const isDesktop = useMedia({ from: 'md' })
 
@@ -36,7 +35,15 @@ export const PaymentModal = memo(() => {
   }, [opened])
 
   return (
-    <Modal.Root opened={opened} onClose={$$modals.close} size="lg" centered>
+    <Modal.Root
+      opened={opened}
+      onClose={() => {
+        $$modals.close()
+        closePayment()
+      }}
+      size="lg"
+      centered
+    >
       <Modal.Overlay />
       <Modal.Content>
         <form
@@ -111,14 +118,16 @@ const FormStart = memo(() => {
 
 const FormFinish = memo(() => {
   const requiredFieldsFilled = useUnit($requiredFieldsFilled)
-  const { pending: depositPending } = useUnit(depositMutation)
-  const { pending: withdrawPending } = useUnit(withdrawMutation)
-  const pending = depositPending || withdrawPending
+  const creatingPayment = useUnit($creatingPayment)
 
   return (
     <div className="grow flex flex-col gap-4 justify-end">
       <TotalAmount />
-      <Button type="submit" loading={pending} disabled={!requiredFieldsFilled}>
+      <Button
+        type="submit"
+        loading={creatingPayment}
+        disabled={!requiredFieldsFilled}
+      >
         Продолжить
       </Button>
     </div>

@@ -2,8 +2,7 @@ import { createStatus, handleExceptions } from '@core/client'
 import { createField, createForm } from '@core/forms'
 import { createMutation } from '@farfetched/core'
 import { gemInt } from '@games/model'
-import { $$modals } from 'apps/games-app/src/routing'
-import { combine, createStore, sample } from 'effector'
+import { combine, createEffect, createStore, sample } from 'effector'
 import { and, condition, interval, or } from 'patronum'
 import { z } from 'zod'
 import {
@@ -25,8 +24,9 @@ import {
   WithdrawalMethodConfig,
 } from '../../../shared/api/core'
 import { createApiEffect } from '../../../shared/api/effects'
-import { Operation } from './modal'
+import { $operation, Operation } from './modal'
 import { destroy, initialize } from './shared'
+import { paymentCreated } from './status'
 
 const getDepositConfigsFx = createApiEffect(getPaymentsDepositMethods)
 const getWithdrawalConfigsFx = createApiEffect(getPaymentsWithdrawalMethods)
@@ -58,13 +58,10 @@ export const { $succeeded: $withdrawalConfigsLoaded } = createStatus(
   getWithdrawalConfigsFx,
 )
 
-export const $operation = $$modals.$active.map((modal) => {
-  if (modal === Operation.Deposit || modal === Operation.Withdrawal) {
-    return modal
-  }
-
-  return null
-})
+export const $creatingPayment = or(
+  depositMutation.$pending,
+  withdrawMutation.$pending,
+)
 
 const $depositConfigs = createStore<DepositMethodConfig[]>([])
   .on(getDepositConfigsFx.doneData, (_, lists) => lists)
@@ -362,6 +359,31 @@ condition({
   if: $operation.map((operation) => operation === Operation.Deposit),
   then: depositMutation.start,
   else: withdrawMutation.start,
+})
+
+sample({
+  clock: depositMutation.finished.success,
+  fn: ({ result }) => result.id,
+  target: paymentCreated,
+})
+
+sample({
+  clock: depositMutation.finished.success,
+  filter: ({ result }) => result.flow === DepositFlow.Redirect,
+  fn: ({ result }) => {
+    if (result.flowDetails.flow !== DepositFlow.Redirect)
+      throw new Error('Invalid flow')
+    return result.flowDetails.redirectUrl
+  },
+  target: createEffect((url: string) => {
+    window.open(url)
+  }),
+})
+
+sample({
+  clock: withdrawMutation.finished.success,
+  fn: ({ result }) => result.id,
+  target: paymentCreated,
 })
 
 sample({

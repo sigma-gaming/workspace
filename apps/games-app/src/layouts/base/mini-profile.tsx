@@ -17,7 +17,10 @@ import { $$session } from '../../entities/session/index.ts'
 import { $$user } from '../../entities/user'
 import { routes } from '../../routing'
 import { AuthenticationAction } from '../../shared/api/access/index.ts'
-import { $$paymentModal } from '../../widgets/payment-modal'
+import {
+  openDeposit,
+  openWithdrawal,
+} from '../../widgets/payment-modal/model/modal.ts'
 import { Balance } from './balance.tsx'
 
 function useAvatarSize() {
@@ -99,7 +102,7 @@ export const MiniProfile = () => {
 
         <Menu.Item
           className="text-green-400"
-          onClick={() => $$paymentModal.openDeposit()}
+          onClick={() => openDeposit()}
           leftSection={
             <IconWallet style={{ width: rem(16), height: rem(16) }} />
           }
@@ -108,7 +111,7 @@ export const MiniProfile = () => {
         </Menu.Item>
 
         <Menu.Item
-          onClick={() => $$paymentModal.openWithdrawal()}
+          onClick={() => openWithdrawal()}
           leftSection={
             <IconCoins style={{ width: rem(16), height: rem(16) }} />
           }

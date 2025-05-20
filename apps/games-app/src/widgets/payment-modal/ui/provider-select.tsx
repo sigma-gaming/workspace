@@ -2,7 +2,8 @@ import { Select } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { forwardRef, memo } from 'react'
 import { PaymentProvider } from '../../../shared/api/core'
-import { $operation, $providerOptions, fields } from '../model/form'
+import { $providerOptions, fields } from '../model/form'
+import { $operation } from '../model/modal'
 
 export const ProviderSelect = memo(
   forwardRef<HTMLInputElement>((_, ref) => {

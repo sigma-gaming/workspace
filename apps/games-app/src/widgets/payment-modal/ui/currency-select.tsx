@@ -2,7 +2,8 @@ import { Select } from '@mantine/core'
 import { useUnit } from 'effector-react'
 import { forwardRef, memo } from 'react'
 import { Currency } from '../../../shared/api/core'
-import { $currencyOptions, $operation, fields } from '../model/form'
+import { $currencyOptions, fields } from '../model/form'
+import { $operation } from '../model/modal'
 
 const currencyLabelMap: Record<Currency, string> = {
   [Currency.Rub]: 'Рубль',
