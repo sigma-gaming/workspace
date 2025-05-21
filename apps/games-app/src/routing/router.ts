@@ -4,6 +4,7 @@ import {
   bonuses,
   diceGame,
   games,
+  loading,
   paymentFailureCallback,
   paymentSuccessCallback,
   pincodeGame,
@@ -19,6 +20,7 @@ const routes = [
   { path: '/affiliate', route: affiliate },
   { path: '/callbacks/payment/success', route: paymentSuccessCallback },
   { path: '/callbacks/payment/failure', route: paymentFailureCallback },
+  { path: '/loading', route: loading },
 ] satisfies UnmappedRouteObject<any>[]
 
 export const router = createHistoryRouter({

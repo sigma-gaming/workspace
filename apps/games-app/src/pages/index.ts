@@ -5,6 +5,7 @@ import { PaymentSuccessCallbackPage } from './callbacks/payment-success'
 import { GamesPage } from './games'
 import { DiceGamePage } from './games-dice'
 import { PincodeGamePage } from './games-pincode'
+import { LoadingPage } from './loading'
 import { SettingsPage } from './settings'
 
 export const PAGES = [
@@ -16,4 +17,5 @@ export const PAGES = [
   PaymentSuccessCallbackPage,
   PaymentFailureCallbackPage,
   AffiliatePage,
+  LoadingPage,
 ]

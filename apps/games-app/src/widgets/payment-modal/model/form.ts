@@ -28,6 +28,14 @@ import { $operation, Operation } from './modal'
 import { destroy, initialize } from './shared'
 import { paymentCreated } from './status'
 
+export function checkRedirectUrl() {
+  const redirectUrl = localStorage.getItem('payment/redirect-url')
+  if (!redirectUrl) return false
+  localStorage.removeItem('payment/redirect-url')
+  window.location.href = redirectUrl
+  return true
+}
+
 const getDepositConfigsFx = createApiEffect(getPaymentsDepositMethods)
 const getWithdrawalConfigsFx = createApiEffect(getPaymentsWithdrawalMethods)
 const getWalletsFx = createApiEffect(getPaymentsWallets)
@@ -362,6 +370,21 @@ condition({
 })
 
 sample({
+  clock: form.submitted,
+  source: {
+    config: $selectedConfig,
+    operation: $operation,
+  },
+  filter: ({ config, operation }) => {
+    if (operation !== Operation.Deposit) return false
+    return (config as DepositMethodConfig).flow === DepositFlow.Redirect
+  },
+  target: createEffect(() => {
+    window.open('/loading')
+  }),
+})
+
+sample({
   clock: depositMutation.finished.success,
   fn: ({ result }) => result.id,
   target: paymentCreated,
@@ -376,7 +399,7 @@ sample({
     return result.flowDetails.redirectUrl
   },
   target: createEffect((url: string) => {
-    window.open(url)
+    localStorage.setItem('payment/redirect-url', url)
   }),
 })
 
