@@ -33,3 +33,6 @@ Thumbs.db
 
 # Next.js
 .next
+
+# Local development certificates
+ssl/local.*
